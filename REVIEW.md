@@ -2,6 +2,8 @@
 
 Reviewed: 2026-11-01
 
+Follow-up security review: see SECURITY.md for the newer authentication rules, 22-group regression results, and remaining deployment boundaries.
+
 All reproduced findings from the two reviews and follow-up failure-path checks have been addressed. This records the tested scope; it is not a claim that software can be guaranteed defect-free.
 
 ## Changes

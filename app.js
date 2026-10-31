@@ -48,7 +48,12 @@
       this.setToken(data.token);
       return data;
     },
-    logout: function () { this.clearToken(); },
+    logout: async function () {
+      if (!this.getToken()) return;
+      const res = await fetch(API + "/api/auth/logout", { method: "POST", headers: this.headers() });
+      if (!res.ok && res.status !== 401) throw new Error("Sign out failed. Please try again.");
+      this.clearToken();
+    },
     me: async function () {
       const t = this.getToken();
       if (!t) return null;
@@ -631,13 +636,17 @@
       var out = document.createElement("button");
       out.className = "pf-acct-item";
       out.textContent = "Sign out";
-      out.onclick = function () {
-        closeAcctMenu();
-        Auth.logout();
-        PFGoogle.disableAutoSelect();
-        updateAuthButton();
-        notifyAuthChange(0);
-        if (typeof window.toast === "function") window.toast("Signed out", true);
+      out.onclick = async function () {
+        out.disabled = true;
+        try {
+          await Auth.logout();
+          closeAcctMenu();
+          PFGoogle.disableAutoSelect();
+          updateAuthButton();
+          notifyAuthChange(0);
+          if (typeof window.toast === "function") window.toast("Signed out", true);
+        } catch (e) { if (typeof window.toast === "function") window.toast(e.message, false); }
+        finally { out.disabled = false; }
       };
       acctMenu.appendChild(out);
       document.body.appendChild(acctMenu);

@@ -12,17 +12,19 @@ try {
 }
 
 const express = require("express");
-const cors = require("cors");
+const security = require("./security");
 const { register, login, findOrCreateGoogleUser, getUserById, updateProfile, authMiddleware } = require("./auth");
 const { verifyCredential, isConfigured, CLIENT_ID } = require("./google");
 const widgetsRouter = require("./routes/widgets");
+const db = require("./db");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors({ origin: true, credentials: false }));
-app.use(express.json({ limit: "2mb" }));
+app.disable("x-powered-by");
+app.use(security.headers);
+app.use(security.browserOrigin);
 
 const rateLimit = require("./limits");
 // Set TRUST_PROXY to trusted proxy IPs/subnets when deploying behind a proxy.
@@ -32,7 +34,9 @@ app.use("/api/auth/register", rateLimit("register", 40, 10 * 60 * 1000));
 app.use("/api/auth/login", rateLimit("login", 40, 10 * 60 * 1000));
 app.use("/api/auth/google", rateLimit("google", 30, 10 * 60 * 1000));
 app.use("/api", (req, res, next) => { res.setHeader("Cache-Control", "no-store"); next(); });
-app.use((req, res, next) => { res.setHeader("X-Content-Type-Options", "nosniff"); next(); });
+app.use("/api", rateLimit("api", 1200, 60000));
+// Reject oversized/compressed JSON after cheap origin and rate checks.
+app.use(express.json({ limit: "192kb", inflate: false }));
 
 function noStore(res) {
   res.setHeader("Cache-Control", "no-store");
@@ -59,6 +63,14 @@ app.post("/api/auth/login", (req, res) => {
   } catch (e) {
     res.status(401).json({ error: e.message });
   }
+});
+
+// Revoke the current bearer token server-side; other devices stay signed in.
+app.post("/api/auth/logout", authMiddleware, (req, res) => {
+  const now = Math.floor(Date.now() / 1000);
+  db.prepare("DELETE FROM revoked_tokens WHERE expires_at <= ?").run(now);
+  db.prepare("INSERT OR REPLACE INTO revoked_tokens(token_hash, expires_at) VALUES (?, ?)").run(req.session.tokenHash, req.session.expiresAt);
+  res.json({ ok: true });
 });
 
 // Tells the browser whether a Google button can be rendered at all.
@@ -121,6 +133,7 @@ app.use((req, res, next) => {
   if (pathname === "/") pathname = "/index.html";
   if (!publicFiles.has(pathname.slice(1))) return next();
   res.setHeader("Cache-Control", "no-store");
+  if (pathname.endsWith(".html")) security.htmlHeaders(res, pathname.slice(1));
   res.sendFile(path.join(__dirname, "..", pathname.slice(1)));
 });
 app.use("/assets", express.static(path.join(__dirname, "..", "assets"), {
@@ -131,6 +144,7 @@ app.use("/assets", express.static(path.join(__dirname, "..", "assets"), {
 // SPA-ish fallback: serve index.html for unknown routes (but not API)
 app.get("*", (req, res, next) => {
   if (req.path.startsWith("/api/")) return next();
+  security.htmlHeaders(res);
   res.sendFile(path.join(__dirname, "..", "index.html"));
 });
 
@@ -148,8 +162,8 @@ if (require.main === module) app.listen(PORT, () => {
 app.use("/api", (req, res) => res.status(404).json({ error: "Endpoint not found" }));
 app.use((err, req, res, next) => {
   if (res.headersSent) return next(err);
-  const status = err.status === 413 ? 413 : err instanceof SyntaxError || err.status === 400 ? 400 : 500;
+  const status = err.status === 413 ? 413 : err.status === 415 ? 415 : err instanceof SyntaxError || err.status === 400 ? 400 : 500;
   if (status === 500) console.error("[popforge] request failed:", err.message);
-  res.status(status).json({ error: status === 413 ? "Request is too large" : status === 400 ? "Invalid request" : "Server error" });
+  res.status(status).json({ error: status === 413 ? "Request is too large" : status === 415 ? "Unsupported content encoding" : status === 400 ? "Invalid request" : "Server error" });
 });
 module.exports = app;

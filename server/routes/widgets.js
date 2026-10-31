@@ -3,7 +3,7 @@ const express = require("express");
 const db = require("../db");
 const { authMiddleware } = require("../auth");
 
-const { object, validateConfig } = require("../validation");
+const { object, validateConfig, validateShape } = require("../validation");
 const rateLimit = require("../limits");
 const crypto = require("crypto");
 const router = express.Router();
@@ -98,7 +98,7 @@ router.delete("/:id", authMiddleware, (req, res) => {
 // Public, fire-and-forget telemetry from third-party pages. Unknown ids
 // (demo configs, hand-written embeds, deleted widgets) are dropped silently:
 // a 404 here only ever pollutes the embedder's browser console.
-router.post("/:id/view", (req, res) => {
+router.post("/:id/view", rateLimit("view", 600, 60000), (req, res) => {
   const r = db.prepare("UPDATE widgets SET view_count = view_count + 1, updated_at = updated_at WHERE id = ?").run(req.params.id);
   if (r.changes === 0) return res.status(204).end();
   res.json({ ok: true });
@@ -111,11 +111,11 @@ router.post("/:id/submit", rateLimit("submit", 120, 60000), (req, res) => {
     // Accept with 2xx so customer pages stay console-clean, but never pretend
     // a lead landed: flag it here and in the response body. The studio's
     // "Test now" mode uses test_ ids by design, so those stay quiet.
-    if (!/^test_/.test(req.params.id)) console.warn("[popforge] lead dropped — no widget with id", req.params.id);
+    // Unknown public widget IDs are intentionally not logged: callers control this input.
     return res.status(202).json({ ok: false, stored: false, reason: "unknown_widget" });
   }
   const data = req.body && Object.prototype.hasOwnProperty.call(req.body, "data") ? req.body.data : (req.body || {});
-  if (!object(data) || Buffer.byteLength(JSON.stringify(data)) > 16384) return res.status(400).json({ error: "Submission must be an object up to 16 KB" });
+  if (!object(data) || validateShape(data) || Buffer.byteLength(JSON.stringify(data)) > 16384) return res.status(400).json({ error: "Submission must be an object up to 16 KB" });
   const requestId = req.body && req.body.requestId;
   if (requestId !== undefined && (typeof requestId !== "string" || !/^[A-Za-z0-9_-]{8,100}$/.test(requestId))) return res.status(400).json({ error: "Invalid request ID" });
   db.prepare("INSERT INTO submissions (widget_id, data, request_id) VALUES (?, ?, ?) ON CONFLICT(widget_id, request_id) WHERE request_id IS NOT NULL DO NOTHING").run(req.params.id, JSON.stringify(data), requestId || null);
@@ -126,7 +126,10 @@ router.post("/:id/submit", rateLimit("submit", 120, 60000), (req, res) => {
 router.get("/:id/submissions", authMiddleware, (req, res) => {
   const r = db.prepare("SELECT id FROM widgets WHERE id = ? AND user_id = ?").get(req.params.id, req.user.id);
   if (!r) return res.status(404).json({ error: "Widget not found" });
-  const rows = db.prepare("SELECT id, data, created_at FROM submissions WHERE widget_id = ? ORDER BY created_at DESC").all(req.params.id);
+  const limit = req.query.limit === undefined ? 200 : Number(req.query.limit);
+  const before = req.query.before === undefined ? null : Number(req.query.before);
+  if (!Number.isSafeInteger(limit) || limit < 1 || limit > 500 || (before !== null && (!Number.isSafeInteger(before) || before < 1))) return res.status(400).json({ error: "Invalid pagination parameters" });
+  const rows = db.prepare("SELECT id, data, created_at FROM submissions WHERE widget_id = ? AND (? IS NULL OR id < ?) ORDER BY id DESC LIMIT ?").all(req.params.id, before, before, limit);
   res.json(rows.map(x => ({ id: x.id, data: JSON.parse(x.data), createdAt: x.created_at })));
 });
 

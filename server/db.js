@@ -67,4 +67,6 @@ const submissionColumns = db.prepare("PRAGMA table_info(submissions)").all().map
 if (!submissionColumns.includes("request_id")) db.exec("ALTER TABLE submissions ADD COLUMN request_id TEXT");
 db.exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_submission_request ON submissions(widget_id, request_id) WHERE request_id IS NOT NULL");
 
+db.exec("CREATE TABLE IF NOT EXISTS revoked_tokens (token_hash TEXT PRIMARY KEY, expires_at INTEGER NOT NULL)");
+db.exec("CREATE INDEX IF NOT EXISTS idx_revoked_expiry ON revoked_tokens(expires_at)");
 module.exports = db;

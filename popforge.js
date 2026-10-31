@@ -301,8 +301,19 @@
       if (p.mode === "include") return (p.include || []).some(glob);
       if (p.mode === "exclude") return !(p.exclude || []).some(glob);
       function glob(g) {
-        var rx = new RegExp("^" + String(g).replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*") + "$", "i");
-        return rx.test(String(g).charAt(0) === "/" ? location.pathname : href);
+        var pattern = String(g).toLowerCase();
+        var text = (pattern.charAt(0) === "/" ? location.pathname : href).toLowerCase();
+        var parts = pattern.split("*");
+        if (parts.length === 1) return text === pattern;
+        if (!text.startsWith(parts[0])) return false;
+        var cursor = parts[0].length;
+        for (var i = 1; i < parts.length - 1; i++) {
+          var at = text.indexOf(parts[i], cursor);
+          if (at === -1) return false;
+          cursor = at + parts[i].length;
+        }
+        var tail = parts[parts.length - 1];
+        return text.endsWith(tail) && text.length - tail.length >= cursor;
       }
       return true;
     },
@@ -594,7 +605,7 @@
       h += '<div class="pf-spin"><div class="pf-spin-stage"><div class="pf-spin-wheel" style="background:' + escAttr(wheelGradient(segs, A)) + '">';
       segs.forEach(function (sg, i) {
         var ang = i * segA + segA / 2;
-        h += '<span class="pf-spin-seg" style="transform:rotate(' + ang.toFixed(2) + 'deg) translateY(-76px) rotate(' + (-ang).toFixed(2) + 'deg);color:' + escAttr(th.accentText || "#FFFFFF") + '">' + esc(sg.label || "") + "</span>";
+        h += '<span class="pf-spin-seg" style="transform:rotate(' + ang.toFixed(2) + 'deg) translateY(-76px) rotate(' + (-ang).toFixed(2) + 'deg);color:' + escAttr(safeColor(th.accentText, "#FFFFFF")) + '">' + esc(sg.label || "") + "</span>";
       });
       h += '</div><div class="pf-spin-pointer" style="border-top-color:' + escAttr(A) + '"></div><button class="pf-spin-hub" type="button">' + esc(mc.spin.buttonText || "SPIN") + "</button></div></div>";
     }
@@ -636,7 +647,11 @@
     if ((m = String(url).match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/)))
       url = "https://www.youtube.com/embed/" + m[1];
     else if ((m = String(url).match(/vimeo\.com\/(\d+)/))) url = "https://player.vimeo.com/video/" + m[1];
-    return '<iframe src="' + escAttr(safeUrl(url, false)) + '" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>';
+    try {
+      var parsed = new URL(url);
+      if (parsed.protocol !== "https:" || ["www.youtube.com", "www.youtube-nocookie.com", "player.vimeo.com"].indexOf(parsed.hostname) === -1) return "";
+    } catch (e) { return ""; }
+    return '<iframe sandbox="allow-scripts allow-same-origin allow-presentation" referrerpolicy="strict-origin-when-cross-origin" src="' + escAttr(safeUrl(url, false)) + '" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>';
   }
   function startCountdown(scope, cd, self) {
     var el = scope.querySelector(".pf-countdown");

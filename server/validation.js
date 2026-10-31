@@ -1,6 +1,8 @@
 function object(value) { return !!value && typeof value === "object" && !Array.isArray(value); }
 function validateConfig(cfg) {
   if (!object(cfg)) return "config must be an object";
+  const shapeError = validateShape(cfg);
+  if (shapeError) return shapeError;
   if (Buffer.byteLength(JSON.stringify(cfg)) > 131072) return "config is too large (128 KB maximum)";
   for (const key of ["theme", "content", "trigger", "devices", "sticky", "pages"]) {
     if (cfg[key] !== undefined && !object(cfg[key])) return key + " must be an object";
@@ -21,6 +23,9 @@ function validateConfig(cfg) {
     if (typeof field.name !== "string" || !/^[a-zA-Z0-9_-]{1,64}$/.test(field.name) || names.has(field.name) || ["__proto__", "constructor", "prototype"].includes(field.name)) return "Form field names must be unique letters, numbers, underscores or hyphens";
     names.add(field.name);
   }
+  return null;
+}
+function validateShape(cfg) {
   let count = 0;
   function scan(value, depth) {
     if (++count > 5000 || depth > 12) return false;
@@ -32,4 +37,4 @@ function validateConfig(cfg) {
   }
   return scan(cfg, 0) ? null : "Config is too complex or contains unsafe keys";
 }
-module.exports = { object, validateConfig };
+module.exports = { object, validateConfig, validateShape };

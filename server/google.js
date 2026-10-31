@@ -23,7 +23,7 @@ async function verifyCredential(credential) {
   if (!isConfigured()) {
     throw fail("GOOGLE_NOT_CONFIGURED", "Google sign-in is not configured on this server. Add GOOGLE_CLIENT_ID to .env and restart.");
   }
-  if (!credential || typeof credential !== "string") {
+  if (!credential || typeof credential !== "string" || credential.length > 16384) {
     throw fail("BAD_REQUEST", "Missing Google credential");
   }
   if (!client) client = new OAuth2Client(CLIENT_ID);
@@ -44,6 +44,7 @@ async function verifyCredential(credential) {
   return {
     sub: payload.sub,
     emailVerified: true,
+    hostedDomain: typeof payload.hd === "string" ? payload.hd : null,
     email: String(payload.email).trim().toLowerCase(),
     name: payload.name || payload.given_name || "",
     picture: payload.picture || ""

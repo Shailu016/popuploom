@@ -59,15 +59,68 @@ test('owner CRUD, validation, live config and lead isolation',async()=>{
 });
 test('verified Google linking revokes unverified passwords and previous sessions',async()=>{
  const auth=require('../server/auth');
- const pre=auth.register('victim@example.com','attacker-password');
- assert.throws(()=>auth.findOrCreateGoogleUser({sub:'victim-sub',email:'victim@example.com'}),/verified/);
- const linked=auth.findOrCreateGoogleUser({sub:'victim-sub',email:'victim@example.com',emailVerified:true});
+ const pre=auth.register('victim@gmail.com','attacker-password');
+ assert.throws(()=>auth.findOrCreateGoogleUser({sub:'victim-sub',email:'victim@gmail.com'}),/verified/);
+ const linked=auth.findOrCreateGoogleUser({sub:'victim-sub',email:'victim@gmail.com',emailVerified:true});
  assert.equal(pre.user.id,linked.user.id);
- assert.throws(()=>auth.login('victim@example.com','attacker-password'),/Invalid/);
+ assert.throws(()=>auth.login('victim@gmail.com','attacker-password'),/Invalid/);
  assert.equal((await api('/api/widgets',{token:pre.token})).status,401);
  assert.equal((await api('/api/widgets',{token:linked.token})).status,200);
- assert.equal(auth.findOrCreateGoogleUser({sub:'victim-sub',email:'victim@example.com',emailVerified:true}).user.id,linked.user.id);
- assert.throws(()=>auth.findOrCreateGoogleUser({sub:'different-google-sub',email:'victim@example.com',emailVerified:true}),/different Google account/);
+ assert.equal(auth.findOrCreateGoogleUser({sub:'victim-sub',email:'victim@gmail.com',emailVerified:true}).user.id,linked.user.id);
+ assert.throws(()=>auth.findOrCreateGoogleUser({sub:'different-google-sub',email:'victim@gmail.com',emailVerified:true}),/different Google account/);
+});
+test('third-party Google email cannot take over an existing password account',async()=>{
+ const auth=require('../server/auth');const pre=auth.register('third-party@example.com','legitimate-password');
+ assert.throws(()=>auth.findOrCreateGoogleUser({sub:'third-party-sub',email:'third-party@example.com',emailVerified:true}),/existing email and password/);
+ assert.equal(auth.login('third-party@example.com','legitimate-password').user.id,pre.user.id);
+ const workspace=auth.findOrCreateGoogleUser({sub:'workspace-sub',email:'third-party@example.com',emailVerified:true,hostedDomain:'example.com'});assert.equal(workspace.user.id,pre.user.id);
+ const fresh=auth.findOrCreateGoogleUser({sub:'fresh-third-party',email:'new-third-party@example.net',emailVerified:true});assert.equal(auth.findOrCreateGoogleUser({sub:'fresh-third-party',email:'new-third-party@example.net',emailVerified:true}).user.id,fresh.user.id);
+});
+test('logout revokes exactly one session even when issued in the same second',async()=>{
+ const auth=require('../server/auth'),user=auth.register('logout@example.com','logout-test-password').user;
+ const token=auth.signToken(user),other=auth.signToken(user);assert.notEqual(token,other);
+ assert.equal((await api('/api/auth/logout',{method:'POST',token})).status,200);
+ assert.equal((await api('/api/widgets',{token})).status,401);
+ assert.equal((await api('/api/widgets',{token:other})).status,200);
+});
+test('origin isolation keeps private APIs private while allowing public embeds',async()=>{
+ const headers={Origin:'https://untrusted.example'};
+ assert.equal((await api('/api/widgets',{token:account.token,headers})).status,403);
+ assert.equal((await api('/API/auth/me',{token:account.token,headers})).status,403);
+ assert.equal((await api('/api/auth/register',{method:'OPTIONS',headers:{...headers,'Access-Control-Request-Method':'POST'}})).status,403);
+ const publicConfig=await api('/api/widgets/'+widget.id+'/config',{headers});assert.equal(publicConfig.status,200);assert.equal(publicConfig.headers.get('access-control-allow-origin'),'*');
+ assert.equal((await api('/popforge.js',{headers})).status,200);
+ assert.equal((await api('/api/widgets',{token:account.token,headers:{Origin:base}})).status,200);
+});
+test('HTML security headers prevent clickjacking and restrict script execution',async()=>{
+ for(const url of ['/','/studio.html','/profile.html','/demo.html','/unknown-page']){
+  const r=await api(url);const policy=r.headers.get('content-security-policy');assert.ok(policy.includes("frame-ancestors 'none'"));assert.ok(policy.includes("base-uri 'none'"));assert.ok(policy.includes("object-src 'none'"));
+  const scripts=policy.split(';').find(s=>s.trim().startsWith('script-src'));assert.ok(scripts.includes('sha256-'));assert.ok(!scripts.includes("'unsafe-inline'"));assert.equal(r.headers.get('x-frame-options'),'DENY');assert.equal(r.headers.get('x-powered-by'),null);
+ }
+});
+test('CSP hashes normalize line endings and update when the HTML file changes',()=>{
+ let html='<script>window.example=1;\r\n</script>',mtime=1;const headers={};
+ const box={module:{exports:{}},__dirname:path.join(root,'server'),process:{env:{NODE_ENV:'production'}},URL,require:name=>name==='fs'?{readFileSync:()=>html,statSync:()=>({mtimeMs:mtime,size:html.length})}:require(name)};
+ vm.runInNewContext(fs.readFileSync(path.join(root,'server/security.js'),'utf8'),box);
+ const res={setHeader:(key,value)=>headers[key]=value};box.module.exports.htmlHeaders(res,'index.html');
+ const first=headers['Content-Security-Policy'];assert.ok(first.includes(crypto.createHash('sha256').update('window.example=1;\n').digest('base64')));
+ html='<script>window.example=2;</script>';mtime++;box.module.exports.htmlHeaders(res,'index.html');assert.notEqual(first,headers['Content-Security-Policy']);
+ box.module.exports.headers({secure:true},res,()=>{});assert.equal(headers['Strict-Transport-Security'],'max-age=31536000');
+});
+test('Google verifier preserves signed hosted-domain claims and fails closed',async()=>{
+ let payload={sub:'verified-sub',email:'owner@example.com',email_verified:true,hd:'example.com'},fail=false;
+ const box={module:{exports:{}},process:{env:{GOOGLE_CLIENT_ID:'test-client'}},require:name=>{assert.equal(name,'google-auth-library');return {OAuth2Client:class {async verifyIdToken(){if(fail)throw Error('bad signature');return {getPayload:()=>payload};}}};}};
+ vm.runInNewContext(fs.readFileSync(path.join(root,'server/google.js'),'utf8'),box);
+ const verify=box.module.exports.verifyCredential;assert.equal((await verify('fixture')).hostedDomain,'example.com');
+ payload.email_verified=false;await assert.rejects(verify('fixture'),{code:'EMAIL_UNVERIFIED'});
+ await assert.rejects(verify('x'.repeat(16385)),{code:'BAD_REQUEST'});fail=true;await assert.rejects(verify('fixture'),{code:'BAD_TOKEN'});
+});
+test('invalid passwords, deep JSON, oversized and compressed bodies are rejected safely',async()=>{
+ assert.equal((await api('/api/auth/register',{method:'POST',body:{email:'weak@example.com',password:'short'}})).status,400);
+ const deep='{"name":"Deep","config":{"content":{},"nested":'+'['.repeat(2000)+'0'+']'.repeat(2000)+'}}';
+ const r=await fetch(base+'/api/widgets',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+account.token},body:deep});assert.equal(r.status,400);assert.ok(!(await r.text()).includes('stack'));
+ const large=await fetch(base+'/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({value:'x'.repeat(200000)})});assert.equal(large.status,413);
+ const zipped=await fetch(base+'/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json','Content-Encoding':'gzip'},body:require('node:zlib').gzipSync('{}')});assert.equal(zipped.status,415);
 });
 test('production rejects missing or placeholder signing secrets',()=>{
  const src=fs.readFileSync(path.join(root,'server/auth.js'),'utf8');
@@ -86,6 +139,13 @@ test('submission retries are idempotent and listing reports accurate counts',asy
  const list=(await api('/api/widgets',{token:account.token})).data;
  assert.equal(list.find(r=>r.id===widget.id).submissionCount,leads.length);
  for(const data of [null,false,0,[], 'bad'])assert.equal((await api('/api/widgets/'+widget.id+'/submit',{method:'POST',body:{data}})).status,400);
+});
+test('lead access is paginated and public view writes are rate limited',async()=>{
+ const first=(await api('/api/widgets/'+widget.id+'/submissions?limit=1',{token:account.token})).data;assert.equal(first.length,1);
+ const next=(await api('/api/widgets/'+widget.id+'/submissions?limit=1&before='+first[0].id,{token:account.token})).data;assert.ok(next.every(r=>r.id<first[0].id));
+ assert.equal((await api('/api/widgets/'+widget.id+'/submissions?limit=10000',{token:account.token})).status,400);
+ for(let i=0;i<600;i++)assert.equal((await api('/api/widgets/'+widget.id+'/view',{method:'POST'})).status,200);
+ assert.equal((await api('/api/widgets/'+widget.id+'/view',{method:'POST'})).status,429);
 });
 test('rate limit cannot be bypassed with spoofed forwarded IP addresses',async()=>{
  for(let i=0;i<40;i++)assert.equal((await api('/api/auth/login',{method:'POST',headers:{'X-Forwarded-For':'192.0.2.'+i},body:{email:'missing@example.com',password:'wrong'}})).status,401);
@@ -126,6 +186,9 @@ test('targeting, untrusted rendering, storage restrictions and explicit test mod
  const html=c.cardHTML({cfg:{placement:'slide:br" onmouseover="alert(1)',theme:{accent:'red" onclick="alert(1)'},content:{buttonText:'Bad',buttonUrl:'javascript:alert(1)',form:{enabled:true,fields:[{name:'email',type:'text" autofocus onfocus="alert(1)'}]}}}});
  assert.ok(!html.includes(' onmouseover="')&&!html.includes(' onclick="')&&!html.includes(' autofocus '));
  await c.recordSubmission({preview:false,test:true,cfg:{id:'test_123'}},{});
+ const started=Date.now();assert.equal(p.pageOk.call({cfg:{pages:{mode:'include',include:['/shop/'+('*a'.repeat(40))+'b']}}}),false);assert.ok(Date.now()-started<1000);
+ const bad=c.cardHTML({cfg:{content:{videoEmbed:'https://untrusted.example/steal'}}});assert.ok(!bad.includes('<iframe'));
+ const good=c.cardHTML({cfg:{content:{videoEmbed:'https://www.youtube.com/watch?v=abcdefghijk'}}});assert.ok(good.includes('sandbox="allow-scripts allow-same-origin allow-presentation"'));
 });
 test('one widget API override does not change the default API for other widgets',()=>{
  const box={window:{},document:{readyState:'loading',querySelector:()=>({getAttribute:()=> 'https://override.example'}),querySelectorAll:selector=>selector.startsWith('script')?[{src:'https://default.example/popforge.js'}]:[],addEventListener(){}},URL,console};
@@ -158,6 +221,11 @@ test('browser: all templates, save failures, installation, test mode, delete and
  try{
   const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(base,{waitUntil:'networkidle0'});
+  await page.evaluate(()=>openAuthModal());
+  await page.click('#authModal a[onclick*="closeAuthModal"]');
+  assert.equal(await page.$eval('#authModal',el=>el.style.display),'none');
+  const injections=await page.evaluate(()=>{const s=document.createElement('script');s.textContent='window.injectedScriptRan=true';document.body.appendChild(s);const b=document.createElement('button');b.setAttribute('onclick','window.injectedHandlerRan=true');document.body.appendChild(b);b.click();return [!!window.injectedScriptRan,!!window.injectedHandlerRan];});
+  assert.deepEqual(injections,[false,false]);
   const templates=await page.evaluate(()=>{const stage=document.createElement('div');document.body.appendChild(stage);return PF.templates.map(t=>{try{const p=PopForge.preview(stage,PF.cfgFor(t.id));if(!stage.querySelector('.pf-card'))throw Error('No popup card');p.destroy();return {id:t.id,ok:true};}catch(e){return {id:t.id,error:e.message};}});});
   assert.ok(templates.length>=40);assert.deepEqual(templates.filter(t=>!t.ok),[]);
   const behavior=await page.evaluate(async()=>{
@@ -209,6 +277,13 @@ test('browser: all templates, save failures, installation, test mode, delete and
   await page.goto(base,{waitUntil:'networkidle0'});
   await page.evaluate(()=>{localStorage.removeItem('pf.token');localStorage.setItem('pf.widgets',JSON.stringify([{id:"x'><img src=x onerror=window.importXss=true>",name:'Imported',cfg:{},viewCount:'<img src=x onerror=window.importXss=true>'}]));});
   await page.reload({waitUntil:'networkidle0'});assert.equal(await page.evaluate(()=>window.importXss),undefined);
+  const logoutToken=require('../server/auth').signToken(account.user);
+  await page.evaluate(token=>{localStorage.setItem('pf.token',token);localStorage.removeItem('pf.widgets');},logoutToken);
+  await page.reload({waitUntil:'networkidle0'});await page.click('#btnAuth');
+  await page.waitForSelector('.pf-acct-menu',{visible:true});
+  await page.evaluate(()=>Array.from(document.querySelectorAll('.pf-acct-item')).find(el=>el.textContent==='Sign out').click());
+  await page.waitForFunction(()=>!localStorage.getItem('pf.token'));
+  assert.equal((await api('/api/widgets',{token:logoutToken})).status,401);
   assert.deepEqual(errors,[]);
  }finally{await browser.close();}
 });

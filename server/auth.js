@@ -20,7 +20,7 @@ const JWT_EXPIRES = "30d";
 function signToken(user) {
   const row = db.prepare("SELECT token_version FROM users WHERE id = ?").get(user.id);
   if (!row) throw new Error("Account not found");
-  return jwt.sign({ userId: user.id, email: user.email, tokenVersion: row.token_version }, JWT_SECRET, { expiresIn: JWT_EXPIRES, algorithm: "HS256" });
+  return jwt.sign({ userId: user.id, email: user.email, tokenVersion: row.token_version }, JWT_SECRET, { expiresIn: JWT_EXPIRES, algorithm: "HS256", jwtid: crypto.randomUUID() });
 }
 
 // The only user fields that are ever sent to a browser.
@@ -52,7 +52,7 @@ function register(email, password, name) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) throw new Error("Enter a valid email address");
   if (typeof password !== "string" || !password) throw new Error("Email and password are required");
   if (Buffer.byteLength(password, "utf8") > 72) throw new Error("Password must be at most 72 UTF-8 bytes");
-  if (password.length < 6) throw new Error("Password must be at least 6 characters");
+  if (password.length < 12) throw new Error("Password must be at least 12 characters");
   const existing = db.prepare("SELECT id FROM users WHERE email = ?").get(email);
   if (existing) throw new Error("An account with that email already exists");
   const hash = bcrypt.hashSync(password, 10);
@@ -101,6 +101,10 @@ function findOrCreateGoogleUser(profile) {
     row = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
     if (row) {
       if (row.google_id && row.google_id !== sub) throw new Error("Email belongs to a different Google account");
+      // A historical verification of a third-party address does not prove current ownership.
+      if (!email.endsWith("@gmail.com") && !(typeof profile.hostedDomain === "string" && profile.hostedDomain.trim())) {
+        throw new Error("Sign in with your existing email and password. Google cannot verify current ownership of this email for account linking.");
+      }
       // Verified email ownership replaces unverified credentials and revokes prior sessions.
       const unusableHash = bcrypt.hashSync(crypto.randomBytes(32).toString("hex"), 10);
       db.prepare("UPDATE users SET google_id = ?, password_hash = ?, token_version = token_version + 1, name = COALESCE(name, ?), avatar_url = COALESCE(avatar_url, ?) WHERE id = ?")
@@ -125,7 +129,10 @@ function authMiddleware(req, res, next) {
   if (!token) return res.status(401).json({ error: "Not authenticated" });
   try {
     const payload = jwt.verify(token, JWT_SECRET, { algorithms: ["HS256"] });
-    if (!Number.isSafeInteger(payload.userId)) throw new Error("Invalid account");
+    if (!Number.isSafeInteger(payload.userId) || !Number.isSafeInteger(payload.exp)) throw new Error("Invalid account");
+    const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+    if (db.prepare("SELECT token_hash FROM revoked_tokens WHERE token_hash = ?").get(tokenHash)) throw new Error("Revoked session");
+    req.session = { tokenHash, expiresAt: payload.exp };
     const row = db.prepare("SELECT id, email, token_version FROM users WHERE id = ?").get(payload.userId);
     if (!row || (payload.tokenVersion === undefined ? 0 : payload.tokenVersion) !== row.token_version) throw new Error("Revoked session");
     req.user = { id: row.id, email: row.email };

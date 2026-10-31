@@ -80,7 +80,7 @@ Google Identity Services needs a client id. No client secret is used: the server
 
 Notes:
 - GIS only works on `http://localhost` or HTTPS origins. A plain `http://192.168.x.x:3000` will not render the button.
-- Signing in with Google proves email ownership and keeps the existing popup shelf. On first linking, the old unverified password is disabled and all previous sessions are revoked. Linked accounts use Google sign-in thereafter.
+- Automatic Google linking requires Gmail or a verified Workspace hosted-domain claim. On first linking, the old unverified password is disabled and all previous sessions are revoked. Existing password accounts using other email providers must sign in with email/password. Already-linked accounts use the stable Google identity.
 - Google-linked accounts use Google sign-in; password login is disabled for them.
 - To verify the backend path without Google, `POST /api/auth/google` returns `503 { code: "GOOGLE_NOT_CONFIGURED" }` when `GOOGLE_CLIENT_ID` is unset.
 
@@ -92,6 +92,7 @@ Notes:
 | `POST /api/auth/login` | None | Sign in, returns `{ user, token }` |
 | `POST /api/auth/google` | None | Exchange a Google ID token for `{ user, token }` |
 | `GET /api/auth/config` | None | `{ googleClientId }` (or `null`) for the browser button |
+| `POST /api/auth/logout` | Bearer | Revoke the current session token |
 | `GET /api/auth/me` | Bearer | Current user (name + avatar when Google-linked) |
 | `GET /api/widgets` | Bearer | List the user's widgets (with `viewCount`) |
 | `POST /api/widgets` | Bearer | Create a widget |
@@ -99,7 +100,7 @@ Notes:
 | `PUT /api/widgets/:id` | Bearer | Update name/config |
 | `DELETE /api/widgets/:id` | Bearer | Delete widget (+ its submissions) |
 | `GET /api/widgets/:id/config` | public | Live config for the embedded runtime (no owner data) |
-| `GET /api/widgets/:id/submissions` | Bearer | List captured leads |
+| `GET /api/widgets/:id/submissions` | Bearer | List captured leads (default 200, max 500; use limit and before ID for pagination) |
 | `POST /api/widgets/:id/view` | public | Increment view counter (called by the embed runtime) |
 | `POST /api/widgets/:id/submit` | public | Store a lead (called by the embed runtime) |
 | `GET /api/health` | None | Liveness check |
@@ -153,6 +154,8 @@ Platform notes (learned from researching competitors so you don't repeat their g
 
 - Works wherever raw HTML runs: WordPress (Custom HTML), Shopify (liquid/sections), Webflow embeds, Ghost, GitHub Pages, static sites.
 - On builders that trap third-party widgets in iframes (some Wix/GoDaddy/Hostinger embeds, Google Sites, Canva), a fixed popup can't escape the frame. Install at body level where the platform allows code, or prefer the strip placements.
+
+See [SECURITY.md](SECURITY.md) for the security review, deployment settings and public-config trust boundaries. New passwords require at least 12 characters. Set APP_ORIGINS for additional trusted frontend origins; private APIs otherwise accept only the app origin.
 
 Run `npm test` for isolated API, auth and browser regression checks. Browser checks use Chrome/Edge when available; set `POPFORGE_BROWSER` to an executable path to override. Existing project data is never used by the tests.
 
