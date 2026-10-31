@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PopForge. Build custom popups. Own your channel.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./ui.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23FF6A1F'/%3E%3Cpath d='M17 6L9 18h6l-4 8 12-13h-6l4-7z' fill='%23180A01'/%3E%3C/svg%3E">
+<script>document.documentElement.className += " js";</script>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="wrap inner">
+    <a class="logo" href="./index.html"><span class="mark"><svg viewBox="0 0 32 32" width="15" height="15" aria-hidden="true"><path d="M17 6L9 18h6l-4 8 12-13h-6l4-7z" fill="currentColor"/></svg></span> Pop<span><i>Forge</i></span></a>
+    <div class="nav-links">
+      <a href="#templates">Templates</a>
+      <a href="#features">Features</a>
+      <a href="#dash">My popups</a>
+      <a href="#docs">Docs</a>
+    </div>
+    <div class="nav-cta">
+      <a class="btn primary small" href="./studio.html?tpl=blank">Open the studio</a>
+      <button class="btn small ghost" id="btnAuth" onclick="openAuthModal()">Sign in</button>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-lines"></div>
+  <div class="wrap">
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <div class="kicker">Popup studio · works on any site builder</div>
+        <h1 class="h-hero">Forge popups<br>people <em>actually click.</em></h1>
+        <p class="sub">A self-serve popup tool for makers and small shops. Design on a template, wire up smart timing, copy one script, and you're done. Everything you make saves to your account and stays yours.</p>
+        <div class="hero-cta">
+          <a class="btn primary" href="#templates">Browse 45 templates</a>
+          <a class="btn ghost" href="./studio.html?tpl=blank">Open the studio</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><b>45</b><span>Original builds</span></div>
+          <div class="stat"><b>6</b><span>Journeys</span></div>
+          <div class="stat"><b>6</b><span>Smart triggers</span></div>
+          <div class="stat"><b>1</b><span>Script tag</span></div>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="aura"></div>
+        <div class="frame-back" aria-hidden="true"></div>
+        <div class="frame">
+          <div class="frame-tabs">
+            <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="ftab active"><i class="fav"></i><span class="ftab-title">New Arrivals — yourshop.com</span></span>
+            <span class="ftab">Lookbook</span>
+            <span class="ftab-add">+</span>
+          </div>
+          <div class="frame-bar">
+            <span class="fnav" aria-hidden="true"><span>‹</span><span>›</span></span>
+            <span class="url">
+              <svg width="10" height="11" viewBox="0 0 12 14" fill="none" aria-hidden="true"><path d="M3.2 6V4.3a2.8 2.8 0 0 1 5.6 0V6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><rect x="1.7" y="6" width="8.6" height="6.5" rx="1.7" fill="currentColor"/></svg>
+              yourshop.com/new-arrivals
+            </span>
+            <span class="fdots" aria-hidden="true">•••</span>
+          </div>
+          <div class="hero-stage pf-stage" id="heroStage">
+            <div class="stage-faux-page">
+              <div class="fx-nav"><i></i><span></span><span></span><span></span><em></em></div>
+              <div class="fx-hero"><b></b><b></b><u></u><a></a></div>
+              <div class="fx-cards"><div></div><div></div><div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="float-chip ch-a"><span class="dot"></span> Live preview</div>
+        <div class="float-chip ch-b"><span class="spark"></span> Trigger · exit intent</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="templates">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="kicker">Template gallery</div>
+      <h2 class="h-sec">Pick a lane, then <em>put your spin on it</em>.</h2>
+      <p class="sub">Forty-five original builds, sorted by the job they do across six journeys: capture the contact, convert the sale, retain the buyer, win back the almost-gone, announce the news, or earn trust. Every one is a starting point, not a cage. Swap colors, words, triggers and shapes in the studio.</p>
+    </div>
+    <div class="cats" id="catBar"></div>
+    <p class="journey-note" id="journeyNote"></p>
+    <div id="tplGrid"></div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="kicker">Three steps</div>
+      <h2 class="h-sec">From idea to live widget <em>in one sitting</em></h2>
+    </div>
+    <div class="steps">
+      <div class="card step rv"><b>01</b><h3>Choose a build</h3><p class="mut">Start from a template or an empty canvas. Each one ships with layout, timing rules and copy that already makes sense.</p></div>
+      <div class="card step rv"><b>02</b><h3>Shape it in the studio</h3><p class="mut">Edit content, colors and behavior with a live preview. Test triggers on demand. No deploy, no guesswork.</p></div>
+      <div class="card step rv"><b>03</b><h3>Copy the embed line</h3><p class="mut">One script plus one config tag. Paste before your site's closing body tag and it's live. Edits sync automatically.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="kicker">Included</div>
+      <h2 class="h-sec">Every widget carries <em>the full toolkit</em></h2>
+      <p class="sub">No tiers, no view-count meters counting your traffic for you. Built-in from day one:</p>
+    </div>
+    <div class="grid g3 bento">
+      <div class="feat wide rv"><span class="fnum">01 · Triggers</span><h3>Six triggers, first hit wins</h3><p>Page load, on-page timer, scroll depth, scroll-past-element, click-a-button, or exit intent (desktop). Mix several; the fastest fires.</p></div>
+      <div class="feat rv"><span class="fnum">02 · Frequency</span><h3>Honest frequency rules</h3><p>Every load, once per day, once per week, once ever, or keep showing until it's dismissed, then rest for a day.</p></div>
+      <div class="feat rv"><span class="fnum">03 · Targeting</span><h3>Page paths with wildcards</h3><p>All pages, or a list of paths to include or exclude. Use <span class="mono">/shop/*</span> style patterns to cover whole sections.</p></div>
+      <div class="feat wide rv"><span class="fnum">04 · Devices</span><h3>Per-device on/off</h3><p>Desktop and phone separately. Exit-intent knows not to run on touch screens without being told.</p></div>
+      <div class="feat rv"><span class="fnum">05 · Blocks</span><h3>Stackable content blocks</h3><p>Badge, heading, text, image, video embed, countdown, copyable code chip, quick-pick buttons, CTA, links row, fine print.</p></div>
+      <div class="feat rv"><span class="fnum">06 · Leads</span><h3>Lead intake that lands somewhere</h3><p>Forms and tap-buttons save responses on-device, and can POST to any webhook (Sheets, Zapier, CRM) the moment they arrive.</p></div>
+      <div class="feat rv"><span class="fnum">07 · Performance</span><h3>Lazy render, light hit</h3><p>Nothing loads until the popup is summoned. Slow pages stay fast. Animation styles are opt-in, not forced.</p></div>
+      <div class="feat wide rv"><span class="fnum">08 · Re-entry</span><h3>Sticky door-knock button</h3><p>A round, discreet button that re-opens the popup anytime. Good for deals that deserve a second look.</p></div>
+      <div class="feat rv"><span class="fnum">09 · Signals</span><h3>Signals you can actually use</h3><p>Open/submit events stream to GTM's data layer when present, and every view is tallied under My popups.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="dash">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="kicker">Your shelf</div>
+      <div class="sec-title-row">
+        <h2 class="h-sec">My popups</h2>
+        <div class="sec-title-actions">
+          <button class="btn small" id="btnImport">Import file</button>
+          <button class="btn small" id="btnExportAll">Export all (.json)</button>
+        </div>
+      </div>
+      <p class="sub" style="max-width:72ch">Your popups live in your account, so they follow you between browsers. Each saved popup gets its own install code, and studio edits sync to the live site.</p>
+    </div>
+    <div id="dashNotice" class="card rv" style="display:none;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px;border-color:rgba(255,106,31,.28)">
+      <div style="flex:1;min-width:240px"><b>You're browsing as a guest.</b> <span class="mut">Drafts stay in this browser and can't be installed on a website until you have an account.</span></div>
+      <button class="btn small primary" data-open-auth>Create a free account</button>
+    </div>
+    <div class="card dash rv" id="dashWrap">
+      <div id="dashEmpty" class="empty" style="display:block">
+        <div class="big16">∅</div>
+        <b>The shelf is empty.</b><br>Grab a template above and your first popup will appear here.
+      </div>
+      <table id="dashTable" style="display:none">
+        <thead><tr><th>Name</th><th>Build</th><th>Status</th><th>Views</th><th>Leads saved</th><th>Updated</th><th style="text-align:right">Actions</th></tr></thead>
+        <tbody id="dashRows"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="docs">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="kicker">Docs</div>
+      <h2 class="h-sec">The install code</h2>
+      <p class="sub">Sign in, save a popup, then copy its install code from My popups. Paste this pair anywhere before <span class="mono">&lt;/body&gt;</span> — the id in the div is yours:</p>
+    </div>
+    <div class="codebox rv" id="docCode">&lt;!-- PopForge install. Paste before &lt;/body&gt; --&gt;
+&lt;div data-popforge="wan_your_widget_id"&gt;&lt;/div&gt;
+&lt;script src="https://your-popforge-host/popforge.js"&gt;&lt;/script&gt;</div>
+    <div class="card mt16 rv">
+      <b style="letter-spacing:-.01em">How it stays in sync.</b> <span class="mut">The snippet carries only your widget id. Visitors' browsers fetch the live config, so editing or republishing in the studio updates every installed copy without touching the site again. Installing requires a free account: guests can design and preview, but the install code is issued only for popups saved to your account.</span>
+    </div>
+    <div class="card mt16 rv">
+      <b style="letter-spacing:-.01em">Platform note.</b> <span class="mut">Where a builder traps widgets inside an iframe (Wix's editor preview walls, Canva, Google Sites), fixed widgets may be boxed in. Install into the page body itself where the platform allows a custom-code block. On pure-code platforms (WordPress + HTML block, Shopify custom liquid, Webflow embeds, GitHub Pages, any static host) it behaves normally.</span>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap cols">
+    <div>
+      <div class="logo"><span class="mark"><svg viewBox="0 0 32 32" width="15" height="15" aria-hidden="true"><path d="M17 6L9 18h6l-4 8 12-13h-6l4-7z" fill="currentColor"/></svg></span> Pop<span><i>Forge</i></span></div>
+      <div style="max-width:44ch">Built as a fresh alternative. Own designs, own rules, your data.</div>
+    </div>
+    <div class="mono" style="font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2)">Free tier forever · Export anytime · No view-count prison</div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<!-- Auth modal -->
+<div id="authModal" class="modal">
+  <div class="modal-card">
+    <h3 id="authTitle">Sign in</h3>
+    <p class="mut" id="authSub" style="font-size:13.5px;margin:0 0 20px">Welcome back. Your saved popups and install codes are waiting.</p>
+
+    <div class="fieldset" style="margin-bottom:14px;display:none" id="authNameRow">
+      <label class="label">Your name</label>
+      <input class="inp" id="authName" type="text" placeholder="Maya" autocomplete="name" maxlength="60">
+    </div>
+
+    <div id="authGoogleWrap" style="display:none;margin-bottom:18px">
+      <div id="authGoogleBtn" style="display:flex;justify-content:center;min-height:44px"></div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:16px;color:var(--muted-2);font-size:11px;letter-spacing:.1em;text-transform:uppercase">
+        <span style="flex:1;height:1px;background:rgba(255,255,255,.1)"></span>or use email<span style="flex:1;height:1px;background:rgba(255,255,255,.1)"></span>
+      </div>
+    </div>
+
+    <div class="fieldset" style="margin-bottom:14px">
+      <label class="label">Email</label>
+      <input class="inp" id="authEmail" type="email" placeholder="you@example.com" autocomplete="email">
+    </div>
+    <div class="fieldset" style="margin-bottom:20px">
+      <label class="label">Password</label>
+      <input class="inp" id="authPass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')submitAuth()">
+    </div>
+    <div id="authErr" style="color:var(--danger);font-size:13px;margin-bottom:12px;display:none"></div>
+    <button class="btn primary" style="width:100%;margin-bottom:12px" id="authSubmit" onclick="submitAuth()">Sign in</button>
+    <div style="text-align:center;font-size:13.5px" class="mut">
+      <span id="authSwitchText">New to PopForge?</span>
+      <a href="#" onclick="toggleAuthMode();return false" style="color:var(--acc);font-weight:600;text-decoration:none" id="authSwitchLink">Create one</a>
+    </div>
+    <div style="text-align:center;margin-top:16px">
+      <a href="#" onclick="closeAuthModal();return false" class="mut" style="font-size:12.5px;text-decoration:none">Keep browsing as a guest</a>
+    </div>
+  </div>
+</div>
+
+<script src="./popforge.js"></script>
+<script src="./app.js"></script>
+<script>
+(function () {
+  var toastEl = document.getElementById("toast");
+  window.toast = function (msg, ok) {
+    toastEl.textContent = msg;
+    toastEl.className = "toast show" + (ok ? " ok" : "");
+    clearTimeout(toastEl._t);
+    toastEl._t = setTimeout(function () { toastEl.className = "toast"; }, 2400);
+  };
+
+  /* ---------- template gallery, grouped by journey ---------- */
+  var activeJourney = "all";
+  var catBar = document.getElementById("catBar");
+  var ALL_VIEW = [{ id: "all", label: "All", blurb: PF.templates.length + " builds across six journeys. Pick the job first; the look comes second." }].concat(PF.journeys);
+
+  ALL_VIEW.forEach(function (j) {
+    var count = j.id === "all" ? PF.templates.length : PF.templates.filter(function (t) { return t.journey === j.id; }).length;
+    var chip = document.createElement("button");
+    chip.className = "cat-chip" + (j.id === "all" ? " on" : "");
+    chip.innerHTML = j.label + '<span class="n">' + count + "</span>";
+    chip.onclick = function () {
+      activeJourney = j.id;
+      catBar.querySelectorAll(".cat-chip").forEach(function (x) { x.classList.toggle("on", x === chip); });
+      document.querySelectorAll(".journey-block").forEach(function (block) {
+        block.classList.toggle("hide", activeJourney !== "all" && block.getAttribute("data-journey") !== activeJourney);
+      });
+      var note = document.getElementById("journeyNote");
+      note.textContent = j.blurb || "";
+    };
+    catBar.appendChild(chip);
+  });
+  document.getElementById("journeyNote").textContent = ALL_VIEW[0].blurb;
+
+  var stages = {};
+  var gridRoot = document.getElementById("tplGrid");
+
+  PF.journeys.forEach(function (j) {
+    var list = PF.templates.filter(function (t) { return t.journey === j.id; })
+      .sort(function (a, b) { return (b.best ? 1 : 0) - (a.best ? 1 : 0); });
+    if (!list.length) return;
+
+    var section = document.createElement("section");
+    section.className = "journey-block";
+    section.setAttribute("data-journey", j.id);
+    section.innerHTML =
+      '<div class="journey-head rv">' +
+        '<div><div class="journey-kicker">' + j.label + '</div><h3>' + j.blurb + '</h3></div>' +
+        '<span class="journey-count">' + list.length + " builds</span>" +
+      '</div>' +
+      '<div class="grid g3 journey-grid"></div>';
+    gridRoot.appendChild(section);
+    var holder = section.querySelector(".journey-grid");
+
+    list.forEach(function (t) {
+      var el = document.createElement("div");
+      el.className = "tpl-card";
+      el.setAttribute("data-journey", t.journey);
+      el.innerHTML =
+        '<div class="tpl-stage pf-stage" id="stg_' + t.id + '">' +
+          '<div class="stage-faux-page">' +
+            '<div class="fx-nav"><i></i><span></span><span></span><span></span><em></em></div>' +
+            '<div class="fx-hero"><b></b><b></b><u></u><a></a></div>' +
+            '<div class="fx-cards"><div></div><div></div><div></div></div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="tpl-meta">' +
+          (t.best ? '<span class="tpl-best">Top pick</span>' : '') +
+          '<span class="tpl-name">' + t.name + '</span>' +
+          '<span class="tpl-tag">' + t.tag + '</span>' +
+        '</div>' +
+        '<div class="tpl-blurb">' + t.blurb + '</div>' +
+        '<div class="tpl-actions"><button class="btn small primary" data-open="' + t.id + '">Use template</button>' +
+        '<button class="btn small ghost" data-prev="' + t.id + '">Hide</button></div>';
+      holder.appendChild(el);
+
+      var stage = el.querySelector(".tpl-stage");
+      var cfg = PF.cfgFor(t.id);
+      cfg.name = t.name;
+      stages[t.id] = PopForge.preview(stage, cfg);
+      fitMini(stage);
+      watchStage(stage);
+    });
+  });
+
+  function watchStage(stage) {
+    var card = stage.querySelector(".pf-card");
+    if (window.ResizeObserver) {
+      if (card) new ResizeObserver(function () { fitMini(stage); }).observe(card);
+      new ResizeObserver(function () { fitMini(stage); }).observe(stage);
+    }
+    stage.querySelectorAll("img, iframe").forEach(function (el) {
+      if (el.tagName === "IMG" && el.complete && el.naturalWidth) { fitMini(stage); return; }
+      el.addEventListener("load", function () { fitMini(stage); });
+    });
+  }
+
+  function fitMini(stage) {
+    var card = stage.querySelector(".pf-card");
+    var holder = stage.querySelector(".pf-holder");
+    if (!card || !holder) return;
+    var sw = stage.clientWidth, sh = stage.clientHeight;
+    var cw = card.offsetWidth, ch = card.offsetHeight;
+    if (!cw || !ch || !sw || !sh) return;
+    var isCorner = holder.classList.contains("pf-corner");
+    // corner holders keep their real-world 22px inset on both axes,
+    // anchored to their corner, so the available box is the stage minus both insets
+    var ax = sw - (isCorner ? 44 : 0);
+    var ay = sh - (isCorner ? 44 : 0);
+    var s = Math.min(1, (ax * 0.94) / cw, (ay * 0.94) / ch);
+    if (isCorner) s = Math.min(s, (ax * 0.55) / cw);
+    if (s <= 0.02) return;
+    stage.style.setProperty("--mz", s.toFixed(3));
+  }
+
+  document.getElementById("tplGrid").addEventListener("click", function (e) {
+    var open = e.target.closest("[data-open]");
+    var prev = e.target.closest("[data-prev]");
+    if (open) location.href = "./studio.html?tpl=" + open.getAttribute("data-open");
+    if (prev) togglePreview(prev.getAttribute("data-prev"));
+  });
+
+  function togglePreview(id) {
+    var stage = document.getElementById("stg_" + id);
+    var btn = stage.closest(".tpl-card").querySelector("[data-prev]");
+    var t = PF.templates.find(function (x) { return x.id === id; });
+    if (stages[id]) {
+      stages[id].destroy();
+      stages[id].holderEl && stages[id].holderEl.remove();
+      delete stages[id];
+      if (btn) btn.textContent = "Show";
+      return;
+    }
+    var cfg = PF.cfgFor(id);
+    cfg.name = t.name;
+    stages[id] = PopForge.preview(stage, cfg);
+    fitMini(stage);
+    watchStage(stage);
+    if (btn) btn.textContent = "Hide";
+  }
+
+  /* ---------- dashboard ---------- */
+  var dashRequest = 0;
+  async function refreshDash() {
+    var request = ++dashRequest;
+    try {
+    var list = (await PF.store.loadAll()).sort(function (a, b) { return new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime(); });
+    // fetch submission counts in parallel
+    await Promise.all(list.map(async function (w) {
+      if (!PF.auth.isAuthed()) {
+        try { w.submissions = await PF.store.submissions(w.id); } catch (e) { w.submissions = []; }
+      }
+    }));
+    if (request !== dashRequest) return;
+    var empty = document.getElementById("dashEmpty");
+    var table = document.getElementById("dashTable");
+    var rows = document.getElementById("dashRows");
+    if (!list.length) { empty.style.display = "block"; table.style.display = "none"; return; }
+    empty.style.display = "none"; table.style.display = "table";
+    rows.innerHTML = "";
+    list.forEach(function (w) {
+      var t = PF.templates.find(function (x) { return x.id === (w.cfg && w.cfg.template || "blank"); });
+      var subs = PF.auth.isAuthed() ? Number(w.submissionCount) || 0 : (w.submissions || []).length;
+      var tr = document.createElement("tr");
+      tr.innerHTML =
+        "<td><b>" + esc(w.name) + "</b></td>" +
+        "<td>" + esc((t && t.name) || (w.cfg && w.cfg.template) || "custom") + "</td>" +
+        "<td><span class='pill live'>" + (PF.auth.isAuthed() ? "cloud" : "local") + "</span></td>" +
+        "<td><b>" + (Number(w.viewCount) || 0) + "</b></td>" +
+        "<td>" + subs + "</td>" +
+        "<td>" + new Date(w.updatedAt || 0).toLocaleDateString() + "</td>" +
+        "<td style='text-align:right;white-space:nowrap'>" +
+        "<button class='btn small' data-edit='" + esc(w.id) + "'>Edit</button> " +
+        "<button class='btn small' data-copy='" + esc(w.id) + "'>Install code</button> " +
+        "<button class='btn small danger' data-del='" + esc(w.id) + "'>Delete</button></td>";
+      rows.appendChild(tr);
+    });
+    } catch (e) { toast("Could not load your popups: " + e.message, false); }
+  }
+  document.getElementById("dashWrap").addEventListener("click", async function (e) {
+    var ed = e.target.closest("[data-edit]");
+    var cp = e.target.closest("[data-copy]");
+    var dl = e.target.closest("[data-del]");
+    if (ed) location.href = "./studio.html?id=" + ed.getAttribute("data-edit");
+    if (cp) {
+      if (!PF.auth.isAuthed()) {
+        toast("Create a free account to get this popup's install code", false);
+        if (window.openAuthModal) window.openAuthModal();
+        return;
+      }
+      copyToClipboard(PF.snippet(cp.getAttribute("data-copy")));
+      toast("Install code copied. Paste it once before </body>", true);
+    }
+    if (dl) {
+      try {
+      if (confirm("Delete this saved popup? This can't be undone.")) {
+        await PF.store.remove(dl.getAttribute("data-del"));
+        refreshDash();
+        toast("Deleted", true);
+      }
+      } catch (err) { toast(err.message || "Delete failed", false); }
+    }
+  });
+  document.getElementById("btnExportAll").onclick = async function () {
+    var data = JSON.stringify(await PF.store.loadAll(), null, 2);
+    var blob = new Blob([data], { type: "application/json" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "popforge-widgets-backup.json";
+    a.click();
+    toast("Backup downloaded", true);
+  };
+  document.getElementById("btnImport").onclick = function () {
+    var input = document.createElement("input");
+    input.type = "file"; input.accept = ".json,application/json";
+    input.onchange = async function () {
+      var f = input.files[0]; if (!f) return;
+      f.text().then(async function (txt) {
+        try {
+          var list = JSON.parse(txt);
+          if (!Array.isArray(list) || list.length > 200) throw new Error("bad file");
+          for (var i = 0; i < list.length; i++) {
+            if (list[i] && list[i].cfg) await PF.store.save(list[i]);
+          }
+          refreshDash();
+          toast("Imported " + list.length + " widget(s)", true);
+        } catch (err) { toast("Couldn't read that file", false); }
+      });
+    };
+    input.click();
+  };
+
+  /* helpers */
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function copyToClipboard(text) {
+    var fallback = function () {
+      var ta = document.createElement("textarea");
+      ta.value = text; document.body.appendChild(ta);
+      ta.select(); try { document.execCommand("copy"); } catch (e) {}
+      ta.remove();
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).catch(fallback);
+    else fallback();
+  }
+
+  /* ---- auth modal (shared behaviour from app.js) ---- */
+  var authUI = PF.mountAuthUI({
+    buttonId: "btnAuth",
+    onAuthChange: function () {
+      updateDashNotice();
+      refreshDash();
+    }
+  });
+
+  function updateDashNotice() {
+    var n = document.getElementById("dashNotice");
+    if (n) n.style.display = PF.auth.isAuthed() ? "none" : "flex";
+  }
+  updateDashNotice();
+
+  // Show the real install snippet in the docs section for this host.
+  var docCode = document.getElementById("docCode");
+  if (docCode) {
+    docCode.textContent =
+      '<!-- PopForge install. Paste before </body> -->\n' +
+      '<div data-popforge="wan_your_widget_id"></div>\n' +
+      '<script src="' + PF.apiBase + '/popforge.js"><\/script>';
+  }
+
+  /* ---------- nav: condensed state once the page scrolls ---------- */
+  var siteNav = document.querySelector(".site-nav");
+  var onScroll = function () { siteNav.classList.toggle("scrolled", window.scrollY > 8); };
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+
+  /* ---------- hero: a real PopForge popup, live in the browser frame ---------- */
+  var heroStage = document.getElementById("heroStage");
+  if (heroStage) {
+    var heroCfg = PF.cfgFor("lowStock");
+    if (heroCfg) {
+      PopForge.preview(heroStage, heroCfg);
+      fitMini(heroStage);
+      watchStage(heroStage);
+      var heroTimer;
+      window.addEventListener("resize", function () {
+        clearTimeout(heroTimer);
+        heroTimer = setTimeout(function () { fitMini(heroStage); }, 120);
+      }, { passive: true });
+    }
+  }
+
+  /* ---------- reveal on scroll, gently staggered ----------
+     Rect-based sweep instead of IntersectionObserver: same effect, but it can
+     never strand content at opacity 0 in browsers where IO callbacks stall. */
+  var rvList = [].slice.call(document.querySelectorAll(".rv"));
+  rvList.forEach(function (el, i) {
+    el.style.transitionDelay = (Math.min(i % 7, 5) * 45) + "ms";
+  });
+  function sweepReveals() {
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    for (var i = rvList.length - 1; i >= 0; i--) {
+      var el = rvList[i];
+      if (el.getBoundingClientRect().top < vh * 0.94) {
+        el.classList.add("in");
+        rvList.splice(i, 1);
+      }
+    }
+    if (!rvList.length && rvSweep) { clearInterval(rvSweep); rvSweep = null; }
+    return rvList.length;
+  }
+  var rvLast = 0;
+  function queueSweep() {
+    var now = Date.now();
+    if (now - rvLast < 90) return;   // cheap throttle while scrolling
+    rvLast = now;
+    sweepReveals();                  // synchronous: no rAF dependency
+  }
+  var rvSweep = setInterval(sweepReveals, 600); // safety net; self-clears
+  window.addEventListener("scroll", queueSweep, { passive: true });
+  window.addEventListener("resize", queueSweep, { passive: true });
+  window.addEventListener("load", sweepReveals);
+  sweepReveals();
+
+  // if a stored token is expired or the account is gone, drop it and show guest state
+  if (PF.auth.isAuthed()) {
+    PF.auth.me().then(function (u) {
+      if (!u) { updateAuthButton(); refreshDash(); }
+    }).catch(function (e) { toast(e.message || "Could not check your session", false); });
+  }
+
+  refreshDash();
+})();
+</script>
+</body>
+</html>

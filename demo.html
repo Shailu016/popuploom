@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boxcar Supply Co. | PopForge demo site</title>
+<link rel="stylesheet" href="./ui.css">
+</head>
+<body style="background:#F6F4EF;color:#181A1E">
+
+<header style="border-bottom:1px solid rgba(0,0,0,.1);padding:16px 0;background:#fffdf8">
+  <div class="wrap" style="display:flex;align-items:center;gap:24px">
+    <b style="font-size:18px;letter-spacing:-.02em">Boxcar Supply Co.</b>
+    <nav class="mut" style="font-size:13px">Shop · Repairs · Journal</nav>
+    <span style="margin-left:auto;font-size:12px" class="pill live">demo page, popups are armed</span>
+  </div>
+</header>
+
+<section class="wrap" style="padding:56px 0 30px">
+  <h1 style="font-size:40px;letter-spacing:-.03em;margin:0 0 12px">Tools that outlive the job site.</h1>
+  <p style="font-size:16px;color:#5B616B;max-width:620px;line-height:1.6">A fake storefront to show forged popups landing on a real-looking page. Five widgets are wired up here:</p>
+  <ul style="font-size:14px;color:#5B616B;line-height:2">
+    <li><b>Eighteen Check</b>. Age gate on arrival. Allow passes you through, deny explains.</li>
+    <li><b>Spin to Win</b>. Prize wheel fires about 9s in, one spin per visitor.</li>
+    <li><b>48-Hour Drop</b>. Flash deal with a live countdown and sticky button, about 18s in.</li>
+    <li><b>Proof Pulse</b>. Social-proof toasts in the bottom-left corner, rotating.</li>
+    <li><b>Screen Room</b>. Click the button below to eject the 90-second tour.</li>
+  </ul>
+  <p style="font-size:12.5px;color:#8A9099">Frequency rules remember visitors via localStorage. Use a private window for a clean repeat, or clear site data.</p>
+  <button id="show-tour" style="margin-top:14px;padding:12px 20px;border:0;border-radius:12px;background:#111;color:#fff;font-weight:700;cursor:pointer">▶ Watch the tour</button>
+</section>
+
+<section class="wrap grid g3" style="padding:20px 20px 80px">
+  <div class="card" style="background:#fff">
+    <b>Clawdriver Starter</b>
+    <p class="mut" style="font-size:13px;margin:8px 0 0">The one to own first.</p>
+  </div>
+  <div class="card" style="background:#fff">
+    <b>Hammer, honestly named</b>
+    <p class="mut" style="font-size:13px;margin:8px 0 0">Honest 16oz and heavy-ish.</p>
+  </div>
+  <div class="card" style="background:#fff">
+    <b>Tape Measure XL</b>
+    <p class="mut" style="font-size:13px;margin:8px 0 0">12 meters of self-love.</p>
+  </div>
+</section>
+
+<footer style="border-top:1px solid rgba(0,0,0,.1);padding:20px 0 40px" class="mut">
+  <div class="wrap" style="font-size:12px">Boxcar Supply Co., demo page for <b style="color:#181A1E">PopForge</b>. Open <a href="./index.html" style="color:#111">the studio</a> to edit what fires here.</div>
+  </footer>
+
+<script src="./popforge.js"></script>
+<script>
+  function arm(cfg) {
+    var div = document.createElement("div");
+    div.setAttribute("data-popforge-test", "1");
+    div.setAttribute("data-popforge", window.PopForge.encodeCfg(cfg));
+    document.body.appendChild(div);
+  }
+
+  // ---- Eighteen Check: on load, always ----
+  arm({
+    v: 1, id: "demo_age", name: "Eighteen Check", template: "age18",
+    placement: "modal",
+    trigger: { type: "load" },
+    frequency: "always",
+    pages: { mode: "all" },
+    devices: { desktop: true, mobile: true },
+    sticky: { enabled: false, label: "" },
+    theme: { style: "ink", accent: "#F99A1F", accentText: "#261303", text: "#EFEDEB", bg: "#0F1117", radius: 20, animation: "pop", overlay: true },
+    content: {
+      badge: "Age verification",
+      title: "Are you 18\nor older?",
+      body: "This demo shop carries sharp things. One tap and you're through. We don't store your answer.",
+      ageGate: {
+        enabled: true, minAge: 18,
+        allowLabel: "Yes, I'm 18 or older",
+        denyLabel: "No, take me back",
+        denyUrl: "",
+        denyMessage: "Sorry, you must be 18 or older to enter.",
+        allowMessage: "Welcome in. Enjoy responsibly."
+      },
+      note: "A courtesy gate, not a profile."
+    }
+  });
+
+  // ---- Spin to Win: 9s in, once per day ----
+  arm({
+    v: 1, id: "demo_spin", name: "Spin to Win", template: "wheelWin",
+    placement: "modal",
+    trigger: { type: "delay", delay: 9 },
+    frequency: "once:day",
+    pages: { mode: "all" },
+    devices: { desktop: true, mobile: true },
+    sticky: { enabled: true, label: "Spin!" },
+    theme: { style: "ink", accent: "#FFC53D", accentText: "#221A00", text: "#F4EEDF", bg: "#131722", radius: 22, animation: "pop", overlay: true },
+    content: {
+      badge: "One spin per visitor",
+      title: "Spin to win",
+      body: "A real prize, no tricks. The wheel decides; the code is yours either way.",
+      image: "./assets/prize-bundle.jpg",
+      spin: {
+        enabled: true, buttonText: "SPIN",
+        segments: [
+          { emoji: "🎁", label: "10% off" },
+          { emoji: "🎉", label: "20% off" },
+          { emoji: "🚚", label: "Free shipping" },
+          { emoji: "😅", label: "Try again" },
+          { emoji: "💰", label: "$10 credit" },
+          { emoji: "⭐", label: "Mystery gift" }
+        ]
+      },
+      note: "Codes work at checkout. One spin, once a day."
+    }
+  });
+
+  // ---- 48-Hour Drop: 18s in, once per day, countdown +48h, coupon ----
+  arm({
+    v: 1, id: "demo_48h", name: "48-Hour Drop", template: "drop48",
+    placement: "modal",
+    trigger: { type: "delay", delay: 18 },
+    frequency: "once:day",
+    pages: { mode: "all" },
+    devices: { desktop: true, mobile: true },
+    sticky: { enabled: true, label: "48H Drop" },
+    theme: { style: "ink", accent: "#F99A1F", accentText: "#261303", text: "#F2F4F6", bg: "#14181F", radius: 20, animation: "pop", overlay: true },
+    content: {
+      badge: "48-hour drop",
+      title: "The weekend window is open",
+      body: "Everything storewide sits at 30% off while the clock runs. Grab a code. It dies with the timer.",
+      image: "./assets/flash-watch.jpg",
+      countdown: { target: new Date(Date.now() + 48 * 36e5).toISOString() },
+      coupon: { code: "WINDOW-48" },
+      buttonText: "Claim the code",
+      buttonUrl: "#deal",
+      note: "Ends when the timer hits zero. No exceptions."
+    }
+  });
+
+  // ---- Proof Pulse: 21s in, corner toasts, always ----
+  arm({
+    v: 1, id: "demo_proof", name: "Proof Pulse", template: "proofPulse",
+    placement: "slide:bl",
+    trigger: { type: "delay", delay: 21 },
+    frequency: "always",
+    pages: { mode: "all" },
+    devices: { desktop: true, mobile: true },
+    sticky: { enabled: false, label: "" },
+    theme: { style: "light", accent: "#F99A1F", accentText: "#261303", text: "#171A1F", bg: "#FFFFFF", radius: 16, animation: "slideUp", overlay: false },
+    content: {
+      proof: {
+        enabled: true, interval: 5000,
+        items: [
+          { name: "Maya", action: "just unlocked 20% off", ago: "2 min ago" },
+          { name: "Derek", action: "signed up for the drop list", ago: "6 min ago" },
+          { name: "Priya", action: "claimed the free-shipping code", ago: "11 min ago" }
+        ]
+      }
+    }
+  });
+
+  // ---- Screen Room: opens via #show-tour click ----
+  arm({
+    v: 1, id: "demo_tour", name: "Screen Room", template: "player",
+    placement: "modal",
+    trigger: { type: "click", selector: "#show-tour" },
+    frequency: "always",
+    pages: { mode: "all" },
+    devices: { desktop: true, mobile: true },
+    sticky: { enabled: false, label: "" },
+    theme: { style: "light", accent: "#151A20", accentText: "#FFFFFF", text: "#12151A", bg: "#FFFFFF", radius: 16, animation: "fade", overlay: true },
+    content: {
+      title: "The 90-second shop tour",
+      body: "How browsing, buying and pickup work. Short film.",
+      videoEmbed: "https://www.youtube.com/watch?v=G6Dp2Ly3aO0",
+      buttonText: "Watch full film",
+      buttonUrl: "#tour"
+    }
+  });
+</script>
+</body>
+</html>

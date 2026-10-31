@@ -1,0 +1,16 @@
+node_modules/
+.env
+.env.*
+!.env.example
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.log
+coverage/
+playwright-report/
+test-results/
+qa-shot.js
+.DS_Store
+Thumbs.db

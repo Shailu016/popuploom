@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PopForge Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./ui.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23F99A1F'/%3E%3Cpath d='M17 6L9 18h6l-4 8 12-13h-6l4-7z' fill='%23261303'/%3E%3C/svg%3E">
+</head>
+<body class="studio-body">
+
+<div class="studio-nav">
+  <div class="wrap inner">
+    <a class="logo" href="./index.html"><span class="mark"><svg viewBox="0 0 32 32" width="15" height="15" aria-hidden="true"><path d="M17 6L9 18h6l-4 8 12-13h-6l4-7z" fill="currentColor"/></svg></span> Pop<span><i>Forge</i></span></a>
+    <a class="btn small ghost" href="./index.html#dash">← My popups</a>
+    <span class="pill" id="tplPill">template</span>
+    <input class="name-input" id="nameInput" placeholder="Name this widget" maxlength="48">
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+      <button class="btn small ghost" id="btnAuth">Sign in</button>
+      <button class="btn small" id="btnTest">▶ Test now</button>
+      <button class="btn small danger" id="btnDel">Delete</button>
+      <button class="btn small primary" id="btnSave">Save widget</button>
+    </div>
+  </div>
+</div>
+
+<div class="studio-grid">
+  <div class="rail" id="panel-rail">
+    <div class="tabs">
+      <button class="tab on" data-p="content">Content</button>
+      <button class="tab" data-p="design">Design</button>
+      <button class="tab" data-p="behavior">Behavior</button>
+      <button class="tab" data-p="publish">Publish</button>
+    </div>
+    <div class="advbar">
+      <label class="toggle" title="Show advanced options">
+        <input type="checkbox" id="advToggle" hidden><span class="track"></span>
+      </label>
+      <span style="font-weight:700;font-size:13px;letter-spacing:-.01em">Advanced options</span>
+      <span class="mut" style="font-size:11.5px;margin-left:auto" id="advHint">off</span>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="panel on" id="panel_content">
+      <div class="fieldset">
+        <label class="label">Badge (optional kicker)</label>
+        <input class="inp" id="f-badge" placeholder="e.g. Summer pilot">
+      </div>
+      <div class="fieldset">
+        <label class="label">Headline</label>
+        <textarea class="ta" id="f-title" rows="2" placeholder="Big and bold. Line breaks are allowed"></textarea>
+      </div>
+      <div class="fieldset">
+        <label class="label">Body text</label>
+        <textarea class="ta" id="f-body" rows="3" placeholder="Short, one idea, no essays."></textarea>
+      </div>
+      <div class="fieldset adv">
+        <label class="label">Image URL</label>
+        <input class="inp" id="f-image" placeholder="https://…/hero.jpg">
+        <div class="hintline">Optional. Shows above the headline at card width.</div>
+      </div>
+      <div class="fieldset adv">
+        <label class="label">Video embed</label>
+        <input class="inp" id="f-video" placeholder="YouTube or Vimeo link">
+        <div class="hintline">Takes the media slot automatically and fits 16:9.</div>
+      </div>
+      <div class="row2">
+        <div class="fieldset">
+          <label class="label">Button label</label>
+          <input class="inp" id="f-btnLabel" placeholder="Book a slot">
+        </div>
+        <div class="fieldset">
+          <label class="label">Button URL</label>
+          <input class="inp" id="f-btnUrl" placeholder="https://…">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="fieldset">
+          <label class="label">Button style</label>
+          <select class="sel" id="f-btnStyle">
+            <option value="light">Accent</option>
+            <option value="dark">Ink (dark)</option>
+          </select>
+        </div>
+        <div class="fieldset">
+          <label class="label">Coupon code</label>
+          <input class="inp mono" id="f-couponCode" placeholder="WELCOME-10">
+          <div class="hintline">Shows a tap-to-copy chip.</div>
+        </div>
+      </div>
+      <div class="fieldset" style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px">
+        <label class="toggle" style="margin-bottom:10px">
+          <input type="checkbox" id="formEnabled" hidden><span class="track"></span><b style="font-size:13.5px">Lead form (replaces button)</b>
+        </label>
+        <div id="formBlock" style="display:none">
+          <div class="row2">
+            <div>
+              <label class="label">Submit label</label>
+              <input class="inp" id="formBtnLabel" placeholder="Join the list">
+            </div>
+            <div>
+              <label class="label">Success message</label>
+              <input class="inp" id="formSuccess" placeholder="Thanks, you're in!">
+            </div>
+          </div>
+          <div class="adv" style="margin-top:10px">
+            <label class="label">Webhook (optional)</label>
+            <input class="inp mono" id="formHook" placeholder="https://hooks.zapier.com/…">
+            <div class="hintline">Every submission POSTs there (no-cors) <i>and</i> is kept on-device under the widget's shelf entry.</div>
+          </div>
+          <div class="adv" style="margin-top:10px">
+            <label class="label">Fields</label>
+            <div id="fieldsList"></div>
+            <button class="btn small" id="addField" type="button">+ Add field</button>
+          </div>
+        </div>
+      </div>
+      <div class="fieldset" style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px">
+        <label class="label">Tap-meter choices (optional)</label>
+        <div class="hintline" style="margin:0 0 10px">Quick emoji picks for a 1-tap feedback poll. Fills the button zone.</div>
+        <div id="choicesList"></div>
+        <button class="btn small" id="addChoice" type="button">+ Add choice</button>
+      </div>
+      <div class="fieldset" style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px">
+        <label class="toggle" style="margin-bottom:10px">
+          <input type="checkbox" id="spinEnabled" hidden><span class="track"></span><b style="font-size:13.5px">Prize wheel (replaces button)</b>
+        </label>
+        <div id="spinBlock" style="display:none">
+          <label class="label">Spin button label</label>
+          <input class="inp" id="spinBtnLabel" placeholder="SPIN">
+          <label class="label" style="margin-top:10px">Wheel segments</label>
+          <div id="spinList"></div>
+          <button class="btn small" id="addSpinSeg" type="button">+ Add segment</button>
+          <div class="hintline">Each segment is a prize. Every spin is logged with the widget's leads.</div>
+        </div>
+      </div>
+      <div class="fieldset" style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px">
+        <label class="toggle" style="margin-bottom:10px">
+          <input type="checkbox" id="ageEnabled" hidden><span class="track"></span><b style="font-size:13.5px">Age gate (replaces button)</b>
+        </label>
+        <div id="ageBlock" style="display:none">
+          <div class="row2">
+            <div>
+              <label class="label">Allow label</label>
+              <input class="inp" id="ageAllow" placeholder="Yes, I'm 18 or older">
+            </div>
+            <div>
+              <label class="label">Deny label</label>
+              <input class="inp" id="ageDeny" placeholder="No, I'm under 18">
+            </div>
+          </div>
+          <div class="fieldset adv" style="margin-top:10px">
+            <label class="label">Deny redirect (optional)</label>
+            <input class="inp" id="ageDenyUrl" placeholder="https://google.com">
+            <div class="hintline">Leave empty to show the deny message instead of redirecting.</div>
+          </div>
+          <div class="fieldset" style="margin-top:10px">
+            <label class="label">Deny message</label>
+            <input class="inp" id="ageDenyMsg" placeholder="Sorry, you must be 18 or older to enter.">
+          </div>
+        </div>
+      </div>
+      <div class="fieldset" style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px">
+        <label class="toggle" style="margin-bottom:10px">
+          <input type="checkbox" id="proofEnabled" hidden><span class="track"></span><b style="font-size:13.5px">Social proof toasts</b>
+        </label>
+        <div id="proofBlock" style="display:none">
+          <label class="label">Seconds per item</label>
+          <input class="inp" type="number" min="3" id="proofInterval" value="5" style="max-width:100px">
+          <label class="label" style="margin-top:10px">Activity items (rotate one at a time)</label>
+          <div id="proofList"></div>
+          <button class="btn small" id="addProofItem" type="button">+ Add item</button>
+          <div class="hintline">Pops into a corner card and cycles through the list. Set Headline/Body empty for a clean toast.</div>
+        </div>
+      </div>
+      <div class="fieldset" style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px">
+        <label class="label">Shortcut links row (optional)</label>
+        <div id="linksList"></div>
+        <button class="btn small" id="addLink" type="button">+ Add link</button>
+      </div>
+      <div class="row2">
+        <div class="fieldset">
+          <label class="label">Countdown</label>
+          <select class="sel" id="f-countdownPreset">
+            <option value="">Off</option>
+            <option value="1">1 hour</option>
+            <option value="24">24 hours</option>
+            <option value="48">48 hours</option>
+            <option value="72">72 hours</option>
+            <option value="custom">Custom date</option>
+          </select>
+          <div class="hintline">Shows a live clock strip counting down.</div>
+          <div id="cdCustomRow" style="display:none;margin-top:10px">
+            <label class="label">Ends at</label>
+            <input class="inp" type="datetime-local" id="f-countdownTarget">
+          </div>
+        </div>
+        <div class="fieldset">
+          <label class="label">Fine print</label>
+          <input class="inp" id="f-note" placeholder="…small legality/PR line">
+        </div>
+      </div>
+    </div>
+
+    <!-- DESIGN -->
+    <div class="panel" id="panel_design">
+      <div class="fieldset">
+        <label class="label">Card mood</label>
+        <select class="sel" id="d-style">
+          <option value="light">Daylight (white card)</option>
+          <option value="ink">Ink (midnight card)</option>
+        </select>
+      </div>
+      <div class="fieldset">
+        <label class="label">Accent</label>
+        <div class="swatches" id="palette">
+          <div class="sw" data-color="#F99A1F" style="background:#F99A1F"></div>
+          <div class="sw" data-color="#FF6B4A" style="background:#FF6B4A"></div>
+          <div class="sw" data-color="#4EA1FF" style="background:#4EA1FF"></div>
+          <div class="sw" data-color="#C9A0FF" style="background:#C9A0FF"></div>
+          <div class="sw" data-color="#FFC53D" style="background:#FFC53D"></div>
+          <div class="sw" data-color="#1B1612" style="background:#1B1612"></div>
+        </div>
+        <div class="colorrow" style="margin-top:10px">
+          <input type="color" id="d-accent" value="#F99A1F"><span class="mut" style="font-size:12px">accent</span>
+        </div>
+        <div class="colorrow mt16 adv">
+          <input type="color" id="d-accentText" value="#261303"><span class="mut" style="font-size:12px">text on accent</span>
+          <input type="color" id="d-text" value="#171A20"><span class="mut" style="font-size:12px">body text</span>
+          <input type="color" id="d-bg" value="#FFFFFF"><span class="mut" style="font-size:12px">card bg (light)</span>
+        </div>
+      </div>
+      <div class="fieldset rangebox">
+        <label class="label">Corner radius <span id="d-radiusOut" class="mut" style="font-weight:600;text-transform:none;float:right">18px</span></label>
+        <input type="range" id="d-radius" min="0" max="32" value="18">
+      </div>
+      <div class="fieldset">
+        <label class="label">Entry animation</label>
+        <select class="sel" id="d-anim">
+          <option value="pop">Pop (spring scale)</option>
+          <option value="fade">Fade</option>
+          <option value="slideDown">Slide down</option>
+          <option value="slideUp">Slide up</option>
+        </select>
+      </div>
+      <div class="fieldset adv">
+        <label class="label">Background image</label>
+        <input class="inp" id="d-bgImg" placeholder="https://…/backdrop.jpg">
+        <div class="hintline">Covers the card with a darkening veil. Text switches automatically to light.</div>
+      </div>
+      <div class="fieldset check adv">
+        <label class="toggle">
+          <input type="checkbox" id="d-overlay" hidden checked><span class="track"></span>
+        </label>
+        <span style="font-weight:700;font-size:13.5px">Dim backdrop (modal)</span>
+      </div>
+      <div class="fieldset" style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px">
+        <label class="toggle">
+          <input type="checkbox" id="stickyEnabled" hidden><span class="track"></span><b style="font-size:13.5px;margin-left:14px">Sticky door-knock button</b>
+        </label>
+        <div class="hintline">A round pill parked at bottom-right that re-opens the popup whenever it's clicked. Great for deals.</div>
+        <div id="stickyLabelRow" style="display:none;margin-top:10px">
+          <label class="label">Sticky button label</label>
+          <input class="inp" id="stickyLabel" placeholder="Deal!">
+        </div>
+      </div>
+    </div>
+
+    <!-- BEHAVIOR -->
+    <div class="panel" id="panel_behavior">
+      <div class="fieldset">
+        <label class="label">Placement</label>
+        <select class="sel" id="b-placement">
+          <option value="modal">Modal, centered takeover</option>
+          <option value="fullscreen">Fullscreen, wall-to-wall takeover</option>
+          <option value="slide:br">Slide-in, bottom-right</option>
+          <option value="slide:bl">Slide-in, bottom-left</option>
+          <option value="slide:tr">Slide-in, top-right</option>
+          <option value="slide:tl">Slide-in, top-left</option>
+          <option value="topbar">Masthead bar, top strip</option>
+          <option value="bottombar">Anchor bar, bottom strip</option>
+        </select>
+      </div>
+      <div class="fieldset">
+        <label class="label">Show when…</label>
+        <select class="sel" id="b-trigger">
+          <option value="load">Page loads</option>
+          <option value="delay">After a timer</option>
+          <option value="scrollPct">After scrolling deep</option>
+          <option value="scrollTo">Scrolling past an element</option>
+          <option value="click">Clicking a certain button</option>
+          <option value="exitIntent">Exit intent (desktop)</option>
+        </select>
+        <div id="wf-delay" style="display:block;margin-top:10px">
+          <label class="label">Gracetime (seconds)</label>
+          <input class="inp" type="number" id="t-delay" min="0" value="5" style="max-width:120px">
+        </div>
+        <div id="wf-pct" style="display:none;margin-top:10px">
+          <label class="label">Scroll depth <span id="t-pctOut" class="mut" style="float:right;font-weight:600;text-transform:none">50%</span></label>
+          <input type="range" id="t-pct" min="5" max="95" value="50">
+        </div>
+        <div id="wf-sel" class="adv" style="display:none;margin-top:10px">
+          <label class="label">CSS selector</label>
+          <input class="inp mono" id="t-selector" placeholder=".cta-buy or #show-tour">
+          <div class="hintline" id="t-selectorHint"></div>
+        </div>
+        <div class="hintline" id="b-switchHint">Fire several triggers together. The first one to hit wins.</div>
+      </div>
+      <div class="fieldset">
+        <label class="label">How often</label>
+        <select class="sel" id="b-frequency">
+          <option value="always">Every page load</option>
+          <option value="once:day">Once a day per visitor</option>
+          <option value="once:week">Once a week per visitor</option>
+          <option value="once:ever">Once ever per visitor</option>
+          <option value="close24h">Until closed, then rest 24h</option>
+        </select>
+      </div>
+      <div class="fieldset adv">
+        <label class="label">Page rules</label>
+        <label class="check"><input type="radio" name="pmode" data-pmode="all" checked> <span>Whole site</span></label>
+        <label class="check"><input type="radio" name="pmode" data-pmode="include"> <span>Only listed paths</span></label>
+        <label class="check"><input type="radio" name="pmode" data-pmode="exclude"> <span>Everywhere except listed</span></label>
+        <div id="b-includeBox" style="display:none;margin-top:8px">
+          <label class="label">Include paths (one per line, * allowed)</label>
+          <textarea class="ta mono" id="b-include" rows="3" placeholder="/shop/*&#10;/checkout*"></textarea>
+        </div>
+        <div id="b-excludeBox" style="display:none;margin-top:8px">
+          <label class="label">Exclude paths (one per line, * allowed)</label>
+          <textarea class="ta mono" id="b-exclude" rows="3" placeholder="/legal/*&#10;/status"></textarea>
+        </div>
+      </div>
+      <div class="fieldset adv">
+        <label class="label">Devices</label>
+        <label class="check"><input type="checkbox" id="b-devDesktop" checked> <span>🖥️ Desktop</span></label>
+        <label class="check"><input type="checkbox" id="b-devMobile" checked> <span>📱 Mobile</span></label>
+        <div class="hintline">Exit intent self-disables on touch. No fumbling needed.</div>
+      </div>
+    </div>
+
+    <!-- PUBLISH -->
+    <div class="panel" id="panel_publish">
+      <div class="fieldset card" id="pubGate">
+        <b style="display:block;margin-bottom:6px">Install on your website</b>
+        <p class="mut" style="font-size:13px;margin:0 0 14px;line-height:1.6">Install codes are tied to an account, so your popup can pull its live config and report views and leads back to you. You can keep designing as a guest; your draft stays in this browser.</p>
+        <button class="btn primary bigsave" data-open-auth>Sign in or create a free account</button>
+        <div class="hintline" style="margin-top:10px">Free while you build. No card.</div>
+      </div>
+
+      <div class="fieldset card" id="pubUnsaved" style="display:none">
+        <b style="display:block;margin-bottom:6px">One step left</b>
+        <p class="mut" style="font-size:13px;margin:0 0 14px;line-height:1.6">Save this popup to your account and its install code appears right here.</p>
+        <button class="btn primary bigsave" id="btnSaveFromPublish">Save widget</button>
+      </div>
+
+      <div class="fieldset card" id="pubReady" style="display:none">
+        <div class="checkline"><b id="pubName">Untitled popup</b><span class="mut" id="pubAccount">Signed in</span></div>
+        <div class="checkline">✓ <b>Auto-sync:</b> once installed, edits saved in this studio go live on your site without touching the snippet again.</div>
+        <div class="checkline">⚠ <b>One rule:</b> the snippet must reference <span class="mono">popforge.js</span> from a path your visitors' browsers can actually load (this server, or a copy on your CDN).</div>
+        <button class="btn primary bigsave" id="btnCopySnippet">Copy install code</button>
+      </div>
+
+      <div class="fieldset pf-snippet-wrap" id="pubSnippetWrap" style="display:none">
+        <label class="label">Your install code</label>
+        <div class="codebox" id="pubBox"></div>
+        <div class="hintline" style="margin-top:8px">Paste before <span class="mono">&lt;/body&gt;</span> on every page where the popup should run. One widget id, one code, any number of pages.</div>
+      </div>
+      <div class="fieldset card">
+        <label class="label" style="margin-bottom:10px">Where it works out-of-the-box</label>
+        <div class="_pf_snips mut" style="font-size:13px;line-height:1.85">
+          WordPress (Custom HTML block) · Shopify (custom liquid / theme editor) · Webflow (embed) · Elementor HTML widget · Wix custom element (body-level) · Carrd, Ghost, GitHub Pages, any static host, any hand-written HTML.
+        </div>
+        <div class="hintline" style="margin-top:8px">Inside builders that lock widgets into an iframe (editor previews, Canva, Google Sites), fixed popups can't escape the frame. Mount the snippet at body level where the platform allows code, or use a bar placement instead of a corner slide.</div>
+      </div>
+      <div class="fieldset card">
+        <label class="label">Sanity checks</label>
+        <div class="pub-list mut">
+          <li>▶ <b>Test now</b> fires the current design as a real overlay.</li>
+          <li>Frequency rules remember visitors via <span class="mono">localStorage</span>. Use a private window for a clean test.</li>
+          <li>Views + saved leads count up under <b>My popups</b>.</li>
+          <li>Export your shelf as a .json backup before clearing browser data.</li>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stage-col">
+    <div class="stage-head">
+      <span style="font-weight:800;font-size:13px;letter-spacing:.06em;text-transform:uppercase" class="mut">Live preview</span>
+      <div class="device-pill">
+        <button class="on" data-dev="desktop">🖥 Desktop</button>
+        <button data-dev="mobile">📱 Mobile</button>
+      </div>
+      <span class="mut" style="font-size:12px;margin-left:auto">Frequency rules are off in preview</span>
+    </div>
+    <div class="stage" id="stage">
+      <div class="stage-faux-page">
+        <div class="fx-nav"><i></i><span></span><span></span><span></span><em></em></div>
+        <div class="fx-hero"><b></b><b></b><u></u><a></a></div>
+        <div class="fx-cards"><div></div><div></div><div></div></div>
+      </div>
+    </div>
+    <div class="mut" style="font-size:12px;margin-top:10px;text-align:center">Trigger timing is silenced here. Hit ▶ Test now for the real overlay effect.</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Auth modal (same shared behaviour as the landing page) -->
+<div id="authModal" class="modal">
+  <div class="modal-card">
+    <h3 id="authTitle">Sign in</h3>
+    <p class="mut" id="authSub" style="font-size:13.5px;margin:0 0 20px">Welcome back. Your saved popups and install codes are waiting.</p>
+
+    <div class="fieldset" style="margin-bottom:14px;display:none" id="authNameRow">
+      <label class="label">Your name</label>
+      <input class="inp" id="authName" type="text" placeholder="Maya" autocomplete="name" maxlength="60">
+    </div>
+
+    <div id="authGoogleWrap" style="display:none;margin-bottom:18px">
+      <div id="authGoogleBtn" style="display:flex;justify-content:center;min-height:44px"></div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:16px;color:var(--muted-2);font-size:11px;letter-spacing:.1em;text-transform:uppercase">
+        <span style="flex:1;height:1px;background:rgba(255,255,255,.1)"></span>or use email<span style="flex:1;height:1px;background:rgba(255,255,255,.1)"></span>
+      </div>
+    </div>
+
+    <div class="fieldset" style="margin-bottom:14px">
+      <label class="label">Email</label>
+      <input class="inp" id="authEmail" type="email" placeholder="you@example.com" autocomplete="email">
+    </div>
+    <div class="fieldset" style="margin-bottom:20px">
+      <label class="label">Password</label>
+      <input class="inp" id="authPass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')submitAuth()">
+    </div>
+    <div id="authErr" style="color:var(--danger);font-size:13px;margin-bottom:12px;display:none"></div>
+    <button class="btn primary" style="width:100%;margin-bottom:12px" id="authSubmit" onclick="submitAuth()">Sign in</button>
+    <div style="text-align:center;font-size:13.5px" class="mut">
+      <span id="authSwitchText">New to PopForge?</span>
+      <a href="#" onclick="toggleAuthMode();return false" style="color:var(--acc);font-weight:600;text-decoration:none" id="authSwitchLink">Create one</a>
+    </div>
+    <div style="text-align:center;margin-top:16px">
+      <a href="#" onclick="closeAuthModal();return false" class="mut" style="font-size:12.5px;text-decoration:none">Keep designing as a guest</a>
+    </div>
+  </div>
+</div>
+
+<script src="./popforge.js"></script>
+<script src="./app.js"></script>
+<script src="./studio.js"></script>
+</body>
+</html>
