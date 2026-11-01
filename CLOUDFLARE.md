@@ -13,3 +13,13 @@ Legacy bcrypt passwords remain valid and upgrade to PBKDF2 after successful logi
 Rate counters use atomic D1 upserts shared across isolates with hashed IP keys and periodic expiry cleanup. These produce D1 writes and are not a substitute for edge protection against large distributed attacks. Config reads use no-store and D1 directly to avoid per-location cache invalidation problems. Review D1 usage and production traffic capacity before launch.
 
 The integration suite runs the actual Wrangler bundle using an isolated SQLite-backed D1 adapter and local HTTP bridge; it does not emulate every Cloudflare runtime/CPU constraint. A live Cloudflare/D1 smoke test and real Google sign-in still need validation after configuration. Existing production data is never used by the suites.
+
+## Live deployment
+
+URL: https://popforge.hyperzod-alerts.workers.dev
+
+Account: shailendra@hyperzod.com (existing authenticated Cloudflare account). D1 database: popforge. JWT_SECRET is stored as an encrypted Cloudflare secret and is not in this repository. No paid upgrade, purchased domain or other paid add-on was enabled. Account billing subscriptions could not be read with the current OAuth scope; verify the Workers plan in the dashboard before relying on a zero-cost guarantee. Free-tier quotas apply.
+
+Production started with a fresh database; local accounts and data were not imported. Live HTTPS and Chrome smoke tests passed registration, login, saved widget config, lead capture, deletion, logout revocation, gallery loading and studio test popups. The temporary test account was removed.
+
+To publish later changes: npm run deploy:cf. Google sign-in needs an OAuth client configured with this deployment origin; email/password login is working.

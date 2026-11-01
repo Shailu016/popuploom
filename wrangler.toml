@@ -1,5 +1,7 @@
 # PopForge on Cloudflare Workers + D1
 name = "popforge"
+account_id = "3756fc6127db533059ae745ba42fc7df"
+workers_dev = true
 main = "worker/index.js"
 compatibility_date = "2026-10-01"
 
@@ -16,9 +18,8 @@ run_worker_first = true
 [[d1_databases]]
 binding = "DB"
 database_name = "popforge"
-# Placeholder for local development. After `wrangler d1 create popforge`,
-# replace this with the real id from the Cloudflare dashboard output.
-database_id = "00000000-0000-0000-0000-000000000000"
+# Production D1 database provisioned for this deployment.
+database_id = "d3d5d84f-dc1d-462a-a71c-acadec18a154"
 migrations_dir = "worker/migrations"
 
 [vars]
