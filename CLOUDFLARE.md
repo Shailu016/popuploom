@@ -16,10 +16,10 @@ The integration suite runs the actual Wrangler bundle using an isolated SQLite-b
 
 ## Live deployment
 
-URL: https://popforge.hyperzod-alerts.workers.dev
+Current URL: https://popforge.shailu3597.workers.dev
 
-Account: shailendra@hyperzod.com (existing authenticated Cloudflare account). D1 database: popforge. JWT_SECRET is stored as an encrypted Cloudflare secret and is not in this repository. No paid upgrade, purchased domain or other paid add-on was enabled. Account billing subscriptions could not be read with the current OAuth scope; verify the Workers plan in the dashboard before relying on a zero-cost guarantee. Free-tier quotas apply.
+Owner: shailu3597@gmail.com. Database ID: eefbbb0c-aabb-4b08-b596-f0cf53aadc88. The encrypted JWT_SECRET is stored in Cloudflare and is not committed. No paid upgrade or domain purchase was enabled. Free-tier quotas apply; billing subscriptions were not readable with the deployment OAuth scopes.
 
-Production started with a fresh database; local accounts and data were not imported. Live HTTPS and Chrome smoke tests passed registration, login, saved widget config, lead capture, deletion, logout revocation, gallery loading and studio test popups. The temporary test account was removed.
+The former hyperzod-account public site and previews were disabled at the owner's request; its database was preserved. Local databases were not imported or modified. Production uses a fresh database.
 
-To publish later changes: npm run deploy:cf. Google sign-in needs an OAuth client configured with this deployment origin; email/password login is working.
+Live HTTPS, crawl files, metadata and public SEO routes are responding. To publish updates use npm run deploy:cf. Google sign-in needs a configured OAuth client and authorized origin; none is configured currently. See SEO.md for indexing and webmaster verification steps.

@@ -593,7 +593,7 @@
     h += '<button class="pf-close" aria-label="Close">&#10005;</button><div class="pf-body">';
     var A = safeColor(th.accent, "#F99A1F");
     if (mc.badge) h += '<div class="pf-badge">' + esc(mc.badge) + "</div>";
-    if (mc.image) h += '<div class="pf-media"><img src="' + escAttr(safeUrl(mc.image, true)) + '" alt=""></div>';
+    if (mc.image) h += '<div class="pf-media"><img loading="lazy" decoding="async" src="' + escAttr(safeUrl(mc.image, true)) + '" alt=""></div>';
     if (mc.videoEmbed) h += '<div class="pf-vid">' + videoFrame(mc.videoEmbed) + "</div>";
     if (mc.title) h += '<div class="pf-title">' + esc(mc.title) + "</div>";
     if (mc.body) h += '<div class="pf-text">' + esc(mc.body) + "</div>";

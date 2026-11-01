@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://popforge.shailu3597.workers.dev/sitemap.xml

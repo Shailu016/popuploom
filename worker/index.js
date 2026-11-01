@@ -16,7 +16,7 @@ const JSON_LIMIT = 192 * 1024;
 
 // Explicit public allowlist, same as the Express server's static middleware.
 const PUBLIC_FILES = new Set([
-  "index.html", "studio.html", "profile.html", "demo.html",
+  "templates.html", "guides/install-popups.html", "robots.txt", "sitemap.xml", "llms.txt", "index.html", "studio.html", "profile.html", "demo.html",
   "app.js", "studio.js", "popforge.js", "ui.css"
 ]);
 
@@ -205,25 +205,27 @@ async function serveIndex(env, request, sec, cors, headOnly) {
 }
 
 async function serveStatic(request, env, pathname, sec, cors, headOnly) {
+  if (pathname === "/index.html") return Response.redirect(new URL("/", request.url).href, 308);
   const file = pathname === "/" ? "/index.html" : pathname;
   if (PUBLIC_FILES.has(file.slice(1))) {
     const asset = await env.ASSETS.fetch(new Request(new URL(file, request.url)));
     if (asset.status === 404) return new Response("Not found", { status: 404, headers: { ...sec, ...cors } });
     const headers = new Headers(asset.headers);
     headers.set("Cache-Control", "no-store");
+    if (["/studio.html", "/profile.html", "/demo.html"].includes(file)) headers.set("X-Robots-Tag", "noindex, follow");
     if (file.endsWith(".html")) for (const [key, value] of Object.entries(htmlHeaders(env, file.slice(1)))) headers.set(key, value);
     return new Response(headOnly ? null : asset.body, { status: asset.status, headers: { ...sec, ...cors, ...Object.fromEntries(headers) } });
   }
   if (file.startsWith("/assets/")) {
     const asset = await env.ASSETS.fetch(new Request(new URL(file, request.url)));
     // Express falls through to the SPA fallback when a static asset is missing.
-    if (asset.status === 404) return serveIndex(env, request, sec, cors, headOnly);
+    if (asset.status === 404) return new Response("Not found", {status:404,headers:{...sec,...cors,"X-Robots-Tag":"noindex"}});
     const headers = new Headers(asset.headers);
     headers.set("Cache-Control", "no-store");
     return new Response(headOnly ? null : asset.body, { status: asset.status, headers: { ...sec, ...cors, ...Object.fromEntries(headers) } });
   }
   // SPA-ish fallback: serve index.html for unknown routes (but not API)
-  return serveIndex(env, request, sec, cors, headOnly);
+  return new Response(headOnly ? null : `<!doctype html><html lang="en"><head><title>Page not found | PopForge</title><meta name="robots" content="noindex"></head><body><h1>Page not found</h1><a href="/">Return to PopForge</a></body></html>`, {status:404,headers:{...sec,...cors,"Content-Type":"text/html; charset=utf-8","X-Robots-Tag":"noindex"}});
 }
 
 export default {

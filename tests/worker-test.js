@@ -33,13 +33,24 @@ async function req(method, path, { token, body, headers, raw } = {}) {
   r = await req("GET", "/popforge.js", { raw: true });
   check("popforge.js 200 no-store", r.status === 200 && r.headers.get("cache-control") === "no-store");
   r = await req("GET", "/server/index.js");
-  check("server/index.js blocked (SPA fallback returns html)", r.status === 200 && typeof r.data === "string" && r.data.includes("<!DOCTYPE") || r.data.includes("<html"));
+  check("server/index.js returns 404", r.status === 404 && typeof r.data === "string" && !r.data.includes("const fs"));
   r = await req("GET", "/package.json");
-  check("package.json blocked (SPA fallback)", r.status === 200 && typeof r.data === "string" && (r.data.includes("<html") || r.data.includes("<!DOCTYPE")));
+  check("package.json returns 404", r.status === 404 && typeof r.data === "string");
   r = await req("GET", "/some/unknown/page");
-  check("unknown route -> index.html 200", r.status === 200 && typeof r.data === "string" && (r.data.includes("<html") || r.data.includes("<!DOCTYPE")));
+  check("unknown route returns real 404", r.status === 404 && typeof r.data === "string");
   r = await req("HEAD", "/");
   check("HEAD / 200 empty body", r.status === 200);
+
+  console.log("== SEO ==");
+  for (const path of ["/", "/templates.html", "/guides/install-popups.html"]) {
+    const response = await fetch(BASE + path); const html = await response.text();
+    check("indexable metadata " + path, response.status === 200 && /name="description"/.test(html) && html.includes('rel="canonical"') && !html.includes('content="noindex'));
+    check("single H1 " + path, (html.match(/<h1[ >]/g) || []).length === 1);
+    for (const match of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) { JSON.parse(match[1]); }
+  }
+  for (const path of ["/robots.txt", "/sitemap.xml", "/llms.txt"]) { const response = await fetch(BASE + path); check("crawler file " + path, response.status === 200 && !(await response.text()).includes("<!doctype")); }
+  const redirect = await fetch(BASE + "/index.html", {redirect:"manual"}); check("canonical homepage redirect", redirect.status === 308);
+  const editor = await fetch(BASE + "/studio.html"); check("studio noindex header", editor.headers.get("x-robots-tag")?.includes("noindex"));
 
   console.log("== health/api 404 ==");
   r = await req("GET", "/api/health");

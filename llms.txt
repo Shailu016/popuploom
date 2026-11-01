@@ -1,0 +1,17 @@
+# PopForge
+
+> Free website popup builder with 45 templates, a visual editor, hosted widget configuration and lead capture.
+
+## Public product information
+- [Overview and FAQ](https://popforge.shailu3597.workers.dev/): features, account requirements, supported triggers and limitations.
+- [Template catalog](https://popforge.shailu3597.workers.dev/templates.html): all 45 starting designs grouped by purpose.
+- [Installation guide](https://popforge.shailu3597.workers.dev/guides/install-popups.html): installation, platform constraints and troubleshooting.
+
+## Product facts
+- Guest users can design and preview. An account and saved widget are required for hosted install code.
+- Supported automatic triggers: page load, delay, scroll depth, scroll to element, click and desktop exit intent. Choose one per widget.
+- Custom HTML/JavaScript support is required on the destination website. Iframe embeds cannot escape their frame.
+- Captured responses are associated with the owner's saved widget; API and account data are not public documentation.
+- No conversion outcome or search ranking is guaranteed.
+
+This file is an optional product summary, not a crawler access policy or a promise of AI visibility. See robots.txt for crawler rules.
