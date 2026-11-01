@@ -67,11 +67,13 @@ function hostReq(host, path, method = "GET") {
   const OLD_HOST = "popforge.shailu3597.workers.dev";
   const WWW_HOST = "www.popuploom.com";
   r = await hostReq(OLD_HOST, "/");
-  check("legacy homepage redirects to apex", r.status === 308 && r.headers.location === "https://popuploom.com/", r.status);
+  check("legacy homepage stays usable before cutover", r.status === 200 && !r.headers.location, r.status);
   r = await hostReq(OLD_HOST, "/templates.html?ref=1");
-  check("legacy page redirect keeps query", r.status === 308 && r.headers.location === "https://popuploom.com/templates.html?ref=1");
+  check("legacy templates stay direct before cutover", r.status === 200 && !r.headers.location);
   r = await hostReq(OLD_HOST, "/index.html");
-  check("legacy index.html redirects in one hop", r.status === 308 && r.headers.location === "https://popuploom.com/");
+  check("legacy index.html normalizes on its own host before cutover", r.status === 308 && r.headers.location === "http://" + OLD_HOST + "/");
+  r = await hostReq(OLD_HOST, "/studio.html?tpl=cafeClub");
+  check("legacy studio stays direct before cutover", r.status === 200 && !r.headers.location);
   r = await hostReq(OLD_HOST, "/migration.html");
   check("legacy recovery page stays direct", r.status === 200 && !r.headers.location && /noindex/.test(r.headers["x-robots-tag"] || ""));
   r = await hostReq(OLD_HOST, "/popforge.js");

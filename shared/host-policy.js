@@ -45,7 +45,9 @@ function isDirectPath(pathname) {
  * Returns an absolute redirect target for a browser page move, or null when the
  * request should be handled normally. `rawUrl` must be the absolute request URL.
  */
-function pageRedirect(rawUrl, method) {
+function pageRedirect(rawUrl, method, cutoverEnabled = false) {
+  // Fail closed until DNS, TLS and the new application have been verified.
+  const moveLegacy = cutoverEnabled === true || cutoverEnabled === "true";
   if (method !== "GET" && method !== "HEAD") return null;
   let url;
   try { url = new URL(rawUrl); } catch (e) { return null; }
@@ -55,7 +57,7 @@ function pageRedirect(rawUrl, method) {
   // Same-origin /index.html normalization is safe on every host (including
   // localhost) and keeps one canonical URL per deployment.
   if (pathname === "/index.html") {
-    if (APEX_HOSTS.has(host) || WWW_HOSTS.has(host) || LEGACY_HOSTS.has(host)) {
+    if (APEX_HOSTS.has(host) || WWW_HOSTS.has(host) || (moveLegacy && LEGACY_HOSTS.has(host))) {
       return NEW_ORIGIN + "/" + url.search;
     }
     return url.origin + "/" + url.search;
@@ -66,7 +68,7 @@ function pageRedirect(rawUrl, method) {
 
   if (WWW_HOSTS.has(host)) return NEW_ORIGIN + pathname + url.search;
 
-  if (LEGACY_HOSTS.has(host)) {
+  if (moveLegacy && LEGACY_HOSTS.has(host)) {
     const mapped = LEGACY_PAGES.get(pathname);
     return mapped ? NEW_ORIGIN + mapped + url.search : null;
   }

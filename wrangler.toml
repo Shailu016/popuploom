@@ -28,6 +28,9 @@ migrations_dir = "worker/migrations"
 # Leave empty to allow only same-origin (and public widget endpoints).
 APP_ORIGINS = ""
 
+# Enable only after apex DNS, HTTPS and application smoke checks pass.
+DOMAIN_CUTOVER_ENABLED = "false"
+
 NODE_ENV = "production"
 
 [build]

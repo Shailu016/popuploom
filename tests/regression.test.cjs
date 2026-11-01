@@ -11,6 +11,7 @@ process.env.DB_PATH=path.join(temp,'test.db');
 process.env.JWT_SECRET=crypto.randomBytes(32).toString('hex');
 process.env.NODE_ENV='test';
 process.env.TRUST_PROXY='';
+process.env.DOMAIN_CUTOVER_ENABLED='false';
 process.env.GOOGLE_CLIENT_ID='';
 const app=require('../server/index');
 let server,base,account,widget;
@@ -231,7 +232,8 @@ test('shared namespace, dual attributes and API override precedence',()=>{
  assert.equal(box.window.checkRef(legacyOnly),'wan_old');
 });
 test('host policy only moves known pages and never crosses hosts for API or runtime files',()=>{
- const {pageRedirect}=require('../shared/host-policy');
+ const {pageRedirect:policy}=require('../shared/host-policy');
+ const pageRedirect=(url,method)=>policy(url,method,true);
  const apex='https://popuploom.com',old='https://popforge.shailu3597.workers.dev';
  assert.equal(pageRedirect(apex+'/','GET'),null);
  assert.equal(pageRedirect(apex+'/templates.html','GET'),null);
@@ -257,6 +259,15 @@ test('host policy only moves known pages and never crosses hosts for API or runt
  assert.equal(pageRedirect('http://localhost:3000/index.html','GET'),'http://localhost:3000/');
  assert.equal(pageRedirect('http://localhost:3000/','GET'),null);
 });
+test('legacy cutover defaults off and requires an explicit enable value',()=>{
+ const {pageRedirect}=require('../shared/host-policy');
+ const old='https://popforge.shailu3597.workers.dev';
+ for(const flag of [undefined,false,'false','0','TRUE','yes']){
+  for(const path of ['/','/studio.html?tpl=cafeClub','/templates.html','/profile.html'])assert.equal(pageRedirect(old+path,'GET',flag),null);
+  assert.equal(pageRedirect(old+'/index.html?ref=1','HEAD',flag),old+'/?ref=1');
+ }
+ for(const flag of [true,'true'])assert.equal(pageRedirect(old+'/studio.html?tpl=cafeClub','GET',flag),'https://popuploom.com/studio.html?tpl=cafeClub');
+});
 function rawRequest(path,{method='GET',host}={}){
  return new Promise((resolve,reject)=>{
   const u=new URL(base);const req=require('node:http').request({hostname:u.hostname,port:u.port,path,method,headers:host?{Host:host}:{}},res=>{
@@ -267,8 +278,9 @@ function rawRequest(path,{method='GET',host}={}){
 test('Express redirects match the shared policy and leave API/runtime requests alone',async()=>{
  const old='popforge.shailu3597.workers.dev';
  let r=await rawRequest('/index.html');assert.equal(r.status,308);assert.equal(r.headers.location,base+'/');
- r=await rawRequest('/',{host:old});assert.equal(r.status,308);assert.equal(r.headers.location,'https://popuploom.com/');
- r=await rawRequest('/studio.html?tpl=cafeClub',{host:old});assert.equal(r.status,308);assert.equal(r.headers.location,'https://popuploom.com/studio.html?tpl=cafeClub');
+ r=await rawRequest('/',{host:old});assert.equal(r.status,200);assert.equal(r.headers.location,undefined);
+ r=await rawRequest('/studio.html?tpl=cafeClub',{host:old});assert.equal(r.status,200);assert.equal(r.headers.location,undefined);
+ r=await rawRequest('/index.html?ref=1',{host:old});assert.equal(r.status,308);assert.equal(r.headers.location,'http://'+old+'/?ref=1');
  r=await rawRequest('/migration.html',{host:old});assert.equal(r.status,200);assert.match(r.headers['x-robots-tag']||'',/noindex/);assert.ok(r.body.includes('pf.widgets'));
  r=await rawRequest('/popforge.js',{host:old});assert.equal(r.status,200);assert.match(r.headers['content-type']||'',/javascript/);
  r=await rawRequest('/api/health',{host:old});assert.equal(r.status,200);assert.ok(r.body.includes('"ok":true'));

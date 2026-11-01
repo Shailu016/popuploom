@@ -65,3 +65,9 @@ Owner: shailu3597@gmail.com. Database ID: `eefbbb0c-aabb-4b08-b596-f0cf53aadc88`
 The former hyperzod-account public site and previews were disabled at the owner's request; its database was preserved. Local databases were not imported or modified. Production uses a fresh database.
 
 Live HTTPS, crawl files, metadata and public SEO routes are responding on the legacy host. To publish updates use `npm run deploy:cf` or push to `main`. Google sign-in needs a configured OAuth client and authorized origin; none is configured currently. See `SEO.md` for indexing and webmaster verification steps.
+
+## Domain redirect safety gate
+
+`DOMAIN_CUTOVER_ENABLED` defaults to `"false"` in Wrangler and `.env.example`. When absent or disabled, legacy browser pages stay on the working workers.dev origin; `/index.html` only normalizes on that same origin. Both runtimes and all API paths remain direct.
+
+Only set `DOMAIN_CUTOVER_ENABLED = "true"` after apex DNS, valid HTTPS, application pages, sign-in, and external embeds have been verified. Keep it false while domain setup is blocked. The rebrand source metadata already targets the apex, so the entire rebrand is still a staged release: do not publish it merely because redirect tests pass. Complete or deliberately defer the canonical metadata cutover before releasing. Existing permanent redirects cached by clients cannot be undone by this flag; keep the target domain reachable if cutover was previously enabled.

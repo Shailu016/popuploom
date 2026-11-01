@@ -249,7 +249,7 @@ export default {
 
     // Permanent browser-page moves only: the shared policy leaves API calls,
     // runtime files, assets and the recovery page on their current host.
-    const redirect = hostPolicy.pageRedirect(request.url, method);
+    const redirect = hostPolicy.pageRedirect(request.url, method, env.DOMAIN_CUTOVER_ENABLED);
     if (redirect) {
       return new Response(null, {
         status: 308,

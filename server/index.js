@@ -25,7 +25,7 @@ const PORT = process.env.PORT || 3000;
 // Permanent browser-page moves (apex canonicalization and legacy-host moves).
 // API/runtime/asset requests are never redirected by the shared policy.
 app.use((req, res, next) => {
-  const target = hostPolicy.pageRedirect(req.protocol + "://" + req.get("host") + req.originalUrl, req.method);
+  const target = hostPolicy.pageRedirect(req.protocol + "://" + req.get("host") + req.originalUrl, req.method, process.env.DOMAIN_CUTOVER_ENABLED);
   if (!target) return next();
   res.setHeader("Location", target);
   res.setHeader("Cache-Control", "no-store");

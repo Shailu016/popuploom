@@ -13,3 +13,9 @@ The dedicated deploy token is stored as the encrypted repository Actions secret 
 Verified on 2026-11-01: all tests, production deployment, and live health verification passed in https://github.com/Shailu016/popforge/actions/runs/41303371404. That run is the pre-rebrand baseline.
 
 Schema migrations and customer-data imports are not executed automatically. Review and apply migrations separately using the existing deployment instructions. No paid plan or billing upgrade was enabled by this setup; GitHub Actions and Cloudflare account allowances still apply.
+
+## Domain redirect safety gate
+
+`DOMAIN_CUTOVER_ENABLED` defaults to `"false"` in Wrangler and `.env.example`. When absent or disabled, legacy browser pages stay on the working workers.dev origin; `/index.html` only normalizes on that same origin. Both runtimes and all API paths remain direct.
+
+Only set `DOMAIN_CUTOVER_ENABLED = "true"` after apex DNS, valid HTTPS, application pages, sign-in, and external embeds have been verified. Keep it false while domain setup is blocked. The rebrand source metadata already targets the apex, so the entire rebrand is still a staged release: do not publish it merely because redirect tests pass. Complete or deliberately defer the canonical metadata cutover before releasing. Existing permanent redirects cached by clients cannot be undone by this flag; keep the target domain reachable if cutover was previously enabled.
