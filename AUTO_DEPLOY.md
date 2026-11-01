@@ -1,13 +1,13 @@
 # Automatic deployment
 
-Workflow: .github/workflows/deploy-cloudflare.yml. Pushes to main and manual dispatch run locked dependency installation, Worker integration/unit tests and application/browser regressions before deployment. Jobs serialize production releases and use read-only repository permissions. Third-party actions are pinned to verified official action commit hashes. Deployment credentials are available only in the production deployment step.
+Automatic deployment is configured for the private Shailu016/popforge repository. Every push to main runs the tests and deploys to https://popforge.shailu3597.workers.dev/ if they pass. Manual deployment is also available through the Test and deploy to Cloudflare workflow.
 
-Destination: PopForge in the shailu3597@gmail.com Cloudflare account (66d3b261587ce5aeb4849141b6cca30d). Health URL: https://popforge.shailu3597.workers.dev/api/health.
+Workflow: .github/workflows/deploy-cloudflare.yml. It installs locked dependencies, checks Worker integration and unit tests, and runs application/browser regressions before deployment. Production releases run sequentially. Repository permissions are read-only, official actions are pinned to commit hashes, and the deployment credential is available only in the deployment step.
 
-One-time prerequisites:
-1. The GitHub login publishing the workflow needs workflow scope.
-2. Create a dedicated Cloudflare API token with the Edit Cloudflare Workers template restricted to this Gmail account. Do not copy a Wrangler OAuth login or JWT_SECRET into CI. Existing application secrets remain in Cloudflare.
-3. Add the token as the repository Actions secret CLOUDFLARE_API_TOKEN at https://github.com/Shailu016/popforge/settings/secrets/actions . Never commit the token or paste it into chat.
-4. Push main or run Test and deploy to Cloudflare from the Actions tab. Verify a successful run and the live health check before calling auto-deployment active.
+Destination: the shailu3597@gmail.com Cloudflare account (66d3b261587ce5aeb4849141b6cca30d). The workflow verifies https://popforge.shailu3597.workers.dev/api/health after deployment.
 
-Schema migrations and customer-data imports are deliberately not executed automatically. Review and apply migrations separately using the existing deployment instructions. No paid plan or billing overage configuration is enabled; GitHub Actions and Cloudflare account allowances still apply.
+The dedicated PopForge GitHub Deploy token is stored as the encrypted repository Actions secret CLOUDFLARE_API_TOKEN. It is restricted to this Cloudflare account, with Workers Scripts: Edit and Account Settings: Read. It has no expiration; revoke or rotate it through Cloudflare API Tokens if access is no longer needed. Never commit the token, copy a personal Wrangler OAuth credential into CI, or paste credentials into chat. Existing application secrets remain in Cloudflare.
+
+Verified on 2026-11-01: all tests, production deployment, and live health verification passed in https://github.com/Shailu016/popforge/actions/runs/41303371404.
+
+Schema migrations and customer-data imports are not executed automatically. Review and apply migrations separately using the existing deployment instructions. No paid plan or billing upgrade was enabled by this setup; GitHub Actions and Cloudflare account allowances still apply.
