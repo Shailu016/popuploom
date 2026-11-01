@@ -1,6 +1,17 @@
 # Security review
 
-Reviewed: 2026-11-01. Scope: this repository, local API and browser runtime.
+Reviewed: 2026-11-01. Scope: this repository, local API, Cloudflare Worker and browser runtime.
+
+## Rebrand migration boundaries
+
+The PopupLoom identity migration keeps the security model unchanged:
+
+- `/popuploom.js` and `/popforge.js` serve the same bytes and are never redirected across hosts, so an installed site's CSP can keep allowing its existing script origin.
+- Page redirects are limited to an exact allowlist of known browser pages and method GET/HEAD. `/api/*`, runtime files, assets and `/migration.html` stay on the host that received the request.
+- Redirect targets are built from a fixed apex origin plus the validated request path/query. The Worker does not trust a user-supplied Host header.
+- The migration page is `noindex,nofollow`, reads only `pf.widgets` in the browser, performs no upload, and never clears or overwrites drafts.
+- The new CSRF/CORS surface is unchanged: public widget endpoints remain cross-origin by design; private endpoints still require same-origin and authorization.
+- CSP hashes are regenerated for the new `migration.html` inline script; no `unsafe-inline` script policy was added.
 
 ## Fixed findings and hardening
 
@@ -18,9 +29,11 @@ https://developers.google.com/identity/gsi/web/guides/verify-google-id-token
 
 ## Evidence
 
-- npm test: **22 groups passed, 0 failed, 0 skipped**.
+- `npm test`: **26 groups passed, 0 failed, 0 skipped**.
+- Worker integration suite: **79 assertions passed**, including legacy/new host policy, runtime alias identity and migration noindex.
 - Real headless Chrome tested every one of the 45 templates, studio behavior, mobile layouts, blocked script/event-handler injections, legitimate inline controls, and server-revoked logout.
 - API checks cover cross-account access, private files, forged/revoked sessions, origin rejection, public embed compatibility, depth/size/encoding rejection, rate-limit bypass attempts, retry deduplication and pagination.
+- Migration checks cover dual runtime paths loaded in either order, dual attribute handling, API override precedence, legacy analytics, host-specific redirects, non-redirected API/runtime requests and replayed scans.
 - Authentication fixtures verify the signed-claim mapping and Gmail/Workspace/third-party linking rules. CSP tests cover per-page hashes, line endings and edits.
 - npm audit: **0 known vulnerabilities**, production and development dependencies included.
 - Tests use isolated temporary databases and browser profiles. The existing project database was not used.

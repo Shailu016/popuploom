@@ -3,6 +3,7 @@ import auth from "./auth.js";
 import http from "./http.js";
 import widgets from "./widgets.js";
 import { originCheck, securityHeaders, htmlHeaders } from "./security.js";
+import hostPolicy from "../shared/host-policy.js";
 
 const { ApiError, register, login, findOrCreateGoogleUser, verifyCredential, getUserById, updateProfile, authMiddleware, revokeToken } = auth;
 const { json, rateLimit } = http;
@@ -16,8 +17,8 @@ const JSON_LIMIT = 192 * 1024;
 
 // Explicit public allowlist, same as the Express server's static middleware.
 const PUBLIC_FILES = new Set([
-  "templates.html", "guides/install-popups.html", "robots.txt", "sitemap.xml", "llms.txt", "index.html", "studio.html", "profile.html", "demo.html",
-  "app.js", "studio.js", "popforge.js", "ui.css"
+  "templates.html", "guides/install-popups.html", "robots.txt", "sitemap.xml", "llms.txt", "index.html", "studio.html", "profile.html", "demo.html", "migration.html",
+  "app.js", "studio.js", "popuploom.js", "popforge.js", "ui.css"
 ]);
 
 // [regex, method, handler, needsAuth]
@@ -183,7 +184,7 @@ async function handleApi(request, env, ctx, pathname, method, cors) {
 // Keep API errors machine-readable without exposing SQL, paths, or stack traces.
 function errorResponse(e) {
   if (e instanceof ApiError) return json({ error: e.message }, e.status, e.headers || {});
-  console.error("[popforge] request failed:", e && e.message);
+  console.error("[popuploom] request failed:", e && e.message);
   return json({ error: "Server error" }, 500);
 }
 
@@ -205,14 +206,13 @@ async function serveIndex(env, request, sec, cors, headOnly) {
 }
 
 async function serveStatic(request, env, pathname, sec, cors, headOnly) {
-  if (pathname === "/index.html") return Response.redirect(new URL("/", request.url).href, 308);
   const file = pathname === "/" ? "/index.html" : pathname;
   if (PUBLIC_FILES.has(file.slice(1))) {
     const asset = await env.ASSETS.fetch(new Request(new URL(file, request.url)));
     if (asset.status === 404) return new Response("Not found", { status: 404, headers: { ...sec, ...cors } });
     const headers = new Headers(asset.headers);
     headers.set("Cache-Control", "no-store");
-    if (["/studio.html", "/profile.html", "/demo.html"].includes(file)) headers.set("X-Robots-Tag", "noindex, follow");
+    if (["/studio.html", "/profile.html", "/demo.html", "/migration.html"].includes(file)) headers.set("X-Robots-Tag", file === "/migration.html" ? "noindex, nofollow" : "noindex, follow");
     if (file.endsWith(".html")) for (const [key, value] of Object.entries(htmlHeaders(env, file.slice(1)))) headers.set(key, value);
     return new Response(headOnly ? null : asset.body, { status: asset.status, headers: { ...sec, ...cors, ...Object.fromEntries(headers) } });
   }
@@ -224,8 +224,8 @@ async function serveStatic(request, env, pathname, sec, cors, headOnly) {
     headers.set("Cache-Control", "no-store");
     return new Response(headOnly ? null : asset.body, { status: asset.status, headers: { ...sec, ...cors, ...Object.fromEntries(headers) } });
   }
-  // SPA-ish fallback: serve index.html for unknown routes (but not API)
-  return new Response(headOnly ? null : `<!doctype html><html lang="en"><head><title>Page not found | PopForge</title><meta name="robots" content="noindex"></head><body><h1>Page not found</h1><a href="/">Return to PopForge</a></body></html>`, {status:404,headers:{...sec,...cors,"Content-Type":"text/html; charset=utf-8","X-Robots-Tag":"noindex"}});
+  // Unknown paths are real 404s, never a soft homepage.
+  return new Response(headOnly ? null : `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Page not found | PopupLoom</title><meta name="robots" content="noindex"></head><body style="background:#0A0B10;color:#F5F5F7;font-family:system-ui,sans-serif;padding:48px"><h1 style="font-size:28px">Page not found</h1><p style="color:#9DA0AC">That page does not exist. <a href="/" style="color:#FF6A1F">Return to PopupLoom</a>.</p></body></html>`, {status:404,headers:{...sec,...cors,"Content-Type":"text/html; charset=utf-8","X-Robots-Tag":"noindex"}});
 }
 
 export default {
@@ -246,6 +246,16 @@ export default {
     const method = request.method;
     const headOnly = method === "HEAD";
     const effectiveMethod = headOnly ? "GET" : method;
+
+    // Permanent browser-page moves only: the shared policy leaves API calls,
+    // runtime files, assets and the recovery page on their current host.
+    const redirect = hostPolicy.pageRedirect(request.url, method);
+    if (redirect) {
+      return new Response(null, {
+        status: 308,
+        headers: { ...sec, ...cors, Location: redirect, "Cache-Control": "no-store" }
+      });
+    }
 
     if (method === "OPTIONS") {
       return new Response(null, {

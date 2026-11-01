@@ -17,9 +17,20 @@ const { register, login, findOrCreateGoogleUser, getUserById, updateProfile, aut
 const { verifyCredential, isConfigured, CLIENT_ID } = require("./google");
 const widgetsRouter = require("./routes/widgets");
 const db = require("./db");
+const hostPolicy = require("../shared/host-policy");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Permanent browser-page moves (apex canonicalization and legacy-host moves).
+// API/runtime/asset requests are never redirected by the shared policy.
+app.use((req, res, next) => {
+  const target = hostPolicy.pageRedirect(req.protocol + "://" + req.get("host") + req.originalUrl, req.method);
+  if (!target) return next();
+  res.setHeader("Location", target);
+  res.setHeader("Cache-Control", "no-store");
+  res.status(308).end();
+});
 
 // Middleware
 app.disable("x-powered-by");
@@ -79,7 +90,7 @@ app.get("/api/auth/config", (req, res) => {
   res.json({ googleClientId: isConfigured() ? CLIENT_ID : null });
 });
 
-// Exchange a Google Identity Services credential for a PopForge session.
+// Exchange a Google Identity Services credential for a PopupLoom session.
 app.post("/api/auth/google", async (req, res) => {
   try {
     const credential = req.body && req.body.credential;
@@ -122,8 +133,8 @@ app.get("/api/health", (req, res) => res.json({ ok: true, version: "2.0" }));
 
 // ---- Static files (frontend): explicit public allowlist ----
 const publicFiles = new Set([
-  "templates.html", "guides/install-popups.html", "robots.txt", "sitemap.xml", "llms.txt", "index.html", "studio.html", "profile.html", "demo.html",
-  "app.js", "studio.js", "popforge.js", "ui.css"
+  "templates.html", "guides/install-popups.html", "robots.txt", "sitemap.xml", "llms.txt", "index.html", "studio.html", "profile.html", "demo.html", "migration.html",
+  "app.js", "studio.js", "popuploom.js", "popforge.js", "ui.css"
 ]);
 app.use((req, res, next) => {
   if (req.method !== "GET" && req.method !== "HEAD") return next();
@@ -132,25 +143,29 @@ app.use((req, res, next) => {
   catch (e) { return res.status(400).end(); }
   if (pathname === "/") pathname = "/index.html";
   if (!publicFiles.has(pathname.slice(1))) return next();
+  const file = pathname === "/popforge.js" ? "/popuploom.js" : pathname;
   res.setHeader("Cache-Control", "no-store");
-  if (pathname.endsWith(".html")) security.htmlHeaders(res, pathname.slice(1));
-  res.sendFile(path.join(__dirname, "..", pathname.slice(1)));
+  if (file.endsWith(".html")) {
+    security.htmlHeaders(res, file.slice(1));
+    if (file === "/migration.html") res.setHeader("X-Robots-Tag", "noindex, nofollow");
+  }
+  res.sendFile(path.join(__dirname, "..", file.slice(1)));
 });
 app.use("/assets", express.static(path.join(__dirname, "..", "assets"), {
   dotfiles: "deny", index: false, redirect: false,
   setHeaders: res => res.setHeader("Cache-Control", "no-store")
 }));
 
-// SPA-ish fallback: serve index.html for unknown routes (but not API)
+// Unknown routes are real 404s, not a soft homepage.
 app.get("*", (req, res, next) => {
   if (req.path.startsWith("/api/")) return next();
   security.htmlHeaders(res);
-  res.sendFile(path.join(__dirname, "..", "index.html"));
+  res.status(404).type("html").send('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Page not found | PopupLoom</title><meta name="robots" content="noindex"></head><body style="background:#0A0B10;color:#F5F5F7;font-family:system-ui,sans-serif;padding:48px"><h1 style="font-size:28px">Page not found</h1><p style="color:#9DA0AC">That page does not exist. <a href="/" style="color:#FF6A1F">Return to PopupLoom</a>.</p></body></html>');
 });
 
 if (require.main === module) app.listen(PORT, () => {
   console.log("");
-  console.log("  ⚡ PopForge server running");
+  console.log("  ⚡ PopupLoom server running");
   console.log("  → http://localhost:" + PORT);
   console.log("  → API: http://localhost:" + PORT + "/api");
   console.log("  → DB:  " + (process.env.DB_PATH || path.join(__dirname, "..", "popforge.db")));
@@ -163,7 +178,7 @@ app.use("/api", (req, res) => res.status(404).json({ error: "Endpoint not found"
 app.use((err, req, res, next) => {
   if (res.headersSent) return next(err);
   const status = err.status === 413 ? 413 : err.status === 415 ? 415 : err instanceof SyntaxError || err.status === 400 ? 400 : 500;
-  if (status === 500) console.error("[popforge] request failed:", err.message);
+  if (status === 500) console.error("[popuploom] request failed:", err.message);
   res.status(status).json({ error: status === 413 ? "Request is too large" : status === 415 ? "Unsupported content encoding" : status === 400 ? "Invalid request" : "Server error" });
 });
 module.exports = app;

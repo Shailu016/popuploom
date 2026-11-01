@@ -1,4 +1,5 @@
 // tests/worker-test.js — full API pass against wrangler dev (port 8787)
+const http = require("node:http");
 const BASE = process.env.BASE || "http://localhost:8787";
 let pass = 0, fail = 0;
 const fails = [];
@@ -24,6 +25,21 @@ async function req(method, path, { token, body, headers, raw } = {}) {
   return { status: res.status, data };
 }
 
+// Sends a request with an alternate Host header so the shared host policy can
+// be exercised without DNS or a deployed custom domain.
+function hostReq(host, path, method = "GET") {
+  return new Promise((resolve, reject) => {
+    const base = new URL(BASE);
+    const r = http.request({ hostname: base.hostname, port: base.port, path, method, headers: { Host: host } }, res => {
+      const chunks = [];
+      res.on("data", c => chunks.push(c));
+      res.on("end", () => resolve({ status: res.statusCode, headers: res.headers, body: Buffer.concat(chunks).toString("utf8") }));
+    });
+    r.on("error", reject);
+    r.end();
+  });
+}
+
 (async () => {
   console.log("== static/security ==");
   let r = await req("GET", "/", { raw: true });
@@ -32,6 +48,12 @@ async function req(method, path, { token, body, headers, raw } = {}) {
   check("studio.html CSP present", r.status === 200 && /content-security-policy/i.test(Array.from(r.headers.keys()).join(",")));
   r = await req("GET", "/popforge.js", { raw: true });
   check("popforge.js 200 no-store", r.status === 200 && r.headers.get("cache-control") === "no-store");
+  const legacyRuntime = await (await fetch(BASE + "/popforge.js")).text();
+  r = await req("GET", "/popuploom.js", { raw: true });
+  check("popuploom.js 200 no-store", r.status === 200 && r.headers.get("cache-control") === "no-store");
+  check("runtime alias is byte-identical", (await (await fetch(BASE + "/popuploom.js")).text()) === legacyRuntime);
+  r = await req("GET", "/migration.html", { raw: true });
+  check("migration page noindex + CSP", r.status === 200 && /noindex, nofollow/.test(r.headers.get("x-robots-tag") || "") && /content-security-policy/i.test(Array.from(r.headers.keys()).join(",")));
   r = await req("GET", "/server/index.js");
   check("server/index.js returns 404", r.status === 404 && typeof r.data === "string" && !r.data.includes("const fs"));
   r = await req("GET", "/package.json");
@@ -40,6 +62,36 @@ async function req(method, path, { token, body, headers, raw } = {}) {
   check("unknown route returns real 404", r.status === 404 && typeof r.data === "string");
   r = await req("HEAD", "/");
   check("HEAD / 200 empty body", r.status === 200);
+
+  console.log("== host policy ==");
+  const OLD_HOST = "popforge.shailu3597.workers.dev";
+  const WWW_HOST = "www.popuploom.com";
+  r = await hostReq(OLD_HOST, "/");
+  check("legacy homepage redirects to apex", r.status === 308 && r.headers.location === "https://popuploom.com/", r.status);
+  r = await hostReq(OLD_HOST, "/templates.html?ref=1");
+  check("legacy page redirect keeps query", r.status === 308 && r.headers.location === "https://popuploom.com/templates.html?ref=1");
+  r = await hostReq(OLD_HOST, "/index.html");
+  check("legacy index.html redirects in one hop", r.status === 308 && r.headers.location === "https://popuploom.com/");
+  r = await hostReq(OLD_HOST, "/migration.html");
+  check("legacy recovery page stays direct", r.status === 200 && !r.headers.location && /noindex/.test(r.headers["x-robots-tag"] || ""));
+  r = await hostReq(OLD_HOST, "/popforge.js");
+  check("legacy runtime stays direct", r.status === 200 && !r.headers.location && r.body.includes("PopupLoom"));
+  r = await hostReq(OLD_HOST, "/popuploom.js");
+  check("new runtime on legacy host stays direct", r.status === 200 && !r.headers.location);
+  r = await hostReq(OLD_HOST, "/assets/favicon.svg");
+  check("legacy static assets stay direct", r.status === 200 && !r.headers.location);
+  r = await hostReq(OLD_HOST, "/api/health");
+  check("legacy API stays direct", r.status === 200 && !r.headers.location && r.body.includes('"ok":true'));
+  r = await hostReq(OLD_HOST, "/unknown-page");
+  check("legacy unknown path is a real 404", r.status === 404 && !r.headers.location);
+  r = await hostReq(OLD_HOST, "/", "POST");
+  check("legacy POST is never redirected", r.status !== 308 && !r.headers.location, r.status);
+  r = await hostReq(WWW_HOST, "/studio.html?tpl=cafeClub");
+  check("www page redirects to apex", r.status === 308 && r.headers.location === "https://popuploom.com/studio.html?tpl=cafeClub");
+  r = await hostReq(WWW_HOST, "/api/health");
+  check("www API stays direct", r.status === 200 && !r.headers.location);
+  r = await hostReq("popuploom.com", "/");
+  check("apex homepage serves 200", r.status === 200 && !r.headers.location, r.status);
 
   console.log("== SEO ==");
   for (const path of ["/", "/templates.html", "/guides/install-popups.html"]) {
@@ -111,6 +163,10 @@ async function req(method, path, { token, body, headers, raw } = {}) {
   console.log("== public config/view/submit ==");
   r = await req("GET", "/api/widgets/" + wid + "/config");
   check("public config 200 no owner data", r.status === 200 && r.data.id === wid && !("user_id" in r.data), r);
+  r = await hostReq(OLD_HOST, "/api/widgets/" + wid + "/config");
+  check("legacy host serves live config directly", r.status === 200 && !r.headers.location && r.body.includes(wid));
+  r = await hostReq(OLD_HOST, "/api/widgets/" + wid + "/view", "POST");
+  check("legacy host POST is not redirected", r.status !== 308 && !r.headers.location, r.status);
   r = await req("GET", "/api/widgets/does-not-exist-123/config");
   check("unknown config 404", r.status === 404);
   r = await req("POST", "/api/widgets/" + wid + "/view");

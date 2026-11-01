@@ -1,8 +1,10 @@
-# PopForge
+# PopupLoom
 
-A fresh, self-serve popup tool for your own site visitors to create, save, and reuse. Built from scratch. Vanilla frontend (no build step) plus a small Node backend (Express + SQLite) for accounts, cloud saves, and lead/view tallies.
+Free website popup builder with a visual editor, popup templates, hosted embeds, and lead capture. Vanilla frontend (no build step) plus a small Node backend (Express + SQLite) for accounts, cloud saves, and lead/view tallies.
 
-> Design note: PopForge is conceptually inspired by existing popup platforms but is an original product. Its own identity, dark-studio UI, template designs, copy, naming, and an improved behavior model. Nothing is copied.
+Canonical site: **https://popuploom.com/**
+
+> The private repository, project folder, Worker service, D1 database and CI token keep their original `popforge` names. Those are infrastructure identifiers, not visible branding. Keeping them preserves existing deployments and data.
 
 ---
 
@@ -12,12 +14,15 @@ A fresh, self-serve popup tool for your own site visitors to create, save, and r
 |---|---|
 | `index.html` | Landing page + template gallery (45 live mini-previews, category filters) + My popups shelf/dashboard |
 | `studio.html` + `studio.js` | The editor ("studio"): Content / Design / Behavior / Publish tabs with live preview |
-| `popforge.js` | The runtime. The drop-in embed engine your visitors paste onto their sites |
+| `popuploom.js` | The runtime. The drop-in embed engine your visitors paste onto their sites. Canonical source, also served as `/popforge.js` through a byte-for-byte alias |
 | `app.js` | Shared code: API-aware storage, auth, the template catalog (original designs), helpers |
-| `assets/` | Original template imagery (twelve generated in-house product shots across discount, email, gamified and seasonal templates) |
-| `ui.css` | Studio/landing theme |
+| `migration.html` | Noindex recovery page on the former host for guest drafts saved in `localStorage` |
+| `assets/` | Original template imagery, PopupLoom wordmark/mark and favicons, and `og-popuploom.png` |
+| `ui.css` | Studio/landing theme ("Refined Ember on Graphite") |
 | `demo.html` | Fake storefront with five popups armed (age gate, spin wheel, flash deal, social proof, video), for end-to-end testing |
 | `server/` | Express API: auth (JWT + bcrypt + Google ID-token verification), widget CRUD, live public config, view tallies, lead submissions; SQLite via `node:sqlite` |
+| `shared/host-policy.js` | Single source of truth for canonical-host and legacy-page redirects, used by both Express and the Worker |
+| `worker/` | Cloudflare Worker port of the API, static allowlist, security headers and host policy |
 | `package.json` | Backend deps + start scripts (`bcryptjs`, `cors`, `express`, `jsonwebtoken`, `google-auth-library`) |
 | `.env.example` | Template for `PORT`, `JWT_SECRET`, `GOOGLE_CLIENT_ID` |
 
@@ -30,7 +35,7 @@ npm start
 # → http://localhost:3000   (API: /api, DB: popforge.db)
 ```
 
-Requires Node 22.13+ (built and tested on Node 24) — the server uses `node:sqlite`, `process.loadEnvFile`, and `fetch`. The database file is created automatically on first boot. Copy `.env.example` to `.env` first if you want Google sign-in or a production secret.
+Requires Node 22.13+ (built and tested on Node 24). The server uses `node:sqlite`, `process.loadEnvFile`, and `fetch`. The database file is created automatically on first boot. Copy `.env.example` to `.env` first if you want Google sign-in or a production secret.
 
 | Env var | Default | Purpose |
 |---|---|---|
@@ -47,28 +52,47 @@ JWT_SECRET="$(openssl rand -hex 32)" PORT=8080 npm start
 
 ## Accounts, installation and Google sign-in
 
-Installation is account-gated. Anyone can open the studio, design a popup, and preview it, but the install code is issued only for a popup saved to a real account. Guest drafts live in `localStorage` and are moved into the account automatically on first sign-in.
+Installation is account-gated. Anyone can open the studio, design a popup, and preview it, but the install code is issued only for a popup saved to a real account. Guest drafts live in `localStorage` and are moved into the account on sign-in.
 
 Every saved widget gets its own id (`wan_…`) and its own install code:
 
 ```html
-<!-- PopForge: paste once, before </body> -->
-<div data-popforge="wan_your_widget_id"></div>
-<script src="https://your-popforge-host/popforge.js"></script>
+<!-- PopupLoom: paste once, before </body> -->
+<div data-popuploom="wan_your_widget_id"></div>
+<script src="https://popuploom.com/popuploom.js"></script>
 ```
 
-The snippet carries only the id. `popforge.js` fetches the live config from `GET /api/widgets/:id/config` when the page loads, so saving in the studio updates every installed copy without re-pasting. Old inline base64 snippets still work.
+The snippet carries only the id. `popuploom.js` fetches the live config from `GET /api/widgets/:id/config` when the page loads, so saving in the studio updates every installed copy without re-pasting. Old inline base64 snippets still work.
+
+### Compatibility with existing installs
+
+The previous brand shipped `<div data-popforge="…"></div>` and `/popforge.js`. Both continue to work:
+
+- `/popforge.js` is the same runtime bytes as `/popuploom.js`; neither path redirects across domains.
+- The runtime accepts `data-popuploom` and `data-popforge`. If a node carries both, `data-popuploom` wins and only one popup is mounted.
+- `data-popforge-ready` / `data-popuploom-ready` are both written as mount markers, so repeated scans stay idempotent.
+- `window.PopupLoom` and `window.PopForge` are the same object, exposing `show`, `preview`, `scan`, `encodeCfg`, `version`, `API`, `snippet` and the instance registry.
+- Existing analytics contracts are unchanged: `popforge:*` window events and `popforge_*` `dataLayer` pushes still fire. No duplicate new-brand events are emitted.
+- Storage keys (`pf.*`) and runtime CSS classes (`.pf-*`) are unchanged, so saved drafts, tokens and frequency state keep working on the same origin.
+
+API base precedence is: per-widget `data-api` attribute → `window.POPUPLOOM_API` → legacy `window.POPFORGE_API` → the origin that served the executing script. The script origin is captured from `document.currentScript`, so both filenames work even when the tag is moved or injected.
+
+### Moving from the former host
+
+`localStorage` is scoped by origin, so guest drafts on the old `workers.dev` host do not appear automatically on `popuploom.com`. Account-owned popups, submissions and widget configs are in D1 and remain available after signing in on the new domain.
+
+For guest drafts, `/migration.html` stays reachable on the old host. It reads the existing `pf.widgets` key, validates entries, lists them, and downloads `popuploom-widgets-backup.json` in the established import format. It never uploads, clears or overwrites drafts. The same origin contains the import UI under **My popups**.
 
 ### Set up Google sign-in (one-time, ~5 minutes)
 
 Google Identity Services needs a client id. No client secret is used: the server verifies the signed ID token against the client id.
 
 1. Open [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials) and create (or pick) a project.
-2. Configure the **OAuth consent screen** (External): app name `PopForge`, your support email, and the `openid`, `email`, `profile` scopes. While the app is in **Testing**, add your own Google address under **Test users**.
+2. Configure the **OAuth consent screen** (External): app name `PopupLoom`, your support email, and the `openid`, `email`, `profile` scopes. While the app is in **Testing**, add your own Google address under **Test users**.
 3. **Create credentials → OAuth client ID → Web application.**
 4. Under **Authorized JavaScript origins** add:
    - `http://localhost:3000` for local development
-   - `https://your-production-domain.com` when you deploy
+   - `https://popuploom.com` and, if used, `https://popforge.shailu3597.workers.dev` while old sessions remain
    Do **not** add a redirect URI; the button flow does not use one.
 5. Copy the **Client ID** (ends in `.apps.googleusercontent.com`).
 6. Create `.env` next to `package.json`:
@@ -105,7 +129,18 @@ Notes:
 | `POST /api/widgets/:id/submit` | public | Store a lead (called by the embed runtime) |
 | `GET /api/health` | None | Liveness check |
 
-The embed runtime finds the API in this order: `data-api` attribute on the widget div, then `window.POPFORGE_API`, then the origin `popforge.js` was loaded from. CORS is open for these public reporting endpoints, so widgets on other domains report correctly.
+Public endpoints keep their permissive CORS behavior so embeds on external sites can report views and leads. Private endpoints still accept only the app origin (plus any `APP_ORIGINS` entries).
+
+## Host and redirect policy
+
+`shared/host-policy.js` is applied by both the Express server and the Worker:
+
+- `https://popuploom.com` is the canonical apex. It serves pages directly.
+- `https://www.popuploom.com` permanently redirects browser pages to the same apex path and query in one hop.
+- The former host redirects only known browser pages (`/`, `/index.html`, templates, guide, studio, account, demo) to the apex.
+- On every host, `/popuploom.js`, `/popforge.js`, `/assets/*`, `/api/*`, `/migration.html`, `/robots.txt` and `/sitemap.xml` are served directly. Installed embeds and API clients never cross a host boundary.
+- Unknown paths return a real 404, never a homepage redirect.
+- Localhost, `127.0.0.1` and test hosts are never redirected to production. Only same-origin `/index.html` normalization applies.
 
 ## The saved-widget lifecycle
 
@@ -113,9 +148,9 @@ The embed runtime finds the API in this order: `data-api` attribute on the widge
 2. Guests can design and preview; drafts stay in `localStorage` and no install code is issued
 3. To install, they create an account (email/password or Google). Guest drafts migrate into the account automatically
 4. Save widget stores it in SQLite under their account (My popups, cloud pill)
-5. Publish tab issues that widget's own install code (`<div data-popforge="wan_…">` + `popforge.js`), tied to the account that saved it
+5. Publish tab issues that widget's own install code (`<div data-popuploom="wan_…">` + `popuploom.js`), tied to the account that saved it
 6. Any of their popups can be re-opened, edited, duplicated, or deleted from My popups anytime; edits sync to installed copies
-7. Export all (.json) backs the shelf up; Import file restores on another machine
+7. Export all (.json) writes `popuploom-widgets-backup.json`; Import file restores on another machine
 8. Views and saved leads are tallied per widget. The embedded runtime reports them to the API
 
 ## Runtime feature map
@@ -134,30 +169,30 @@ The embed runtime finds the API in this order: `data-api` attribute on the widge
 | Age gate | allow passes through (logs a verified event, then auto-closes); deny shows a message or redirects to a configurable URL |
 | Social proof | bottom-left corner card that cycles through configured activity items on an interval |
 | Sticky button | optional pill that reopens the popup |
-| Analytics | `popforge:view / open / close / submit` window events + `dataLayer` pushes when GTM exists |
+| Analytics | `popforge:view / open / close / submit` window events + `dataLayer` pushes when GTM exists (retained for compatibility) |
 | Safety | URL/image inputs sanitized (HTML-escaped), CSS-selector errors caught, lazy render (nothing loads until summoned) |
 | Animations | pop (spring) · fade · slideUp · slideDown; all opt-in |
 
 ## Embedding on a site (what end users copy)
 
 ```html
-<!-- PopForge install. Paste once, before </body> -->
-<div data-popforge="wan_your_widget_id"></div>
-<script src="https://your-popforge-host/popforge.js"></script>
+<!-- PopupLoom install. Paste once, before </body> -->
+<div data-popuploom="wan_your_widget_id"></div>
+<script src="https://popuploom.com/popuploom.js"></script>
 ```
 
-Each account-owned widget has its own id in that `data-popforge` attribute. The runtime resolves it against `GET /api/widgets/:id/config`, so the site never needs re-editing after a design change. The studio fills in the absolute script URL for you.
+Each account-owned widget has its own id in that `data-popuploom` attribute. The runtime resolves it against `GET /api/widgets/:id/config`, so the site never needs re-editing after a design change. The studio fills in the absolute script URL for you.
 
-Power users can still hand-write an inline base64 config (the older format) or call `PopForge.show(cfg)` directly. Inline configs always start with `eyJ` and skip the network fetch; hosted ids match `/^[A-Za-z0-9_-]{3,64}$/`.
+Power users can still hand-write an inline base64 config (the older format) or call `PopupLoom.show(cfg)` directly. Inline configs always start with `eyJ` and skip the network fetch; hosted ids match `/^[A-Za-z0-9_-]{3,64}$/`.
 
-Platform notes (learned from researching competitors so you don't repeat their gaps):
+Platform notes:
 
 - Works wherever raw HTML runs: WordPress (Custom HTML), Shopify (liquid/sections), Webflow embeds, Ghost, GitHub Pages, static sites.
 - On builders that trap third-party widgets in iframes (some Wix/GoDaddy/Hostinger embeds, Google Sites, Canva), a fixed popup can't escape the frame. Install at body level where the platform allows code, or prefer the strip placements.
 
 See [SECURITY.md](SECURITY.md) for the security review, deployment settings and public-config trust boundaries. New passwords require at least 12 characters. Set APP_ORIGINS for additional trusted frontend origins; private APIs otherwise accept only the app origin.
 
-Run `npm test` for isolated API, auth and browser regression checks. Browser checks use Chrome/Edge when available; set `POPFORGE_BROWSER` to an executable path to override. Existing project data is never used by the tests.
+Run `npm test` for isolated API, auth and browser regression checks. Browser checks use Chrome/Edge when available; the `POPFORGE_BROWSER` environment variable still overrides the executable path for compatibility. Existing project data is never used by the tests.
 
 Reverse proxy deployments must set `TRUST_PROXY` to the trusted proxy IPs/subnets; forwarded headers are ignored by default.
 
@@ -216,16 +251,16 @@ Gallery categories with live previews on `index.html`. Every design is original 
 
 Plus a blank canvas start in the studio. Template images resolve from `assets/`; countdown targets in templates auto-arm to a live future time when copied.
 
-## Differences from the platforms we studied (intentional)
+## Intentional product differences
 
-- Fresh dark-studio editor UI; original template set, names, copy, and generated imagery throughout
-- Spin-to-win as a first-class block. Elfsight's gallery has no wheel (an open community request); Wisepops/OptinMonster gate theirs behind email-first flows. Ours is config-driven, one tap
-- 18+ age gate as a native template + block, not a DIY rebuild from a generic lightbox
-- CSS selectors instead of element IDs for click / scroll-past triggers (more flexible)
-- A 5th frequency rule: "until closed, then rest 24h". Better post-conversion etiquette
+- Original template set, names, copy, and generated imagery throughout
+- Spin-to-win as a first-class block, config-driven and one tap
+- 18+ age gate as a native template + block
+- CSS selectors instead of element IDs for click / scroll-past triggers
+- A 5th frequency rule: "until closed, then rest 24h"
 - Counts views and leads for the user's popups without a view-count paywall
 - The countdown is a real live block, auto-armed from a date picker in the editor
-- iframe/escape-hatch guidance ships in-product instead of a footgun
+- iframe/escape-hatch guidance ships in-product
 
 ## Roadmap ideas
 
@@ -236,4 +271,4 @@ Plus a blank canvas start in the studio. Template images resolve from `assets/`;
 
 ## Cloudflare deployment
 
-See [CLOUDFLARE.md](CLOUDFLARE.md) for build, tests, D1 migration, private data imports, secrets, and deployment prerequisites.
+See [CLOUDFLARE.md](CLOUDFLARE.md) for build, tests, D1 migration, private data imports, secrets, and deployment prerequisites. The domain cutover steps and current blockers are tracked there and in [SEO.md](SEO.md).

@@ -1,7 +1,7 @@
 {
-  "name": "popforge",
+  "name": "popuploom",
   "version": "2.0.0",
-  "description": "PopForge. Self-serve popup tool with a real backend + database",
+  "description": "PopupLoom: free website popup builder with a visual editor, templates, hosted embeds and lead capture",
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",

@@ -6,7 +6,7 @@ const path=require('node:path');
 const vm=require('node:vm');
 const crypto=require('node:crypto');
 const root=path.resolve(__dirname,'..');
-const temp=fs.mkdtempSync(path.join(os.tmpdir(),'popforge-regression-'));
+const temp=fs.mkdtempSync(path.join(os.tmpdir(),'popuploom-regression-'));
 process.env.DB_PATH=path.join(temp,'test.db');
 process.env.JWT_SECRET=crypto.randomBytes(32).toString('hex');
 process.env.NODE_ENV='test';
@@ -36,7 +36,7 @@ test('private files stay private including encoded separators and extensions',as
   const r=await api(url);assert.ok(r.status===404||r.headers.get('content-type').includes('text/html'),url);
   assert.ok(!String(r.data).includes('SQLite format 3')&&!String(r.data).includes('JWT_SECRET=')&&!String(r.data).includes('const JWT_SECRET'),url);
  }
- for(const url of ['/','/studio.html','/profile.html','/demo.html','/app.js','/studio.js','/popforge.js','/ui.css','/assets/winter-gift.jpg'])assert.equal((await api(url)).status,200,url);
+ for(const url of ['/','/templates.html','/guides/install-popups.html','/migration.html','/studio.html','/profile.html','/demo.html','/app.js','/studio.js','/popuploom.js','/popforge.js','/ui.css','/assets/winter-gift.jpg','/assets/favicon.svg','/assets/og-popuploom.png'])assert.equal((await api(url)).status,200,url);
 });
 test('owner CRUD, validation, live config and lead isolation',async()=>{
  const other=(await api('/api/auth/register',{method:'POST',body:{email:'other@example.com',password:'other-test-password'}})).data;
@@ -89,6 +89,7 @@ test('origin isolation keeps private APIs private while allowing public embeds',
  assert.equal((await api('/API/auth/me',{token:account.token,headers})).status,403);
  assert.equal((await api('/api/auth/register',{method:'OPTIONS',headers:{...headers,'Access-Control-Request-Method':'POST'}})).status,403);
  const publicConfig=await api('/api/widgets/'+widget.id+'/config',{headers});assert.equal(publicConfig.status,200);assert.equal(publicConfig.headers.get('access-control-allow-origin'),'*');
+ assert.equal((await api('/popuploom.js',{headers})).status,200);
  assert.equal((await api('/popforge.js',{headers})).status,200);
  assert.equal((await api('/api/widgets',{token:account.token,headers:{Origin:base}})).status,200);
 });
@@ -175,7 +176,7 @@ test('legacy database migration preserves accounts and revokes old Google sessio
 function runtime(){
  let response={ok:true,json:async()=>({ok:true})};const timers=[];
  const box={window:{},document:{readyState:'loading',querySelector:()=>null,querySelectorAll:()=>[],addEventListener(){},createElement:()=>({setAttribute(){}})},location:{href:'https://shop.example/shop/item?ref=x',pathname:'/shop/item'},console,URL,TextEncoder,TextDecoder,setTimeout:fn=>timers.push(fn),clearTimeout(){},setInterval:()=>1,clearInterval(){},addEventListener(){},removeEventListener(){},localStorage:{getItem(){throw Error('blocked');},setItem(){}},fetch:async()=>{if(response instanceof Error)throw response;return response;}};
- const src=fs.readFileSync(path.join(root,'popforge.js'),'utf8').replace('  function boot() {','  window.checks={PopupInstance,cardHTML,recordSubmission,submitLike,wireSpin};\n  function boot() {');
+ const src=fs.readFileSync(path.join(root,'popuploom.js'),'utf8').replace('  function boot() {','  window.checks={PopupInstance,cardHTML,recordSubmission,submitLike,wireSpin};\n  function boot() {');
  vm.runInNewContext(src,box);return {box,c:box.window.checks,timers,setResponse:r=>response=r};
 }
 test('targeting, untrusted rendering, storage restrictions and explicit test mode',async()=>{
@@ -192,10 +193,122 @@ test('targeting, untrusted rendering, storage restrictions and explicit test mod
 });
 test('one widget API override does not change the default API for other widgets',()=>{
  const box={window:{},document:{readyState:'loading',querySelector:()=>({getAttribute:()=> 'https://override.example'}),querySelectorAll:selector=>selector.startsWith('script')?[{src:'https://default.example/popforge.js'}]:[],addEventListener(){}},URL,console};
- const src=fs.readFileSync(path.join(root,'popforge.js'),'utf8').replace('  function boot() {','  window.checkApi=apiFor;\n  function boot() {');
+ const src=fs.readFileSync(path.join(root,'popuploom.js'),'utf8').replace('  function boot() {','  window.checkApi=apiFor;\n  function boot() {');
  vm.runInNewContext(src,box);
  assert.equal(box.window.checkApi({getAttribute:()=>null}),'https://default.example');
  assert.equal(box.window.checkApi({getAttribute:()=> 'https://specific.example'}),'https://specific.example');
+});
+test('shared namespace, dual attributes and API override precedence',()=>{
+ const src=fs.readFileSync(path.join(root,'popuploom.js'),'utf8').replace('  function boot() {','  window.checkApi=apiFor;window.checkRef=refFor;window.checkReady=isReady;window.checkSetReady=setReady;window.Runtime=Runtime;\n  function boot() {');
+ function load(document,win={}){const box={window:win,document:Object.assign({readyState:'loading',querySelector:()=>null,querySelectorAll:()=>[],addEventListener(){}},document),location:{href:'https://shop.example/'},console,URL,TextEncoder,TextDecoder,setTimeout:()=>1,clearTimeout(){},setInterval:()=>1,clearInterval(){},addEventListener(){},removeEventListener(){},localStorage:{getItem(){return null;},setItem(){}},fetch:async()=>null};vm.runInNewContext(src,box);return box;}
+ // Script-derived origin works for both filenames.
+ const oldScript=load({currentScript:{src:'https://old.example/popforge.js'}});
+ assert.equal(oldScript.window.checkApi({getAttribute:()=>null}),'https://old.example');
+ const newScript=load({currentScript:{src:'https://new.example/popuploom.js'}});
+ assert.equal(newScript.window.checkApi({getAttribute:()=>null}),'https://new.example');
+ // New global override wins over the legacy one, which still works alone.
+ assert.equal(load({currentScript:{src:'https://script.example/popuploom.js'}},{POPUPLOOM_API:'https://new-api.example/',POPFORGE_API:'https://legacy-api.example'}).window.checkApi({getAttribute:()=>null}),'https://new-api.example');
+ assert.equal(load({currentScript:{src:'https://script.example/popuploom.js'}},{POPFORGE_API:'https://legacy-api.example/'}).window.checkApi({getAttribute:()=>null}),'https://legacy-api.example');
+ // Per-node data-api wins over both globals.
+ assert.equal(newScript.window.checkApi({getAttribute:()=> 'https://node-api.example/'}),'https://node-api.example');
+ // Both public names share one object, so a second script load is a no-op.
+ const box=load({currentScript:{src:'https://new.example/popuploom.js'}});
+ assert.equal(box.window.PopupLoom,box.window.PopForge);
+ const before=box.window.Runtime;
+ vm.runInNewContext(src,box);
+ assert.equal(box.window.Runtime,before);
+ // data-popuploom wins deterministically; one node, one ready marker pair.
+ const both={attrs:{'data-popuploom':'wan_new','data-popforge':'wan_old'},hasAttribute(k){return k in this.attrs;},getAttribute(k){return this.attrs[k]||null;},setAttribute(k,v){this.attrs[k]=v;},removeAttribute(k){delete this.attrs[k];}};
+ assert.equal(box.window.checkRef(both),'wan_new');
+ box.window.checkSetReady(both,'1');
+ assert.equal(box.window.checkReady(both),true);
+ assert.equal(both.attrs['data-popforge-ready'],'1');
+ assert.equal(both.attrs['data-popuploom-ready'],'1');
+ const legacyOnly={attrs:{'data-popforge':'wan_old'},hasAttribute(k){return k in this.attrs;},getAttribute(k){return this.attrs[k]||null;},setAttribute(k,v){this.attrs[k]=v;},removeAttribute(k){delete this.attrs[k];}};
+ assert.equal(box.window.checkReady(legacyOnly),false);
+ box.window.checkSetReady(legacyOnly,'loading');
+ assert.equal(box.window.checkReady(legacyOnly),true);
+ assert.equal(box.window.checkRef(legacyOnly),'wan_old');
+});
+test('host policy only moves known pages and never crosses hosts for API or runtime files',()=>{
+ const {pageRedirect}=require('../shared/host-policy');
+ const apex='https://popuploom.com',old='https://popforge.shailu3597.workers.dev';
+ assert.equal(pageRedirect(apex+'/','GET'),null);
+ assert.equal(pageRedirect(apex+'/templates.html','GET'),null);
+ assert.equal(pageRedirect(apex+'/index.html','GET'),apex+'/');
+ assert.equal(pageRedirect(apex+'/index.html?x=1','GET'),apex+'/?x=1');
+ assert.equal(pageRedirect('https://www.popuploom.com/studio.html?tpl=cafeClub','GET'),apex+'/studio.html?tpl=cafeClub');
+ assert.equal(pageRedirect('https://www.popuploom.com/index.html','GET'),apex+'/');
+ assert.equal(pageRedirect('https://www.popuploom.com/api/health','GET'),null);
+ assert.equal(pageRedirect('https://www.popuploom.com/popforge.js','GET'),null);
+ assert.equal(pageRedirect(old+'/','GET'),apex+'/');
+ assert.equal(pageRedirect(old+'/index.html','GET'),apex+'/');
+ assert.equal(pageRedirect(old+'/templates.html?ref=1','GET'),apex+'/templates.html?ref=1');
+ assert.equal(pageRedirect(old+'/guides/install-popups.html','GET'),apex+'/guides/install-popups.html');
+ assert.equal(pageRedirect(old+'/studio.html?id=wan_123','GET'),apex+'/studio.html?id=wan_123');
+ assert.equal(pageRedirect(old+'/migration.html','GET'),null);
+ assert.equal(pageRedirect(old+'/popforge.js','GET'),null);
+ assert.equal(pageRedirect(old+'/popuploom.js','GET'),null);
+ assert.equal(pageRedirect(old+'/assets/favicon.svg','GET'),null);
+ assert.equal(pageRedirect(old+'/api/widgets/wan_1/config','GET'),null);
+ assert.equal(pageRedirect(old+'/api/widgets/wan_1/view','POST'),null);
+ assert.equal(pageRedirect(old+'/unknown','GET'),null);
+ assert.equal(pageRedirect(old+'/','POST'),null);
+ assert.equal(pageRedirect('http://localhost:3000/index.html','GET'),'http://localhost:3000/');
+ assert.equal(pageRedirect('http://localhost:3000/','GET'),null);
+});
+function rawRequest(path,{method='GET',host}={}){
+ return new Promise((resolve,reject)=>{
+  const u=new URL(base);const req=require('node:http').request({hostname:u.hostname,port:u.port,path,method,headers:host?{Host:host}:{}},res=>{
+   const chunks=[];res.on('data',c=>chunks.push(c));res.on('end',()=>resolve({status:res.statusCode,headers:res.headers,body:Buffer.concat(chunks).toString('utf8')}));
+  });req.on('error',reject);req.end();
+ });
+}
+test('Express redirects match the shared policy and leave API/runtime requests alone',async()=>{
+ const old='popforge.shailu3597.workers.dev';
+ let r=await rawRequest('/index.html');assert.equal(r.status,308);assert.equal(r.headers.location,base+'/');
+ r=await rawRequest('/',{host:old});assert.equal(r.status,308);assert.equal(r.headers.location,'https://popuploom.com/');
+ r=await rawRequest('/studio.html?tpl=cafeClub',{host:old});assert.equal(r.status,308);assert.equal(r.headers.location,'https://popuploom.com/studio.html?tpl=cafeClub');
+ r=await rawRequest('/migration.html',{host:old});assert.equal(r.status,200);assert.match(r.headers['x-robots-tag']||'',/noindex/);assert.ok(r.body.includes('pf.widgets'));
+ r=await rawRequest('/popforge.js',{host:old});assert.equal(r.status,200);assert.match(r.headers['content-type']||'',/javascript/);
+ r=await rawRequest('/api/health',{host:old});assert.equal(r.status,200);assert.ok(r.body.includes('"ok":true'));
+ r=await rawRequest('/unknown-page',{host:old});assert.equal(r.status,404);assert.ok(r.body.includes('Page not found'));
+ r=await rawRequest('/',{host:old,method:'POST'});assert.equal(r.status,404);assert.equal(r.headers.location,undefined);
+});
+test('identity, metadata and crawler files agree on the apex origin',async()=>{
+ const pages={
+  '/':['PopupLoom — Free Popup Builder for Websites','https://popuploom.com/'],
+  '/templates.html':['Free Website Popup Templates | PopupLoom','https://popuploom.com/templates.html'],
+  '/guides/install-popups.html':['How to Add a Popup to Your Website | PopupLoom','https://popuploom.com/guides/install-popups.html']
+ };
+ for(const [url,[title,canonical]] of Object.entries(pages)){
+  const html=(await api(url)).data;
+  assert.ok(html.includes('<title>'+title+'</title>'),url);
+  assert.ok(html.includes('rel="canonical" href="'+canonical+'"'),url);
+  assert.ok(html.includes('property="og:site_name" content="PopupLoom"'),url);
+  assert.ok(html.includes('https://popuploom.com/assets/og-popuploom.png'),url);
+  assert.ok(!html.includes('og-popforge.png'),url);
+  assert.ok(!html.includes('content="noindex'),url);
+  if(url==='/')assert.ok(html.includes('Popup<span><i>Loom</i></span>'),url);
+  if(url!=='/')assert.ok(!/popforge\.shailu3597\.workers\.dev/.test(html),url);
+  for(const match of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)){const data=JSON.parse(match[1]);assert.ok(JSON.stringify(data).includes('popuploom.com'),url);}
+ }
+ const studio=(await api('/studio.html')).data;
+ assert.ok(studio.includes('<title>PopupLoom Studio</title>'));
+ assert.ok(studio.includes('name="robots" content="noindex,follow"'));
+ const account=(await api('/profile.html')).data;
+ assert.ok(account.includes('<title>Your Account | PopupLoom</title>'));
+ const robots=(await api('/robots.txt')).data;
+ assert.ok(robots.includes('Sitemap: https://popuploom.com/sitemap.xml'));
+ const sitemap=(await api('/sitemap.xml')).data;
+ assert.ok(!sitemap.includes('popforge'));
+ assert.ok(!sitemap.includes('studio.html')&&!sitemap.includes('migration.html'));
+ const llms=(await api('/llms.txt')).data;
+ assert.ok(llms.startsWith('# PopupLoom')&&llms.includes('https://popuploom.com/'));
+ const home=(await api('/')).data;
+ assert.ok(home.includes('popuploom-widgets-backup.json'));
+ assert.ok(home.includes('data-popuploom="wan_your_widget_id"'));
+ assert.ok(home.includes('https://popuploom.com/popuploom.js'));
 });
 test('failed leads preserve entered data, retry safely, escape success text, and keep spin prize',async()=>{
  const {c,setResponse,timers}=runtime();let body={innerHTML:'form',querySelector:()=>null,appendChild(el){this.error=el;}};
@@ -237,11 +350,15 @@ test('browser: all templates, save failures, installation, test mode, delete and
    const node=document.createElement('div');node.setAttribute('data-popforge',PopForge.encodeCfg(cfg));node.setAttribute('data-popforge-test','1');document.body.appendChild(node);PopForge.scan();
    const inst=PopForge._inst[PopForge._inst.length-1];await new Promise(r=>setTimeout(r,300));inst.close();await new Promise(r=>setTimeout(r,200));inst.stickyEl.click();const reopened=inst.visible;
    const count=PopForge._inst.length;PopForge.scan();const noDuplicate=PopForge._inst.length===count;inst.destroy();node.remove();
+   const dual=document.createElement('div');dual.setAttribute('data-popforge',PopForge.encodeCfg(cfg));dual.setAttribute('data-popuploom',PopForge.encodeCfg(cfg));dual.setAttribute('data-popuploom-test','1');document.body.appendChild(dual);
+   const beforeDual=PopupLoom._inst.length;PopupLoom.scan();const dualDelta=PopupLoom._inst.length-beforeDual;PopupLoom._inst[PopupLoom._inst.length-1].destroy();dual.remove();
+   const load=document.createElement('script');load.src='/popforge.js';document.body.appendChild(load);await new Promise(r=>{load.onload=r;load.onerror=r;});
+   const afterSecondScript=PopupLoom._inst.length;PopupLoom.scan();const noSecondMount=PopupLoom._inst.length===afterSecondScript;load.remove();
    const invalid=PF.cfgFor('age18');invalid.id='invalid_selector_regression';invalid.trigger={type:'click',selector:'['};
    const invalidNode=document.createElement('div');invalidNode.setAttribute('data-popforge',PopForge.encodeCfg(invalid));invalidNode.setAttribute('data-popforge-test','1');document.body.appendChild(invalidNode);PopForge.scan();invalidNode.remove();
-   return {delay,reopened,noDuplicate};
+   return {delay,reopened,noDuplicate,dualDelta,noSecondMount,sameNamespace:PopupLoom===PopForge,hasScan:typeof PopupLoom.scan==='function'};
   });
-  assert.equal(behavior.delay,5000);assert.equal(behavior.reopened,true);assert.equal(behavior.noDuplicate,true);
+  assert.equal(behavior.delay,5000);assert.equal(behavior.reopened,true);assert.equal(behavior.noDuplicate,true);assert.equal(behavior.dualDelta,1);assert.equal(behavior.noSecondMount,true);assert.equal(behavior.sameNamespace,true);assert.equal(behavior.hasScan,true);
   for(const template of templates){
    await page.goto(base+'/studio.html?tpl='+template.id,{waitUntil:'domcontentloaded'});
    await page.waitForSelector('#stage .pf-card');
@@ -266,7 +383,7 @@ test('browser: all templates, save failures, installation, test mode, delete and
   rejectSave=false;
   await Promise.all([page.waitForResponse(r=>r.request().method()==='POST'&&new URL(r.url()).pathname==='/api/widgets'&&r.status()===201),page.click('#btnSave')]);
   await page.waitForFunction(()=>document.querySelector('#pubSnippetWrap').style.display==='block');
-  const code=await page.$eval('#pubBox',e=>e.textContent);const id=code.match(/data-popforge="([^"]+)"/)[1];assert.equal((await api('/api/widgets/'+id+'/config')).status,200);
+  const code=await page.$eval('#pubBox',e=>e.textContent);const id=code.match(/data-popuploom="([^"]+)"/)[1];assert.equal((await api('/api/widgets/'+id+'/config')).status,200);
   const submissions=[];page.on('request',req=>{if(req.url().includes('/submit'))submissions.push(req.url());});
   await page.click('#btnTest');await page.waitForSelector('.pf-holder:not(#stage .pf-holder) [data-age="allow"]');
   await page.evaluate(()=>{const holder=Array.from(document.querySelectorAll('.pf-holder')).find(e=>!e.closest('#stage'));holder.querySelector('[data-age="allow"]').click();});

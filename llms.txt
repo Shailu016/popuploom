@@ -1,11 +1,11 @@
-# PopForge
+# PopupLoom
 
 > Free website popup builder with 45 templates, a visual editor, hosted widget configuration and lead capture.
 
 ## Public product information
-- [Overview and FAQ](https://popforge.shailu3597.workers.dev/): features, account requirements, supported triggers and limitations.
-- [Template catalog](https://popforge.shailu3597.workers.dev/templates.html): all 45 starting designs grouped by purpose.
-- [Installation guide](https://popforge.shailu3597.workers.dev/guides/install-popups.html): installation, platform constraints and troubleshooting.
+- [Overview and FAQ](https://popuploom.com/): features, account requirements, supported triggers and limitations.
+- [Template catalog](https://popuploom.com/templates.html): all 45 starting designs grouped by purpose.
+- [Installation guide](https://popuploom.com/guides/install-popups.html): installation, platform constraints and troubleshooting.
 
 ## Product facts
 - Guest users can design and preview. An account and saved widget are required for hosted install code.

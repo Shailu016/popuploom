@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Boxcar Supply Co. | PopForge demo site</title>
+<title>Boxcar Supply Co. | PopupLoom demo site</title>
 <link rel="stylesheet" href="./ui.css">
 <meta name="robots" content="noindex,follow">
 </head>
@@ -19,7 +19,7 @@
 
 <section class="wrap" style="padding:56px 0 30px">
   <h1 style="font-size:40px;letter-spacing:-.03em;margin:0 0 12px">Tools that outlive the job site.</h1>
-  <p style="font-size:16px;color:#5B616B;max-width:620px;line-height:1.6">A fake storefront to show forged popups landing on a real-looking page. Five widgets are wired up here:</p>
+  <p style="font-size:16px;color:#5B616B;max-width:620px;line-height:1.6">A fake storefront to show hand-built popups landing on a real-looking page. Five widgets are wired up here:</p>
   <ul style="font-size:14px;color:#5B616B;line-height:2">
     <li><b>Eighteen Check</b>. Age gate on arrival. Allow passes you through, deny explains.</li>
     <li><b>Spin to Win</b>. Prize wheel fires about 9s in, one spin per visitor.</li>
@@ -47,15 +47,15 @@
 </section>
 
 <footer style="border-top:1px solid rgba(0,0,0,.1);padding:20px 0 40px" class="mut">
-  <div class="wrap" style="font-size:12px">Boxcar Supply Co., demo page for <b style="color:#181A1E">PopForge</b>. Open <a href="./index.html" style="color:#111">the studio</a> to edit what fires here.</div>
+  <div class="wrap" style="font-size:12px">Boxcar Supply Co., demo page for <b style="color:#181A1E">PopupLoom</b>. Open <a href="./index.html" style="color:#111">the studio</a> to edit what fires here.</div>
   </footer>
 
-<script src="./popforge.js"></script>
+<script src="./popuploom.js"></script>
 <script>
   function arm(cfg) {
     var div = document.createElement("div");
-    div.setAttribute("data-popforge-test", "1");
-    div.setAttribute("data-popforge", window.PopForge.encodeCfg(cfg));
+    div.setAttribute("data-popuploom-test", "1");
+    div.setAttribute("data-popuploom", window.PopupLoom.encodeCfg(cfg));
     document.body.appendChild(div);
   }
 

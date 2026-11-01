@@ -1,4 +1,4 @@
-/* PopForge: shared app code. Storage (API + localStorage fallback), auth, template presets */
+/* PopupLoom: shared app code. Storage (API + localStorage fallback), auth, template presets */
 (function () {
   "use strict";
 
@@ -6,6 +6,8 @@
   /* API base detection                                                  */
   /* ------------------------------------------------------------------ */
   function apiBase() {
+    if (window.POPUPLOOM_API) return String(window.POPUPLOOM_API).replace(/\/$/, "");
+    // Legacy override kept for self-hosted copies of the previous snippet.
     if (window.POPFORGE_API) return String(window.POPFORGE_API).replace(/\/$/, "");
     // derive from where this script was loaded (same origin as the server)
     try {
@@ -81,7 +83,7 @@
       }
       return this._config;
     },
-    // Exchange a Google Identity Services credential for a PopForge session.
+    // Exchange a Google Identity Services credential for a PopupLoom session.
     loginWithGoogle: async function (credential) {
       const res = await fetch(API + "/api/auth/google", {
         method: "POST",
@@ -443,13 +445,15 @@
   /* Install snippets                                                     */
   /* An account-owned widget is installed by id; the runtime then pulls   */
   /* the live config from the API, so studio edits sync without re-paste. */
+  /* The script origin follows the host that served this page, so a       */
+  /* snippet copied on popuploom.com points at popuploom.com.             */
   /* ------------------------------------------------------------------ */
   function snippetFor(id) {
     if (!/^[A-Za-z0-9_-]{3,64}$/.test(String(id || ""))) return "";
     var base = API || (window.location && window.location.origin) || "";
-    return "<!-- PopForge: paste once, before </body> -->\n" +
-      '<div data-popforge="' + String(id) + '"></div>\n' +
-      '<script src="' + base + '/popforge.js"></script>';
+    return "<!-- PopupLoom: paste once, before </body> -->\n" +
+      '<div data-popuploom="' + String(id) + '"></div>\n' +
+      '<script src="' + base + '/popuploom.js"></script>';
   }
 
   /* ------------------------------------------------------------------ */
@@ -544,7 +548,7 @@
         ? "Welcome back. Your saved popups and install codes are waiting."
         : "Free to start. Your popups live in your account, and every saved popup gets its own install code.";
       if (submitEl) submitEl.textContent = isLogin ? "Sign in" : "Create account";
-      if (swText) swText.textContent = isLogin ? "New to PopForge?" : "Already have an account?";
+      if (swText) swText.textContent = isLogin ? "New to PopupLoom?" : "Already have an account?";
       if (swLink) swLink.textContent = isLogin ? "Create one" : "Sign in";
       if (nameRow) nameRow.style.display = isLogin ? "none" : "block";
       if (passEl) passEl.setAttribute("autocomplete", isLogin ? "current-password" : "new-password");
@@ -740,7 +744,11 @@
     google: PFGoogle,
     mountAuthUI: mountAuthUI
   };
-  window.PopForge = window.PopForge || {};
-  window.PopForge.API = API;
-  window.PopForge.snippet = snippetFor;
+  // The runtime owns the scan/show/preview helpers; app.js only adds the
+  // shared API base and snippet helper. Both names point at the same object.
+  var shared = window.PopupLoom || window.PopForge || {};
+  shared.API = API;
+  shared.snippet = snippetFor;
+  window.PopupLoom = shared;
+  window.PopForge = shared;
 })();

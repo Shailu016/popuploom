@@ -1,4 +1,4 @@
-/* PopForge Studio: editor logic */
+/* PopupLoom Studio: editor logic */
 (function () {
   "use strict";
 
@@ -460,7 +460,7 @@
       }
       var cfg = JSON.parse(JSON.stringify(state));
       cfg.frequency = "always";
-      previewInst = PopForge.preview(stageEl, cfg);
+      previewInst = PopupLoom.preview(stageEl, cfg);
       // publish tab
       var pill = document.getElementById("tplPill");
       var t = PF.templates.find(function (x) { return x.id === state.template; });
@@ -607,7 +607,7 @@
     var cfg = JSON.parse(JSON.stringify(state));
     cfg.frequency = "always";
     cfg.id = "test_" + Date.now().toString(36);
-    window.PopForge.show(cfg, { test: true });
+    window.PopupLoom.show(cfg, { test: true });
     toast("Test popup running. Escape or the ✕ closes it", true);
   };
   document.getElementById("btnDel").onclick = async function () {

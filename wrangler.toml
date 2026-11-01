@@ -1,4 +1,5 @@
-# PopForge on Cloudflare Workers + D1
+# PopupLoom on Cloudflare Workers + D1
+# The Worker, database and binding keep their original names for continuity.
 name = "popforge"
 account_id = "66d3b261587ce5aeb4849141b6cca30d"
 workers_dev = true
@@ -12,7 +13,7 @@ directory = "./.cf-build/public"
 binding = "ASSETS"
 not_found_handling = "none"
 # Every request hits the Worker first so it can apply CSP, no-store headers,
-# the public-file allowlist, and the SPA fallback exactly like the Express server.
+# the public-file allowlist, host redirects and real 404s exactly like Express.
 run_worker_first = true
 
 [[d1_databases]]
