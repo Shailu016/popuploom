@@ -1,0 +1,32 @@
+# PopForge on Cloudflare Workers + D1
+name = "popforge"
+main = "worker/index.js"
+compatibility_date = "2026-10-01"
+
+[assets]
+# The whole project root is the static site; .assetsignore keeps server files,
+# the database, and tooling out of the public bucket.
+directory = "./.cf-build/public"
+binding = "ASSETS"
+not_found_handling = "none"
+# Every request hits the Worker first so it can apply CSP, no-store headers,
+# the public-file allowlist, and the SPA fallback exactly like the Express server.
+run_worker_first = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "popforge"
+# Placeholder for local development. After `wrangler d1 create popforge`,
+# replace this with the real id from the Cloudflare dashboard output.
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "worker/migrations"
+
+[vars]
+# Comma-separated extra origins allowed to call the API from a browser.
+# Leave empty to allow only same-origin (and public widget endpoints).
+APP_ORIGINS = ""
+
+NODE_ENV = "production"
+
+[build]
+command = "node scripts/build-cf.cjs"

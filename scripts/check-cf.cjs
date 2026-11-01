@@ -1,0 +1,1 @@
+const fs=require('fs');const config=fs.readFileSync('wrangler.toml','utf8');if(config.includes('00000000-0000-0000-0000-000000000000')){console.error('Set the real D1 database_id before deploying. Configure JWT_SECRET with wrangler secret put JWT_SECRET.');process.exit(1);}

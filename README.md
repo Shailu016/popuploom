@@ -233,3 +233,7 @@ Plus a blank canvas start in the studio. Template images resolve from `assets/`;
 - Email-provider connectors (ConvertKit/Mailchimp) on top of the existing DB + webhook capture
 - Template import from JSON in the studio
 - Per-widget public share links (view-only preview)
+
+## Cloudflare deployment
+
+See [CLOUDFLARE.md](CLOUDFLARE.md) for build, tests, D1 migration, private data imports, secrets, and deployment prerequisites.

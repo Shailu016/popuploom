@@ -1,0 +1,1 @@
+const fs=require('fs'),path=require('path');require('./csp-hashes.js');const out=path.resolve('.cf-build/public');fs.mkdirSync(out,{recursive:true});for(const f of ['index.html','studio.html','profile.html','demo.html','app.js','studio.js','popforge.js','ui.css'])fs.copyFileSync(f,path.join(out,f));fs.cpSync('assets',path.join(out,'assets'),{recursive:true});

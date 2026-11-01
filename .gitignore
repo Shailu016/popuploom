@@ -14,3 +14,11 @@ test-results/
 qa-shot.js
 .DS_Store
 Thumbs.db
+
+.wrangler/
+.dev.vars
+.dev.vars.*
+private-data/
+worker/migrations/*_data.sql
+recovered-*.json
+.cf-build/

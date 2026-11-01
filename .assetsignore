@@ -1,0 +1,26 @@
+# Keep server files, the database, and tooling out of the public asset bucket.
+.git/
+.wrangler/
+node_modules/
+server/
+worker/
+scripts/
+tests/
+*.db
+*.db-shm
+*.db-wal
+.env
+*.log
+package.json
+package-lock.json
+wrangler.toml
+README.md
+qa-shot.js
+recovered-cyberdrop.json
+
+private-data/
+.dev.vars
+.dev.vars.*
+.cf-build/
+SECURITY.md
+REVIEW.md
