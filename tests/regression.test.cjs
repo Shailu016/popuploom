@@ -551,7 +551,7 @@ test('browser: all templates, save failures, installation, test mode, delete and
   await page.evaluate(()=>{URL.createObjectURL=blob=>{blob.text().then(t=>window.exportedCSV=t);return 'blob:qa-export';};HTMLAnchorElement.prototype.click=function(){};});
   await page.click('#export');await page.waitForFunction(()=>window.exportedCSV&&document.querySelector('#status').textContent==='Exported 502 leads.');
   const csv=await page.evaluate(()=>window.exportedCSV);assert.ok(csv.includes('lead0@example.com')&&csv.includes('lead501@example.com'));assert.ok(csv.includes("'=2+2"));
-  await page.evaluate(()=>localStorage.removeItem('pf.token'));await page.reload({waitUntil:'networkidle0'});assert.equal(await page.$eval('#export',e=>e.disabled),true);assert.equal(await page.$eval('#leadsTable',e=>e.hidden),true);
+  await page.evaluate(()=>{localStorage.removeItem('pf.token');dispatchEvent(new StorageEvent('storage',{key:'pf.token',newValue:null}));});await page.waitForFunction(()=>document.querySelector('#leadsTable').hidden);await page.reload({waitUntil:'networkidle0'});assert.equal(await page.$eval('#export',e=>e.disabled),true);assert.equal(await page.$eval('#leadsTable',e=>e.hidden),true);
   await page.goto(base,{waitUntil:'networkidle0'});
   const logoutToken=require('../server/auth').signToken(account.user);
   await page.evaluate(token=>{localStorage.setItem('pf.token',token);localStorage.removeItem('pf.widgets');},logoutToken);
