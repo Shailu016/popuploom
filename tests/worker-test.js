@@ -63,6 +63,8 @@ function hostReq(host, path, method = "GET", extraHeaders = {}) {
   check("package.json returns 404", r.status === 404 && typeof r.data === "string");
   r = await req("GET", "/some/unknown/page");
   check("unknown route returns real 404", r.status === 404 && typeof r.data === "string");
+  r = await req("GET", "/some/unknown/page", { raw: true });
+  check("unknown route carries CSP and noindex", r.status === 404 && /content-security-policy/i.test(Array.from(r.headers.keys()).join(",")) && /noindex/.test(r.headers.get("x-robots-tag") || ""));
   r = await req("HEAD", "/");
   check("HEAD / 200 empty body", r.status === 200);
 
@@ -181,6 +183,9 @@ function hostReq(host, path, method = "GET", extraHeaders = {}) {
   check("update widget", r.status === 200 && r.data.name === "Renamed" && r.data.cfg.v === 2);
   r = await req("PUT", "/api/widgets/" + wid, { token, body: { name: "Hijack", config: { id: "someone-elses-widget" } } });
   check("update keeps own id", r.status === 200 && r.data.cfg.id === wid);
+  r = await req("POST", "/api/widgets", { token, body: { name: "Chosen id", config: { id: "customer-chosen-id" } } });
+  check("create ignores client-provided id", r.status === 201 && r.data.id !== "customer-chosen-id" && r.data.cfg.id === r.data.id, r);
+  if (r.status === 201) await req("DELETE", "/api/widgets/" + r.data.id, { token });
   r = await req("PUT", "/api/widgets/" + wid, { body: { name: "No Auth" } });
   check("update without auth 401", r.status === 401);
   r = await req("POST", "/api/widgets", { token, body: '{"name":"Evil","__proto__":{"poll":1}}' });

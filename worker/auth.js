@@ -124,12 +124,26 @@ async function register(env, email, password, name) {
   return { user, token: await signToken(env, user) };
 }
 
+// Failing logins still perform one PBKDF2 verification. Without this, a missing
+// or Google-only account returned before the key derivation and its faster
+// response disclosed which emails are registered. Generated once per isolate.
+let dummyHashPromise = null;
+function dummyPasswordHash() {
+  if (!dummyHashPromise) dummyHashPromise = hashPassword(crypto.randomUUID());
+  return dummyHashPromise;
+}
+
 async function login(env, email, password) {
   email = String(email || "").trim().toLowerCase();
   const row = await env.DB.prepare("SELECT id, email, name, avatar_url, password_hash, google_id FROM users WHERE email = ?").bind(email).first();
-  if (!row || row.google_id || typeof password !== "string" || new TextEncoder().encode(password).length > 72) throw new ApiError(401, "Invalid email or password");
-  // Google-only accounts get a random, unusable hash, so this can never match.
-  if (!(await verifyPassword(password || "", row.password_hash))) throw new ApiError(401, "Invalid email or password");
+  const passwordString = typeof password === "string" ? password : "";
+  const canMatch = !!row && !row.google_id && typeof password === "string"
+    && new TextEncoder().encode(passwordString).length <= 72;
+  // Google-only accounts get a random, unusable hash; a dummy hash covers
+  // unknown emails. Both still pay the same verification cost before failing.
+  const stored = canMatch ? row.password_hash : await dummyPasswordHash();
+  const valid = await verifyPassword(passwordString, stored);
+  if (!canMatch || !valid) throw new ApiError(401, "Invalid email or password");
   if (/^\$2[aby]\$/.test(row.password_hash)) {
     const upgraded = await hashPassword(password);
     await env.DB.prepare("UPDATE users SET password_hash = ? WHERE id = ? AND password_hash = ?").bind(upgraded, row.id, row.password_hash).run();

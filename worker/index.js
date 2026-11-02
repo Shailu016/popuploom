@@ -243,8 +243,10 @@ async function serveStatic(request, env, pathname, sec, cors, headOnly) {
     headers.set("Cache-Control", "no-store");
     return new Response(headOnly ? null : asset.body, { status: asset.status, headers: { ...sec, ...cors, ...Object.fromEntries(headers) } });
   }
-  // Unknown paths are real 404s, never a soft homepage.
-  return new Response(headOnly ? null : `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Page not found | PopupLoom</title><meta name="robots" content="noindex"></head><body style="background:#0A0B10;color:#F5F5F7;font-family:system-ui,sans-serif;padding:48px"><h1 style="font-size:28px">Page not found</h1><p style="color:#9DA0AC">That page does not exist. <a href="/" style="color:#FF6A1F">Return to PopupLoom</a>.</p></body></html>`, {status:404,headers:{...sec,...cors,"Content-Type":"text/html; charset=utf-8","X-Robots-Tag":"noindex"}});
+  // Unknown paths are real 404s, never a soft homepage. Apply the same
+  // HTML hardening as every other page so an error response cannot be framed
+  // or used as a weaker CSP context.
+  return new Response(headOnly ? null : `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Page not found | PopupLoom</title><meta name="robots" content="noindex"></head><body style="background:#0A0B10;color:#F5F5F7;font-family:system-ui,sans-serif;padding:48px"><h1 style="font-size:28px">Page not found</h1><p style="color:#9DA0AC">That page does not exist. <a href="/" style="color:#FF6A1F">Return to PopupLoom</a>.</p></body></html>`, {status:404,headers:{...sec,...cors,...htmlHeaders(env,"404"),"Content-Type":"text/html; charset=utf-8","X-Robots-Tag":"noindex"}});
 }
 
 export default {

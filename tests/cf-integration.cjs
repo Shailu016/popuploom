@@ -34,7 +34,11 @@ console.log('PASS Worker legacy cutover disabled by default and explicitly enabl
  const csp=home.headers.get('Content-Security-Policy')||'';
  assert.ok(csp.includes('https://static.cloudflareinsights.com'));
  assert.ok(csp.includes('https://cloudflareinsights.com'));
- console.log('PASS CSP permits the Cloudflare Web Analytics beacon');
+ const missing=await worker.fetch(new Request('https://popuploom.com/no-such-page-9182'),env,{waitUntil(){}});
+ assert.equal(missing.status,404);
+ assert.ok((missing.headers.get('Content-Security-Policy')||'').includes("frame-ancestors 'none'"));
+ assert.match(missing.headers.get('X-Robots-Tag')||'',/noindex/);
+ console.log('PASS CSP permits the Cloudflare Web Analytics beacon and 404s stay hardened');
 }
 let cancelled=false;const stream=new ReadableStream({pull(c){c.enqueue(new Uint8Array(65536));},cancel(){cancelled=true;}});const oversized=await worker.fetch(new Request('https://test/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:stream,duplex:'half'}),env,{waitUntil(){}});assert.equal(oversized.status,413);assert.equal(cancelled,true);console.log('PASS streamed bodies stop at limit');
 const server=http.createServer(async(req,res)=>{try{const chunks=[];for await(const c of req)chunks.push(c);const body=Buffer.concat(chunks);const request=new Request('http://'+req.headers.host+req.url,{method:req.method,headers:req.headers,...(!['GET','HEAD'].includes(req.method)?{body}:{} )});const response=await worker.fetch(request,env,{waitUntil:p=>p.catch(()=>{})});res.writeHead(response.status,Object.fromEntries(response.headers));res.end(Buffer.from(await response.arrayBuffer()));}catch(e){res.writeHead(500);res.end(String(e));}});await new Promise(r=>server.listen(0,'127.0.0.1',r));try{const child=spawn(process.execPath,['tests/worker-test.js'],{cwd:root,env:{...process.env,BASE:'http://127.0.0.1:'+server.address().port},stdio:'inherit',windowsHide:true});const code=await new Promise(r=>child.once('exit',r));assert.equal(code,0);}finally{await new Promise(r=>server.close(r));db.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

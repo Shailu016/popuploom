@@ -58,11 +58,10 @@ async function createWidget(c) {
   const invalid = validateConfig(config);
   if (invalid) return json({ error: invalid }, 400);
   if (template != null && (typeof template !== "string" || template.length > 100)) return json({ error: "Invalid template" }, 400);
-  // Keep the client-provided config id so the embedded runtime can report
-  // views/submits against this row. Never let one user claim another's id.
-  const wanted = (config && typeof config.id === "string" && /^[A-Za-z0-9_-]{3,64}$/.test(config.id)) ? config.id : null;
-  const taken = wanted ? await c.env.DB.prepare("SELECT id FROM widgets WHERE id = ?").bind(wanted).first() : null;
-  const id = (wanted && !taken) ? wanted : randomWidgetId();
+  // The database id is always server-generated. Honouring a client-chosen id
+  // would let a new account reclaim the id of a deleted widget, so an embed
+  // left on a customer site would silently start serving someone else's popup.
+  const id = randomWidgetId();
   config.id = id;
   await c.env.DB.prepare("INSERT INTO widgets (id, user_id, name, template, config) VALUES (?, ?, ?, ?, ?)")
     .bind(id, c.user.id, name, template || null, JSON.stringify(config)).run();

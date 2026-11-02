@@ -49,6 +49,9 @@ test('owner CRUD, validation, live config and lead isolation',async()=>{
  assert.equal((await api('/api/widgets/'+widget.id,{token:account.token})).data.name,'Original');
  assert.equal((await api('/api/widgets/'+widget.id,{method:'PUT',token:account.token,body:{name:'Updated',config:{content:{title:'New headline'}}}})).status,200);
  const live=await api('/api/widgets/'+widget.id+'/config');assert.equal(live.data.cfg.content.title,'New headline');assert.equal(live.data.cfg.id,widget.id);
+ const chosen=await api('/api/widgets',{method:'POST',token:account.token,body:{name:'Chosen id',config:{id:'customer-chosen-id'}}});
+ assert.equal(chosen.status,201);assert.notEqual(chosen.data.id,'customer-chosen-id');assert.equal(chosen.data.cfg.id,chosen.data.id);
+ assert.equal((await api('/api/widgets/'+chosen.data.id,{method:'DELETE',token:account.token})).status,200);
  assert.equal((await api('/api/widgets/'+widget.id+'/submit',{method:'POST',body:{data:{email:'lead@example.com'}}})).status,201);
  assert.equal((await api('/api/widgets/'+widget.id+'/submit',{method:'POST',body:{data:[]}})).status,400);
  assert.equal((await api('/api/widgets/'+widget.id+'/submissions',{token:other.token})).status,404);

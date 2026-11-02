@@ -54,11 +54,10 @@ router.post("/", authMiddleware, (req, res) => {
   const invalid = validateConfig(config);
   if (invalid) return res.status(400).json({ error: invalid });
   if (template != null && (typeof template !== "string" || template.length > 100)) return res.status(400).json({ error: "Invalid template" });
-  // Keep the client-provided config id so the embedded runtime can report
-  // views/submits against this row. Never let one user claim another's id.
-  const wanted = (config && typeof config.id === "string" && /^[A-Za-z0-9_-]{3,64}$/.test(config.id)) ? config.id : null;
-  const taken = wanted ? db.prepare("SELECT id FROM widgets WHERE id = ?").get(wanted) : null;
-  const id = (wanted && !taken) ? wanted : ("wan_" + crypto.randomBytes(12).toString("hex"));
+  // The database id is always server-generated. Honouring a client-chosen id
+  // would let a new account reclaim the id of a deleted widget, so an embed
+  // left on a customer site would silently start serving someone else's popup.
+  const id = "wan_" + crypto.randomBytes(12).toString("hex");
   config.id = id;
   db.prepare(
     "INSERT INTO widgets (id, user_id, name, template, config) VALUES (?, ?, ?, ?, ?)"

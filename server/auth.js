@@ -62,12 +62,25 @@ function register(email, password, name) {
   return { user, token: signToken(user) };
 }
 
+// Failing logins still perform one bcrypt comparison. Without this, a missing
+// or Google-only account returned before the hash work and its faster response
+// disclosed which emails are registered. Generated once per process.
+let dummyHash = null;
+function dummyPasswordHash() {
+  if (!dummyHash) dummyHash = bcrypt.hashSync(crypto.randomBytes(16).toString("hex"), 10);
+  return dummyHash;
+}
+
 function login(email, password) {
   email = String(email || "").trim().toLowerCase();
   const row = db.prepare("SELECT id, email, name, avatar_url, password_hash, google_id FROM users WHERE email = ?").get(email);
-  if (!row || row.google_id || typeof password !== "string" || Buffer.byteLength(password, "utf8") > 72) throw new Error("Invalid email or password");
-  // Google-only accounts get a random, unusable hash, so this can never match.
-  if (!bcrypt.compareSync(password || "", row.password_hash)) throw new Error("Invalid email or password");
+  const passwordString = typeof password === "string" ? password : "";
+  const canMatch = !!row && !row.google_id && typeof password === "string"
+    && Buffer.byteLength(passwordString, "utf8") <= 72;
+  // Google-only accounts get a random, unusable hash; a dummy hash covers
+  // unknown emails. Both still pay the same comparison cost before failing.
+  const valid = bcrypt.compareSync(passwordString, canMatch ? row.password_hash : dummyPasswordHash());
+  if (!canMatch || !valid) throw new Error("Invalid email or password");
   const user = { id: row.id, email: row.email, name: row.name || null, avatarUrl: row.avatar_url || null };
   return { user, token: signToken(user) };
 }
