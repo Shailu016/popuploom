@@ -41,16 +41,13 @@ function isDirectPath(pathname) {
     || pathname.startsWith("/assets/");
 }
 
-/**
- * Returns an absolute redirect target for a browser page move, or null when the
- * request should be handled normally. `rawUrl` must be the absolute request URL.
- */
-function pageRedirect(rawUrl, method, cutoverEnabled = false) {
-  // Fail closed until DNS, TLS and the new application have been verified.
-  const moveLegacy = cutoverEnabled === true || cutoverEnabled === "true";
-  if (method !== "GET" && method !== "HEAD") return null;
-  let url;
-  try { url = new URL(rawUrl); } catch (e) { return null; }
+function isMoveEnabled(cutoverEnabled) {
+  return cutoverEnabled === true || cutoverEnabled === "true";
+}
+
+// Canonical browser-page rules, evaluated against an already-secure URL.
+// Returns null when the request should be served where it is.
+function canonicalTarget(url, moveLegacy) {
   const host = url.hostname.toLowerCase();
   const pathname = url.pathname;
 
@@ -76,4 +73,40 @@ function pageRedirect(rawUrl, method, cutoverEnabled = false) {
   return null;
 }
 
-module.exports = { NEW_ORIGIN, APEX_HOSTS, WWW_HOSTS, LEGACY_HOSTS, LEGACY_PAGES, DIRECT_PATHS, isDirectPath, pageRedirect };
+/**
+ * Returns an absolute redirect target for a browser page move, or null when the
+ * request should be handled normally. `rawUrl` must be the absolute request URL.
+ */
+function pageRedirect(rawUrl, method, cutoverEnabled = false) {
+  // Fail closed until DNS, TLS and the new application have been verified.
+  const moveLegacy = isMoveEnabled(cutoverEnabled);
+  if (method !== "GET" && method !== "HEAD") return null;
+  let url;
+  try { url = new URL(rawUrl); } catch (e) { return null; }
+  return canonicalTarget(url, moveLegacy);
+}
+
+/**
+ * Upgrades a plaintext request on an approved host to HTTPS in a single hop.
+ * The target is computed after the canonical host rules, so e.g.
+ * `http://www.popuploom.com/studio.html` goes straight to
+ * `https://popuploom.com/studio.html` instead of bouncing through two redirects.
+ * Localhost, 127.0.0.1 and unknown preview hosts are never redirected.
+ */
+function secureRedirect(rawUrl, cutoverEnabled = false) {
+  let url;
+  try { url = new URL(rawUrl); } catch (e) { return null; }
+  if (url.protocol !== "http:") return null;
+  const host = url.hostname.toLowerCase();
+  if (!APEX_HOSTS.has(host) && !WWW_HOSTS.has(host) && !LEGACY_HOSTS.has(host)) return null;
+
+  const secure = new URL(url.href);
+  secure.protocol = "https:";
+  const target = canonicalTarget(secure, isMoveEnabled(cutoverEnabled));
+  return target || secure.href;
+}
+
+module.exports = {
+  NEW_ORIGIN, APEX_HOSTS, WWW_HOSTS, LEGACY_HOSTS, LEGACY_PAGES, DIRECT_PATHS,
+  isDirectPath, pageRedirect, secureRedirect
+};

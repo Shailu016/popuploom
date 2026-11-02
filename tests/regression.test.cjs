@@ -97,7 +97,7 @@ test('origin isolation keeps private APIs private while allowing public embeds',
 test('HTML security headers prevent clickjacking and restrict script execution',async()=>{
  for(const url of ['/','/studio.html','/profile.html','/demo.html','/unknown-page']){
   const r=await api(url);const policy=r.headers.get('content-security-policy');assert.ok(policy.includes("frame-ancestors 'none'"));assert.ok(policy.includes("base-uri 'none'"));assert.ok(policy.includes("object-src 'none'"));
-  const scripts=policy.split(';').find(s=>s.trim().startsWith('script-src'));assert.ok(scripts.includes('sha256-'));assert.ok(!scripts.includes("'unsafe-inline'"));assert.equal(r.headers.get('x-frame-options'),'DENY');assert.equal(r.headers.get('x-powered-by'),null);
+  const scripts=policy.split(';').find(s=>s.trim().startsWith('script-src'));assert.ok(scripts.includes('sha256-'));assert.ok(!scripts.includes("'unsafe-inline'"));assert.ok(scripts.includes('https://static.cloudflareinsights.com'));assert.ok(policy.includes('connect-src')&&policy.includes('https://cloudflareinsights.com'));assert.equal(r.headers.get('x-frame-options'),'DENY');assert.equal(r.headers.get('x-powered-by'),null);
  }
 });
 test('CSP hashes normalize line endings and update when the HTML file changes',()=>{
@@ -258,6 +258,29 @@ test('host policy only moves known pages and never crosses hosts for API or runt
  assert.equal(pageRedirect(old+'/','POST'),null);
  assert.equal(pageRedirect('http://localhost:3000/index.html','GET'),'http://localhost:3000/');
  assert.equal(pageRedirect('http://localhost:3000/','GET'),null);
+});
+test('plaintext production hosts upgrade to HTTPS in one hop',()=>{
+ const {secureRedirect}=require('../shared/host-policy');
+ const apex='https://popuploom.com',old='https://popforge.shailu3597.workers.dev',oldHttp='http://popforge.shailu3597.workers.dev';
+ assert.equal(secureRedirect('http://popuploom.com/','true'),apex+'/');
+ assert.equal(secureRedirect('http://popuploom.com/index.html?x=1',true),apex+'/?x=1');
+ assert.equal(secureRedirect('http://popuploom.com/templates.html?ref=1',true),apex+'/templates.html?ref=1');
+ assert.equal(secureRedirect('http://www.popuploom.com/studio.html?tpl=cafeClub',true),apex+'/studio.html?tpl=cafeClub');
+ assert.equal(secureRedirect('http://www.popuploom.com/index.html',true),apex+'/');
+ assert.equal(secureRedirect('http://www.popuploom.com/api/health',true),'https://www.popuploom.com/api/health');
+ assert.equal(secureRedirect('http://www.popuploom.com/popforge.js',true),'https://www.popuploom.com/popforge.js');
+ assert.equal(secureRedirect('http://www.popuploom.com/assets/favicon.svg',true),'https://www.popuploom.com/assets/favicon.svg');
+ assert.equal(secureRedirect(oldHttp+'/','true'),apex+'/');
+ assert.equal(secureRedirect(oldHttp+'/templates.html?ref=1',true),apex+'/templates.html?ref=1');
+ assert.equal(secureRedirect(oldHttp+'/migration.html',true),old+'/migration.html');
+ assert.equal(secureRedirect(oldHttp+'/popforge.js',true),old+'/popforge.js');
+ assert.equal(secureRedirect(oldHttp+'/unknown',true),old+'/unknown');
+ assert.equal(secureRedirect(oldHttp+'/index.html',false),old+'/');
+ assert.equal(secureRedirect(oldHttp+'/studio.html',false),old+'/studio.html');
+ assert.equal(secureRedirect('http://localhost:3000/','true'),null);
+ assert.equal(secureRedirect('http://127.0.0.1:8080/studio.html',true),null);
+ assert.equal(secureRedirect('http://preview.example.com/studio.html',true),null);
+ assert.equal(secureRedirect(apex+'/','true'),null);
 });
 test('legacy cutover defaults off and requires an explicit enable value',()=>{
  const {pageRedirect}=require('../shared/host-policy');

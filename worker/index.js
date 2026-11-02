@@ -15,6 +15,25 @@ const apiLimit = rateLimit("api", 1200, 60000);
 
 const JSON_LIMIT = 192 * 1024;
 
+// Cloudflare reports the scheme the visitor actually used in `cf-visitor`.
+// `request.url` is normally http for plaintext requests too, but preferring the
+// edge header keeps the policy correct behind any normalizing proxy.
+function clientScheme(request) {
+  const visitor = request.headers.get("cf-visitor");
+  if (visitor) {
+    try {
+      const scheme = String(JSON.parse(visitor).scheme || "").toLowerCase();
+      if (scheme === "http" || scheme === "https") return scheme;
+    } catch (e) { /* fall through to the other signals */ }
+  }
+  const forwarded = request.headers.get("x-forwarded-proto");
+  if (forwarded) {
+    const scheme = forwarded.split(",")[0].trim().toLowerCase();
+    if (scheme === "http" || scheme === "https") return scheme;
+  }
+  return new URL(request.url).protocol === "https:" ? "https" : "http";
+}
+
 // Explicit public allowlist, same as the Express server's static middleware.
 const PUBLIC_FILES = new Set([
   "templates.html", "guides/install-popups.html", "robots.txt", "sitemap.xml", "llms.txt", "index.html", "studio.html", "profile.html", "demo.html", "migration.html",
@@ -230,31 +249,49 @@ async function serveStatic(request, env, pathname, sec, cors, headOnly) {
 
 export default {
   async fetch(request, env, ctx) {
-    let pathname;
+    let url;
     try {
-      pathname = new URL(request.url).pathname;
+      url = new URL(request.url);
     } catch (e) {
       return new Response("Bad Request", { status: 400 });
     }
+    const pathname = url.pathname;
+    const scheme = clientScheme(request);
+    // Normalize the effective URL to the scheme the visitor used. This keeps
+    // canonical redirects single-hop even when a proxy reports the original
+    // scheme separately from the URL it forwards.
+    if (url.protocol !== scheme + ":") url.protocol = scheme + ":";
+    const canonicalUrl = url.href;
+
     const sec = securityHeaders(env, request);
-    let cors;
+    let cors = {};
+    let corsError = null;
     try {
       cors = originCheck(env, request, pathname);
     } catch (e) {
-      return withHeaders(errorResponse(e), { ...sec, "Cache-Control": "no-store" });
+      // A plaintext request must still reach HTTPS. Origin policy is enforced
+      // on the HTTPS target, so do not turn the upgrade into a 403.
+      corsError = e;
     }
     const method = request.method;
     const headOnly = method === "HEAD";
     const effectiveMethod = headOnly ? "GET" : method;
 
-    // Permanent browser-page moves only: the shared policy leaves API calls,
-    // runtime files, assets and the recovery page on their current host.
-    const redirect = hostPolicy.pageRedirect(request.url, method, env.DOMAIN_CUTOVER_ENABLED);
+    // Plaintext requests on approved hosts are upgraded in one hop. Browser
+    // pages additionally move to the apex; API calls, runtime files, assets
+    // and the recovery page stay on their current host.
+    const redirect = scheme === "http"
+      ? (hostPolicy.secureRedirect(canonicalUrl, env.DOMAIN_CUTOVER_ENABLED)
+        || hostPolicy.pageRedirect(canonicalUrl, method, env.DOMAIN_CUTOVER_ENABLED))
+      : hostPolicy.pageRedirect(canonicalUrl, method, env.DOMAIN_CUTOVER_ENABLED);
     if (redirect) {
       return new Response(null, {
         status: 308,
         headers: { ...sec, ...cors, Location: redirect, "Cache-Control": "no-store" }
       });
+    }
+    if (corsError) {
+      return withHeaders(errorResponse(corsError), { ...sec, "Cache-Control": "no-store" });
     }
 
     if (method === "OPTIONS") {

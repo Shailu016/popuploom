@@ -26,11 +26,14 @@ async function req(method, path, { token, body, headers, raw } = {}) {
 }
 
 // Sends a request with an alternate Host header so the shared host policy can
-// be exercised without DNS or a deployed custom domain.
-function hostReq(host, path, method = "GET") {
+// be exercised without DNS or a deployed custom domain. Cloudflare reports the
+// visitor's scheme in cf-visitor; simulate HTTPS by default and pass
+// `{"cf-visitor": '{"scheme":"http"}'}` to exercise the upgrade path.
+function hostReq(host, path, method = "GET", extraHeaders = {}) {
   return new Promise((resolve, reject) => {
     const base = new URL(BASE);
-    const r = http.request({ hostname: base.hostname, port: base.port, path, method, headers: { Host: host } }, res => {
+    const headers = { Host: host, "cf-visitor": JSON.stringify({ scheme: "https" }), ...extraHeaders };
+    const r = http.request({ hostname: base.hostname, port: base.port, path, method, headers }, res => {
       const chunks = [];
       res.on("data", c => chunks.push(c));
       res.on("end", () => resolve({ status: res.statusCode, headers: res.headers, body: Buffer.concat(chunks).toString("utf8") }));
@@ -71,7 +74,7 @@ function hostReq(host, path, method = "GET") {
   r = await hostReq(OLD_HOST, "/templates.html?ref=1");
   check("legacy templates stay direct before cutover", r.status === 200 && !r.headers.location);
   r = await hostReq(OLD_HOST, "/index.html");
-  check("legacy index.html normalizes on its own host before cutover", r.status === 308 && r.headers.location === "http://" + OLD_HOST + "/");
+  check("legacy index.html normalizes on its own host before cutover", r.status === 308 && r.headers.location === "https://" + OLD_HOST + "/");
   r = await hostReq(OLD_HOST, "/studio.html?tpl=cafeClub");
   check("legacy studio stays direct before cutover", r.status === 200 && !r.headers.location);
   r = await hostReq(OLD_HOST, "/migration.html");
@@ -94,6 +97,27 @@ function hostReq(host, path, method = "GET") {
   check("www API stays direct", r.status === 200 && !r.headers.location);
   r = await hostReq("popuploom.com", "/");
   check("apex homepage serves 200", r.status === 200 && !r.headers.location, r.status);
+
+  console.log("== HTTPS upgrade ==");
+  const plaintext = { "cf-visitor": JSON.stringify({ scheme: "http" }) };
+  r = await hostReq("popuploom.com", "/studio.html?tpl=cafeClub", "GET", plaintext);
+  check("plaintext apex upgrades to HTTPS", r.status === 308 && r.headers.location === "https://popuploom.com/studio.html?tpl=cafeClub", r.headers.location);
+  r = await hostReq(WWW_HOST, "/studio.html?tpl=cafeClub", "GET", plaintext);
+  check("plaintext www page upgrades straight to apex", r.status === 308 && r.headers.location === "https://popuploom.com/studio.html?tpl=cafeClub", r.headers.location);
+  r = await hostReq(WWW_HOST, "/api/health", "GET", plaintext);
+  check("plaintext www API upgrades without crossing hosts", r.status === 308 && r.headers.location === "https://www.popuploom.com/api/health", r.headers.location);
+  r = await hostReq(WWW_HOST, "/popforge.js", "GET", plaintext);
+  check("plaintext www runtime upgrades without crossing hosts", r.status === 308 && r.headers.location === "https://www.popuploom.com/popforge.js", r.headers.location);
+  r = await hostReq(OLD_HOST, "/templates.html", "GET", plaintext);
+  check("plaintext legacy page upgrades without a redirect chain", r.status === 308 && r.headers.location === "https://" + OLD_HOST + "/templates.html", r.headers.location);
+  r = await hostReq(OLD_HOST, "/popforge.js", "GET", plaintext);
+  check("plaintext legacy runtime stays on legacy host", r.status === 308 && r.headers.location === "https://" + OLD_HOST + "/popforge.js", r.headers.location);
+  r = await hostReq(OLD_HOST, "/migration.html", "GET", plaintext);
+  check("plaintext recovery page stays on legacy host", r.status === 308 && r.headers.location === "https://" + OLD_HOST + "/migration.html", r.headers.location);
+  r = await hostReq("popuploom.com", "/api/health", "POST", plaintext);
+  check("plaintext non-GET is upgraded with 308", r.status === 308 && r.headers.location === "https://popuploom.com/api/health", r.headers.location);
+  r = await req("GET", "/", { raw: true });
+  check("localhost is never upgraded or redirected", r.status === 200 && !r.headers.get("location"), r.status);
 
   console.log("== SEO ==");
   for (const path of ["/", "/templates.html", "/guides/install-popups.html"]) {

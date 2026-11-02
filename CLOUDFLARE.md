@@ -22,10 +22,15 @@ The integration suite runs the actual Wrangler bundle using an isolated SQLite-b
 - redirects `www.popuploom.com` browser pages to the same apex path and query;
 - redirects only known browser pages from the former `workers.dev` host;
 - leaves `/popuploom.js`, `/popforge.js`, `/assets/*`, `/api/*`, `/migration.html`, `/robots.txt` and `/sitemap.xml` direct on every host;
+- upgrades plaintext requests on the three approved hosts to HTTPS in one hop, so `http://www.popuploom.com/studio.html` goes straight to `https://popuploom.com/studio.html` and API/runtime requests are upgraded without crossing hosts;
 - returns real 404s for unknown paths;
 - never sends localhost/test hosts to production.
 
+The Worker reads the visitor scheme from `cf-visitor` (falling back to `x-forwarded-proto` and then the request URL), so the upgrade is enforced in code even if the zone-level **Always Use HTTPS** setting is off. The Express server applies the same rule only when a trusted proxy reports `x-forwarded-proto: http`; local HTTP development is never redirected. Tests cover plaintext upgrades, single-hop targets, direct API/runtime paths and the localhost exemption.
+
 Because the Worker receives the request URL after routing, Custom Domain requests arrive as `https://popuploom.com/...` and are handled correctly without trusting a user-supplied Host header.
+
+The Content Security Policy allowlists `https://static.cloudflareinsights.com` for scripts and `https://cloudflareinsights.com` for connections so Cloudflare Web Analytics can post its beacon. Inline scripts remain hash-pinned; do not add `'unsafe-inline'`.
 
 ## Domain status (2026-11-02)
 

@@ -22,10 +22,16 @@ const hostPolicy = require("../shared/host-policy");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Permanent browser-page moves (apex canonicalization and legacy-host moves).
-// API/runtime/asset requests are never redirected by the shared policy.
+// Permanent browser-page moves (apex canonicalization and legacy-host moves),
+// plus a single-hop HTTPS upgrade when a trusted proxy reports a plaintext
+// request. API/runtime/asset requests are never moved across hosts.
 app.use((req, res, next) => {
-  const target = hostPolicy.pageRedirect(req.protocol + "://" + req.get("host") + req.originalUrl, req.method, process.env.DOMAIN_CUTOVER_ENABLED);
+  const host = req.get("host");
+  const forwardedProto = String(req.get("x-forwarded-proto") || "").split(",")[0].trim().toLowerCase();
+  const plaintext = forwardedProto === "http" && host
+    ? hostPolicy.secureRedirect("http://" + host + req.originalUrl, process.env.DOMAIN_CUTOVER_ENABLED)
+    : null;
+  const target = plaintext || hostPolicy.pageRedirect(req.protocol + "://" + host + req.originalUrl, req.method, process.env.DOMAIN_CUTOVER_ENABLED);
   if (!target) return next();
   res.setHeader("Location", target);
   res.setHeader("Cache-Control", "no-store");

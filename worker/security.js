@@ -39,10 +39,10 @@ export function htmlHeaders(env, file = "index.html") {
   const origins = String(env.APP_ORIGINS || "").split(",").map(v => v.trim()).filter(Boolean);
   const policy = [
     "default-src 'self'", "base-uri 'none'", "object-src 'none'", "frame-ancestors 'none'", "form-action 'self'",
-    "script-src 'self' 'unsafe-hashes' https://accounts.google.com/gsi/ " + (hashes[file] || ""),
+    "script-src 'self' 'unsafe-hashes' https://accounts.google.com/gsi/ https://static.cloudflareinsights.com " + (hashes[file] || ""),
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/",
     "font-src 'self' https://fonts.gstatic.com", "img-src 'self' https: http: data:",
-    "connect-src 'self' https://accounts.google.com/gsi/ " + origins.join(" "),
+    "connect-src 'self' https://accounts.google.com/gsi/ https://cloudflareinsights.com " + origins.join(" "),
     "frame-src https://accounts.google.com/gsi/ https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com"
   ].join("; ");
   return {

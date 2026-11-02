@@ -12,5 +12,29 @@ for(const flag of [undefined,'false','true']){
  }
 }
 console.log('PASS Worker legacy cutover disabled by default and explicitly enabled');
+{
+ const plainEnv={...env,DOMAIN_CUTOVER_ENABLED:'true'},plainHeaders={'cf-visitor':JSON.stringify({scheme:'http'})};
+ const cases=[
+  ['https://popuploom.com/studio.html?tpl=cafeClub','https://popuploom.com/studio.html?tpl=cafeClub'],
+  ['https://popuploom.com/index.html?ref=1','https://popuploom.com/?ref=1'],
+  ['https://www.popuploom.com/studio.html?x=1','https://popuploom.com/studio.html?x=1'],
+  ['https://www.popuploom.com/api/health','https://www.popuploom.com/api/health'],
+  ['https://www.popuploom.com/popforge.js','https://www.popuploom.com/popforge.js'],
+  ['https://popforge.shailu3597.workers.dev/templates.html?ref=1','https://popuploom.com/templates.html?ref=1'],
+  ['https://popforge.shailu3597.workers.dev/migration.html','https://popforge.shailu3597.workers.dev/migration.html'],
+  ['https://popforge.shailu3597.workers.dev/popforge.js','https://popforge.shailu3597.workers.dev/popforge.js']
+ ];
+ for(const [url,location] of cases){const response=await worker.fetch(new Request(url,{headers:plainHeaders}),plainEnv,{waitUntil(){}});assert.equal(response.status,308,url);assert.equal(response.headers.get('Location'),location,url);}
+ const local=await worker.fetch(new Request('http://localhost:3000/studio.html',{headers:plainHeaders}),env,{waitUntil(){}});
+ assert.equal(local.status,200);assert.equal(local.headers.get('Location'),null);
+ console.log('PASS plaintext production hosts upgrade to HTTPS in one hop, localhost untouched');
+}
+{
+ const home=await worker.fetch(new Request('https://popuploom.com/'),env,{waitUntil(){}});
+ const csp=home.headers.get('Content-Security-Policy')||'';
+ assert.ok(csp.includes('https://static.cloudflareinsights.com'));
+ assert.ok(csp.includes('https://cloudflareinsights.com'));
+ console.log('PASS CSP permits the Cloudflare Web Analytics beacon');
+}
 let cancelled=false;const stream=new ReadableStream({pull(c){c.enqueue(new Uint8Array(65536));},cancel(){cancelled=true;}});const oversized=await worker.fetch(new Request('https://test/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:stream,duplex:'half'}),env,{waitUntil(){}});assert.equal(oversized.status,413);assert.equal(cancelled,true);console.log('PASS streamed bodies stop at limit');
 const server=http.createServer(async(req,res)=>{try{const chunks=[];for await(const c of req)chunks.push(c);const body=Buffer.concat(chunks);const request=new Request('http://'+req.headers.host+req.url,{method:req.method,headers:req.headers,...(!['GET','HEAD'].includes(req.method)?{body}:{} )});const response=await worker.fetch(request,env,{waitUntil:p=>p.catch(()=>{})});res.writeHead(response.status,Object.fromEntries(response.headers));res.end(Buffer.from(await response.arrayBuffer()));}catch(e){res.writeHead(500);res.end(String(e));}});await new Promise(r=>server.listen(0,'127.0.0.1',r));try{const child=spawn(process.execPath,['tests/worker-test.js'],{cwd:root,env:{...process.env,BASE:'http://127.0.0.1:'+server.address().port},stdio:'inherit',windowsHide:true});const code=await new Promise(r=>child.once('exit',r));assert.equal(code,0);}finally{await new Promise(r=>server.close(r));db.close();}})().catch(e=>{console.error(e);process.exitCode=1;});
