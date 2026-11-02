@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recover guest drafts | PopupLoom</title>
+<meta name="description" content="Download guest popup drafts saved in this browser before moving from the old PopForge site to PopupLoom.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="./assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="stylesheet" href="./ui.css">
+<style>
+  .migration-wrap { max-width: 720px; margin: 0 auto; padding: 28px 20px 80px; }
+  .migration-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 8px 0 30px; }
+  .migration-card { padding: 28px; }
+  .migration-card h1 { font-size: 34px; letter-spacing: -.035em; margin: 0 0 12px; }
+  .migration-card p { font-size: 14.5px; line-height: 1.65; }
+  .migration-list { margin: 16px 0 0; padding-left: 20px; font-size: 14px; line-height: 1.8; }
+  .migration-list li { overflow-wrap: anywhere; }
+  .migration-status { margin: 18px 0; font-size: 14px; }
+  .migration-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
+  .migration-note { font-size: 12.5px; color: var(--muted); line-height: 1.65; margin-top: 22px; }
+</style>
+</head>
+<body>
+<div class="migration-wrap">
+  <div class="migration-head">
+    <a class="logo" href="https://popuploom.com/"><span class="mark"><svg viewBox="0 0 32 32" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.8"><circle cx="12.2" cy="16" r="5.4"/><circle cx="19.8" cy="16" r="5.4"/></svg></span> Popup<span><i>Loom</i></span></a>
+    <a class="btn small ghost" href="https://popuploom.com/">Go to PopupLoom</a>
+  </div>
+
+  <main class="card migration-card">
+    <h1>Recover your guest drafts</h1>
+    <p class="mut">This page runs on the old PopForge host, so it can still see drafts saved in this browser before the domain move. Download the backup file, then import it from <b>My popups</b> on PopupLoom.</p>
+
+    <div class="migration-status" id="status" role="status">Checking this browser for drafts…</div>
+    <ul class="migration-list" id="draftList" aria-label="Drafts found in this browser"></ul>
+
+    <div class="migration-actions">
+      <button class="btn primary" id="download" style="display:none">Download backup (.json)</button>
+      <a class="btn ghost" href="https://popuploom.com/#dash">Open PopupLoom</a>
+    </div>
+
+    <p class="migration-note">Nothing is uploaded, and this page never deletes drafts. Account-owned popups live in the database and stay available after you sign in on PopupLoom. Guest drafts are tied to this browser and this old origin, so they need the file above to move.</p>
+  </main>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var KEY = "pf.widgets";
+  var MAX = 200;
+  var statusEl = document.getElementById("status");
+  var listEl = document.getElementById("draftList");
+  var downloadEl = document.getElementById("download");
+
+  function setStatus(text) { statusEl.textContent = text; }
+
+  var drafts = [];
+  var skipped = 0;
+  try {
+    var raw = localStorage.getItem(KEY);
+    if (raw) {
+      var parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) throw new Error("not a list");
+      for (var i = 0; i < parsed.length; i++) {
+        var w = parsed[i];
+        if (w && typeof w === "object" && w.cfg && typeof w.cfg === "object" && !Array.isArray(w.cfg)) {
+          if (drafts.length < MAX) drafts.push(w); else skipped++;
+        } else {
+          skipped++;
+        }
+      }
+    }
+  } catch (e) {
+    setStatus("This browser's draft data could not be read. Nothing was changed.");
+    return;
+  }
+
+  if (!drafts.length) {
+    setStatus(skipped
+      ? "No valid drafts were found in this browser. Unrecognised entries were left untouched."
+      : "No guest drafts were found in this browser. If you used another browser or cleared site data, there is nothing to recover here.");
+    return;
+  }
+
+  setStatus("Found " + drafts.length + " guest draft" + (drafts.length === 1 ? "" : "s") + " in this browser." + (skipped ? " " + skipped + " unrecognised entr" + (skipped === 1 ? "y was" : "ies were") + " skipped." : ""));
+  drafts.forEach(function (w) {
+    var li = document.createElement("li");
+    var name = typeof w.name === "string" && w.name ? w.name : "Untitled draft";
+    li.textContent = name;
+    listEl.appendChild(li);
+  });
+  downloadEl.style.display = "inline-flex";
+  downloadEl.onclick = function () {
+    try {
+      var blob = new Blob([JSON.stringify(drafts, null, 2)], { type: "application/json" });
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "popuploom-widgets-backup.json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+      setStatus("Backup downloaded. Import it from My popups on PopupLoom.");
+    } catch (e) {
+      setStatus("The browser blocked the download. Try a different browser or allow downloads on this page.");
+    }
+  };
+})();
+</script>
+</body>
+</html>

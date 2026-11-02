@@ -1,5 +1,16 @@
 const fs=require('fs'),path=require('path'),http=require('http'),assert=require('assert/strict'),{spawn}=require('child_process'),{DatabaseSync}=require('node:sqlite');
 (async()=>{const root=path.resolve(__dirname,'..');const {default:worker}=await import(require('url').pathToFileURL(path.join(root,'.cf-build/index.js')));const db=new DatabaseSync(':memory:');for(const f of ['0001_init.sql','0003_rate_limits.sql'])db.exec(fs.readFileSync(path.join(root,'worker/migrations',f),'utf8'));
 const env={JWT_SECRET:require('crypto').randomBytes(32).toString('hex'),DB:{prepare(sql){return {bind(...args){return {first:async()=>db.prepare(sql).get(...args),run:async()=>{const r=db.prepare(sql).run(...args);return {meta:{changes:r.changes,last_row_id:r.lastInsertRowid}};},all:async()=>({results:db.prepare(sql).all(...args)})};}};}},ASSETS:{fetch:async r=>{const file=path.join(root,'.cf-build/public',new URL(r.url).pathname);return fs.existsSync(file)&&fs.statSync(file).isFile()?new Response(fs.readFileSync(file),{headers:{'Content-Type':file.endsWith('.html')?'text/html':'application/octet-stream'}}):new Response('',{status:404});}}};
+for(const flag of [undefined,'false','true']){
+ const enabled=flag==='true';
+ for(const path of ['/','/studio.html?tpl=cafeClub','/index.html?ref=1']){
+  const url='https://popforge.shailu3597.workers.dev'+path;
+  const response=await worker.fetch(new Request(url),{...env,DOMAIN_CUTOVER_ENABLED:flag},{waitUntil(){}});
+  const index=path.startsWith('/index.html');
+  assert.equal(response.status,enabled||index?308:200);
+  assert.equal(response.headers.get('Location'),enabled?'https://popuploom.com'+(index?'/?ref=1':path):index?'https://popforge.shailu3597.workers.dev/?ref=1':null);
+ }
+}
+console.log('PASS Worker legacy cutover disabled by default and explicitly enabled');
 let cancelled=false;const stream=new ReadableStream({pull(c){c.enqueue(new Uint8Array(65536));},cancel(){cancelled=true;}});const oversized=await worker.fetch(new Request('https://test/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:stream,duplex:'half'}),env,{waitUntil(){}});assert.equal(oversized.status,413);assert.equal(cancelled,true);console.log('PASS streamed bodies stop at limit');
 const server=http.createServer(async(req,res)=>{try{const chunks=[];for await(const c of req)chunks.push(c);const body=Buffer.concat(chunks);const request=new Request('http://'+req.headers.host+req.url,{method:req.method,headers:req.headers,...(!['GET','HEAD'].includes(req.method)?{body}:{} )});const response=await worker.fetch(request,env,{waitUntil:p=>p.catch(()=>{})});res.writeHead(response.status,Object.fromEntries(response.headers));res.end(Buffer.from(await response.arrayBuffer()));}catch(e){res.writeHead(500);res.end(String(e));}});await new Promise(r=>server.listen(0,'127.0.0.1',r));try{const child=spawn(process.execPath,['tests/worker-test.js'],{cwd:root,env:{...process.env,BASE:'http://127.0.0.1:'+server.address().port},stdio:'inherit',windowsHide:true});const code=await new Promise(r=>child.once('exit',r));assert.equal(code,0);}finally{await new Promise(r=>server.close(r));db.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

@@ -1,8 +1,8 @@
-# PopForge review and fixes
+# PopupLoom review and fixes
 
 Reviewed: 2026-11-01
 
-Follow-up security review: see SECURITY.md for the newer authentication rules, 22-group regression results, and remaining deployment boundaries.
+Follow-up security review: see SECURITY.md for the newer authentication rules, 26-group regression results, and remaining deployment boundaries.
 
 All reproduced findings from the two reviews and follow-up failure-path checks have been addressed. This records the tested scope; it is not a claim that software can be guaranteed defect-free.
 
@@ -23,14 +23,16 @@ All reproduced findings from the two reviews and follow-up failure-path checks h
 - Avoid duplicate runtime initialization and keep per-widget API overrides isolated.
 - Destroy old preview timers/listeners. Fetch cloud submission counts without downloading every lead into the dashboard; sort saved dates correctly.
 - Require Node 22.13+ so node:sqlite is available without an experimental launch flag.
+- Keep one runtime implementation served at both `/popuploom.js` and `/popforge.js`; accept both widget attributes; share one `window.PopupLoom`/`window.PopForge` object; preserve legacy analytics and storage keys.
+- Add a noindex old-origin draft recovery page and confined host-policy redirects that never move API, runtime, asset or recovery requests.
 
 ## Validation
 
 Run npm test from this folder. The permanent suite is tests/regression.test.cjs.
 
-Latest result: 14 test groups passed, 0 failed, 0 skipped. Real headless Chrome was used for the browser group.
+Latest result: 26 test groups passed, 0 failed, 0 skipped. Real headless Chrome was used for the browser group. The Worker integration suite passed 79 assertions.
 
-Coverage includes private-file requests with encoded paths; owner isolation; valid/invalid configs; JSON errors; JWT secrets; Google credential/session replacement; spoofed forwarded addresses; retry deduplication; failed cloud operations; legacy database migration; unsafe imports/rendering; popup closure during submission; API override isolation; every template's schema and preview; opening all 45 templates in the studio; failed and successful saves; installation config retrieval; test-mode approval; deletion; sticky reopening; duplicate scans; invalid selectors; proof timing; and studio layouts at 390, 768 and 1440 pixels.
+Coverage includes private-file requests with encoded paths; owner isolation; valid/invalid configs; JSON errors; JWT secrets; Google credential/session replacement; spoofed forwarded addresses; retry deduplication; failed cloud operations; legacy database migration; unsafe imports/rendering; popup closure during submission; API override isolation; dual runtime/attribute loading; host-policy redirects and direct API/runtime paths; every template's schema and preview; opening all 45 templates in the studio; failed and successful saves; installation config retrieval; test-mode approval; deletion; sticky reopening; duplicate scans; invalid selectors; proof timing; and studio layouts at 390, 768 and 1440 pixels.
 
 All application JavaScript and inline HTML scripts passed syntax parsing. npm audit reported 0 known vulnerabilities across production and development dependencies.
 

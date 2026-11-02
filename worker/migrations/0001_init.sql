@@ -1,4 +1,4 @@
--- PopForge schema for D1 (final shape of server/db.js after its migrations)
+-- PopupLoom (formerly PopForge) schema for D1 (final shape of server/db.js after its migrations)
 CREATE TABLE users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   email TEXT UNIQUE NOT NULL,

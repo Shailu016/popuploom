@@ -1,9 +1,21 @@
-# PopForge on Cloudflare Workers + D1
+# PopupLoom on Cloudflare Workers + D1
+# The Worker, database and binding keep their original names for continuity.
 name = "popforge"
 account_id = "66d3b261587ce5aeb4849141b6cca30d"
 workers_dev = true
 main = "worker/index.js"
 compatibility_date = "2026-10-01"
+
+# Keep both approved custom domains attached on every GitHub deployment.
+[[routes]]
+pattern = "popuploom.com"
+zone_id = "a8ba7d253a7c97dd33d22504bfd5e7aa"
+custom_domain = true
+
+[[routes]]
+pattern = "www.popuploom.com"
+zone_id = "a8ba7d253a7c97dd33d22504bfd5e7aa"
+custom_domain = true
 
 [assets]
 # The whole project root is the static site; .assetsignore keeps server files,
@@ -12,7 +24,7 @@ directory = "./.cf-build/public"
 binding = "ASSETS"
 not_found_handling = "none"
 # Every request hits the Worker first so it can apply CSP, no-store headers,
-# the public-file allowlist, and the SPA fallback exactly like the Express server.
+# the public-file allowlist, host redirects and real 404s exactly like Express.
 run_worker_first = true
 
 [[d1_databases]]
@@ -26,6 +38,9 @@ migrations_dir = "worker/migrations"
 # Comma-separated extra origins allowed to call the API from a browser.
 # Leave empty to allow only same-origin (and public widget endpoints).
 APP_ORIGINS = ""
+
+# Enable only after apex DNS, HTTPS and application smoke checks pass.
+DOMAIN_CUTOVER_ENABLED = "false"
 
 NODE_ENV = "production"
 
