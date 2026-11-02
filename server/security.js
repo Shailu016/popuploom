@@ -18,7 +18,10 @@ const htmlFiles = new Set(["index.html", "studio.html", "profile.html", "demo.ht
 const policyCache = new Map();
 const hash = text => "'sha256-" + crypto.createHash("sha256").update(text).digest("base64") + "'";
 function scriptHashes(file) {
-  if (!htmlFiles.has(file)) throw new Error("Unknown HTML file");
+  // Only first-party pages are exact-declared; unknown HTML (owner verification
+  // drop files, future additions) gets the same base policy with no inline
+  // script authority, exactly like the Worker's hashes[file] || "" fallback.
+  if (!htmlFiles.has(file)) return "";
   const location = path.join(__dirname, "..", file), stat = fs.statSync(location);
   const cache = policyCache.get(file);
   if (cache && cache.mtime === stat.mtimeMs && cache.size === stat.size) return cache.hashes;

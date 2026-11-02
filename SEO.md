@@ -18,6 +18,7 @@ Implemented for the production PopupLoom domain:
 - noindex editor/account/demo/recovery pages
 - canonical `/index.html` → `/` redirect and real 404s
 - regenerated per-page CSP hashes
+- optional site-verification wiring (owner-supplied values only; see below)
 
 Public indexing targets: `/`, `/templates.html`, `/guides/install-popups.html`. The sitemap excludes app/account/API routes and the migration page. Unknown paths return 404 rather than duplicate homepage content. Account authorization remains enforced independently of robots.txt.
 
@@ -40,5 +41,15 @@ Webmaster actions requiring the owner's account verification:
 2. Add the site to Bing Webmaster Tools or import a verified Search Console property, then submit the same sitemap.
 
 Verification tokens must come from the owner's own webmaster account; none were invented. Google/Bing indexing, citations by AI tools, real-user Core Web Vitals and rankings require observation after launch. No worldwide ranking or recommendation is guaranteed.
+
+### Site verification implementation
+
+The application side of verification is wired so the owner never edits code:
+
+- **Meta method:** set the `SITE_VERIFICATION_METAS` secret (or env) as comma-separated `name=content` pairs, for example `google-site-verification=AbC123...,msvalidate.01=0123...`. Every build injects exactly those `<meta name=… content=…>` tags before `</head>` on all public pages. Values are validated against a strict charset; anything unsafe or unparsable is silently dropped rather than rendered.
+- **Drop-file method:** place the file Search Console or Bing hands you (`google*.html`, e.g. `googled9222a9e1190a4db.html`, or `BingSiteAuth.xml`) in the repository root on the machine that deploys, and run `npm run deploy:cf`. The build copies such files into the public bundle and both runtimes serve them on every host with `Cache-Control: no-store` and the standard security headers. These filenames are gitignored so tokens are never committed.
+- In both runtimes, a matching filename with no actual file — and any lookalike, traversal or suffix variant — returns the same hardened 404 as any unknown path; the filename pattern (`^google[a-z0-9]{12,32}\.html$` or `^BingSiteAuth\.xml$`, case-insensitive) is the only gate.
+
+Validation: the Worker integration suite (96 assertions) and the application/browser suite (30 groups) pass. JSON-LD is parsed for syntax and checked against visible product content: HowTo steps mirror the visible guide headings and sentences, and breadcrumb markup matches the visible breadcrumb lines. No fake reviews, backlinks, ratings or ranking claims were added. This is not a claim of Google rich-result eligibility.
 
 Keep permanent page redirects for at least a year, preferably longer. Legacy embed/API support on the old host may need to remain indefinitely.

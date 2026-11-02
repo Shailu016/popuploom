@@ -18,6 +18,7 @@ const { verifyCredential, isConfigured, CLIENT_ID } = require("./google");
 const widgetsRouter = require("./routes/widgets");
 const db = require("./db");
 const hostPolicy = require("../shared/host-policy");
+const verification = require("../shared/verification");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -148,7 +149,17 @@ app.use((req, res, next) => {
   try { pathname = decodeURIComponent(req.path); }
   catch (e) { return res.status(400).end(); }
   if (pathname === "/") pathname = "/index.html";
-  if (!publicFiles.has(pathname.slice(1))) return next();
+  if (!publicFiles.has(pathname.slice(1))) {
+    // Verification drop files are served only when the owner actually placed
+    // the file; a pattern-matching name with no file falls through to the same
+    // hardened 404 as any other unknown path. The strict regex in
+    // shared/verification.js forbids slashes and leading dots, so the join
+    // below can never traverse above the project root.
+    if (!verification.verificationFile(pathname.slice(1))) return next();
+    let dropStat = null;
+    try { dropStat = fs.statSync(path.join(__dirname, "..", pathname.slice(1))); } catch (e) {}
+    if (!dropStat || !dropStat.isFile()) return next();
+  }
   const file = pathname === "/popforge.js" ? "/popuploom.js" : pathname;
   res.setHeader("Cache-Control", "no-store");
   if (file.endsWith(".html")) {

@@ -39,6 +39,38 @@ test('private files stay private including encoded separators and extensions',as
  }
  for(const url of ['/','/templates.html','/guides/install-popups.html','/migration.html','/studio.html','/profile.html','/demo.html','/app.js','/studio.js','/popuploom.js','/popforge.js','/ui.css','/robots.txt','/sitemap.xml','/llms.txt','/llms-full.txt','/assets/winter-gift.jpg','/assets/favicon.svg','/assets/og-popuploom.png'])assert.equal((await api(url)).status,200,url);
 });
+test('owner verification drop files serve exactly and lookalikes stay hardened 404s',async()=>{
+ // Drop files are owner-provided, so a name is only written when absent and
+ // removed in finally — a real owner file is asserted to serve but never
+ // overwritten or deleted. Everything is also gitignored as a second guard.
+ const created=[];
+ const want=[
+  ['googled9222a9e1190a4db.html','google-site-verification: regression d9222a9e1190a4db\n',/text\/html/],
+  ['BingSiteAuth.xml','<?xml version="1.0" encoding="UTF-8"?><users><user>regression</user></users>',/xml/]
+ ];
+ try{
+  for(const [name,body,typeRe] of want){
+   const abs=path.join(root,name);
+   const owned=fs.existsSync(abs);
+   if(!owned){fs.writeFileSync(abs,body);created.push(abs);}
+   const got=await api('/'+name);
+   assert.equal(got.status,200,name);
+   assert.match(String(got.headers.get('content-type')||''),typeRe,name);
+   assert.match(String(got.headers.get('cache-control')||''),/no-store/,name);
+   if(!owned)assert.equal(got.data,body,name);
+   const head=await fetch(base+'/'+name,{method:'HEAD'});
+   assert.equal(head.status,200,name+' HEAD');
+  }
+ }finally{
+  for(const abs of created)fs.rmSync(abs,{force:true});
+ }
+ for(const bad of ['googled9222a9e1190a4db.htmlx','google-notmine000000000000.html','google123456789012.html','bingsiteauth.xml','BingSiteAuth.xml.bak','googled9222a9e1190a4db.html/','%2e%2e%2fpackage.json','.env']){
+  const r=await api('/'+bad);
+  assert.equal(r.status,404,bad);
+  assert.ok(String(r.headers.get('content-security-policy')||'').length>0,bad+' 404 keeps CSP');
+  assert.ok(String(r.data).includes('noindex'),bad+' 404 stays out of indexes');
+ }
+});
 test('owner CRUD, validation, live config and lead isolation',async()=>{
  const other=(await api('/api/auth/register',{method:'POST',body:{email:'other@example.com',password:'other-test-password'}})).data;
  assert.equal((await api('/api/widgets/'+widget.id,{token:other.token})).status,404);

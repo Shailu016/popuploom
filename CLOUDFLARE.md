@@ -2,7 +2,7 @@
 
 Use Node 22.13+ and `npm ci`. Run `npm run test:cf`, `npm run test:cf:integration`, and `npm test`.
 
-The build copies only frontend files and assets into `.cf-build/public` and regenerates CSP hashes. `wrangler deploy` also runs this build. The build copies `popuploom.js` byte-for-byte to `popforge.js` so the legacy script path cannot drift. Private exports, `.dev.vars`, `.wrangler` state and recovered backups are ignored by Git.
+The build copies only frontend files and assets into `.cf-build/public` and regenerates CSP hashes. `wrangler deploy` also runs this build. The build copies `popuploom.js` byte-for-byte to `popforge.js` so the legacy script path cannot drift. Private exports, `.dev.vars`, `.wrangler` state and recovered backups are ignored by Git. Owner site-verification values also enter the bundle at build time: `SITE_VERIFICATION_METAS` (`name=content` pairs, e.g. from a GitHub secret) becomes `<meta>` tags inside every page head, and any root-level `google*.html` or `BingSiteAuth.xml` is copied as a drop file. Both are strict-validated in `shared/verification.js`; missing or lookalike names are hardened 404s.
 
 Before deployment create or select a D1 database, put its real `database_id` into `wrangler.toml`, configure `JWT_SECRET` with `wrangler secret put JWT_SECRET`, and configure `GOOGLE_CLIENT_ID` if needed. `JWT_SECRET` must be unique and at least 32 characters. It is required in every Worker environment; for local development use an ignored `.dev.vars` file. `npm run deploy:cf` rejects the placeholder database ID. No production resources are created by the tests.
 

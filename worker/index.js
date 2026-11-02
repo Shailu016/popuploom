@@ -4,6 +4,7 @@ import http from "./http.js";
 import widgets from "./widgets.js";
 import { originCheck, securityHeaders, htmlHeaders } from "./security.js";
 import hostPolicy from "../shared/host-policy.js";
+import { verificationFile } from "../shared/verification.js";
 
 const { ApiError, register, login, findOrCreateGoogleUser, verifyCredential, getUserById, updateProfile, authMiddleware, revokeToken } = auth;
 const { json, rateLimit } = http;
@@ -242,6 +243,16 @@ async function serveStatic(request, env, pathname, sec, cors, headOnly) {
     const headers = new Headers(asset.headers);
     headers.set("Cache-Control", "no-store");
     return new Response(headOnly ? null : asset.body, { status: asset.status, headers: { ...sec, ...cors, ...Object.fromEntries(headers) } });
+  }
+  // Search Console / Bing verification drop files. The strict name pattern
+  // (shared/verification.js) means traversal and lookalike paths stay 404.
+  if (verificationFile(file.slice(1))) {
+    const asset = await env.ASSETS.fetch(new Request(new URL(file, request.url)));
+    if (asset.status !== 404) {
+      const headers = new Headers(asset.headers);
+      headers.set("Cache-Control", "no-store");
+      return new Response(headOnly ? null : asset.body, { status: asset.status, headers: { ...sec, ...cors, ...Object.fromEntries(headers) } });
+    }
   }
   // Unknown paths are real 404s, never a soft homepage. Apply the same
   // HTML hardening as every other page so an error response cannot be framed

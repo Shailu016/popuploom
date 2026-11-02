@@ -22,3 +22,8 @@ private-data/
 worker/migrations/*_data.sql
 recovered-*.json
 .cf-build/
+
+# Owner site-verification drop files are deployed from the working tree
+# (npm run deploy:cf) but are never committed.
+google*.html
+BingSiteAuth.xml

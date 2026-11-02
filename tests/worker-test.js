@@ -65,6 +65,10 @@ function hostReq(host, path, method = "GET", extraHeaders = {}) {
   check("unknown route returns real 404", r.status === 404 && typeof r.data === "string");
   r = await req("GET", "/some/unknown/page", { raw: true });
   check("unknown route carries CSP and noindex", r.status === 404 && /content-security-policy/i.test(Array.from(r.headers.keys()).join(",")) && /noindex/.test(r.headers.get("x-robots-tag") || ""));
+  for (const path of ["/googled9222a9e1190a4db.htmlx", "/google-notmine000000000000.html", "/google123456789012.html", "/BingSiteAuth.xml.bak"]) {
+    const lookalike = await fetch(BASE + path);
+    check("verification lookalike stays hardened 404 " + path, lookalike.status === 404 && /noindex/i.test(lookalike.headers.get("x-robots-tag") || "") && /content-security-policy/i.test(Array.from(lookalike.headers.keys()).join(",")));
+  }
   r = await req("HEAD", "/");
   check("HEAD / 200 empty body", r.status === 200);
 
