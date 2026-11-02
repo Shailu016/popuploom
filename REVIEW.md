@@ -30,7 +30,7 @@ All reproduced findings from the two reviews and follow-up failure-path checks h
 
 Run npm test from this folder. The permanent suite is tests/regression.test.cjs.
 
-Latest result: 26 test groups passed, 0 failed, 0 skipped. Real headless Chrome was used for the browser group. The Worker integration suite passed 79 assertions.
+Latest result: 27 test groups passed, 0 failed, 0 skipped. Real headless Chrome was used for the browser group. The Worker integration suite passed 80 assertions.
 
 Coverage includes private-file requests with encoded paths; owner isolation; valid/invalid configs; JSON errors; JWT secrets; Google credential/session replacement; spoofed forwarded addresses; retry deduplication; failed cloud operations; legacy database migration; unsafe imports/rendering; popup closure during submission; API override isolation; dual runtime/attribute loading; host-policy redirects and direct API/runtime paths; every template's schema and preview; opening all 45 templates in the studio; failed and successful saves; installation config retrieval; test-mode approval; deletion; sticky reopening; duplicate scans; invalid selectors; proof timing; and studio layouts at 390, 768 and 1440 pixels.
 
@@ -45,3 +45,5 @@ Restart the server to load the changes. Startup automatically adds the session-v
 For reverse proxy deployment, configure TRUST_PROXY with trusted proxy IPs/subnets. Keep JWT_SECRET configured with a unique random secret of at least 32 characters.
 
 The live Google consent/token exchange and delivery to a real external webhook receiver were not exercised. Authentication linking was tested with verified-profile fixtures. Production traffic capacity and deployment-specific TLS/proxy behavior were not load-tested.
+
+Release follow-up: legacy redirects now require an explicit cutover flag; production enables it only after DNS/TLS and the live rebrand checks passed. Backup imports assign fresh IDs so recovered data cannot overwrite newer matching drafts. Browser coverage verifies preservation of the existing draft and the imported copy.

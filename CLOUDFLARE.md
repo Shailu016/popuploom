@@ -27,36 +27,15 @@ The integration suite runs the actual Wrangler bundle using an isolated SQLite-b
 
 Because the Worker receives the request URL after routing, Custom Domain requests arrive as `https://popuploom.com/...` and are handled correctly without trusting a user-supplied Host header.
 
-## Domain status (2026-11-01)
+## Domain status (2026-11-02)
 
-Current production origin: **https://popforge.shailu3597.workers.dev** (the legacy hostname remains required for installed embeds, API clients and draft recovery).
+Canonical production origin: **https://popuploom.com**. The `www` browser pages redirect to the apex. The former **https://popforge.shailu3597.workers.dev** origin remains enabled for installed embeds, API clients and guest-draft recovery at `/migration.html`.
 
-Target canonical origin: **https://popuploom.com**.
+The domain remains registered at GoDaddy. With owner approval, delegation changed to `aisha.ns.cloudflare.com` and `weston.ns.cloudflare.com`. Authoritative DNS records were reviewed first; DNSSEC was off and no MX records were present. The DMARC TXT and `_domainconnect` CNAME were preserved. GoDaddy parking A records and the old www CNAME were replaced with Worker-managed bindings.
 
-`popuploom.com` is registered at GoDaddy and still delegates to GoDaddy nameservers. The production Cloudflare account currently has no zone for it. The existing Wrangler OAuth session has Workers/D1 scopes but not `zone:read` or DNS write, and the GitHub token is limited to Workers Scripts Edit + Account Settings Read. Domain attachment therefore cannot be completed from CI or this local session.
+Cloudflare Free zone: `a8ba7d253a7c97dd33d22504bfd5e7aa`, in the existing Gmail account. Both custom domains attach to the existing `popforge` Worker, use issued TLS certificates, and are declared with the exact zone ID in `wrangler.toml`. Keep `workers_dev = true` for compatibility.
 
-Owner steps before enabling Release B (identity/canonical/redirect cutover):
-
-1. Add `popuploom.com` to the `shailu3597@gmail.com` Cloudflare account.
-2. Inventory and recreate necessary DNS records (MX, SPF, DKIM, DMARC, verification) before changing nameservers at GoDaddy.
-3. Wait for the Cloudflare zone to become active.
-4. Add the apex and `www` as Workers Custom Domains for the existing `popforge` Worker. Keep `workers_dev = true`.
-5. Deploy and verify apex HTTPS, `www` redirects, both runtime paths, `/api/health`, and old/new embeds.
-6. Only then update the workflow's health target to `https://popuploom.com/api/health`.
-
-A declarative starting point once the zone exists (top-level TOML array tables, not `[vars]`):
-
-```toml
-[[routes]]
-pattern = "popuploom.com"
-custom_domain = true
-
-[[routes]]
-pattern = "www.popuploom.com"
-custom_domain = true
-```
-
-Do not add routes before the zone is active: Wrangler will fail, and guessed DNS targets are unsafe.
+The first rebranded GitHub deployment passed all tests, custom-domain publishing and live health checks: https://github.com/Shailu016/popforge/actions/runs/41374596216 . Live public pages passed desktop/mobile checks, and a third-party-origin test loaded the old and new scripts together without duplicate mounting or customer-data writes. Backup imports create copies rather than overwriting matching newer drafts.
 
 ## Live deployment record
 
@@ -68,6 +47,6 @@ Live HTTPS, crawl files, metadata and public SEO routes are responding on the le
 
 ## Domain redirect safety gate
 
-`DOMAIN_CUTOVER_ENABLED` defaults to `"false"` in Wrangler and `.env.example`. When absent or disabled, legacy browser pages stay on the working workers.dev origin; `/index.html` only normalizes on that same origin. Both runtimes and all API paths remain direct.
+The shared policy defaults to disabled when `DOMAIN_CUTOVER_ENABLED` is absent or not exactly `true`. Production now explicitly enables it after domain, HTTPS and live embed checks passed. `.env.example` stays disabled for local/self-hosted copies.
 
-Only set `DOMAIN_CUTOVER_ENABLED = "true"` after apex DNS, valid HTTPS, application pages, sign-in, and external embeds have been verified. Keep it false while domain setup is blocked. The rebrand source metadata already targets the apex, so the entire rebrand is still a staged release: do not publish it merely because redirect tests pass. Complete or deliberately defer the canonical metadata cutover before releasing. Existing permanent redirects cached by clients cannot be undone by this flag; keep the target domain reachable if cutover was previously enabled.
+Set the production flag to `"false"` to stop future legacy-page redirects if necessary. Old/new runtime paths, API requests and the recovery page always remain direct. Cached permanent redirects cannot be undone by this flag: keep the new domain operational during rollback. Do not restore an old database snapshot over live customer writes.

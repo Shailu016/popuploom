@@ -271,4 +271,4 @@ Plus a blank canvas start in the studio. Template images resolve from `assets/`;
 
 ## Cloudflare deployment
 
-See [CLOUDFLARE.md](CLOUDFLARE.md) for build, tests, D1 migration, private data imports, secrets, and deployment prerequisites. The domain cutover steps and current blockers are tracked there and in [SEO.md](SEO.md).
+See [CLOUDFLARE.md](CLOUDFLARE.md) for build, tests, D1 migration, private data imports, secrets, and deployment prerequisites. The live custom-domain bindings, legacy compatibility, rollback controls and webmaster verification steps are documented there and in [SEO.md](SEO.md).
