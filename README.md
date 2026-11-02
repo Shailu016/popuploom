@@ -272,3 +272,11 @@ Plus a blank canvas start in the studio. Template images resolve from `assets/`;
 ## Cloudflare deployment
 
 See [CLOUDFLARE.md](CLOUDFLARE.md) for build, tests, D1 migration, private data imports, secrets, and deployment prerequisites. The live custom-domain bindings, legacy compatibility, rollback controls and webmaster verification steps are documented there and in [SEO.md](SEO.md).
+
+## Lead inbox and account controls
+
+Open **My popups → Leads** for any saved popup. The inbox shows 100 responses per page; **Export all leads as CSV** follows every 500-row API page, includes all captured fields, supports cancellation, and escapes spreadsheet formula prefixes. API ownership checks remain enforced. Empty, expired-session and request-error states are explicit. The CSV is a browser download: keep exported personal data private.
+
+Your account supports password changes and permanent account deletion after current-password verification, or a matching Google identity for Google-only account deletion. Password changes invalidate existing sessions. Account deletion cascades to saved widgets and their leads. Export before deleting. Password reset remains intentionally out of scope.
+
+Countdown presets now choose a fixed deadline; unrelated edits and saves preserve it. Expiry stops the displayed clock but does not enforce checkout discounts or automatically hide the popup. Template forms collect responses and use truthful default confirmation text. Sending emails, PDFs or calendar invitations needs the website owner's integration. The optional client-side webhook remains best effort, with explicit limitations in the editor; it is not a reliable delivery queue. `/privacy.html` describes actual storage and external requests without claiming legal certification.

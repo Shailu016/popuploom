@@ -22,6 +22,8 @@ const LEGACY_PAGES = new Map([
   ["/guides/install-popups.html", "/guides/install-popups.html"],
   ["/studio.html", "/studio.html"],
   ["/profile.html", "/profile.html"],
+  ["/leads.html", "/leads.html"],
+  ["/privacy.html", "/privacy.html"],
   ["/demo.html", "/demo.html"]
 ]);
 

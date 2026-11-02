@@ -113,7 +113,7 @@
           <div class="adv" style="margin-top:10px">
             <label class="label">Webhook (optional)</label>
             <input class="inp mono" id="formHook" placeholder="https://hooks.zapier.com/…">
-            <div class="hintline">Every submission POSTs there (no-cors) <i>and</i> is kept on-device under the widget's shelf entry.</div>
+            <div class="hintline">Responses are saved to your lead inbox. This optional browser webhook is best effort: delivery cannot be confirmed or retried reliably. Never put secrets in its URL. Emails, downloads and invitations require your own integration.</div>
           </div>
           <div class="adv" style="margin-top:10px">
             <label class="label">Fields</label>
@@ -196,7 +196,7 @@
             <option value="72">72 hours</option>
             <option value="custom">Custom date</option>
           </select>
-          <div class="hintline">Shows a live clock strip counting down.</div>
+          <div class="hintline">Counts down to one saved deadline. Editing other fields does not restart it. At zero, the clock stops; it does not expire coupons or hide the popup.</div>
           <div id="cdCustomRow" style="display:none;margin-top:10px">
             <label class="label">Ends at</label>
             <input class="inp" type="datetime-local" id="f-countdownTarget">

@@ -60,6 +60,10 @@ function noStore(res) {
   res.setHeader("Cache-Control", "no-store");
 }
 
+app.post('/api/auth/account', rateLimit('account-action',10,60000), authMiddleware, async (req,res) => {
+  try { res.json(await require('./auth').manageAccount(req.user.id,req.body||{})); }
+  catch(e){res.status(400).json({error:e.message});}
+});
 // ---- Auth routes ----
 app.post("/api/auth/register", (req, res) => {
   try {
@@ -141,7 +145,7 @@ app.get("/api/health", (req, res) => res.json({ ok: true, version: "2.0" }));
 // ---- Static files (frontend): explicit public allowlist ----
 const publicFiles = new Set([
   "templates.html", "guides/install-popups.html", "robots.txt", "sitemap.xml", "llms.txt", "llms-full.txt", "index.html", "studio.html", "profile.html", "demo.html", "migration.html",
-  "app.js", "studio.js", "popuploom.js", "popforge.js", "ui.css"
+  "leads.html", "privacy.html", "leads.js", "account.js", "app.js", "studio.js", "popuploom.js", "popforge.js", "ui.css"
 ]);
 app.use((req, res, next) => {
   if (req.method !== "GET" && req.method !== "HEAD") return next();

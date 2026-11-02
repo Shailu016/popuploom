@@ -208,7 +208,7 @@
       <div class="logo"><span class="mark"><svg viewBox="0 0 32 32" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.8"><circle cx="12.2" cy="16" r="5.4"/><circle cx="19.8" cy="16" r="5.4"/></svg></span> Popup<span><i>Loom</i></span></div>
       <div style="max-width:44ch">Built as a fresh alternative. Own designs, own rules, your data.</div>
     </div>
-    <div class="mono" style="font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2)">Free tier forever · Export anytime · No view-count prison</div>
+    <div class="mono" style="font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2)"><a href="/privacy.html">Privacy and data handling</a> · Free tier forever · Export anytime · No view-count prison</div>
   </div>
 </footer>
 
@@ -425,6 +425,7 @@
         "<td>" + subs + "</td>" +
         "<td>" + new Date(w.updatedAt || 0).toLocaleDateString() + "</td>" +
         "<td style='text-align:right;white-space:nowrap'>" +
+        "<button class='btn small' data-leads='" + esc(w.id) + "'>Leads</button> " +
         "<button class='btn small' data-edit='" + esc(w.id) + "'>Edit</button> " +
         "<button class='btn small' data-copy='" + esc(w.id) + "'>Install code</button> " +
         "<button class='btn small danger' data-del='" + esc(w.id) + "'>Delete</button></td>";
@@ -436,6 +437,8 @@
     var ed = e.target.closest("[data-edit]");
     var cp = e.target.closest("[data-copy]");
     var dl = e.target.closest("[data-del]");
+    var lead = e.target.closest("[data-leads]");
+    if (lead) location.href = "./leads.html?id=" + encodeURIComponent(lead.getAttribute("data-leads"));
     if (ed) location.href = "./studio.html?id=" + ed.getAttribute("data-edit");
     if (cp) {
       if (!PF.auth.isAuthed()) {

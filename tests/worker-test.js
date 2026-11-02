@@ -239,6 +239,16 @@ function hostReq(host, path, method = "GET", extraHeaders = {}) {
   r = await req("GET", "/api/auth/me", { token: token2 });
   check("other token still valid", r.status === 200);
 
+  console.log('== account controls ==');
+  const ca=await req('POST','/api/auth/register',{body:{email:'account-controls.'+Date.now()+'@example.com',password:'original-password-123'}});
+  const caToken=ca.data.token,caEmail=ca.data.user.email;
+  r=await req('POST','/api/auth/account',{token:caToken,body:{action:'password',currentPassword:'wrong',newPassword:'changed-password-123'}});check('account changes require current password',r.status===400);
+  r=await req('POST','/api/auth/account',{token:caToken,body:{action:'password',currentPassword:'original-password-123',newPassword:'changed-password-123'}});check('account password changes',r.status===200);
+  r=await req('GET','/api/auth/me',{token:caToken});check('password change revokes old session',r.status===401);
+  const cb=await req('POST','/api/auth/login',{body:{email:caEmail,password:'changed-password-123'}});
+  r=await req('POST','/api/auth/account',{token:cb.data.token,body:{action:'delete',currentPassword:'changed-password-123',confirmation:caEmail}});check('account deletion requires verified credentials and email',r.status===200);
+  r=await req('GET','/api/auth/me',{token:cb.data.token});check('deleted account session rejected',r.status===401);
+  r=await req('GET','/leads.html',{raw:true});check('lead inbox is served with noindex',r.status===200&&r.headers.get('x-robots-tag').includes('noindex'));
   console.log("== rate limit (login 40/10min) ==");
   let got429 = false, count = 0;
   for (let i = 0; i < 45; i++) {

@@ -440,6 +440,22 @@ test('closing a popup during submission does not reject or lose a stored lead',a
  const result=c.submitLike(self,{email:'closing@example.com'});
  await new Promise(r=>setImmediate(r));self.holderEl=null;resolve({ok:true});assert.equal(await result,true);
 });
+test('account changes require reauthentication, revoke sessions and cascade deletion',async()=>{
+ const a=(await api('/api/auth/register',{method:'POST',body:{email:'controls@example.com',password:'original-password-123'}})).data;
+ const w=(await api('/api/widgets',{method:'POST',token:a.token,body:{name:'Controls',config:{content:{title:'Hello'}}}})).data;
+ assert.equal((await api('/api/auth/account',{method:'POST',token:a.token,body:{action:'delete',currentPassword:'wrong',confirmation:a.user.email}})).status,400);
+ assert.equal((await api('/api/auth/account',{method:'POST',token:a.token,body:{action:'password',currentPassword:'original-password-123',newPassword:'new-password-12345'}})).status,200);
+ assert.equal((await api('/api/auth/me',{token:a.token})).status,401);
+ const b=require('../server/auth').login(a.user.email,'new-password-12345');
+ assert.equal((await api('/api/auth/account',{method:'POST',token:b.token,body:{action:'delete',currentPassword:'new-password-12345',confirmation:'wrong@example.com'}})).status,400);
+ assert.equal((await api('/api/auth/account',{method:'POST',token:b.token,body:{action:'delete',currentPassword:'new-password-12345',confirmation:a.user.email}})).status,200);
+ assert.equal((await api('/api/widgets/'+w.id+'/config')).status,404);
+ assert.equal((await api('/api/auth/me',{token:b.token})).status,401);
+});
+test('CSV preserves Unicode and escapes spreadsheet formulas, quotes and multiline data',()=>{
+ const {csv}=require('../leads');const text=csv([{id:1,createdAt:'2026-01-01',data:{email:'=HYPERLINK("evil")',name:'Maya, \"hi\"',note:'line1\nline2',unicode:'नमस्ते'}},{id:2,data:{extra:'  +CMD'}}]);
+ assert.ok(text.startsWith('\uFEFF'));assert.ok(text.includes("'=HYPERLINK"));assert.ok(text.includes("'  +CMD"));assert.ok(text.includes('नमस्ते'));assert.ok(text.includes('Field: extra'));assert.ok(text.includes('line1\nline2'));
+});
 const browserPath=process.env.POPFORGE_BROWSER||['C:/Program Files/Google/Chrome/Application/chrome.exe','C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'].find(p=>fs.existsSync(p));
 test('browser: all templates, save failures, installation, test mode, delete and hostile imports',{skip:!browserPath,timeout:120000},async()=>{
  const puppeteer=require('puppeteer-core');const browser=await puppeteer.launch({executablePath:browserPath,headless:true,args:['--no-sandbox'],userDataDir:path.join(temp,'browser')});
@@ -516,6 +532,27 @@ test('browser: all templates, save failures, installation, test mode, delete and
   const recovered=await page.evaluate(()=>JSON.parse(localStorage.getItem('pf.widgets')));
   assert.equal(recovered.find(w=>w.id==='wan_recover').cfg.content.title,'Keep this newer work');
   assert.ok(recovered.some(w=>w.id!=='wan_recover'&&w.cfg.content.title==='Recovered old work'));
+  // Seed only the temporary test DB to exercise more than one API/export page.
+  await page.goto(base+'/studio.html?tpl=drop48',{waitUntil:'networkidle0'});
+  await page.click('#btnSave');await page.waitForFunction(()=>document.querySelector('#toast').textContent.includes('Draft saved'));
+  const savedDeadline=await page.evaluate(()=>JSON.parse(localStorage.getItem('pf.widgets')).find(w=>w.cfg.template==='drop48').cfg.content.countdown.target);
+  await new Promise(r=>setTimeout(r,1100));
+  await page.$eval('#f-title',e=>{e.value='A changed title';e.dispatchEvent(new Event('input',{bubbles:true}));});
+  await page.click('#btnSave');
+  assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('pf.widgets')).find(w=>w.cfg.template==='drop48').cfg.content.countdown.target),savedDeadline);
+  const inboxWidget=(await api('/api/widgets',{method:'POST',token:account.token,body:{name:'Inbox test',config:{content:{title:'Inbox'}}}})).data;
+  const testDb=require('../server/db');
+  for(let i=0;i<502;i++)testDb.prepare('INSERT INTO submissions(widget_id,data) VALUES (?,?)').run(inboxWidget.id,JSON.stringify({email:'lead'+i+'@example.com',note:i===501?'=2+2':'<img src=x onerror=window.leadXss=true>'}));
+  await page.evaluate(token=>localStorage.setItem('pf.token',token),account.token);
+  await page.goto(base+'/leads.html?id='+inboxWidget.id,{waitUntil:'networkidle0'});
+  await page.waitForFunction(()=>document.querySelectorAll('#leadsTable tbody tr').length===100);
+  await page.click('#more');await page.waitForFunction(()=>document.querySelectorAll('#leadsTable tbody tr').length===200);
+  assert.equal(await page.evaluate(()=>window.leadXss),undefined);
+  await page.evaluate(()=>{URL.createObjectURL=blob=>{blob.text().then(t=>window.exportedCSV=t);return 'blob:qa-export';};HTMLAnchorElement.prototype.click=function(){};});
+  await page.click('#export');await page.waitForFunction(()=>window.exportedCSV&&document.querySelector('#status').textContent==='Exported 502 leads.');
+  const csv=await page.evaluate(()=>window.exportedCSV);assert.ok(csv.includes('lead0@example.com')&&csv.includes('lead501@example.com'));assert.ok(csv.includes("'=2+2"));
+  await page.evaluate(()=>localStorage.removeItem('pf.token'));await page.reload({waitUntil:'networkidle0'});assert.equal(await page.$eval('#export',e=>e.disabled),true);assert.equal(await page.$eval('#leadsTable',e=>e.hidden),true);
+  await page.goto(base,{waitUntil:'networkidle0'});
   const logoutToken=require('../server/auth').signToken(account.user);
   await page.evaluate(token=>{localStorage.setItem('pf.token',token);localStorage.removeItem('pf.widgets');},logoutToken);
   await page.reload({waitUntil:'networkidle0'});await page.click('#btnAuth');

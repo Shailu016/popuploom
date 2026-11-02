@@ -13,6 +13,7 @@
   }
 
   /* ---------------- simple/advanced mode ---------------- */
+  var countdownChoice = null;
   var ADV_KEY = "pf.studio.advanced";
   var advOn = false;
   try { advOn = localStorage.getItem(ADV_KEY) === "1"; } catch (e) {}
@@ -224,6 +225,7 @@
       if (cdPreset === "custom") setVal("f-countdownTarget", toLocalDT(new Date(c.countdown.target)));
     }
     setSel("f-countdownPreset", cdPreset);
+    countdownChoice = cdPreset;
     document.getElementById("cdCustomRow").style.display = cdPreset === "custom" ? "block" : "none";
     // choices / links / form
     var cl = document.getElementById("choicesList"); cl.innerHTML = "";
@@ -316,12 +318,14 @@
     if (cdP === "custom") {
       var ct = gval("f-countdownTarget");
       var targetDate = new Date(ct);
-      c.countdown = ct && !isNaN(targetDate.getTime()) ? { target: targetDate.toISOString() } : null;
+      if (!ct || isNaN(targetDate.getTime())) c.countdown = null;
+      else if (countdownChoice !== "custom" || !c.countdown || !c.countdown.target || toLocalDT(new Date(c.countdown.target)) !== ct) c.countdown = { target: targetDate.toISOString() };
     } else if (cdP) {
-      c.countdown = { target: new Date(Date.now() + (+cdP) * 36e5).toISOString() };
+      if (countdownChoice !== cdP || !c.countdown || !c.countdown.target) c.countdown = { target: new Date(Date.now() + (+cdP) * 36e5).toISOString() };
     } else {
       c.countdown = null;
     }
+    countdownChoice = cdP;
     var chs = [];
     document.querySelectorAll("#choicesList .row2").forEach(function (row) {
       var em = row.querySelector('[data-c="emoji"]').value.trim();

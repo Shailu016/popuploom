@@ -439,6 +439,8 @@
     };
   }
   function hash(str) { var h = 5381, i = 0; for (; i < str.length; i++) h = ((h << 5) + h) ^ str.charCodeAt(i); return (h >>> 0).toString(36); }
+  // Presets collect responses; delivery requires the website owner's integration.
+  TEMPLATES.forEach(function(t){var c=t.cfg&&t.cfg.content;if(c&&c.form){c.form.success="Thanks! Your response has been saved.";c.form.buttonLabel="Send details";if(/inbox|email you|we'll email|calendar invite|on its way|send.*PDF/i.test(c.body||""))c.body="Submit your details to register your interest. The website owner handles any follow-up.";}});
   function uid() { return "wan_" + (window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID().replace(/-/g, "") : Date.now().toString(36) + Math.random().toString(36).slice(2, 14)); }
 
   /* ------------------------------------------------------------------ */

@@ -271,3 +271,24 @@ module.exports = {
   hashPassword,
   sha256Hex
 };
+
+async function manageAccount(env, id, body) {
+  const row = await env.DB.prepare("SELECT * FROM users WHERE id = ?").bind(id).first();
+  if (!row) throw new Error("Account not found");
+  if (row.google_id) {
+    const profile = await verifyCredential(env, body.credential);
+    if (profile.sub !== row.google_id) throw new Error("Verify with the Google account linked to this account");
+  } else {
+    if (typeof body.currentPassword !== 'string' || new TextEncoder().encode(body.currentPassword).length>72 || !(await verifyPassword(body.currentPassword,row.password_hash))) throw new Error("Current password is incorrect");
+  }
+  if (body.action === 'password') {
+    if(row.google_id) throw new Error("This account uses Google sign-in. Manage its password with Google.");
+    if(typeof body.newPassword!=='string'||body.newPassword.length<12||new TextEncoder().encode(body.newPassword).length>72)throw new Error("New password must be 12 characters or more and at most 72 UTF-8 bytes");
+    await env.DB.prepare("UPDATE users SET password_hash = ?, token_version = token_version + 1 WHERE id = ?").bind(await hashPassword(body.newPassword),id).run();
+  } else if(body.action === 'delete') {
+    if(body.confirmation!==row.email)throw new Error("Type your account email to confirm deletion");
+    await env.DB.prepare("DELETE FROM users WHERE id = ?").bind(id).run();
+  } else throw new Error("Invalid account action");
+  return {ok:true};
+}
+module.exports.manageAccount = manageAccount;

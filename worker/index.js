@@ -10,6 +10,7 @@ const { ApiError, register, login, findOrCreateGoogleUser, verifyCredential, get
 const { json, rateLimit } = http;
 
 const registerLimit = rateLimit("register", 40, 10 * 60 * 1000);
+const accountLimit = rateLimit("account-action",10,60000);
 const loginLimit = rateLimit("login", 40, 10 * 60 * 1000);
 const googleLimit = rateLimit("google", 30, 10 * 60 * 1000);
 const apiLimit = rateLimit("api", 1200, 60000);
@@ -38,7 +39,7 @@ function clientScheme(request) {
 // Explicit public allowlist, same as the Express server's static middleware.
 const PUBLIC_FILES = new Set([
   "templates.html", "guides/install-popups.html", "robots.txt", "sitemap.xml", "llms.txt", "llms-full.txt", "index.html", "studio.html", "profile.html", "demo.html", "migration.html",
-  "app.js", "studio.js", "popuploom.js", "popforge.js", "ui.css"
+  "leads.html", "privacy.html", "leads.js", "account.js", "app.js", "studio.js", "popuploom.js", "popforge.js", "ui.css"
 ]);
 
 // [regex, method, handler, needsAuth]
@@ -147,6 +148,10 @@ async function profileRoute(c) {
   }
 }
 
+async function accountRoute(c) {
+  try { return json(await auth.manageAccount(c.env,c.user.id,c.body||{})); }
+  catch(e){return json({error:e.message},400);}
+}
 function healthRoute() {
   return json({ ok: true, version: "2.0" });
 }
@@ -155,7 +160,9 @@ async function handleApi(request, env, ctx, pathname, method, cors) {
   let matched = null;
   const params = {};
 
-  if (pathname === "/api/health" && method === "GET") {
+  if (pathname === "/api/auth/account" && method === "POST") {
+    matched = {handler: accountRoute, needsAuth:true, limit:accountLimit};
+  } else if (pathname === "/api/health" && method === "GET") {
     matched = { handler: healthRoute };
   } else if (pathname === "/api/auth/register" && method === "POST") {
     matched = { handler: registerRoute, limit: registerLimit };
@@ -232,7 +239,7 @@ async function serveStatic(request, env, pathname, sec, cors, headOnly) {
     if (asset.status === 404) return new Response("Not found", { status: 404, headers: { ...sec, ...cors } });
     const headers = new Headers(asset.headers);
     headers.set("Cache-Control", "no-store");
-    if (["/studio.html", "/profile.html", "/demo.html", "/migration.html"].includes(file)) headers.set("X-Robots-Tag", file === "/migration.html" ? "noindex, nofollow" : "noindex, follow");
+    if (["/leads.html", "/studio.html", "/profile.html", "/demo.html", "/migration.html"].includes(file)) headers.set("X-Robots-Tag", file === "/migration.html" ? "noindex, nofollow" : "noindex, follow");
     if (file.endsWith(".html")) for (const [key, value] of Object.entries(htmlHeaders(env, file.slice(1)))) headers.set(key, value);
     return new Response(headOnly ? null : asset.body, { status: asset.status, headers: { ...sec, ...cors, ...Object.fromEntries(headers) } });
   }
