@@ -21,7 +21,7 @@ The integration suite runs the actual Wrangler bundle using an isolated SQLite-b
 - treats `https://popuploom.com` as the canonical apex;
 - redirects `www.popuploom.com` browser pages to the same apex path and query;
 - redirects only known browser pages from the former `workers.dev` host;
-- leaves `/popuploom.js`, `/popforge.js`, `/assets/*`, `/api/*`, `/migration.html`, `/robots.txt` and `/sitemap.xml` direct on every host;
+- leaves `/popuploom.js`, `/popforge.js`, `/assets/*`, `/api/*`, `/migration.html`, `/robots.txt`, `/sitemap.xml`, `/llms.txt` and `/llms-full.txt` direct on every host;
 - upgrades plaintext requests on the three approved hosts to HTTPS in one hop, so `http://www.popuploom.com/studio.html` goes straight to `https://popuploom.com/studio.html` and API/runtime requests are upgraded without crossing hosts;
 - returns real 404s for unknown paths;
 - never sends localhost/test hosts to production.

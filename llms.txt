@@ -6,6 +6,7 @@
 - [Overview and FAQ](https://popuploom.com/): features, account requirements, supported triggers and limitations.
 - [Template catalog](https://popuploom.com/templates.html): all 45 starting designs grouped by purpose.
 - [Installation guide](https://popuploom.com/guides/install-popups.html): installation, platform constraints and troubleshooting.
+- [Full documentation](https://popuploom.com/llms-full.txt): extended machine-readable product documentation with the builder facts, embed format, limits and FAQ.
 
 ## Product facts
 - Guest users can design and preview. An account and saved widget are required for hosted install code.

@@ -37,7 +37,7 @@ test('private files stay private including encoded separators and extensions',as
   const r=await api(url);assert.ok(r.status===404||r.headers.get('content-type').includes('text/html'),url);
   assert.ok(!String(r.data).includes('SQLite format 3')&&!String(r.data).includes('JWT_SECRET=')&&!String(r.data).includes('const JWT_SECRET'),url);
  }
- for(const url of ['/','/templates.html','/guides/install-popups.html','/migration.html','/studio.html','/profile.html','/demo.html','/app.js','/studio.js','/popuploom.js','/popforge.js','/ui.css','/assets/winter-gift.jpg','/assets/favicon.svg','/assets/og-popuploom.png'])assert.equal((await api(url)).status,200,url);
+ for(const url of ['/','/templates.html','/guides/install-popups.html','/migration.html','/studio.html','/profile.html','/demo.html','/app.js','/studio.js','/popuploom.js','/popforge.js','/ui.css','/robots.txt','/sitemap.xml','/llms.txt','/llms-full.txt','/assets/winter-gift.jpg','/assets/favicon.svg','/assets/og-popuploom.png'])assert.equal((await api(url)).status,200,url);
 });
 test('owner CRUD, validation, live config and lead isolation',async()=>{
  const other=(await api('/api/auth/register',{method:'POST',body:{email:'other@example.com',password:'other-test-password'}})).data;
@@ -285,6 +285,45 @@ test('plaintext production hosts upgrade to HTTPS in one hop',()=>{
  assert.equal(secureRedirect('http://preview.example.com/studio.html',true),null);
  assert.equal(secureRedirect(apex+'/','true'),null);
 });
+test('HowTo and breadcrumb structured data mirror only visible page content',async()=>{
+ const decode=t=>t.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,'&');
+ const plain=html=>decode(html.replace(/<[^>]*>/g,' ')).replace(/\s+/g,' ');
+ const blocks=html=>[...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(m=>JSON.parse(m[1]));
+ const visibleCrumbs=html=>{
+  const nav=html.match(/aria-label="Breadcrumb"[^>]*>([\s\S]*?)<\/nav>/);
+  if(!nav) return [];
+  return [...nav[1].matchAll(/<a href="(\/[^"]*)"[^>]*>([^<]+)<\/a>/g)].map(m=>({name:m[2],first:false,url:'https://popuploom.com'+m[1]}))
+   .concat([...nav[1].matchAll(/<span>([^<]+)<\/span>/g)].map(m=>({name:m[1],last:true})));
+ };
+ for(const [url,name2] of [['/templates.html','Popup templates'],['/guides/install-popups.html','Installation guide']]){
+  const htmlText=await (await api(url)).data;
+  const crumbs=blocks(htmlText).find(b=>b['@type']==='BreadcrumbList'&&Array.isArray(b.itemListElement)&&b.itemListElement.length===2);
+  assert.ok(crumbs,url);
+  const seen=visibleCrumbs(htmlText);
+  assert.equal(seen.length,crumbs.itemListElement.length,url);
+  for(let i=0;i<seen.length;i++){
+   assert.equal(seen[i].name,crumbs.itemListElement[i].name,url);
+   if(!seen[i].last)assert.equal(seen[i].url,crumbs.itemListElement[i].item,url);
+   else assert.equal(crumbs.itemListElement[i].item,'https://popuploom.com'+url,url);
+  }
+  assert.equal(crumbs.itemListElement[1].name,name2,url);
+ }
+ const guide=await (await api('/guides/install-popups.html')).data;
+ const text=plain(guide);
+ const howTo=blocks(guide).find(b=>b['@type']==='HowTo');
+ assert.ok(howTo&&!('totalTime' in howTo)&&!('performTime' in howTo)&&!('aggregateRating' in howTo));
+ const headings=[...guide.matchAll(/<h2[^>]*>([^<]+)<\/h2>/g)].map(m=>decode(m[1]).replace(/^\d+\.\s*/,''));
+ assert.equal(howTo.step.length,4);
+ let lastAt=-1;
+ howTo.step.forEach((step,i)=>{
+  assert.equal(step.position,i+1);
+  const at=headings.indexOf(step.name);
+  assert.ok(at>lastAt,step.name+' must appear after the previous step heading or not at all');
+  lastAt=at;
+  assert.ok(!/<(?!(\/body>))|&lt;|https?:/.test(step.text),step.name);
+  for(const sentence of step.text.split(/(?<=\.)\s+/))assert.ok(text.includes(sentence),step.name+': '+sentence);
+ });
+ });
 test('legacy cutover defaults off and requires an explicit enable value',()=>{
  const {pageRedirect}=require('../shared/host-policy');
  const old='https://popforge.shailu3597.workers.dev';
@@ -343,6 +382,9 @@ test('identity, metadata and crawler files agree on the apex origin',async()=>{
  assert.ok(!sitemap.includes('studio.html')&&!sitemap.includes('migration.html'));
  const llms=(await api('/llms.txt')).data;
  assert.ok(llms.startsWith('# PopupLoom')&&llms.includes('https://popuploom.com/'));
+ assert.ok(llms.includes('https://popuploom.com/llms-full.txt'));
+ const llmsFull=(await api('/llms-full.txt')).data;
+ assert.ok(llmsFull.startsWith('# PopupLoom')&&llmsFull.includes('45 templates')&&llmsFull.includes('data-popuploom')&&!llmsFull.includes('<!doctype'));
  const home=(await api('/')).data;
  assert.ok(home.includes('popuploom-widgets-backup.json'));
  assert.ok(home.includes('data-popuploom="wan_your_widget_id"'));

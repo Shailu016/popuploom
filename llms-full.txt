@@ -1,0 +1,67 @@
+# PopupLoom — full product documentation
+
+> PopupLoom (https://popuploom.com/) is a free website popup builder with 45 templates, a visual editor, hosted widget configuration and lead capture. This file extends /llms.txt for AI readers. Every fact here is checked against the shipped product source. Nothing in this documentation promises conversions, availability or search-engine visibility.
+
+## Product summary
+- PopupLoom builds website popups for any site that can run custom HTML and JavaScript.
+- Designing and previewing a popup needs no account; generating hosted installation code requires an account and a saved widget.
+- A saved widget's configuration is hosted at /api/widgets/<widget-id>/config and fetched by the runtime whenever an embedded page loads, so owner edits go live without replacing the snippet.
+- Widget identifiers are long random strings such as wan_6c45c0f81a23d95c5d5dbe72.
+
+## Builder capabilities
+- 45 starting templates grouped by purpose: email signup and waitlist, discount and coupon, countdown and seasonal sales, spin the wheel, feedback and micro-survey, link lists and availability, age verification, video, social proof, and announcement bars.
+- Popup placements: centered modal, full screen, slide-ins from four corners, top bar and bottom bar.
+- One automatic trigger per widget, chosen from: page load, timed delay in seconds, scroll depth percentage, scroll to a CSS selector, click on a CSS selector, or desktop exit intent.
+- Show-frequency rules: every time, once per day, once per week, once ever, or silent for 24 hours after the visitor closes it.
+- Page targeting: all pages, or include/exclude lists of up to 100 glob-style patterns with a maximum of 2,048 characters each.
+- Device targeting: desktop and/or mobile.
+- An optional sticky return tab lets visitors reopen a popup they closed.
+- Themes control accent, button style (accent or ink), background and text colors, radius, overlay, entry animation and an optional background image.
+- Content blocks include a badge, headline, body copy, a safe image, a call-to-action button, and up to 50 shortcut links.
+- Forms support up to 50 fields; each field has a label, a required flag, and one of these input types: email, text, phone, or number. Field names must be 1-64 characters of letters, digits, underscore or hyphen, and must be unique. Reserved JavaScript names are rejected.
+- Tap-meter surveys render up to 50 emoji choices without needing an email.
+- Spin-the-wheel widgets render up to 50 prize segments; the outcome shown is client-side.
+- Coupon blocks display a code with a one-tap copy button.
+- Countdown timers can use preset offsets (for example 1 hour or 48 hours) or a fixed date and time chosen by the site owner.
+- Social proof bubbles rotate up to 50 configured items on an interval the owner sets.
+- Age gates require a minimum-age confirmation, with custom allow and deny labels, a deny message and an optional deny redirect URL.
+- A widget configuration is limited to 128 KB. A visitor response is limited to 16 KB. Retries with the same request ID are stored once.
+
+## Embedding and compatibility
+- A saved widget gives a two-line snippet: a widget definition element with the data-popuploom attribute carrying the widget ID, and a script tag loading https://popuploom.com/popuploom.js. Both lines are pasted before the closing body tag.
+- The destination website must allow custom HTML and JavaScript. Widgets cannot escape an iframe they are embedded in.
+- Sites with a Content-Security-Policy must allowlist the runtime origin in their script-src.
+- Legacy embeds installed before the domain move keep working unchanged: the data-popforge attribute and the /popforge.js path on the workers.dev host serve the same runtime bytes.
+- The runtime is CORS-open for its public view and submission reporting only; no visitor cookies or credentials are used.
+
+## Lead capture
+- Form submissions, survey choices and other responses are stored against the saved widget they came from.
+- Only the widget owner can read stored responses, through an authenticated account API that pages results (default 200 records, up to 500 per request).
+- An optional webhook URL can be configured per widget: after each submission the visitor's browser posts the response as plain JSON to that URL. Because webhook URLs are public in the widget configuration, they must never contain private credentials or secrets.
+
+## Accounts and sessions
+- Signing up uses an email address and a password of at least 12 characters; Google sign-in becomes available when the site owner configures it. A verified Google email links to the same single account for that address.
+- Sessions use a 30-day bearer token that the server can revoke at sign-out.
+- Guest designs live in the browser's local storage and are never uploaded.
+- Guest drafts made on the previous PopForge domain move with a noindexed recovery tool on that host: it lists drafts found in the same browser and downloads them as a JSON backup (up to 200 drafts); the backup is then imported from My popups on PopupLoom. The tool uploads nothing and never deletes or modifies drafts. Account-owned popups already live in the database and are unaffected.
+
+## Limits and abuse controls
+- All public endpoints apply per-visitor IP rate limits; oversized, deeply nested or prototype-manipulating JSON is rejected before storage.
+- Stored widget configs and lead data are separate; the public API never exposes owner identifiers, counters or lead payloads.
+
+## Homepage questions and answers (verbatim from the visible FAQ page and its FAQPage markup)
+- What is PopupLoom? — A free website popup builder with a visual editor, 45 templates, saved designs, website embed code and lead capture.
+- Do I need an account? — You can design and preview popups as a guest. Create an account to save popups online and get installation code. Guest drafts are stored in your browser.
+- How do I add a popup to my website? — Save your design, open Publish in the studio, and copy the installation code. Paste the widget div and script before the closing body tag of your website.
+- Can I use PopupLoom with WordPress, Shopify or Webflow? — Install the embed where your platform permits custom HTML or theme code. WordPress Custom HTML, Shopify theme code and Webflow embeds are options, depending on your plan and permissions. Popups placed inside an iframe cannot extend outside that iframe.
+- What popup triggers are available? — A page-load, delay, scroll-depth, scroll-to-element, click or desktop exit-intent trigger, each with configurable page targeting, device settings and frequency rules.
+- Where are captured leads stored? — Responses submitted through installed hosted popups are stored in the PopupLoom database and associated with the saved widget. Account controls access to widget data. Optional client-side webhook URLs are visible to website visitors and must not contain private credentials.
+- Does PopupLoom guarantee better conversions? — No. Results depend on the audience, offer, placement and timing. Test designs on the target website and respect visitor preferences.
+
+## Page map
+- Overview and FAQ: https://popuploom.com/
+- All 45 templates grouped by purpose: https://popuploom.com/templates.html
+- Installation guide for WordPress, Shopify, Webflow and any custom-HTML site: https://popuploom.com/guides/install-popups.html
+- Draft recovery for the previous domain: https://popuploom.com/migration.html (kept out of search indexes)
+
+This documentation is optional and machine-readable. Crawler access rules live in https://popuploom.com/robots.txt.

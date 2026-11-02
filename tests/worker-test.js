@@ -128,7 +128,7 @@ function hostReq(host, path, method = "GET", extraHeaders = {}) {
     check("single H1 " + path, (html.match(/<h1[ >]/g) || []).length === 1);
     for (const match of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) { JSON.parse(match[1]); }
   }
-  for (const path of ["/robots.txt", "/sitemap.xml", "/llms.txt"]) { const response = await fetch(BASE + path); check("crawler file " + path, response.status === 200 && !(await response.text()).includes("<!doctype")); }
+  for (const path of ["/robots.txt", "/sitemap.xml", "/llms.txt", "/llms-full.txt"]) { const response = await fetch(BASE + path); check("crawler file " + path, response.status === 200 && !(await response.text()).includes("<!doctype")); }
   const redirect = await fetch(BASE + "/index.html", {redirect:"manual"}); check("canonical homepage redirect", redirect.status === 308);
   const editor = await fetch(BASE + "/studio.html"); check("studio noindex header", editor.headers.get("x-robots-tag")?.includes("noindex"));
 
