@@ -6,6 +6,17 @@ workers_dev = true
 main = "worker/index.js"
 compatibility_date = "2026-10-01"
 
+# Keep both approved custom domains attached on every GitHub deployment.
+[[routes]]
+pattern = "popuploom.com"
+zone_id = "a8ba7d253a7c97dd33d22504bfd5e7aa"
+custom_domain = true
+
+[[routes]]
+pattern = "www.popuploom.com"
+zone_id = "a8ba7d253a7c97dd33d22504bfd5e7aa"
+custom_domain = true
+
 [assets]
 # The whole project root is the static site; .assetsignore keeps server files,
 # the database, and tooling out of the public bucket.

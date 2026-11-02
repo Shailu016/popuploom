@@ -406,6 +406,16 @@ test('browser: all templates, save failures, installation, test mode, delete and
   await page.goto(base,{waitUntil:'networkidle0'});
   await page.evaluate(()=>{localStorage.removeItem('pf.token');localStorage.setItem('pf.widgets',JSON.stringify([{id:"x'><img src=x onerror=window.importXss=true>",name:'Imported',cfg:{},viewCount:'<img src=x onerror=window.importXss=true>'}]));});
   await page.reload({waitUntil:'networkidle0'});assert.equal(await page.evaluate(()=>window.importXss),undefined);
+  await page.evaluate(()=>localStorage.setItem('pf.widgets',JSON.stringify([{id:'wan_recover',name:'Newer draft',cfg:{content:{title:'Keep this newer work'}}}])));
+  await page.reload({waitUntil:'networkidle0'});
+  const backup=path.join(temp,'migration-backup.json');
+  fs.writeFileSync(backup,JSON.stringify([{id:'wan_recover',name:'Old backup',cfg:{content:{title:'Recovered old work'}}}]));
+  const [chooser]=await Promise.all([page.waitForFileChooser(),page.click('#btnImport')]);
+  await chooser.accept([backup]);
+  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('pf.widgets')||'[]').length===2);
+  const recovered=await page.evaluate(()=>JSON.parse(localStorage.getItem('pf.widgets')));
+  assert.equal(recovered.find(w=>w.id==='wan_recover').cfg.content.title,'Keep this newer work');
+  assert.ok(recovered.some(w=>w.id!=='wan_recover'&&w.cfg.content.title==='Recovered old work'));
   const logoutToken=require('../server/auth').signToken(account.user);
   await page.evaluate(token=>{localStorage.setItem('pf.token',token);localStorage.removeItem('pf.widgets');},logoutToken);
   await page.reload({waitUntil:'networkidle0'});await page.click('#btnAuth');

@@ -475,7 +475,13 @@
           var list = JSON.parse(txt);
           if (!Array.isArray(list) || list.length > 200) throw new Error("bad file");
           for (var i = 0; i < list.length; i++) {
-            if (list[i] && list[i].cfg) await PF.store.save(list[i]);
+            if (list[i] && list[i].cfg) {
+              // A recovered backup creates copies; it must never overwrite a
+              // newer draft or account-owned widget with a matching old ID.
+              var imported = JSON.parse(JSON.stringify(list[i]));
+              imported.id = PF.uid();
+              await PF.store.save(imported);
+            }
           }
           refreshDash();
           toast("Imported " + list.length + " widget(s)", true);
