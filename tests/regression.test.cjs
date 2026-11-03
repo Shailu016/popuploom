@@ -39,6 +39,12 @@ test('private files stay private including encoded separators and extensions',as
  }
  for(const url of ['/','/templates.html','/guides/install-popups.html','/migration.html','/studio.html','/profile.html','/demo.html','/app.js','/studio.js','/popuploom.js','/popforge.js','/ui.css','/robots.txt','/sitemap.xml','/llms.txt','/llms-full.txt','/assets/winter-gift.jpg','/assets/favicon.svg','/assets/og-popuploom.png'])assert.equal((await api(url)).status,200,url);
 });
+test('every template asset reference points at a shipped file',()=>{
+ const src=fs.readFileSync(path.join(root,'app.js'),'utf8');
+ const refs=[...src.matchAll(/@assets\/([A-Za-z0-9._-]+\.(?:jpg|jpeg|png|svg|webp|gif))/g)].map(m=>m[1]);
+ assert.ok(refs.length>=10,'catalog should ship real artwork references');
+ for(const file of new Set(refs))assert.ok(fs.existsSync(path.join(root,'assets',file)),'template references a missing asset: '+file);
+});
 test('owner verification drop files serve exactly and lookalikes stay hardened 404s',async()=>{
  // Drop files are owner-provided, so a name is only written when absent and
  // removed in finally — a real owner file is asserted to serve but never
