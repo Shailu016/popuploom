@@ -262,6 +262,7 @@
 
     // design
     setSel("d-style", th.style || "light");
+ setSel("d-layout", th.layout || "stack");
     document.querySelectorAll(`#palette .sw`).forEach(function (sw) {
       sw.classList.toggle("on", (sw.getAttribute("data-color") || "").toLowerCase() === (th.accent || "").toLowerCase());
     });
@@ -402,6 +403,7 @@
     // design
     var th = state.theme || (state.theme = {});
     th.style = gsell("d-style");
+ th.layout = gsell("d-layout") === "split" ? "split" : "stack";
     th.accent = document.getElementById("d-accent").value;
     th.accentText = document.getElementById("d-accentText").value;
     th.text = document.getElementById("d-text").value;

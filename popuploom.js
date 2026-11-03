@@ -100,6 +100,29 @@
   background: linear-gradient(180deg, rgba(8,10,12,.34), rgba(8,10,12,.74)); z-index: 0;
 }
 .pf-card > .pf-body { position: relative; z-index: 1; }
+/* split modal: text beside a full-bleed image (wide hero layout) */
+.pf-card.pf-split {
+  width: min(1040px, 94vw); padding: 0; display: grid; grid-template-columns: 1fr 1fr;
+  align-items: stretch; overflow: hidden; text-align: center;
+}
+.pf-card.pf-split > .pf-body { padding: 44px 42px; display: flex; flex-direction: column; justify-content: center; }
+.pf-card.pf-split .pf-title { font-size: 30px; line-height: 1.15; }
+.pf-card.pf-split .pf-text { max-width: 44ch; margin-left: auto; margin-right: auto; }
+.pf-card.pf-split .pf-note { text-align: center; }
+.pf-card.pf-split .pf-age-row { flex-direction: row; gap: 12px; margin: 22px 0 0; }
+.pf-card.pf-split .pf-age-row .pf-btn,
+.pf-card.pf-split .pf-age-row .pf-age-deny { flex: 1 1 0; width: auto; }
+.pf-card.pf-split > .pf-media { margin: 0; position: relative; min-height: 100%; }
+.pf-card.pf-split > .pf-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 0; margin: 0; }
+.pf-card.pf-split .pf-close { background: rgba(255,255,255,.92); color: #101314; box-shadow: 0 1px 4px rgba(0,0,0,.24); }
+.pf-card.pf-split .pf-close:hover { background: #fff; }
+@media (max-width: 760px) {
+  .pf-card.pf-split { grid-template-columns: 1fr; width: min(94vw, 460px); }
+  .pf-card.pf-split > .pf-media { order: -1; height: 208px; min-height: 0; }
+  .pf-card.pf-split > .pf-body { padding: 30px 24px; }
+  .pf-card.pf-split .pf-title { font-size: 24px; }
+  .pf-card.pf-split .pf-age-row { flex-direction: column; gap: 10px; margin-top: 18px; }
+}
 .pf-close {
   position: absolute; top: 14px; right: 14px; width: 32px; height: 32px; border: none; border-radius: 999px;
   cursor: pointer; font-size: 13px; line-height: 1; display: grid; place-items: center;
@@ -285,6 +308,7 @@
 .pf-stage .pf-holder.pf-modal { inset: 0; }
 .pf-stage .pf-holder.pf-fullscreen { inset: 0; }
 .pf-stage .pf-card { width: min(430px, 92%); }
+.pf-stage .pf-card.pf-split { width: min(96%, 1000px); }
 .pf-stage .pf-holder.pf-fullscreen .pf-card { width: min(96%, 1080px); max-height: 92%; padding: 24px 28px; }
 .pf-stage .pf-holder.pf-corner .pf-card { width: min(400px, 92%); }
 .pf-stage .pf-proof-card .pf-card { width: min(300px, 88%); padding: 14px 14px 14px 16px; }
@@ -608,13 +632,14 @@
   function cardHTML(self) {
     var c = self.cfg, th = c.theme || {}, mc = c.content || {};
     var p = placementClass(c.placement);
-    var cls = ["pf-card", animName(th.animation, c.placement), p === "modal" ? "" : "", th.style === "ink" ? "pf-ink" : ""].join(" ");
+    var split = th.layout === "split" && !!mc.image && p === "modal";
+    var cls = ["pf-card", animName(th.animation, c.placement), p === "modal" ? "" : "", th.style === "ink" ? "pf-ink" : "", split ? "pf-split" : ""].join(" ");
     var corner = cornerClass(c.placement);
     var h = '<div class="' + cls + (th.bgImage ? " pf-bgimg" : "") + (corner ? ' pf-corner-' + corner : "") + '"' + cardAttrs(th) + (th.bgImage ? ' data-bg="' + escAttr(th.bgImage) + '"' : "") + ">";
     h += '<button class="pf-close" aria-label="Close">&#10005;</button><div class="pf-body">';
     var A = safeColor(th.accent, "#F99A1F");
     if (mc.badge) h += '<div class="pf-badge">' + esc(mc.badge) + "</div>";
-    if (mc.image) h += '<div class="pf-media"><img loading="lazy" decoding="async" src="' + escAttr(safeUrl(mc.image, true)) + '" alt=""></div>';
+    if (mc.image && !split) h += '<div class="pf-media"><img loading="lazy" decoding="async" src="' + escAttr(safeUrl(mc.image, true)) + '" alt=""></div>';
     if (mc.videoEmbed) h += '<div class="pf-vid">' + videoFrame(mc.videoEmbed) + "</div>";
     if (mc.title) h += '<div class="pf-title">' + esc(mc.title) + "</div>";
     if (mc.body) h += '<div class="pf-text">' + esc(mc.body) + "</div>";
@@ -653,7 +678,9 @@
     if (mc.form && mc.form.enabled) h += '<input type="hidden" data-thanks="' + escAttr(thanks) + '">';
     if (mc.links && mc.links.length) h += '<div class="pf-links">' + mc.links.map(function (l) { return '<a href="' + escAttr(safeUrl(l.url, false)) + '" target="_blank" rel="noopener">' + esc(l.label) + "</a>"; }).join("") + "</div>";
     if (mc.note) h += '<div class="pf-note">' + esc(mc.note) + "</div>";
-    h += "</div></div>";
+    h += "</div>";
+    if (split) h += '<div class="pf-media"><img loading="lazy" decoding="async" src="' + escAttr(safeUrl(mc.image, true)) + '" alt=""></div>';
+    h += "</div>";
     return h;
   }
   function animName(a, placement) {

@@ -16,7 +16,8 @@
 - Page targeting: all pages, or include/exclude lists of up to 100 glob-style patterns with a maximum of 2,048 characters each.
 - Device targeting: desktop and/or mobile.
 - An optional sticky return tab lets visitors reopen a popup they closed.
-- Themes control accent, button style (accent or ink), background and text colors, radius, overlay, entry animation and an optional background image.
+- A modal can use a split layout: the image sits beside the text in a wide card (up to 1,040 px), and stacks automatically below 760 px. Without an image or on any non-modal placement it stays stacked.
+- Themes control accent, button style (accent or ink), background and text colors, radius, overlay, entry animation, an optional background image and the stacked/split card layout.
 - Content blocks include a badge, headline, body copy, a safe image, a call-to-action button, and up to 50 shortcut links.
 - Forms support up to 50 fields; each field has a label, a required flag, and one of these input types: email, text, phone, or number. Field names must be 1-64 characters of letters, digits, underscore or hyphen, and must be unique. Reserved JavaScript names are rejected.
 - Tap-meter surveys render up to 50 emoji choices without needing an email.

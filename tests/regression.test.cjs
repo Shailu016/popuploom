@@ -469,6 +469,16 @@ test('browser: all templates, save failures, installation, test mode, delete and
   assert.deepEqual(injections,[false,false]);
   const templates=await page.evaluate(()=>{const stage=document.createElement('div');document.body.appendChild(stage);return PF.templates.map(t=>{try{const p=PopForge.preview(stage,PF.cfgFor(t.id));if(!stage.querySelector('.pf-card'))throw Error('No popup card');p.destroy();return {id:t.id,ok:true};}catch(e){return {id:t.id,error:e.message};}});});
   assert.ok(templates.length>=40);assert.deepEqual(templates.filter(t=>!t.ok),[]);
+  const layouts=await page.evaluate(()=>{
+   const mount=(id,w)=>{const stage=document.createElement('div');stage.className='pf-stage';stage.style.width=w+'px';stage.style.height='640px';document.body.appendChild(stage);const p=PopForge.preview(stage,PF.cfgFor(id));const card=stage.querySelector('.pf-card');const info={split:card.classList.contains('pf-split'),media:!!card.querySelector(':scope > .pf-media'),body:!!card.querySelector(':scope > .pf-body'),cols:getComputedStyle(card).gridTemplateColumns.split(' ').filter(Boolean).length,w:Math.round(card.getBoundingClientRect().width)};p.destroy();stage.remove();return info;};
+   return {age18:mount('age18',1200),drop48:mount('drop48',1200)};
+  });
+  assert.equal(layouts.age18.split,true,'age18 uses the split layout');
+  assert.equal(layouts.age18.media,true,'split image is a direct card child');
+  assert.equal(layouts.age18.body,true,'split text column stays intact');
+  assert.equal(layouts.age18.cols,2,'split renders two columns');
+  assert.ok(layouts.age18.w>=700,'split card is wide: '+layouts.age18.w);
+  assert.equal(layouts.drop48.split,false,'split layout is opt-in per widget');
   const behavior=await page.evaluate(async()=>{
    const nativeInterval=window.setInterval;let delay;
    window.setInterval=(fn,ms)=>{delay=ms;return nativeInterval(fn,ms);};
