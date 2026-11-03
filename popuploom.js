@@ -102,9 +102,10 @@
 .pf-card > .pf-body { position: relative; z-index: 1; }
 /* split modal: text beside a full-bleed image (wide hero layout) */
 .pf-card.pf-split {
-  width: min(1040px, 94vw); padding: 0; display: grid; grid-template-columns: 1fr 1fr;
+  width: min(1040px, 94vw); min-height: 430px; padding: 0; display: grid; grid-template-columns: 1fr 1fr;
   align-items: stretch; overflow: hidden; text-align: center;
 }
+.pf-card.pf-split .pf-badge { align-self: center; }
 .pf-card.pf-split > .pf-body { padding: 44px 42px; display: flex; flex-direction: column; justify-content: center; }
 .pf-card.pf-split .pf-title { font-size: 30px; line-height: 1.15; }
 .pf-card.pf-split .pf-text { max-width: 44ch; margin-left: auto; margin-right: auto; }
@@ -117,7 +118,7 @@
 .pf-card.pf-split .pf-close { background: rgba(255,255,255,.92); color: #101314; box-shadow: 0 1px 4px rgba(0,0,0,.24); }
 .pf-card.pf-split .pf-close:hover { background: #fff; }
 @media (max-width: 760px) {
-  .pf-card.pf-split { grid-template-columns: 1fr; width: min(94vw, 460px); }
+  .pf-card.pf-split { grid-template-columns: 1fr; width: min(94vw, 460px); min-height: 0; }
   .pf-card.pf-split > .pf-media { order: -1; height: 208px; min-height: 0; }
   .pf-card.pf-split > .pf-body { padding: 30px 24px; }
   .pf-card.pf-split .pf-title { font-size: 24px; }
