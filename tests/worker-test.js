@@ -171,6 +171,16 @@ function hostReq(host, path, method = "GET", extraHeaders = {}) {
   r = await req("GET", "/api/auth/me");
   check("me no token 401", r.status === 401);
 
+  console.log("== password reset ==");
+  r = await req("POST", "/api/auth/forgot-password", { body: { email: "no-such-reset-" + Date.now() + "@example.com" } });
+  check("forgot is generic for unknown accounts", r.status === 200 && r.data.ok === true && /If an account exists/.test(r.data.message), r);
+  r = await req("POST", "/api/auth/reset-password", { body: { token: "x", password: "replacement-password-123" } });
+  check("reset rejects malformed tokens generically", r.status === 400 && r.data.code === "INVALID_RESET_TOKEN", r);
+  r = await req("POST", "/api/auth/reset-password", { body: { token: "a".repeat(43), password: "short" } });
+  check("reset enforces the 12 character minimum", r.status === 400 && r.data.code === "WEAK_PASSWORD", r);
+  r = await req("GET", "/reset-password.html", { raw: true });
+  check("reset page noindex + CSP + no-store", r.status === 200 && /noindex, nofollow/.test(r.headers.get("x-robots-tag") || "") && /content-security-policy/i.test(Array.from(r.headers.keys()).join(",")) && r.headers.get("cache-control") === "no-store");
+
   console.log("== widgets CRUD ==");
   r = await req("POST", "/api/widgets", { token, body: { name: "Test Widget", template: "blank", config: { v: 1, theme: { accent: "#123456" } } } });
   check("create widget 201 flat", r.status === 201 && typeof r.data.id === "string" && r.data.id.startsWith("wan_") && r.data.cfg.v === 1, r);

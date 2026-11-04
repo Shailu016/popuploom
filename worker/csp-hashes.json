@@ -6,6 +6,7 @@
   "templates.html": "'sha256-RQhOwteFPCG8TnwYTnjTJmS+9t35D9BWeXsE7dEHAZw=' 'sha256-iUgnUz8EWh0qAGq3qYbjMry7ysvHJtthecVeEHrlyi8='",
   "guides/install-popups.html": "'sha256-VsJha2rCYVwFgvWNspH0vlXmfYtGBF6ulkwPD9U1/eA=' 'sha256-fx86Q835u/HK3SV8HO5+IL/bjYuaPDcF2QhP5g4qhFM=' 'sha256-/Ug/jwiHfF4vLrqvAWd7//IhL5II7xFa60AkU1ZNAc0='",
   "migration.html": "'sha256-6HBmqlbTx1MXYrpA+7AorqIzjdoiYVkC9tgG1qDhid4='",
+  "reset-password.html": "",
   "leads.html": "",
   "privacy.html": ""
 }

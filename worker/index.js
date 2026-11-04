@@ -2,6 +2,9 @@
 import auth from "./auth.js";
 import http from "./http.js";
 import widgets from "./widgets.js";
+import passwordReset from "./password-reset.js";
+import sharedReset from "../shared/password-reset.js";
+import email from "../shared/email.js";
 import { originCheck, securityHeaders, htmlHeaders } from "./security.js";
 import hostPolicy from "../shared/host-policy.js";
 import { verificationFile } from "../shared/verification.js";
@@ -13,6 +16,9 @@ const registerLimit = rateLimit("register", 40, 10 * 60 * 1000);
 const accountLimit = rateLimit("account-action",10,60000);
 const loginLimit = rateLimit("login", 40, 10 * 60 * 1000);
 const googleLimit = rateLimit("google", 30, 10 * 60 * 1000);
+const forgotLimit = rateLimit("forgot-password", 20, 15 * 60 * 1000);
+const forgotEmailLimit = http.emailRateLimit("forgot-password-email", 5, 15 * 60 * 1000);
+const resetLimit = rateLimit("reset-password", 30, 15 * 60 * 1000);
 const apiLimit = rateLimit("api", 1200, 60000);
 
 const JSON_LIMIT = 192 * 1024;
@@ -38,8 +44,8 @@ function clientScheme(request) {
 
 // Explicit public allowlist, same as the Express server's static middleware.
 const PUBLIC_FILES = new Set([
-  "templates.html", "guides/install-popups.html", "robots.txt", "sitemap.xml", "llms.txt", "llms-full.txt", "index.html", "studio.html", "profile.html", "demo.html", "migration.html",
-  "leads.html", "privacy.html", "leads.js", "account.js", "app.js", "studio.js", "popuploom.js", "popforge.js", "ui.css"
+  "templates.html", "guides/install-popups.html", "robots.txt", "sitemap.xml", "llms.txt", "llms-full.txt", "index.html", "studio.html", "profile.html", "demo.html", "migration.html", "reset-password.html",
+  "leads.html", "privacy.html", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "popuploom.js", "popforge.js", "ui.css"
 ]);
 
 // [regex, method, handler, needsAuth]
@@ -108,6 +114,35 @@ async function loginRoute(c) {
   }
 }
 
+// The response never depends on whether the account exists. Delivery runs
+// after the response through ctx.waitUntil so timing and failures stay generic.
+async function forgotRoute(c) {
+  try {
+    const config = passwordReset.requireEmailConfig(c.env);
+    await forgotEmailLimit(c.request, c.env, c.body && c.body.email);
+    const delivery = await passwordReset.forgotPassword(c.env, c.body && c.body.email);
+    if (delivery) {
+      const sending = Promise.resolve()
+        .then(() => email.sendPasswordResetEmail(config, delivery))
+        .catch((e) => console.error("[popuploom] password reset email failed:", e.message));
+      if (c.ctx && typeof c.ctx.waitUntil === "function") c.ctx.waitUntil(sending);
+    }
+    return json(sharedReset.forgotResponse());
+  } catch (e) {
+    if (e instanceof ApiError) return json({ error: e.message, code: e.code }, e.status);
+    throw e;
+  }
+}
+
+async function resetRoute(c) {
+  try {
+    return json(await passwordReset.resetPassword(c.env, c.body && c.body.token, c.body && c.body.password));
+  } catch (e) {
+    if (e instanceof ApiError) return json({ error: e.message, code: e.code }, e.status);
+    throw e;
+  }
+}
+
 async function logoutRoute(c) {
   await revokeToken(c.env, c.session);
   return json({ ok: true });
@@ -168,6 +203,10 @@ async function handleApi(request, env, ctx, pathname, method, cors) {
     matched = { handler: registerRoute, limit: registerLimit };
   } else if (pathname === "/api/auth/login" && method === "POST") {
     matched = { handler: loginRoute, limit: loginLimit };
+  } else if (pathname === "/api/auth/forgot-password" && method === "POST") {
+    matched = { handler: forgotRoute, limit: forgotLimit };
+  } else if (pathname === "/api/auth/reset-password" && method === "POST") {
+    matched = { handler: resetRoute, limit: resetLimit };
   } else if (pathname === "/api/auth/logout" && method === "POST") {
     matched = { handler: logoutRoute, needsAuth: true };
   } else if (pathname === "/api/auth/config" && method === "GET") {
@@ -239,7 +278,7 @@ async function serveStatic(request, env, pathname, sec, cors, headOnly) {
     if (asset.status === 404) return new Response("Not found", { status: 404, headers: { ...sec, ...cors } });
     const headers = new Headers(asset.headers);
     headers.set("Cache-Control", "no-store");
-    if (["/leads.html", "/studio.html", "/profile.html", "/demo.html", "/migration.html"].includes(file)) headers.set("X-Robots-Tag", file === "/migration.html" ? "noindex, nofollow" : "noindex, follow");
+    if (["/leads.html", "/studio.html", "/profile.html", "/demo.html", "/migration.html", "/reset-password.html"].includes(file)) headers.set("X-Robots-Tag", ["/migration.html", "/reset-password.html"].includes(file) ? "noindex, nofollow" : "noindex, follow");
     if (file.endsWith(".html")) for (const [key, value] of Object.entries(htmlHeaders(env, file.slice(1)))) headers.set(key, value);
     return new Response(headOnly ? null : asset.body, { status: asset.status, headers: { ...sec, ...cors, ...Object.fromEntries(headers) } });
   }

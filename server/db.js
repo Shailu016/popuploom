@@ -69,4 +69,9 @@ db.exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_submission_request ON submissions
 
 db.exec("CREATE TABLE IF NOT EXISTS revoked_tokens (token_hash TEXT PRIMARY KEY, expires_at INTEGER NOT NULL)");
 db.exec("CREATE INDEX IF NOT EXISTS idx_revoked_expiry ON revoked_tokens(expires_at)");
+
+// Password resets store only a SHA-256 token hash; the raw token is emailed once.
+db.exec("CREATE TABLE IF NOT EXISTS password_reset_tokens (id INTEGER PRIMARY KEY AUTOINCREMENT, token_hash TEXT NOT NULL UNIQUE, user_id INTEGER NOT NULL, email TEXT NOT NULL, created_at INTEGER NOT NULL, expires_at INTEGER NOT NULL, used_at INTEGER, FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)");
+db.exec("CREATE INDEX IF NOT EXISTS idx_reset_tokens_user ON password_reset_tokens(user_id)");
+db.exec("CREATE INDEX IF NOT EXISTS idx_reset_tokens_expiry ON password_reset_tokens(expires_at)");
 module.exports = db;

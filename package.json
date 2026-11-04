@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server/index.js",
     "dev": "node --watch server/index.js",
-    "test": "node --test tests/regression.test.cjs",
+    "test": "node --test tests/regression.test.cjs tests/password-reset.test.cjs",
     "dev:cf": "wrangler dev",
     "deploy:cf": "node scripts/check-cf.cjs && wrangler deploy",
     "db:migrate:local": "wrangler d1 migrations apply popforge --local",

@@ -32,6 +32,9 @@ const DIRECT_PATHS = new Set([
   "/popuploom.js",
   "/popforge.js",
   "/migration.html",
+  // The reset link carries its token in the URL fragment. Serving the page on
+  // the host from the email avoids any redirect and therefore any fragment loss.
+  "/reset-password.html",
   "/robots.txt",
   "/sitemap.xml"
 ]);

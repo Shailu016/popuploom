@@ -545,6 +545,7 @@
       var swLink = document.getElementById("authSwitchLink");
       var nameRow = document.getElementById("authNameRow");
       var passEl = document.getElementById("authPass");
+      var forgotEl = document.getElementById("authForgot");
       if (title) title.textContent = isLogin ? "Sign in" : "Create your account";
       if (sub) sub.textContent = isLogin
         ? "Welcome back. Your saved popups and install codes are waiting."
@@ -554,6 +555,7 @@
       if (swLink) swLink.textContent = isLogin ? "Create one" : "Sign in";
       if (nameRow) nameRow.style.display = isLogin ? "none" : "block";
       if (passEl) passEl.setAttribute("autocomplete", isLogin ? "current-password" : "new-password");
+      if (forgotEl) forgotEl.style.visibility = isLogin ? "visible" : "hidden";
       showErr("");
     }
     function open() {

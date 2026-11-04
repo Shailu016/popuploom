@@ -17,6 +17,7 @@ Canonical site: **https://popuploom.com/**
 | `popuploom.js` | The runtime. The drop-in embed engine your visitors paste onto their sites. Canonical source, also served as `/popforge.js` through a byte-for-byte alias |
 | `app.js` | Shared code: API-aware storage, auth, the template catalog (original designs), helpers |
 | `migration.html` | Noindex recovery page on the former host for guest drafts saved in `localStorage` |
+| `reset-password.html` + `reset-password.js` | Noindex password reset page: request a link, then set a new password from a single-use URL fragment token |
 | `assets/` | Original template imagery, PopupLoom wordmark/mark and favicons, and `og-popuploom.png` |
 | `ui.css` | Studio/landing theme ("Refined Ember on Graphite") |
 | `demo.html` | Fake storefront with five popups armed (age gate, spin wheel, flash deal, social proof, video), for end-to-end testing |
@@ -43,6 +44,9 @@ Requires Node 22.13+ (built and tested on Node 24). The server uses `node:sqlite
 | `DB_PATH` | `<project>/popforge.db` | SQLite file location |
 | `JWT_SECRET` | random per-process development secret | Required in production; use a unique random secret of at least 32 characters. Signs 30-day login tokens |
 | `GOOGLE_CLIENT_ID` | empty | Enables Sign in with Google. Empty = the Google button is hidden and `/api/auth/google` answers 503 |
+| `RESEND_API_KEY` | empty | Resend API key used to send password reset links. Empty = reset email stays disabled with a clear 503 setup message |
+| `RESET_EMAIL_FROM` | empty | Verified sender, e.g. `PopupLoom <reset@popuploom.com>` |
+| `PUBLIC_ORIGIN` | `http://localhost:PORT` locally, `https://popuploom.com` in production | Origin used to build the reset link. Must be HTTPS outside local development |
 
 Example production start:
 
@@ -114,6 +118,8 @@ Notes:
 |---|---|---|
 | `POST /api/auth/register` | None | Create account, returns `{ user, token }` |
 | `POST /api/auth/login` | None | Sign in, returns `{ user, token }` |
+| `POST /api/auth/forgot-password` | None | Request a single-use reset link. Always the same generic response for unknown, Google-only and existing accounts |
+| `POST /api/auth/reset-password` | None | Consume a reset token and set a new password; revokes existing sessions |
 | `POST /api/auth/google` | None | Exchange a Google ID token for `{ user, token }` |
 | `GET /api/auth/config` | None | `{ googleClientId }` (or `null`) for the browser button |
 | `POST /api/auth/logout` | Bearer | Revoke the current session token |
@@ -192,7 +198,7 @@ Platform notes:
 
 See [SECURITY.md](SECURITY.md) for the security review, deployment settings and public-config trust boundaries. New passwords require at least 12 characters. Set APP_ORIGINS for additional trusted frontend origins; private APIs otherwise accept only the app origin.
 
-Run `npm test` for isolated API, auth and browser regression checks. Browser checks use Chrome/Edge when available; the `POPFORGE_BROWSER` environment variable still overrides the executable path for compatibility. Existing project data is never used by the tests.
+Run `npm test` for isolated API, auth, password-reset and browser regression checks. Browser checks use Chrome/Edge when available; the `POPFORGE_BROWSER` environment variable still overrides the executable path for compatibility. Existing project data is never used by the tests. Password-reset tests replace the Resend sender with a local stub, so they never call the provider or need an API key.
 
 Reverse proxy deployments must set `TRUST_PROXY` to the trusted proxy IPs/subnets; forwarded headers are ignored by default.
 
@@ -277,6 +283,37 @@ See [CLOUDFLARE.md](CLOUDFLARE.md) for build, tests, D1 migration, private data 
 
 Open **My popups → Leads** for any saved popup. The inbox shows 100 responses per page; **Export all leads as CSV** follows every 500-row API page, includes all captured fields, supports cancellation, and escapes spreadsheet formula prefixes. API ownership checks remain enforced. Empty, expired-session and request-error states are explicit. The CSV is a browser download: keep exported personal data private.
 
-Your account supports password changes and permanent account deletion after current-password verification, or a matching Google identity for Google-only account deletion. Password changes invalidate existing sessions. Account deletion cascades to saved widgets and their leads. Export before deleting. Password reset remains intentionally out of scope.
+Your account supports password changes and permanent account deletion after current-password verification, or a matching Google identity for Google-only account deletion. Password changes invalidate existing sessions. Account deletion cascades to saved widgets and their leads. Export before deleting.
+
+## Password reset
+
+**Forgot password?** on the sign-in form opens `/reset-password.html`. The request form always answers with the same generic message, whether or not the address belongs to an account. Accounts that signed up with email and password receive a Resend email containing a link of the form `https://popuploom.com/reset-password.html#token=…`.
+
+- Tokens are 32 random bytes (256 bits), valid for **30 minutes**, and single-use.
+- Only a SHA-256 hash of the token is stored, in `password_reset_tokens` (user id, email, created/expiry/used timestamps). Raw tokens are never stored, logged or returned by the API.
+- Requesting a new link invalidates every earlier outstanding link for that account.
+- Resetting a password increments the account's `token_version`, which signs out every existing session.
+- New passwords must be at least 12 characters and at most 72 UTF-8 bytes, matching the existing policy.
+- Google-only accounts keep using Google sign-in. They receive the same generic response and no reset email or token is created for them.
+- The reset page is `noindex,nofollow`, reads the token from the URL fragment (never sent in a Referer header), removes it from the address bar after reading, and keeps it only in memory for the single POST. It is never written to `localStorage` or analytics.
+- Requests are rate-limited per IP and per normalized email. If email is not configured, both endpoints and the page fail with a clear setup message rather than pretending a message was sent.
+
+### Set up reset email with Resend
+
+1. Create a free account at [resend.com](https://resend.com) and add **popuploom.com** as a sending domain.
+2. Open the domain's **Records** tab in Resend and add the exact values it shows. For `popuploom.com` these are normally an **MX** and **TXT SPF** record on the `send` subdomain (for example `v=spf1 include:amazonses.com ~all`), a **DKIM TXT** record at `resend._domainkey`, and a **DMARC TXT** record at `_dmarc` (for example `v=DMARC1; p=none; rua=mailto:…`). Newer Resend domains may use CNAME records for SPF instead of TXT/MX; copy exactly what the dashboard generates. Wait for Resend to report the domain as **Verified** before sending.
+3. Create an API key and configure it:
+   ```bash
+   # Express (.env)
+   RESEND_API_KEY=re_…
+   RESET_EMAIL_FROM="PopupLoom <reset@popuploom.com>"
+   PUBLIC_ORIGIN=https://popuploom.com
+
+   # Cloudflare Worker (encrypted secret)
+   wrangler secret put RESEND_API_KEY
+   ```
+4. Restart the server. If `RESEND_API_KEY` is missing or the sender is empty, `/api/auth/forgot-password` answers `503` with `RESET_EMAIL_NOT_CONFIGURED` and the setup message.
+
+Resend's free plan allows **3,000 emails per month and 100 per day**. A reset request sends at most one email and is rate-limited, but a burst of real users can still hit the daily cap; the API logs provider failures without the token or recipient and keeps the generic response. Verify SPF/DKIM for `popuploom.com` so mail is not rejected or filed as spam. The project never emails a password and never logs a reset token.
 
 Countdown presets now choose a fixed deadline; unrelated edits and saves preserve it. Expiry stops the displayed clock but does not enforce checkout discounts or automatically hide the popup. Template forms collect responses and use truthful default confirmation text. Sending emails, PDFs or calendar invitations needs the website owner's integration. The optional client-side webhook remains best effort, with explicit limitations in the editor; it is not a reliable delivery queue. `/privacy.html` describes actual storage and external requests without claiming legal certification.

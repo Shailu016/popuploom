@@ -844,3 +844,8 @@ section { padding: 92px 0; position: relative; }
   }
   .js .rv { opacity: 1; transform: none; }
 }
+
+/* password reset status */
+.reset-status { margin-top: 18px; padding: 12px 14px; border-radius: 10px; font-size: 13.5px; line-height: 1.6; border: 1px solid var(--line-2); color: var(--text); background: rgba(255,255,255,.03); }
+.reset-status.ok { border-color: rgba(53,240,176,.4); background: rgba(53,240,176,.08); }
+.reset-status.error { border-color: rgba(255,106,85,.45); background: rgba(255,106,85,.09); color: #FFD9D3; }

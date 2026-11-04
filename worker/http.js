@@ -1,5 +1,6 @@
 // worker/http.js — shared helpers: JSON responses, D1 result normalization, rate limiting
-const { ApiError } = require("./auth");
+const { ApiError, sha256Hex } = require("./auth");
+const shared = require("../shared/password-reset");
 
 function json(data, status = 200, headers = {}) {
   return new Response(JSON.stringify(data), {
@@ -18,18 +19,33 @@ async function all(stmt) {
   return rows(await stmt.all());
 }
 
-// Bounded counters; the visitor IP comes from Cloudflare's header.
+async function ipKey(scope, request) {
+  const address = request.headers.get("CF-Connecting-IP") || "local";
+  return scope + ":" + await sha256Hex(address);
+}
+
+// Atomic D1 counter shared by every isolate. Throws 429 with Retry-After.
+async function enforceLimit(env, key, max, windowMs) {
+  const now = Date.now(), until = (Math.floor(now / windowMs) + 1) * windowMs;
+  const row = await env.DB.prepare("INSERT INTO rate_limits (key, count, expires_at) VALUES (?, 1, ?) ON CONFLICT(key) DO UPDATE SET count = CASE WHEN rate_limits.expires_at <= ? THEN 1 ELSE rate_limits.count + 1 END, expires_at = CASE WHEN rate_limits.expires_at <= ? THEN excluded.expires_at ELSE rate_limits.expires_at END RETURNING count, expires_at").bind(key, until, now, now).first();
+  if (crypto.getRandomValues(new Uint32Array(1))[0] % 100 === 0) await env.DB.prepare("DELETE FROM rate_limits WHERE expires_at <= ?").bind(now).run();
+  if (row.count > max) throw new ApiError(429, "Too many requests. Try again later.", undefined, { "Retry-After": String(Math.max(1, Math.ceil((row.expires_at - now) / 1000))) });
+}
+
 function rateLimit(scope, max, windowMs) {
   return async (request, env) => {
-    const now = Date.now(), until = (Math.floor(now / windowMs) + 1) * windowMs;
-    const address = request.headers.get("CF-Connecting-IP") || "local";
-    const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(address));
-    const ip = [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, "0")).join("");
-    const key = scope + ":" + ip;
-    const row = await env.DB.prepare("INSERT INTO rate_limits (key, count, expires_at) VALUES (?, 1, ?) ON CONFLICT(key) DO UPDATE SET count = CASE WHEN rate_limits.expires_at <= ? THEN 1 ELSE rate_limits.count + 1 END, expires_at = CASE WHEN rate_limits.expires_at <= ? THEN excluded.expires_at ELSE rate_limits.expires_at END RETURNING count, expires_at").bind(key, until, now, now).first();
-    if (crypto.getRandomValues(new Uint32Array(1))[0] % 100 === 0) await env.DB.prepare("DELETE FROM rate_limits WHERE expires_at <= ?").bind(now).run();
-    if (row.count > max) throw new ApiError(429, "Too many requests. Try again later.", undefined, { "Retry-After": String(Math.max(1, Math.ceil((row.expires_at - now) / 1000))) });
+    await enforceLimit(env, await ipKey(scope, request), max, windowMs);
   };
 }
 
-module.exports = { json, all, rateLimit };
+// Normalized-email limiting. The address is hashed before it becomes a key so
+// the shared counter table never stores raw email addresses.
+function emailRateLimit(scope, max, windowMs) {
+  return async (request, env, email) => {
+    const normalized = shared.normalizeEmail(email);
+    if (!shared.isValidEmail(normalized)) return;
+    await enforceLimit(env, scope + ":" + await sha256Hex("email:" + normalized), max, windowMs);
+  };
+}
+
+module.exports = { json, all, rateLimit, emailRateLimit, sha256Hex };

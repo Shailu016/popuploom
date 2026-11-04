@@ -10,6 +10,8 @@ Destination: the `shailu3597@gmail.com` Cloudflare account (`66d3b261587ce5aeb48
 
 The dedicated deploy token is stored as the encrypted repository Actions secret `CLOUDFLARE_API_TOKEN`. It is restricted to this Cloudflare account, with Workers Scripts: Edit and Account Settings: Read. It has no expiration; revoke or rotate it through Cloudflare API Tokens if access is no longer needed. It cannot create zones or change DNS. Never commit the token, copy a personal Wrangler OAuth credential into CI, or paste credentials into chat. Existing application secrets remain in Cloudflare; `JWT_SECRET` is not rotated by a rebrand.
 
+Password reset email needs one additional Cloudflare secret, `RESEND_API_KEY` (`wrangler secret put RESEND_API_KEY`). The non-secret `RESET_EMAIL_FROM` and `PUBLIC_ORIGIN` values live in `wrangler.toml` `[vars]`. The workflow does not create or rotate those values; configure them once per Cloudflare account and verify `popuploom.com` in Resend with SPF and DKIM before enabling production mail. The Resend free plan allows 3,000 emails/month and 100/day.
+
 Verified on 2026-11-01: all tests, production deployment, and live health verification passed in https://github.com/Shailu016/popforge/actions/runs/41303371404. That run is the pre-rebrand baseline.
 
 Schema migrations and customer-data imports are not executed automatically. Review and apply migrations separately using the existing deployment instructions. No paid plan or billing upgrade was enabled by this setup; GitHub Actions and Cloudflare account allowances still apply.

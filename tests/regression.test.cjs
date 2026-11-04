@@ -37,7 +37,7 @@ test('private files stay private including encoded separators and extensions',as
   const r=await api(url);assert.ok(r.status===404||r.headers.get('content-type').includes('text/html'),url);
   assert.ok(!String(r.data).includes('SQLite format 3')&&!String(r.data).includes('JWT_SECRET=')&&!String(r.data).includes('const JWT_SECRET'),url);
  }
- for(const url of ['/','/templates.html','/guides/install-popups.html','/migration.html','/studio.html','/profile.html','/demo.html','/app.js','/studio.js','/popuploom.js','/popforge.js','/ui.css','/robots.txt','/sitemap.xml','/llms.txt','/llms-full.txt','/assets/winter-gift.jpg','/assets/favicon.svg','/assets/og-popuploom.png'])assert.equal((await api(url)).status,200,url);
+ for(const url of ['/','/templates.html','/guides/install-popups.html','/migration.html','/studio.html','/profile.html','/demo.html','/reset-password.html','/app.js','/studio.js','/reset-password.js','/popuploom.js','/popforge.js','/ui.css','/robots.txt','/sitemap.xml','/llms.txt','/llms-full.txt','/assets/winter-gift.jpg','/assets/favicon.svg','/assets/og-popuploom.png'])assert.equal((await api(url)).status,200,url);
 });
 test('every template asset reference points at a shipped file',()=>{
  const src=fs.readFileSync(path.join(root,'app.js'),'utf8');
@@ -140,6 +140,14 @@ test('HTML security headers prevent clickjacking and restrict script execution',
   const r=await api(url);const policy=r.headers.get('content-security-policy');assert.ok(policy.includes("frame-ancestors 'none'"));assert.ok(policy.includes("base-uri 'none'"));assert.ok(policy.includes("object-src 'none'"));
   const scripts=policy.split(';').find(s=>s.trim().startsWith('script-src'));assert.ok(scripts.includes('sha256-'));assert.ok(!scripts.includes("'unsafe-inline'"));assert.ok(scripts.includes('https://static.cloudflareinsights.com'));assert.ok(policy.includes('connect-src')&&policy.includes('https://cloudflareinsights.com'));assert.equal(r.headers.get('x-frame-options'),'DENY');assert.equal(r.headers.get('x-powered-by'),null);
  }
+ const reset=await api('/reset-password.html');
+ const resetPolicy=reset.headers.get('content-security-policy')||'';
+ assert.ok(resetPolicy.includes("frame-ancestors 'none'")&&resetPolicy.includes("object-src 'none'")&&resetPolicy.includes("base-uri 'none'"));
+ assert.ok(!(resetPolicy.split(';').find(s=>s.trim().startsWith('script-src'))||'').includes("'unsafe-inline'"));
+ assert.equal(reset.headers.get('x-frame-options'),'DENY');
+ assert.match(reset.headers.get('x-robots-tag')||'',/noindex, nofollow/);
+ assert.match(String(reset.data),/name="robots" content="noindex,nofollow"/);
+ assert.match(String(reset.data),/name="referrer" content="no-referrer"/);
 });
 test('CSP hashes normalize line endings and update when the HTML file changes',()=>{
  let html='<script>window.example=1;\r\n</script>',mtime=1;const headers={};
@@ -290,6 +298,7 @@ test('host policy only moves known pages and never crosses hosts for API or runt
  assert.equal(pageRedirect(old+'/guides/install-popups.html','GET'),apex+'/guides/install-popups.html');
  assert.equal(pageRedirect(old+'/studio.html?id=wan_123','GET'),apex+'/studio.html?id=wan_123');
  assert.equal(pageRedirect(old+'/migration.html','GET'),null);
+ assert.equal(pageRedirect(old+'/reset-password.html','GET'),null);
  assert.equal(pageRedirect(old+'/popforge.js','GET'),null);
  assert.equal(pageRedirect(old+'/popuploom.js','GET'),null);
  assert.equal(pageRedirect(old+'/assets/favicon.svg','GET'),null);

@@ -19,6 +19,9 @@ const widgetsRouter = require("./routes/widgets");
 const db = require("./db");
 const hostPolicy = require("../shared/host-policy");
 const verification = require("../shared/verification");
+const passwordReset = require("./password-reset");
+const sharedReset = require("../shared/password-reset");
+const resetEmail = require("../shared/email");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -51,6 +54,10 @@ app.set("trust proxy", proxies.length ? proxies : false);
 app.use("/api/auth/register", rateLimit("register", 40, 10 * 60 * 1000));
 app.use("/api/auth/login", rateLimit("login", 40, 10 * 60 * 1000));
 app.use("/api/auth/google", rateLimit("google", 30, 10 * 60 * 1000));
+// IP limits cover the reset flow; the forgot route adds a normalized-email
+// limit after the body is parsed.
+app.use("/api/auth/forgot-password", rateLimit("forgot-password", 20, 15 * 60 * 1000));
+app.use("/api/auth/reset-password", rateLimit("reset-password", 30, 15 * 60 * 1000));
 app.use("/api", (req, res, next) => { res.setHeader("Cache-Control", "no-store"); next(); });
 app.use("/api", rateLimit("api", 1200, 60000));
 // Reject oversized/compressed JSON after cheap origin and rate checks.
@@ -84,6 +91,51 @@ app.post("/api/auth/login", (req, res) => {
     res.json(result);
   } catch (e) {
     res.status(401).json({ error: e.message });
+  }
+});
+
+// Request a reset link. The response is identical for known, unknown and
+// Google-only accounts; delivery happens after the response is sent.
+app.post("/api/auth/forgot-password", (req, res) => {
+  let config;
+  try {
+    config = passwordReset.requireEmailConfig();
+  } catch (e) {
+    return res.status(e.status || 503).json({ error: e.message, code: e.code || sharedReset.NOT_CONFIGURED_CODE });
+  }
+  const limited = rateLimit.checkEmailLimit("forgot-password-email", 5, 15 * 60 * 1000, req.body && req.body.email);
+  if (limited.limited) {
+    res.setHeader("Retry-After", String(limited.retryAfter));
+    return res.status(429).json({ error: "Too many requests. Try again later." });
+  }
+  let delivery;
+  try {
+    delivery = passwordReset.forgotPassword(req.body && req.body.email);
+  } catch (e) {
+    return res.status(e.status || 400).json({ error: e.message, code: e.code || "BAD_REQUEST" });
+  }
+  noStore(res);
+  res.json(sharedReset.forgotResponse());
+  if (delivery) {
+    // Provider failures are logged without the token or address and never
+    // change the already-sent response, so they cannot reveal account state.
+    // Promise.resolve also converts a synchronous sender throw into a rejection.
+    setImmediate(() => Promise.resolve()
+      .then(() => resetEmail.sendPasswordResetEmail(config, delivery))
+      .catch((e) => console.warn("[popuploom] password reset email failed:", e.message)));
+  }
+});
+
+// Consume a single-use token and replace the password. Existing sessions are
+// revoked through the account's token_version.
+app.post("/api/auth/reset-password", (req, res) => {
+  try {
+    const { token, password } = req.body || {};
+    const result = passwordReset.resetPassword(token, password);
+    noStore(res);
+    res.json(result);
+  } catch (e) {
+    res.status(e.status || 400).json({ error: e.message, code: e.code || "BAD_REQUEST" });
   }
 });
 
@@ -144,8 +196,8 @@ app.get("/api/health", (req, res) => res.json({ ok: true, version: "2.0" }));
 
 // ---- Static files (frontend): explicit public allowlist ----
 const publicFiles = new Set([
-  "templates.html", "guides/install-popups.html", "robots.txt", "sitemap.xml", "llms.txt", "llms-full.txt", "index.html", "studio.html", "profile.html", "demo.html", "migration.html",
-  "leads.html", "privacy.html", "leads.js", "account.js", "app.js", "studio.js", "popuploom.js", "popforge.js", "ui.css"
+  "templates.html", "guides/install-popups.html", "robots.txt", "sitemap.xml", "llms.txt", "llms-full.txt", "index.html", "studio.html", "profile.html", "demo.html", "migration.html", "reset-password.html",
+  "leads.html", "privacy.html", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "popuploom.js", "popforge.js", "ui.css"
 ]);
 app.use((req, res, next) => {
   if (req.method !== "GET" && req.method !== "HEAD") return next();
@@ -169,6 +221,7 @@ app.use((req, res, next) => {
   if (file.endsWith(".html")) {
     security.htmlHeaders(res, file.slice(1));
     if (file === "/migration.html") res.setHeader("X-Robots-Tag", "noindex, nofollow");
+    if (file === "/reset-password.html") res.setHeader("X-Robots-Tag", "noindex, nofollow");
   }
   res.sendFile(path.join(__dirname, "..", file.slice(1)));
 });

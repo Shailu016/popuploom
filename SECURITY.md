@@ -28,12 +28,28 @@ The PopupLoom identity migration keeps the security model unchanged:
 Google's authoritative-email rules are documented at:
 https://developers.google.com/identity/gsi/web/guides/verify-google-id-token
 
+## Password reset
+
+Password reset is available for email/password accounts and deliberately unavailable for Google-only accounts, which keep using Google sign-in.
+
+- **Tokens:** 32 bytes from the platform CSPRNG (256 bits), base64url-encoded. The database stores only the SHA-256 hex digest, the user id, normalized email and created/expires/used timestamps. Raw tokens never enter D1, SQLite, logs, analytics or browser storage.
+- **Lifetime and reuse:** 30 minutes. A conditional `UPDATE … WHERE used_at IS NULL AND expires_at > ?` is the single-use gate, so a replayed or concurrent request cannot consume the token twice. Requesting a new link marks every earlier outstanding token for that account used.
+- **Atomicity and revocation:** after consumption, the password hash is replaced and `token_version` is incremented. Every existing bearer session is rejected on its next request. Password hashing keeps the existing bcrypt (Express) / PBKDF2-SHA256 (Worker) approach.
+- **Token comparison:** the row is selected by hash and the digest is re-checked with a constant-time comparison before consumption, so comparisons do not branch on secret contents.
+- **Enumeration:** `POST /api/auth/forgot-password` returns exactly the same status and body for an unknown address, a Google-only account and an existing password account. Delivery happens after the response (`ctx.waitUntil` on the Worker, `setImmediate` on Express), so provider latency and provider failures cannot be observed by the requester. Provider errors are logged without the token, recipient or response body.
+- **Rate limits:** per-IP (20 requests / 15 min) and per-normalized-email (5 / 15 min) for reset requests; per-IP (30 / 15 min) for token consumption. Email counters store a SHA-256 hash of the address, not the address itself.
+- **Password policy:** at least 12 characters and at most 72 UTF-8 bytes, identical to registration and account password changes. The API rejects a token whose format is not exactly 43 base64url characters, and always answers with one generic invalid/expired message for malformed, expired, reused or unknown tokens.
+- **Browser handling:** `/reset-password.html` is `noindex,nofollow`, sends `Referrer-Policy`-equivalent `no-referrer` metadata, reads the token from the URL fragment (fragments are never sent to the server or in `Referer`), and calls `history.replaceState` to remove it from the address bar. The token lives only in a closure until the POST. It is never written to `localStorage`, `sessionStorage`, URLs of subsequent requests, or logs.
+- **CSRF and body limits:** the existing same-origin/`APP_ORIGINS` browser policy applies to both routes. They are JSON POSTs, use the global 192 KB bounded body parser, and are `no-store`.
+- **Email provider:** Resend is called server-side with `fetch`. `RESEND_API_KEY` is an encrypted Worker secret (or an Express `.env` value) and is never sent to a browser. `RESEND_API_KEY`, `RESET_EMAIL_FROM` and `PUBLIC_ORIGIN` are validated at request time; if any is missing, both routes return a clear `503 RESET_EMAIL_NOT_CONFIGURED` message and no email is attempted. No reset email contains a password. The email link is HTTPS outside local development.
+- **Delivery limits:** Resend's free plan is 3,000 emails/month and 100/day. The sending domain must pass Resend's SPF and DKIM verification. Provider rate-limit failures do not expose account existence.
+
 ## Evidence
 
-- `npm test`: **28 groups passed, 0 failed, 0 skipped**.
-- Worker unit suite: **6 tests passed**, covering legacy password upgrade, secret enforcement, shared rate counters, server-generated widget ids, generic login failures and packaging.
-- Worker integration suite: **91 assertions passed**, including legacy/new host policy, HTTPS upgrades, hardened 404s, runtime alias identity and migration noindex.
-- Real headless Chrome tested every one of the 45 templates, studio behavior, mobile layouts, blocked script/event-handler injections, legitimate inline controls, and server-revoked logout.
+- `npm test`: **43 groups passed, 0 failed, 0 skipped** (33 existing regression groups + 10 password-reset groups, including a real headless-browser pass of the reset UI).
+- Worker unit suite: **12 tests passed**, covering legacy password upgrade, secret enforcement, shared rate counters, server-generated widget ids, generic login failures, packaging, reset token hashing/expiry/single-use/session revocation, generic unknown/Google-only responses and hashed email rate-limit keys.
+- Worker integration suite: **106 assertions passed**, including legacy/new host policy, HTTPS upgrades, hardened 404s, runtime alias identity, migration noindex and the Worker reset endpoints.
+- Real headless Chrome tested every one of the 45 templates, studio behavior, mobile layouts, blocked script/event-handler injections, legitimate inline controls, server-revoked logout, the login **Forgot password?** link, the request form, the tokenized reset form, fragment-token cleanup and the absence of token leakage into storage, request URLs, headers or console logs.
 - API checks cover cross-account access, private files, forged/revoked sessions, origin rejection, public embed compatibility, depth/size/encoding rejection, rate-limit bypass attempts, retry deduplication and pagination.
 - Migration checks cover dual runtime paths loaded in either order, dual attribute handling, API override precedence, legacy analytics, host-specific redirects, non-redirected API/runtime requests and replayed scans.
 - Authentication fixtures verify the signed-claim mapping and Gmail/Workspace/third-party linking rules. CSP tests cover per-page hashes, line endings and edits.
@@ -42,7 +58,7 @@ https://developers.google.com/identity/gsi/web/guides/verify-google-id-token
 
 ## Deployment and trust boundaries
 
-Restart the server to load these changes; startup adds the token-revocation table automatically. Use HTTPS and NODE_ENV=production with a unique random JWT_SECRET. HSTS is sent on secure production requests. Configure TRUST_PROXY only for actual trusted proxy addresses and APP_ORIGINS only for trusted frontend origins.
+Restart the server to load these changes; startup adds the token-revocation and password-reset tables automatically. Use HTTPS and NODE_ENV=production with a unique random JWT_SECRET. HSTS is sent on secure production requests. Configure TRUST_PROXY only for actual trusted proxy addresses and APP_ORIGINS only for trusted frontend origins. For password reset, set `RESEND_API_KEY` (encrypted Worker secret or Express `.env`), `RESET_EMAIL_FROM` to a sender on the verified `popuploom.com` domain, and `PUBLIC_ORIGIN=https://popuploom.com`. Without the key the reset routes return a clear 503; no account data or tokens are exposed.
 
 Google linking is automatic only when Google is authoritative for the email. Existing password accounts using other email providers must use email/password sign-in; no current-email ownership challenge service is configured. Newly registered Google identities can still sign in by their verified subject.
 

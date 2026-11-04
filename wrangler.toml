@@ -39,6 +39,13 @@ migrations_dir = "worker/migrations"
 # Leave empty to allow only same-origin (and public widget endpoints).
 APP_ORIGINS = ""
 
+# Password reset email. RESEND_API_KEY is an encrypted secret:
+#   wrangler secret put RESEND_API_KEY
+# Free plan: 3,000 emails/month, 100/day. Verify popuploom.com in Resend
+# (SPF + DKIM). An empty sender keeps reset email disabled with a clear error.
+RESET_EMAIL_FROM = "PopupLoom <reset@popuploom.com>"
+PUBLIC_ORIGIN = "https://popuploom.com"
+
 # Enable only after apex DNS, HTTPS and application smoke checks pass.
 DOMAIN_CUTOVER_ENABLED = "true"
 
