@@ -220,8 +220,7 @@ app.use((req, res, next) => {
   res.setHeader("Cache-Control", "no-store");
   if (file.endsWith(".html")) {
     security.htmlHeaders(res, file.slice(1));
-    if (file === "/migration.html") res.setHeader("X-Robots-Tag", "noindex, nofollow");
-    if (file === "/reset-password.html") res.setHeader("X-Robots-Tag", "noindex, nofollow");
+    if (file === "/migration.html" || file === "/reset-password.html" || file === "/studio.html" || file === "/profile.html" || file === "/leads.html") res.setHeader("X-Robots-Tag", "noindex, nofollow");
   }
   res.sendFile(path.join(__dirname, "..", file.slice(1)));
 });

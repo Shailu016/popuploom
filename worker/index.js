@@ -283,7 +283,7 @@ async function serveStatic(request, env, pathname, sec, cors, headOnly) {
     if (asset.status === 404) return new Response("Not found", { status: 404, headers: { ...sec, ...cors } });
     const headers = new Headers(asset.headers);
     headers.set("Cache-Control", "no-store");
-    if (["/leads.html", "/studio.html", "/profile.html", "/demo.html", "/migration.html", "/reset-password.html"].includes(file)) headers.set("X-Robots-Tag", ["/migration.html", "/reset-password.html"].includes(file) ? "noindex, nofollow" : "noindex, follow");
+    if (["/leads.html", "/studio.html", "/profile.html", "/demo.html", "/migration.html", "/reset-password.html"].includes(file)) headers.set("X-Robots-Tag", ["/migration.html", "/reset-password.html", "/studio.html", "/profile.html", "/leads.html"].includes(file) ? "noindex, nofollow" : "noindex, follow");
     if (file.endsWith(".html")) for (const [key, value] of Object.entries(htmlHeaders(env, file.slice(1)))) headers.set(key, value);
     return new Response(headOnly ? null : asset.body, { status: asset.status, headers: { ...sec, ...cors, ...Object.fromEntries(headers) } });
   }

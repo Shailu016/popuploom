@@ -421,7 +421,7 @@ test('identity, metadata and crawler files agree on the apex origin',async()=>{
  }
  const studio=(await api('/studio.html')).data;
  assert.ok(studio.includes('<title>PopupLoom Studio</title>'));
- assert.ok(studio.includes('name="robots" content="noindex,follow"'));
+ assert.ok(studio.includes('name="robots" content="noindex,nofollow"'));
  const account=(await api('/profile.html')).data;
  assert.ok(account.includes('<title>Your Account | PopupLoom</title>'));
  const robots=(await api('/robots.txt')).data;
