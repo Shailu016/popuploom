@@ -2,7 +2,7 @@ const fs=require('fs'),path=require('path');require('./csp-hashes.js');const out
 // Wipe the previous public bundle so removed/renamed files cannot linger in the
 // deployed asset set. Everything below is copied from the tracked source files.
 fs.rmSync(out,{recursive:true,force:true});fs.mkdirSync(out,{recursive:true});
-for(const f of ['robots.txt','sitemap.xml','llms.txt','llms-full.txt','templates.html','guides/install-popups.html','index.html','studio.html','profile.html','demo.html','migration.html','reset-password.html','leads.html','privacy.html','about.html','contact.html','terms.html','.well-known/security.txt','lead-csv.js','leads.js','account.js','app.js','studio.js','reset-password.js','popuploom.js','ui.css']){fs.mkdirSync(path.dirname(path.join(out,f)),{recursive:true});fs.copyFileSync(f,path.join(out,f));}
+for(const f of ['robots.txt','sitemap.xml','llms.txt','llms-full.txt','templates.html','guides/install-popups.html','guides/index.html','guides/wordpress-popup.html','guides/shopify-popup.html','guides/webflow-popup.html','guides/collect-and-export-leads.html','guides/popup-not-showing.html','index.html','studio.html','profile.html','demo.html','migration.html','reset-password.html','leads.html','privacy.html','about.html','contact.html','terms.html','.well-known/security.txt','lead-csv.js','leads.js','account.js','app.js','studio.js','reset-password.js','popuploom.js','ui.css']){fs.mkdirSync(path.dirname(path.join(out,f)),{recursive:true});fs.copyFileSync(f,path.join(out,f));}
 // Search Console / Bing verification drop files are owner-provided; copy every
 // one that exists instead of hardcoding names that only the owner can know.
 const verification=require('../shared/verification');
@@ -31,3 +31,20 @@ if(metaTags){
 // old installed snippet and a new one can never drift apart.
 fs.copyFileSync('popuploom.js',path.join(out,'popforge.js'));
 fs.cpSync('assets',path.join(out,'assets'),{recursive:true});
+
+// ---- Advertising readiness (Phase B is disabled by default) ----
+// ads.txt is published only when the owner supplies a real publisher ID.
+// Ad code/CMP activation is intentionally blocked in this Phase A build until
+// the account-specific CSP, CMP and consent work is reviewed.
+const publisherId=String(process.env.ADSENSE_PUBLISHER_ID||'').trim();
+if(publisherId){
+  if(!/^pub-\d{16}$/.test(publisherId)) throw new Error('ADSENSE_PUBLISHER_ID must look like pub-0000000000000000');
+  fs.writeFileSync(path.join(out,'ads.txt'),'google.com, '+publisherId+', DIRECT, f08c47fec0942fa0\n');
+  console.log('wrote ads.txt for the configured publisher ID');
+}
+if(process.env.ADSENSE_ENABLED==='true'){
+  const client=String(process.env.ADSENSE_CLIENT||'').trim();
+  const cmp=String(process.env.ADSENSE_CMP||'').trim();
+  if(!/^ca-pub-\d{16}$/.test(client)||!cmp) throw new Error('ADSENSE_ENABLED requires a valid ADSENSE_CLIENT and ADSENSE_CMP');
+  throw new Error('Phase A build: live advertising is not implemented. Complete the CSP/CMP integration and Codex review before enabling it.');
+}

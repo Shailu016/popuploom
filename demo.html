@@ -70,7 +70,7 @@
     sticky: { enabled: false, label: "" },
     theme: { style: "ink", accent: "#F99A1F", accentText: "#261303", text: "#EFEDEB", bg: "#0F1117", radius: 20, animation: "pop", overlay: true },
     content: {
-      badge: "Age verification",
+      badge: "Age notice",
       title: "Are you 18\nor older?",
       body: "This demo shop carries sharp things. One tap and you're through. We don't store your answer.",
       ageGate: {
@@ -79,7 +79,7 @@
         denyLabel: "No, take me back",
         denyUrl: "",
         denyMessage: "Sorry, you must be 18 or older to enter.",
-        allowMessage: "Welcome in. Enjoy responsibly."
+        allowMessage: "Welcome in."
       },
       note: "A courtesy gate, not a profile."
     }
@@ -98,7 +98,7 @@
     content: {
       badge: "One spin per visitor",
       title: "Spin to win",
-      body: "A real prize, no tricks. The wheel decides; the code is yours either way.",
+      body: "A sample prize wheel for this PopupLoom demo. Results are illustrative; no real prize is offered.",
       image: "./assets/prize-bundle.jpg",
       spin: {
         enabled: true, buttonText: "SPIN",
@@ -111,7 +111,7 @@
           { emoji: "⭐", label: "Mystery gift" }
         ]
       },
-      note: "Codes work at checkout. One spin, once a day."
+      note: "Demo only. No purchase, prize or credit is real."
     }
   });
 
@@ -128,13 +128,13 @@
     content: {
       badge: "48-hour drop",
       title: "The weekend window is open",
-      body: "Everything storewide sits at 30% off while the clock runs. Grab a code. It dies with the timer.",
+      body: "Demo offer: 30% off is illustrative and does not apply to any real store.",
       image: "./assets/flash-watch.jpg",
       countdown: { target: new Date(Date.now() + 48 * 36e5).toISOString() },
       coupon: { code: "WINDOW-48" },
       buttonText: "Claim the code",
-      buttonUrl: "#deal",
-      note: "Ends when the timer hits zero. No exceptions."
+      buttonUrl: "",
+      note: "Demo only. The timer and code are design examples."
     }
   });
 
@@ -150,7 +150,7 @@
     theme: { style: "light", accent: "#F99A1F", accentText: "#261303", text: "#171A1F", bg: "#FFFFFF", radius: 16, animation: "slideUp", overlay: false },
     content: {
       proof: {
-        enabled: true, interval: 5000,
+        enabled: true, demo: true, interval: 5000,
         items: [
           { name: "Maya", action: "just unlocked 20% off", ago: "2 min ago" },
           { name: "Derek", action: "signed up for the drop list", ago: "6 min ago" },
@@ -173,9 +173,10 @@
     content: {
       title: "The 90-second shop tour",
       body: "How browsing, buying and pickup work. Short film.",
-      videoEmbed: "https://www.youtube.com/watch?v=G6Dp2Ly3aO0",
+      videoEmbed: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
       buttonText: "Watch full film",
-      buttonUrl: "#tour"
+      buttonUrl: "",
+      note: "Demo video: Big Buck Bunny, Blender Foundation, CC BY 3.0. Replace with your own media."
     }
   });
 </script>

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="733" viewBox="0 0 1100 733" role="img" aria-label="Flash watch illustration">
+<title>Flash watch illustration</title>
+<desc>Original PopupLoom vector artwork authored for this project on 2026-11-05. A stylized wristwatch with an orange strap on a dark stage.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#080A0F"/><stop offset="1" stop-color="#1A0D08"/></linearGradient>
+  <radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FF6A1F" stop-opacity=".7"/><stop offset=".6" stop-color="#FF6A1F" stop-opacity=".18"/><stop offset="1" stop-color="#FF6A1F" stop-opacity="0"/></radialGradient>
+  <radialGradient id="vig" cx="50%" cy="44%" r="76%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".42"/></radialGradient>
+  <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse"><path d="M44 0H0V44" fill="none" stroke="#fff" stroke-opacity=".035"/></pattern>
+</defs>
+<rect width="1100" height="733" fill="url(#bg)"/>
+<rect width="1100" height="733" fill="url(#grid)"/>
+<circle cx="820" cy="160" r="330" fill="url(#glow)"/>
+
+  <ellipse cx="550" cy="666" rx="255" ry="28" fill="#000" opacity=".45"/>
+  <path d="M120 590 L390 120" stroke="#FF6A1F" stroke-width="4" opacity=".18"/>
+  <path d="M165 640 L460 150" stroke="#FF9B63" stroke-width="2" opacity=".18"/>
+  <rect x="482" y="48" width="136" height="626" rx="68" fill="#B94616"/>
+  <rect x="496" y="62" width="108" height="598" rx="54" fill="#F26A2E"/>
+  <path d="M520 92 L602 636" stroke="#FFB07A" stroke-width="16" opacity=".32"/>
+  <rect x="700" y="338" width="36" height="48" rx="12" fill="#FF9B63"/>
+  <circle cx="550" cy="360" r="168" fill="#05070A" opacity=".6"/>
+  <circle cx="550" cy="360" r="154" fill="#090C11" stroke="#FF8A4C" stroke-width="10"/>
+  <circle cx="550" cy="360" r="124" fill="#12171E"/>
+  <g stroke="#E8EEF5" stroke-opacity=".6" stroke-width="3" stroke-linecap="round">
+    <path d="M550 250v18"/><path d="M550 452v18"/><path d="M440 360h18"/><path d="M642 360h18"/>
+    <path d="M472 282l12 12"/><path d="M616 426l12 12"/><path d="M628 282l-12 12"/><path d="M472 438l12-12"/>
+  </g>
+  <path d="M550 360V276" stroke="#F7F9FC" stroke-width="9" stroke-linecap="round"/>
+  <path d="M550 360l70 44" stroke="#FF7A35" stroke-width="11" stroke-linecap="round"/>
+  <circle cx="550" cy="360" r="11" fill="#FF6A1F"/>
+  <circle cx="550" cy="360" r="4" fill="#FFF4EA"/>
+  <path d="M760 600 C860 520 930 430 990 300" stroke="#FF6A1F" stroke-width="3" opacity=".26" fill="none"/>
+
+<rect width="1100" height="733" fill="url(#vig)"/>
+</svg>

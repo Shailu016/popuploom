@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="733" viewBox="0 0 1100 733" role="img" aria-label="Sneaker illustration">
+<title>Sneaker illustration</title>
+<desc>Original PopupLoom vector artwork authored for this project on 2026-11-05. A stylized high-top sneaker with orange accents on a blue stage.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#07152E"/><stop offset="1" stop-color="#123E86"/></linearGradient>
+  <radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#3B82F6" stop-opacity=".7"/><stop offset=".6" stop-color="#3B82F6" stop-opacity=".18"/><stop offset="1" stop-color="#3B82F6" stop-opacity="0"/></radialGradient>
+  <radialGradient id="vig" cx="50%" cy="44%" r="76%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".42"/></radialGradient>
+  <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse"><path d="M44 0H0V44" fill="none" stroke="#fff" stroke-opacity=".035"/></pattern>
+</defs>
+<rect width="1100" height="733" fill="url(#bg)"/>
+<rect width="1100" height="733" fill="url(#grid)"/>
+<circle cx="820" cy="160" r="330" fill="url(#glow)"/>
+
+  <g stroke="#9BC1FF" stroke-width="4" stroke-linecap="round" opacity=".35">
+    <path d="M150 300h120"/><path d="M120 345h170"/><path d="M165 390h130"/>
+  </g>
+  <ellipse cx="560" cy="648" rx="315" ry="30" fill="#020A1C" opacity=".5"/>
+  <path d="M285 575 L285 445 C285 405 305 380 340 365 L430 330 L455 300 C462 286 478 280 494 286 L545 307 L605 365 L760 432 C812 456 840 500 840 555 L822 608 L330 608 C304 608 285 596 285 575Z" fill="#F4F8FF"/>
+  <path d="M455 300 C470 315 490 322 520 322 L560 322 L605 365 L545 307 L494 286 C478 280 462 286 455 300Z" fill="#C9DBF7"/>
+  <path d="M540 315 C600 340 660 370 720 400" stroke="#0A2C5E" stroke-width="5" fill="none" opacity=".45"/>
+  <path d="M340 365 C420 400 500 430 600 455 C680 475 750 505 800 540" stroke="#FF6A1F" stroke-width="17" fill="none" stroke-linecap="round"/>
+  <g stroke="#0A2C5E" stroke-width="7" stroke-linecap="round">
+    <path d="M432 360l30 44"/><path d="M472 380l30 44"/><path d="M512 400l30 44"/><path d="M552 420l28 40"/>
+  </g>
+  <g fill="#0A2C5E"><circle cx="425" cy="414" r="5"/><circle cx="465" cy="434" r="5"/><circle cx="505" cy="454" r="5"/><circle cx="545" cy="474" r="5"/></g>
+  <path d="M300 575 L820 575 L840 555 L840 600 L320 600 C305 600 300 590 300 575Z" fill="#071B3C"/>
+  <path d="M305 600 L830 600 L820 620 L335 620 C315 620 305 612 305 600Z" fill="#04122A"/>
+  <circle cx="735" cy="545" r="13" fill="#FF6A1F"/>
+  <path d="M760 300 C850 340 900 430 910 540" stroke="#7FB1FF" stroke-width="3" fill="none" opacity=".4"/>
+
+<rect width="1100" height="733" fill="url(#vig)"/>
+</svg>

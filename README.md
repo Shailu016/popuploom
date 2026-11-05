@@ -18,7 +18,7 @@ Canonical site: **https://popuploom.com/**
 | `app.js` | Shared code: API-aware storage, auth, the template catalog (original designs), helpers |
 | `migration.html` | Noindex recovery page on the former host for guest drafts saved in `localStorage` |
 | `reset-password.html` + `reset-password.js` | Noindex password reset page: request a link, then set a new password from a single-use URL fragment token |
-| `assets/` | Original template imagery, PopupLoom wordmark/mark and favicons, and `og-popuploom.png` |
+| `assets/` | Original template illustrations, PopupLoom wordmark/mark and favicons, and `og-popuploom.png` |
 | `ui.css` | Studio/landing theme ("Refined Ember on Graphite") |
 | `demo.html` | Fake storefront with five popups armed (age gate, spin wheel, flash deal, social proof, video), for end-to-end testing |
 | `server/` | Express API: auth (JWT + bcrypt + Google ID-token verification), widget CRUD, live public config, view tallies, lead submissions; SQLite via `node:sqlite` |
@@ -289,6 +289,22 @@ See [CLOUDFLARE.md](CLOUDFLARE.md) for build, tests, D1 migration, private data 
 Open **My popups → Leads** for any saved popup. The inbox shows 100 responses per page; **Export all leads as CSV** follows every 500-row API page, includes all captured fields, supports cancellation, and escapes spreadsheet formula prefixes. API ownership checks remain enforced. Empty, expired-session and request-error states are explicit. The CSV is a browser download: keep exported personal data private.
 
 **My popups → Export leads (.csv)** downloads one combined file for the whole workspace. It includes the popup name and id on every row, pages each popup at 500 leads, escapes spreadsheet formula prefixes, and is the only bulk export that contains visitor responses. The `.json` backup beside it stores popup configurations, not leads.
+
+## Advertising readiness
+
+PopupLoom does not currently load AdSense or any advertising script. Phase A prepares the public content, trust pages and eligibility boundary; Phase B requires the owner's real AdSense publisher ID, a Google-certified CMP configuration and a reviewed strict-CSP/consent integration.
+
+- `shared/ad-pages.js` is the explicit allowlist for future manual ad units. It contains substantive public guides only. The homepage, template catalog, editor, account pages, lead inbox, reset/recovery pages, exports and the customer runtime are excluded.
+- `ADSENSE_ENABLED` must remain `false` in this build. Setting it to `true` deliberately fails the build until the CSP/CMP work is implemented and reviewed.
+- `ADSENSE_PUBLISHER_ID` is used only to generate `/ads.txt` with the exact Google record. Never invent a publisher ID; without a valid value no `ads.txt` is published.
+- The production workflow now sets the owner's verified public publisher ID; the homepage contains the matching ownership meta tag. These connect the site for review without loading advertising. Express serves the same record when `ADSENSE_PUBLISHER_ID` is configured.
+- `ADSENSE_CLIENT` and `ADSENSE_CMP` are placeholders for Phase B. No owner values are committed.
+- Original template illustrations and brand assets can be regenerated with `npm run art:generate`; the pinned Sharp development dependency and SVG sources are recorded in `ASSET_PROVENANCE.md`. Legacy image URLs remain supported.
+- Google's current [AdSense CSP guidance](https://support.google.com/adsense/answer/16283098) supports a strict nonce-based policy rather than a rolling host allowlist. Phase B must implement and test that integration; do not add `unsafe-inline`, `unsafe-eval` or blanket hosts to the existing policy just to silence ad errors.
+- The privacy page describes advertising as planned, not active, and links to Google's data-use and ad-settings pages. Do not change it to present tense until ads are actually enabled.
+- No ad code is included in `popuploom.js`, the customer embed, private pages, lead inbox, exports or reset flows.
+
+See `ASSET_PROVENANCE.md` for the source/generation evidence, full asset manifest and the retained external-video license.
 
 ## Lead webhooks
 

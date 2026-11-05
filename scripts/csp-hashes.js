@@ -5,7 +5,7 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 
-const htmlFiles = ["index.html", "studio.html", "profile.html", "demo.html", "templates.html", "guides/install-popups.html", "migration.html", "reset-password.html", "leads.html", "privacy.html", "about.html", "contact.html", "terms.html"];
+const htmlFiles = ["index.html", "studio.html", "profile.html", "demo.html", "templates.html", "guides/install-popups.html", "guides/index.html", "guides/wordpress-popup.html", "guides/shopify-popup.html", "guides/webflow-popup.html", "guides/collect-and-export-leads.html", "guides/popup-not-showing.html", "migration.html", "reset-password.html", "leads.html", "privacy.html", "about.html", "contact.html", "terms.html"];
 const hash = text => "'sha256-" + crypto.createHash("sha256").update(text).digest("base64") + "'";
 
 const out = {};

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="733" viewBox="0 0 1100 733" role="img" aria-label="Linen shirt illustration">
+<title>Linen shirt illustration</title>
+<desc>Original PopupLoom vector artwork authored for this project on 2026-11-05. A natural linen shirt on a hanger in a warm neutral studio.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F6F0E6"/><stop offset="1" stop-color="#DED0BF"/></linearGradient>
+  <radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#C77A4A" stop-opacity=".7"/><stop offset=".6" stop-color="#C77A4A" stop-opacity=".18"/><stop offset="1" stop-color="#C77A4A" stop-opacity="0"/></radialGradient>
+  <radialGradient id="vig" cx="50%" cy="44%" r="76%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".42"/></radialGradient>
+  <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse"><path d="M44 0H0V44" fill="none" stroke="#fff" stroke-opacity=".035"/></pattern>
+</defs>
+<rect width="1100" height="733" fill="url(#bg)"/>
+<rect width="1100" height="733" fill="url(#grid)"/>
+<circle cx="820" cy="160" r="330" fill="url(#glow)"/>
+
+  <rect x="0" y="560" width="1100" height="173" fill="#CDBA9F" opacity=".35"/>
+  <path d="M550 180 L320 330 L420 390 L420 610 L680 610 L680 390 L780 330 Z" fill="#F8F3EA"/>
+  <path d="M550 180 L470 250 L550 330 L630 250 Z" fill="#E7DAC8"/>
+  <path d="M420 390 C390 450 380 520 390 610" stroke="#D8C7B2" stroke-width="6" fill="none" opacity=".8"/>
+  <path d="M680 390 C710 450 720 520 710 610" stroke="#D8C7B2" stroke-width="6" fill="none" opacity=".8"/>
+  <path d="M550 330 L550 610" stroke="#D8C7B2" stroke-width="4" opacity=".7"/>
+  <g fill="#B9A58C"><circle cx="550" cy="390" r="5"/><circle cx="550" cy="455" r="5"/><circle cx="550" cy="520" r="5"/></g>
+  <path d="M430 250 C470 200 530 180 550 180 C570 180 630 200 670 250" stroke="#8B7358" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M550 154 L550 180" stroke="#8B7358" stroke-width="8" stroke-linecap="round"/>
+  <rect x="640" y="420" width="70" height="42" rx="8" fill="#E58A4E"/>
+  <path d="M655 432h40M655 444h28" stroke="#FFF6EC" stroke-width="4" stroke-linecap="round"/>
+  <g stroke="#CDBA9F" stroke-width="3" opacity=".35"><path d="M240 200h90"/><path d="M210 260h70"/><path d="M830 480h90"/></g>
+
+<rect width="1100" height="733" fill="url(#vig)"/>
+</svg>

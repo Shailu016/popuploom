@@ -195,9 +195,16 @@ app.use("/api/widgets", widgetsRouter);
 app.get("/api/health", (req, res) => res.json({ ok: true, version: "2.0" }));
 
 // ---- Static files (frontend): explicit public allowlist ----
+// Match the production build's optional authorized-seller record without
+// loading advertising scripts or requiring a generated file in the source tree.
+app.get('/ads.txt', (req, res, next) => {
+  const publisher = String(process.env.ADSENSE_PUBLISHER_ID || '').trim();
+  if (!/^pub-\d{16}$/.test(publisher)) return next();
+  res.type('text/plain').send('google.com, ' + publisher + ', DIRECT, f08c47fec0942fa0\n');
+});
 const publicFiles = new Set([
-  "templates.html", "guides/install-popups.html", "robots.txt", "sitemap.xml", "llms.txt", "llms-full.txt", "index.html", "studio.html", "profile.html", "demo.html", "migration.html", "reset-password.html",
-  "leads.html", "privacy.html", "about.html", "contact.html", "terms.html", ".well-known/security.txt", "lead-csv.js", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "popuploom.js", "popforge.js", "ui.css"
+  "templates.html", "guides/install-popups.html", "guides/index.html", "guides/wordpress-popup.html", "guides/shopify-popup.html", "guides/webflow-popup.html", "guides/collect-and-export-leads.html", "guides/popup-not-showing.html", "robots.txt", "sitemap.xml", "llms.txt", "llms-full.txt", "index.html", "studio.html", "profile.html", "demo.html", "migration.html", "reset-password.html",
+  "leads.html", "privacy.html", "about.html", "contact.html", "terms.html", ".well-known/security.txt", "lead-csv.js", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "popuploom.js", "popforge.js", "ui.css", "ads.txt"
 ]);
 app.use((req, res, next) => {
   if (req.method !== "GET" && req.method !== "HEAD") return next();
@@ -222,7 +229,9 @@ app.use((req, res, next) => {
     security.htmlHeaders(res, file.slice(1));
     if (file === "/migration.html" || file === "/reset-password.html" || file === "/studio.html" || file === "/profile.html" || file === "/leads.html") res.setHeader("X-Robots-Tag", "noindex, nofollow");
   }
-  res.sendFile(path.join(__dirname, "..", file.slice(1)));
+  const diskPath = path.join(__dirname, "..", file.slice(1));
+  if (!fs.existsSync(diskPath)) return next();
+  res.sendFile(diskPath);
 });
 app.use("/assets", express.static(path.join(__dirname, "..", "assets"), {
   dotfiles: "deny", index: false, redirect: false,

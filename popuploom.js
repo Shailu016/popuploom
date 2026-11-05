@@ -177,6 +177,8 @@
 .pf-btn.pf-dark { background: var(--pf-text, #14181F); color: var(--pf-bg, #fff); }
 .pf-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(0,0,0,.2); filter: brightness(1.03); }
 .pf-btn.pf-dark { background: #14181F; color: #fff; }
+.pf-btn-demo { cursor: default; opacity: .86; }
+.pf-btn-demo:hover { transform: none; box-shadow: none; filter: none; }
 .pf-choice-row { display: flex; gap: 9px; margin-bottom: 18px; }
 .pf-choice {
   flex: 1; padding: 15px 6px 12px; border-radius: 12px; cursor: pointer; text-align: center; border: 1px solid rgba(127,127,127,.26);
@@ -185,11 +187,14 @@
 .pf-choice small { display: block; font-size: 10.5px; font-weight: 700; opacity: .65; margin-top: 4px; }
 .pf-choice:hover { transform: translateY(-2px); border-color: #F99A1F; background: rgba(249,154,31,.1); }
 .pf-links { display: flex; gap: 9px; margin-top: 16px; flex-wrap: wrap; }
-.pf-links a {
+.pf-links a, .pf-links .pf-link-demo {
   flex: 1; min-width: 90px; text-align: center; font-size: 13px; font-weight: 700; text-decoration: none;
   color: inherit; padding: 11px 8px; border-radius: 12px; background: rgba(127,127,127,.08);
   border: 1px solid rgba(127,127,127,.18);
+  display: inline-flex; align-items: center; justify-content: center;
 }
+.pf-link-demo { cursor: default; opacity: .82; }
+.pf-preview-tag { position: absolute; z-index: 2147483646; top: 10px; left: 10px; padding: 4px 8px; border-radius: 999px; background: rgba(10,12,16,.82); color: #fff; font: 700 10px/1.2 ui-sans-serif, system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; pointer-events: none; }
 .pf-links a:hover { border-color: #F99A1F; }
 .pf-note { font-size: 11.5px; opacity: .55; margin-top: 12px; text-align: center; }
 .pf-thanks { text-align: center; padding: 14px 0 6px; }
@@ -281,6 +286,8 @@
 .pf-proof .pf-pname { font-weight: 800; font-size: 14px; letter-spacing: -0.01em; }
 .pf-proof .pf-paction { font-size: 13px; opacity: .78; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pf-proof .pf-pago { font-size: 11px; opacity: .5; margin-top: 2px; }
+.pf-proof-sample { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .62; margin-bottom: 8px; }
+.pf-proof-empty { font-size: 12.5px; opacity: .72; line-height: 1.4; }
 .pf-proof-card .pf-close { top: 10px; right: 10px; width: 26px; height: 26px; font-size: 11px; }
 
 /* fullscreen takeover */
@@ -458,7 +465,7 @@
       if (this.visible) return;
       this.visible = true;
       var c = this.cfg, th = c.theme || {}, mc = c.content || {};
-      var isProof = mc.proof && mc.proof.enabled && (mc.proof.items || []).length;
+      var isProof = mc.proof && mc.proof.enabled;
       var holder = document.createElement("div");
       var pc = isProof ? "proof" : placementClass(c.placement);
       var rootCls = pc === "modal" ? "pf-modal"
@@ -471,6 +478,12 @@
       holder.innerHTML = (pc === "modal" || pc === "fullscreen")
         ? '<div class="pf-overlay pf-anim' + animCls(th.animation || "pop") + '">' + cardHTML(this) + "</div>"
         : (pc === "proof" ? proofHTML(this) : cardHTML(this));
+      if (this.preview) {
+        var previewTag = document.createElement("div");
+        previewTag.className = "pf-preview-tag";
+        previewTag.textContent = "Demo preview";
+        holder.appendChild(previewTag);
+      }
 
       // where does it mount?
       if (this.preview) { this.stage.appendChild(holder); this.holderEl = holder; }
@@ -534,7 +547,7 @@
         submitLike(self, data, form);
       };
 
-      if (isProof) {
+      if (isProof && (mc.proof.items || []).length > 1) {
         var proofEl = holder.querySelector(".pf-proof");
         var items = mc.proof.items;
         var pi = 0;
@@ -673,11 +686,15 @@
       });
       h += '<button class="pf-btn' + (th.buttonStyle === "dark" ? " pf-dark" : "") + '" type="submit">' + esc(mc.form.buttonLabel || "Submit") + "</button></form>";
     } else if (mc.buttonText) {
-      h += '<a class="pf-btn' + (th.buttonStyle === "dark" ? " pf-dark" : "") + '" href="' + escAttr(safeUrl(mc.buttonUrl || "#", false)) + '" target="_blank" rel="noopener">' + esc(mc.buttonText) + "</a>";
+      if (mc.buttonUrl && mc.buttonUrl !== "#") h += '<a class="pf-btn' + (th.buttonStyle === "dark" ? " pf-dark" : "") + '" href="' + escAttr(safeUrl(mc.buttonUrl, false)) + '" target="_blank" rel="noopener">' + esc(mc.buttonText) + "</a>";
+      else h += '<span class="pf-btn pf-btn-demo' + (th.buttonStyle === "dark" ? " pf-dark" : "") + '" role="button" aria-disabled="true" title="Demo button - set a real destination">' + esc(mc.buttonText) + "</span>";
     }
     var thanks = mc.form && (mc.form.success || "You're in! Check your inbox.");
     if (mc.form && mc.form.enabled) h += '<input type="hidden" data-thanks="' + escAttr(thanks) + '">';
-    if (mc.links && mc.links.length) h += '<div class="pf-links">' + mc.links.map(function (l) { return '<a href="' + escAttr(safeUrl(l.url, false)) + '" target="_blank" rel="noopener">' + esc(l.label) + "</a>"; }).join("") + "</div>";
+    if (mc.links && mc.links.length) h += '<div class="pf-links">' + mc.links.map(function (l) {
+      if (l.url && l.url !== "#") return '<a href="' + escAttr(safeUrl(l.url, false)) + '" target="_blank" rel="noopener">' + esc(l.label) + "</a>";
+      return '<span class="pf-link-demo" role="link" aria-disabled="true" title="Demo link - set a real destination">' + esc(l.label) + "</span>";
+    }).join("") + "</div>";
     if (mc.note) h += '<div class="pf-note">' + esc(mc.note) + "</div>";
     h += "</div>";
     if (split) h += '<div class="pf-media"><img loading="lazy" decoding="async" src="' + escAttr(safeUrl(mc.image, true)) + '" alt=""></div>';
@@ -797,10 +814,15 @@
   }
   function proofHTML(self) {
     var th = self.cfg.theme || {}, mc = self.cfg.content || {};
-    var item = (mc.proof.items || [])[0];
+    var proof = mc.proof || {};
+    var items = proof.items || [];
+    var sample = proof.demo ? '<div class="pf-proof-sample">Sample activity - replace with real customer actions</div>' : "";
+    var body = items.length
+      ? '<div class="pf-proof">' + proofItemHTML(items[0], th) + "</div>"
+      : '<div class="pf-proof"><div class="pf-proof-empty">No activity configured. Add real, owner-verified customer actions in the studio.</div></div>';
     return '<div class="pf-card pf-anim-slideUp' + (th.style === "ink" ? " pf-ink" : "") + '"' + cardAttrs(th) + ">" +
       '<button class="pf-close" aria-label="Close">&#10005;</button>' +
-      '<div class="pf-body"><div class="pf-proof">' + proofItemHTML(item, th) + "</div></div></div>";
+      '<div class="pf-body">' + sample + body + "</div></div>";
   }
   async function recordSubmission(self, data) {
     if (self.preview || self.test) return;

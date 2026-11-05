@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Popup Not Showing? A Diagnostic Guide | PopupLoom</title>
+<meta name="description" content="A step-by-step PopupLoom troubleshooting guide: snippet, saved id, trigger, page and device rules, frequency, selector, CSP, cache and iframe limits.">
+<link rel="canonical" href="https://popuploom.com/guides/popup-not-showing.html">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="stylesheet" href="/ui.css"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="wrap" style="padding:24px 26px">
+  <nav aria-label="Main"><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/index.html">Guides</a> · <a href="/about.html">About</a> · <a href="/studio.html?tpl=blank">Open the studio</a></nav>
+  <nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/guides/index.html">Guides</a> › <span>Popup not showing</span></nav>
+</header>
+<main class="wrap" style="padding:30px 26px 80px;max-width:900px">
+  <article>
+    <h1>Popup not showing? A diagnostic guide</h1>
+    <p class="mut">Product screenshots and behavior labels checked on 5 November 2026. Work in a private window and use fake data while testing.</p>
+
+    <h2>Start with the published page</h2>
+    <p>The studio preview intentionally silences trigger timing and marks controls as a demo. A working preview is not proof that the live page works. Open the published URL in a private window, with extensions disabled if possible, and reproduce the exact visitor path.</p>
+
+    <h2>1. Confirm the snippet and the saved id</h2>
+    <ol>
+      <li>View the page source (not the visual editor) and search for <code>data-popuploom</code>.</li>
+      <li>Confirm the div and the <code>popuploom.js</code> script are both present before <code>&lt;/body&gt;</code>.</li>
+      <li>Compare the id in the div with the id on the saved popup in My popups. A preview id or a deleted id will not mount.</li>
+      <li>Confirm the script URL returns the runtime and is not a stale local copy.</li>
+    </ol>
+    <p>If the page uses an old <code>data-popforge</code> snippet, that legacy path is still supported. Do not mix two different ids on the same page unless you intend to mount two popups.</p>
+
+    <h2>2. Check the trigger</h2>
+    <figure>
+      <img src="/assets/guides/studio-behavior-panel.png" alt="PopupLoom behavior panel showing placement, trigger, grace time and frequency settings" style="max-width:100%;height:auto;border-radius:12px;border:1px solid rgba(127,127,127,.25)">
+      <figcaption class="mut" style="font-size:13px;margin-top:8px">The Behavior panel. Trigger, grace time, page rules, devices and frequency all have to allow the visit.</figcaption>
+    </figure>
+    <ul>
+      <li><strong>After a timer:</strong> the page must stay open long enough. The timer starts after the runtime initializes.</li>
+      <li><strong>Scroll depth:</strong> the page must actually scroll. A short page may never reach the percentage.</li>
+      <li><strong>Scroll to element:</strong> the selector must match a real element. A typo or a selector for content that loads later will not fire.</li>
+      <li><strong>Click:</strong> the selector must exist at click time, and the visitor must click that element.</li>
+      <li><strong>Exit intent:</strong> it is a desktop pointer behavior. It is not a reliable touch/mobile trigger; use delay, scroll or click on mobile.</li>
+      <li><strong>Page load:</strong> check that the script is not blocked or deferred past a point where the visitor leaves.</li>
+    </ul>
+
+    <h2>3. Check page, device and frequency rules</h2>
+    <ul>
+      <li>Page mode is all, include, or exclude. An include pattern that does not match the current path suppresses the popup.</li>
+      <li>Desktop and mobile toggles are separate. A template can deliberately disable mobile.</li>
+      <li>Frequency is per visitor in this browser: always, once per day, once per week, once ever, or close for 24 hours. Clear the relevant site data or use a fresh profile for testing.</li>
+      <li>A visitor who already closed or submitted the popup may not see it again by design.</li>
+    </ul>
+
+    <h2>4. Check the browser console</h2>
+    <p>Open developer tools and reload. Look for:</p>
+    <ul>
+      <li>a failed request to <code>popuploom.js</code> or the widget config API;</li>
+      <li>a Content Security Policy error that blocks the script, the config connection, the image, or the video frame;</li>
+      <li>a JavaScript error from another script on the page that stops execution;</li>
+      <li>a 404 for the widget id or a 401/403 from a private API;</li>
+      <li>an ad blocker or privacy extension blocking the request.</li>
+    </ul>
+    <p>If the site has a CSP, allowlist the runtime origin in <code>script-src</code> and the config API in <code>connect-src</code>. Do not remove CSP or add blanket <code>*</code> permissions to make a warning disappear.</p>
+
+    <h2>5. Check the platform and cache</h2>
+    <ul>
+      <li>Paste the code in the page body or footer, not inside an iframe, a rich-text field that escapes HTML, or a metafield rendered as text.</li>
+      <li>Purge page, object, CDN and optimization-plugin caches. A cached page may contain an old id or no snippet.</li>
+      <li>Some WordPress roles and managed plans strip <code>&lt;script&gt;</code> tags. See the <a href="/guides/wordpress-popup.html">WordPress guide</a>.</li>
+      <li>Shopify themes can differ by template and may not run the same footer code in checkout. See the <a href="/guides/shopify-popup.html">Shopify guide</a>.</li>
+      <li>Webflow custom code usually needs a publish and may not run in the Designer canvas. See the <a href="/guides/webflow-popup.html">Webflow guide</a>.</li>
+    </ul>
+
+    <h2>6. Check the content itself</h2>
+    <ul>
+      <li>An empty title, body, image and controls can produce a visually empty card. Add real content.</li>
+      <li>A form with a required field cannot submit until the field is filled. That is not a rendering failure.</li>
+      <li>A video URL must be a supported YouTube or Vimeo URL; an arbitrary iframe URL is rejected by the runtime.</li>
+      <li>A broken image URL shows an empty media slot, not a popup failure.</li>
+      <li>If the popup is configured as a top or bottom bar, check that the page header or another fixed element is not covering it.</li>
+    </ul>
+
+    <h2>7. Verify storage and follow-up separately</h2>
+    <p>If the popup appears but the lead does not, check the lead inbox and the network response for the submit request. A form success message is not proof that a webhook receiver delivered anything. Browser webhooks are best effort; signed server webhooks have a delivery log. Neither sends email, SMS, PDFs or calendar invitations by itself.</p>
+
+    <h2>When to ask for help</h2>
+    <p>Send the published URL, the saved widget id, the trigger setting, a screenshot of the behavior panel, the browser console text and the approximate time of the test to <a href="/contact.html">the contact address</a>. Never send passwords, session tokens, reset links, lead data or webhook secrets.</p>
+
+    <p class="mut">See also: <a href="/guides/install-popups.html">installation guide</a> · <a href="/guides/collect-and-export-leads.html">collect and export leads</a> · <a href="/privacy.html">privacy</a> · <a href="/terms.html">terms</a>.</p>
+  </article>
+</main>
+<footer class="wrap" style="padding:24px 26px"><a href="/">PopupLoom — free website popup builder</a> · <a href="/guides/index.html">Guides</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></footer>
+</body>
+</html>

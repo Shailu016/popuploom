@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Add a Popup to WordPress | PopupLoom</title>
+<meta name="description" content="Install a PopupLoom popup on WordPress using a Custom HTML block or footer code, with script-filtering, caching and testing caveats.">
+<link rel="canonical" href="https://popuploom.com/guides/wordpress-popup.html">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="stylesheet" href="/ui.css"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="wrap" style="padding:24px 26px">
+  <nav aria-label="Main"><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/index.html">Guides</a> · <a href="/about.html">About</a> · <a href="/studio.html?tpl=blank">Open the studio</a></nav>
+  <nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/guides/index.html">Guides</a> › <span>WordPress</span></nav>
+</header>
+<main class="wrap" style="padding:30px 26px 80px;max-width:900px">
+  <article>
+    <h1>Add a PopupLoom popup to WordPress</h1>
+    <p class="mut">Checked against the official WordPress Custom HTML block documentation on 5 November 2026. This guide was not tested on a live WordPress install; the platform UI and plan permissions vary, so verify on your own staging site.</p>
+
+    <h2>Before you start</h2>
+    <ul>
+      <li>You need permission to add custom HTML or edit theme code.</li>
+      <li>Your WordPress role needs the <code>unfiltered_html</code> capability for script tags. The official block documentation says users without it have their block content sanitized by <code>wp_kses()</code>, which strips disallowed tags such as <code>&lt;script&gt;</code> and <code>&lt;iframe&gt;</code>.</li>
+      <li>Some managed WordPress hosts, security plugins and caching layers also remove or delay scripts. Confirm before promising a client that the popup will run.</li>
+      <li>Back up the site or use a staging copy. Do not paste code into a live theme you cannot restore.</li>
+    </ul>
+
+    <h2>Step 1: Save the popup and copy its code</h2>
+    <p>Create the design in the <a href="/studio.html?tpl=blank">PopupLoom studio</a>. Sign in, save the widget, and open <strong>Publish</strong>. Copy the two lines that contain the saved widget id and <code>popuploom.js</code>. The full model is in the <a href="/guides/install-popups.html">installation guide</a>. Guest previews do not issue a hosted code.</p>
+
+    <h2>Step 2: Add it with a Custom HTML block</h2>
+    <ol>
+      <li>Open the page or post in the WordPress block editor.</li>
+      <li>Add a <strong>Custom HTML</strong> block. The official documentation describes searching for “Custom HTML” in the block inserter.</li>
+      <li>Paste the two PopupLoom lines into the HTML field.</li>
+      <li>Use the block preview to check that the markup is present. Do not type the angle brackets as visible text in a Paragraph block.</li>
+      <li>Update or publish the page, then open the published URL in a private window.</li>
+    </ol>
+    <p>If the script disappears after saving, your role probably lacks <code>unfiltered_html</code>, or a security plugin filtered it. Move to a footer-code method instead of fighting the sanitizer.</p>
+
+    <h2>Step 3: Or add it once in footer code</h2>
+    <p>Use this when the popup should appear across the site. Add the two lines before the closing <code>&lt;/body&gt;</code> tag in a child theme's footer template, or through a code-snippet plugin that explicitly allows JavaScript. Do not edit the parent theme directly; a theme update can remove the change.</p>
+    <p>Keep the widget div and script together. If you paste only the script, no popup is mounted. If you paste only the div, nothing loads the runtime.</p>
+
+    <h2>Step 4: Clear caches and test</h2>
+    <ul>
+      <li>Purge the page cache, object cache/CDN cache and any optimization plugin cache.</li>
+      <li>Open a private window and a logged-out session. Do not test while signed in as an administrator if your caching or script rules differ for administrators.</li>
+      <li>Perform the actual trigger: load, delay, scroll depth, click, scroll-to element or desktop exit intent.</li>
+      <li>Check the browser console for blocked requests or CSP errors.</li>
+      <li>Submit one test form response and confirm it appears in the PopupLoom lead inbox. Use fake data.</li>
+    </ul>
+
+    <h2>Common WordPress problems</h2>
+    <ul>
+      <li><strong>The block shows the words “Custom HTML” or the code as text.</strong> The editor may have escaped the markup. Use the HTML view of the block, not a paragraph.</li>
+      <li><strong>The script is missing from the published page.</strong> Check <code>unfiltered_html</code>, security plugins, and host-level script filtering.</li>
+      <li><strong>The popup appears once and never again.</strong> Check the frequency setting and whether a page cache is serving an old configuration. Frequency is stored in the visitor's browser.</li>
+      <li><strong>Desktop exit intent does not fire on mobile.</strong> The template may intentionally disable exit intent on touch devices. Use a delay, scroll or click trigger for mobile.</li>
+      <li><strong>Nothing renders inside the editor preview.</strong> The block preview is not the published site. Test the published URL.</li>
+    </ul>
+
+    <h2>Removing the popup</h2>
+    <p>Delete the Custom HTML block from the page, or remove the two lines from the footer code, then purge caches. Deleting the hosted widget in My popups disables the configuration; removing only the snippet removes it from that WordPress site.</p>
+
+    <h2>Official references</h2>
+    <ul>
+      <li><a href="https://wordpress.org/documentation/article/custom-html/">WordPress.org: Custom HTML block documentation</a></li>
+      <li><a href="https://wordpress.org/documentation/article/block-editor/">WordPress.org: Block editor documentation</a></li>
+    </ul>
+
+    <p class="mut">The PopupLoom product screenshots and install steps were checked on the local build. WordPress plan details and plugin behavior must be verified on your own site. See the <a href="/about.html">About</a>, <a href="/privacy.html">privacy</a>, <a href="/terms.html">terms</a> or <a href="/contact.html">contact</a> pages.</p>
+  </article>
+</main>
+<footer class="wrap" style="padding:24px 26px"><a href="/">PopupLoom — free website popup builder</a> · <a href="/guides/index.html">Guides</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></footer>
+</body>
+</html>

@@ -261,7 +261,11 @@ section { padding: 92px 0; position: relative; }
 .sec-head { margin-bottom: 42px; }
 .sec-head .sub { margin-top: 18px; font-size: 16px; }
 .sec-title-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-.sec-title-actions { margin-left: auto; display: flex; gap: 10px; }
+.sec-title-actions { margin-left: auto; display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+@media (max-width: 620px) {
+  .sec-title-actions { width: 100%; margin-left: 0; justify-content: flex-start; }
+  .sec-title-actions .btn { flex: 1 1 auto; min-width: 0; white-space: normal; text-align: center; }
+}
 
 /* ----------------------------------------------------------------- hero --- */
 .hero { position: relative; padding: clamp(56px, 8vw, 104px) 0 clamp(64px, 7vw, 92px); overflow: hidden; }
@@ -569,8 +573,9 @@ section { padding: 92px 0; position: relative; }
 .step p { margin: 0; color: var(--muted); font-size: 14.5px; line-height: 1.62; }
 
 /* ------------------------------------------------------------ dashboard --- */
-.dash { padding: 6px 4px; }
+.dash { padding: 6px 4px; overflow-x: auto; }
 .dash table { width: 100%; border-collapse: collapse; font-size: 14px; }
+@media (max-width: 760px) { .dash table { min-width: 720px; } }
 .dash th {
   text-align: left; color: var(--muted-2); font-family: var(--font-mono);
   font-size: 10.5px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase;

@@ -9,7 +9,7 @@
 - Widget identifiers are long random strings such as wan_6c45c0f81a23d95c5d5dbe72.
 
 ## Builder capabilities
-- 45 starting templates grouped by purpose: email signup and waitlist, discount and coupon, countdown and seasonal sales, spin the wheel, feedback and micro-survey, link lists and availability, age verification, video, social proof, and announcement bars.
+- 45 starting templates grouped by purpose: email signup and waitlist, discount and coupon, countdown and seasonal sales, spin the wheel, feedback and micro-survey, link lists and availability, age self-declaration gates, video, social-proof toasts for owner-supplied activity, and announcement bars.
 - Popup placements: centered modal, full screen, slide-ins from four corners, top bar and bottom bar.
 - One automatic trigger per widget, chosen from: page load, timed delay in seconds, scroll depth percentage, scroll to a CSS selector, click on a CSS selector, or desktop exit intent.
 - Show-frequency rules: every time, once per day, once per week, once ever, or silent for 24 hours after the visitor closes it.
@@ -24,7 +24,7 @@
 - Spin-the-wheel widgets render up to 50 prize segments; the outcome shown is client-side.
 - Coupon blocks display a code with a one-tap copy button.
 - Countdown timers can use preset offsets (for example 1 hour or 48 hours) or a fixed date and time chosen by the site owner.
-- Social proof bubbles rotate up to 50 configured items on an interval the owner sets.
+- Social proof bubbles rotate up to 50 owner-supplied items on an interval the owner sets. The template includes demonstration names/times marked as sample activity; only publish authentic customer actions. No live purchase tracking is included.
 - Age gates require a minimum-age confirmation, with custom allow and deny labels, a deny message and an optional deny redirect URL.
 - A widget configuration is limited to 128 KB. A visitor response is limited to 16 KB. Retries with the same request ID are stored once.
 
@@ -38,7 +38,7 @@
 ## Lead capture
 - Form submissions, survey choices and other responses are stored against the saved widget they came from.
 - Only the widget owner can read stored responses, through an authenticated account API that pages results (default 200 records, up to 500 per request).
-- An optional webhook URL can be configured per widget: after each submission the visitor's browser posts the response as plain JSON to that URL. Because webhook URLs are public in the widget configuration, they must never contain private credentials or secrets.
+- Two optional webhook paths exist. A browser webhook in the popup configuration posts the response as plain JSON from the visitor's browser; it is best effort, cannot be confirmed or retried reliably, and its URL is public. An authenticated server-side webhook configured in the Lead inbox signs deliveries with HMAC-SHA256, retries transient failures and records a delivery log; its URL and secret are owner-only. Neither path sends marketing email, SMS, PDFs or calendar invitations by itself — those require the website owner's own integration.
 
 ## Accounts and sessions
 - Signing up uses an email address and a password of at least 12 characters; Google sign-in becomes available when the site owner configures it. A verified Google email links to the same single account for that address.
@@ -56,7 +56,7 @@
 - How do I add a popup to my website? — Save your design, open Publish in the studio, and copy the installation code. Paste the widget div and script before the closing body tag of your website.
 - Can I use PopupLoom with WordPress, Shopify or Webflow? — Install the embed where your platform permits custom HTML or theme code. WordPress Custom HTML, Shopify theme code and Webflow embeds are options, depending on your plan and permissions. Popups placed inside an iframe cannot extend outside that iframe.
 - What popup triggers are available? — A page-load, delay, scroll-depth, scroll-to-element, click or desktop exit-intent trigger, each with configurable page targeting, device settings and frequency rules.
-- Where are captured leads stored? — Responses submitted through installed hosted popups are stored in the PopupLoom database and associated with the saved widget. Account controls access to widget data. Optional client-side webhook URLs are visible to website visitors and must not contain private credentials.
+- Where are captured leads stored? - Responses submitted through installed hosted popups are stored in the PopupLoom database and associated with the saved widget. Account controls access to widget data. Optional client-side webhook URLs are visible to website visitors and must not contain private credentials; signed server-side webhook URLs and secrets are owner-only. Neither path sends email, SMS, PDFs or calendar invitations by itself.
 - Does PopupLoom guarantee better conversions? — No. Results depend on the audience, offer, placement and timing. Test designs on the target website and respect visitor preferences.
 
 ## Page map

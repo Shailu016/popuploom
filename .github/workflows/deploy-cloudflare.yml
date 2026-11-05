@@ -16,6 +16,10 @@ jobs:
   deploy:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    env:
+      # Public publisher ID verified in the owner's existing AdSense account.
+      # This publishes ads.txt only; advertising remains disabled.
+      ADSENSE_PUBLISHER_ID: pub-8947829712444522
     steps:
       - name: Check out source
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4

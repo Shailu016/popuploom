@@ -12,6 +12,8 @@ Apply schema migrations with `wrangler d1 migrations apply popforge --remote` af
 
 Lead webhooks are called by the Worker after a lead is stored. Their URLs must be HTTPS and private/localhost destinations are rejected; `ALLOW_INSECURE_WEBHOOKS=true` exists only for local development and tests and must not be set in production. Delivery is retried in the background and recorded in `webhook_deliveries`; it is not a durable queue. Cloudflare Workers block fetches to private network addresses in addition to the application-level checks.
 
+Advertising remains disabled in this Phase A build. `ADSENSE_ENABLED` must stay `false`; setting it `true` intentionally fails `scripts/build-cf.cjs` until account-specific strict-CSP/CMP work is reviewed. A real `ADSENSE_PUBLISHER_ID` may generate `/ads.txt` with the exact Google record; do not commit a placeholder. `shared/ad-pages.js` is the only future ad allowlist and excludes the homepage, editor, account, lead, reset and customer-embed surfaces.
+
 Legacy bcrypt passwords remain valid and upgrade to PBKDF2 after successful login. Legacy bcrypt verification uses JavaScript CPU; validate CPU usage on the chosen Cloudflare plan before migrating production traffic (a paid Worker plan may be required). New passwords use WebCrypto PBKDF2.
 
 Rate counters use atomic D1 upserts shared across isolates with hashed IP keys and periodic expiry cleanup. These produce D1 writes and are not a substitute for edge protection against large distributed attacks. Config reads use no-store and D1 directly to avoid per-location cache invalidation problems. Review D1 usage and production traffic capacity before launch.

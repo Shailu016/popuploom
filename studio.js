@@ -259,6 +259,8 @@
     setVal("proofInterval", String(proofInterval >= 1000 ? proofInterval / 1000 : proofInterval));
     var pl = document.getElementById("proofList"); pl.innerHTML = "";
     ((c.proof && c.proof.items) || []).forEach(function (d) { pl.appendChild(proofRow(d)); });
+    var proofReal = document.getElementById("proofReal");
+    if (proofReal) proofReal.checked = !!(c.proof && (c.proof.items || []).length && !c.proof.demo);
 
     // design
     setSel("d-style", th.style || "light");
@@ -395,8 +397,9 @@
       });
       c.proof = {
         enabled: true,
+        demo: !document.getElementById("proofReal").checked,
         interval: Math.max(3, +gval("proofInterval") || 5),
-        items: pts.length ? pts : [{ name: "Maya", action: "just unlocked 20% off", ago: "2 min ago" }]
+        items: pts
       };
     } else { c.proof = null; }
 

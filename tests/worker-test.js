@@ -262,6 +262,12 @@ function hostReq(host, path, method = "GET", extraHeaders = {}) {
   r=await req('GET','/lead-csv.js',{raw:true});check('shared lead CSV helper is served',r.status===200);
   r=await req('GET','/about.html',{raw:true});check('about page is served',r.status===200&&String(r.headers.get('content-type')).includes('text/html'));
   r=await req('GET','/terms.html',{raw:true});check('terms page is served',r.status===200);
+  r=await req('GET','/guides/index.html',{raw:true});check('guides hub is served',r.status===200);
+  r=await req('GET','/guides/wordpress-popup.html',{raw:true});check('WordPress guide is served',r.status===200);
+  r=await req('GET','/guides/shopify-popup.html',{raw:true});check('Shopify guide is served',r.status===200);
+  r=await req('GET','/guides/webflow-popup.html',{raw:true});check('Webflow guide is served',r.status===200);
+  r=await req('GET','/guides/collect-and-export-leads.html',{raw:true});check('lead guide is served',r.status===200);
+  r=await req('GET','/guides/popup-not-showing.html',{raw:true});check('troubleshooting guide is served',r.status===200);
   r=await req('GET','/.well-known/security.txt',{raw:true});check('security.txt is served',r.status===200&&String(r.data).includes('Contact:'));
   console.log("== rate limit (login 40/10min) ==");
   let got429 = false, count = 0;

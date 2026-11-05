@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="733" viewBox="0 0 1100 733" role="img" aria-label="Coffee and croissant illustration">
+<title>Coffee and croissant illustration</title>
+<desc>Original PopupLoom vector artwork authored for this project on 2026-11-05. A coffee cup, saucer and croissant in warm cream tones.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF8EC"/><stop offset="1" stop-color="#E8D2B5"/></linearGradient>
+  <radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#C4772F" stop-opacity=".7"/><stop offset=".6" stop-color="#C4772F" stop-opacity=".18"/><stop offset="1" stop-color="#C4772F" stop-opacity="0"/></radialGradient>
+  <radialGradient id="vig" cx="50%" cy="44%" r="76%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".42"/></radialGradient>
+  <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse"><path d="M44 0H0V44" fill="none" stroke="#fff" stroke-opacity=".035"/></pattern>
+</defs>
+<rect width="1100" height="733" fill="url(#bg)"/>
+<rect width="1100" height="733" fill="url(#grid)"/>
+<circle cx="820" cy="160" r="330" fill="url(#glow)"/>
+
+  <rect x="0" y="545" width="1100" height="188" fill="#D8B992" opacity=".55"/>
+  <ellipse cx="520" cy="612" rx="265" ry="28" fill="#7B5532" opacity=".25"/>
+  <ellipse cx="520" cy="585" rx="230" ry="38" fill="#F9EDDC"/>
+  <path d="M345 350 C345 520 400 560 520 560 C640 560 695 520 695 350 Z" fill="#FFF9F0"/>
+  <path d="M360 365 C370 505 415 540 520 540 C625 540 670 505 680 365 Z" fill="#F3E4CF"/>
+  <ellipse cx="520" cy="352" rx="175" ry="30" fill="#6A3C21"/>
+  <ellipse cx="520" cy="348" rx="151" ry="21" fill="#A9673F"/>
+  <path d="M450 300 C420 255 458 232 444 190" stroke="#FFF8EC" stroke-width="13" stroke-linecap="round" fill="none" opacity=".65"/>
+  <path d="M530 294 C498 246 538 220 518 176" stroke="#FFF8EC" stroke-width="11" stroke-linecap="round" fill="none" opacity=".45"/>
+  <path d="M760 510 C690 440 690 335 770 300 C850 265 930 330 900 405 C875 468 815 500 760 510 Z" fill="#D68B3C"/>
+  <path d="M768 490 C715 430 718 350 778 322 C835 296 895 350 872 410 C851 462 808 486 768 490Z" fill="#F0B466"/>
+  <g stroke="#9A5A24" stroke-width="3" opacity=".45"><path d="M770 420c40-25 70-58 76-94"/><path d="M790 455c35-18 58-44 66-68"/></g>
+  <circle cx="820" cy="570" r="10" fill="#C4772F"/>
+  <circle cx="865" cy="545" r="5" fill="#C4772F" opacity=".6"/>
+
+<rect width="1100" height="733" fill="url(#vig)"/>
+</svg>

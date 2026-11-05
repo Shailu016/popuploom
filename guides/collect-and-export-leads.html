@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Collect and Export Popup Leads | PopupLoom</title>
+<meta name="description" content="How PopupLoom stores form responses, exports leads as CSV, and uses browser or signed server webhooks. Includes privacy and delivery limits.">
+<link rel="canonical" href="https://popuploom.com/guides/collect-and-export-leads.html">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="stylesheet" href="/ui.css"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="wrap" style="padding:24px 26px">
+  <nav aria-label="Main"><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/index.html">Guides</a> · <a href="/about.html">About</a> · <a href="/studio.html?tpl=blank">Open the studio</a></nav>
+  <nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/guides/index.html">Guides</a> › <span>Collect and export leads</span></nav>
+</header>
+<main class="wrap" style="padding:30px 26px 80px;max-width:900px">
+  <article>
+    <h1>Collect and export popup leads</h1>
+    <p class="mut">Product behavior checked on 5 November 2026. Screenshots use isolated demonstration data, not customer records.</p>
+
+    <h2>Where a response goes</h2>
+    <ol>
+      <li>A visitor submits a popup form or a choice control.</li>
+      <li>The runtime sends the response to the hosted PopupLoom API for the saved widget.</li>
+      <li>The response is stored against that widget and appears in the owner's authenticated lead inbox.</li>
+      <li>If the owner configured a webhook, a separate delivery is attempted. A webhook is an integration, not a replacement for hosted storage.</li>
+    </ol>
+    <p>Guest drafts are different: they live in the browser and do not produce a hosted widget or hosted leads. The install code is issued for a saved account-owned popup.</p>
+
+    <h2>Open the lead inbox</h2>
+    <p>From <strong>My popups</strong>, choose <strong>Leads</strong> on a saved popup. The inbox pages responses newest first and shows every field that was captured. The screenshot below uses fabricated rows so no real person appears.</p>
+    <figure>
+      <img src="/assets/guides/lead-inbox-demo.png" alt="PopupLoom lead inbox with three fabricated sample rows and the webhook settings panel" style="max-width:100%;height:auto;border-radius:12px;border:1px solid rgba(127,127,127,.25)">
+      <figcaption class="mut" style="font-size:13px;margin-top:8px">Lead inbox with demonstration rows. The webhook panel is per popup and owner-only.</figcaption>
+    </figure>
+
+    <h2>Export CSV</h2>
+    <p><strong>Export all leads as CSV</strong> in a popup's inbox follows every API page, not just the visible 100 rows. The workspace-level <strong>Export leads (.csv)</strong> combines every popup and adds the popup name and id columns. Both exports:</p>
+    <ul>
+      <li>include a UTF-8 byte-order mark for spreadsheet compatibility;</li>
+      <li>use the union of captured field names, so later fields are not silently dropped;</li>
+      <li>escape quotes and line breaks;</li>
+      <li>prefix spreadsheet formula prefixes with an apostrophe to reduce CSV injection risk.</li>
+    </ul>
+    <p>The CSV is a browser download. Treat it as personal data: store it with access control, avoid shared drives and delete it when no longer needed. The JSON configuration backup does not contain leads.</p>
+
+    <h2>Browser webhook: best effort</h2>
+    <p>A popup can include an optional browser webhook URL in its form settings. After a successful submission, the visitor's browser posts plain JSON to that URL with <code>no-cors</code>. This path:</p>
+    <ul>
+      <li>cannot confirm delivery or retry reliably;</li>
+      <li>can be blocked by the visitor's browser, extensions or network;</li>
+      <li>exposes the URL in the public widget configuration, so it must never contain private credentials;</li>
+      <li>is not a server-side automation service.</li>
+    </ul>
+
+    <h2>Server-side webhook: signed and retried</h2>
+    <p>Open a popup's lead inbox and configure <strong>Webhook events</strong> with an HTTPS endpoint. Delivery is made by PopupLoom after the lead is stored. The request includes a <code>lead.created</code> event, popup id and name, lead id/time and captured data. Headers include a timestamp and an HMAC-SHA256 signature over <code>timestamp.body</code> using the owner-only signing secret. Delivery is retried on network errors, timeouts, 408, 429 and 5xx responses, and the delivery log records status, attempts and response codes.</p>
+    <p>This is retried background delivery, not a durable queue. Use the delivery log and your receiver's own monitoring. Rotate the secret if it is exposed. Test with the <strong>Send test</strong> button before relying on it.</p>
+
+    <h2>What PopupLoom does not deliver</h2>
+    <p>PopupLoom does not send marketing email campaigns, SMS messages, PDF files, calendar invitations, invoices or customer support replies. It stores the response and can notify an integration. Any follow-up is the website owner's responsibility and must match the copy shown to visitors. Do not publish a promise that a code, file or invitation is “on its way” unless your own system actually sends it.</p>
+
+    <h2>Privacy and retention</h2>
+    <ul>
+      <li>Collect only the fields you need and explain the purpose before collection.</li>
+      <li>Do not put sensitive data in a popup unless you have a lawful basis and appropriate safeguards.</li>
+      <li>Deleting a popup also deletes its hosted responses. Export first if you need a record.</li>
+      <li>Account deletion removes the account and its hosted popups/leads after identity verification, subject to routine backups.</li>
+      <li>Webhook receivers are third parties with their own privacy practices. Choose them deliberately.</li>
+    </ul>
+
+    <h2>A safe test</h2>
+    <ol>
+      <li>Use a saved test popup, not a live customer campaign.</li>
+      <li>Submit clearly fake data such as <code>test@example.com</code>.</li>
+      <li>Confirm the row in the lead inbox, then export and inspect the CSV.</li>
+      <li>Send a webhook test to a receiver you control and verify the signature.</li>
+      <li>Delete the test popup and its responses when finished.</li>
+    </ol>
+
+    <p class="mut">Read the <a href="/privacy.html">privacy and data handling page</a> for storage, browser storage and advertising disclosures. Questions: <a href="/contact.html">contact us</a>.</p>
+  </article>
+</main>
+<footer class="wrap" style="padding:24px 26px"><a href="/">PopupLoom — free website popup builder</a> · <a href="/guides/index.html">Guides</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></footer>
+</body>
+</html>

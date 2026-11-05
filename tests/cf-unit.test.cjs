@@ -149,3 +149,22 @@ test('worker email rate limits are normalized and hashed',async()=>{
   await limit(request,env,'other@example.com');
  }finally{db.close();}
 });
+
+test('production build keeps advertising disabled and gates ads.txt',()=>{
+ const {execFileSync}=require('node:child_process');
+ const out=path.join(root,'.cf-build','public');
+ const base={...process.env,ADSENSE_ENABLED:'false',ADSENSE_CLIENT:'',ADSENSE_CMP:'',ADSENSE_PUBLISHER_ID:''};
+ execFileSync(process.execPath,['scripts/build-cf.cjs'],{cwd:root,env:base});
+ assert.ok(!fs.existsSync(path.join(out,'ads.txt')),'no ads.txt without a real publisher id');
+ for(const rel of ['index.html','studio.html','leads.html','guides/install-popups.html']){
+  const html=fs.readFileSync(path.join(out,rel),'utf8');
+  assert.ok(!/adsbygoogle|googlesyndication|doubleclick|fundingchoicesmessages/i.test(html),rel+' contains no advertising code');
+ }
+ const runtime=fs.readFileSync(path.join(out,'popuploom.js'),'utf8');
+ assert.ok(!/adsbygoogle|googlesyndication|doubleclick|fundingchoicesmessages/i.test(runtime),'customer runtime contains no advertising code');
+ execFileSync(process.execPath,['scripts/build-cf.cjs'],{cwd:root,env:{...base,ADSENSE_PUBLISHER_ID:'pub-1234567890123456'}});
+ assert.equal(fs.readFileSync(path.join(out,'ads.txt'),'utf8'),'google.com, pub-1234567890123456, DIRECT, f08c47fec0942fa0\n');
+ assert.throws(()=>execFileSync(process.execPath,['scripts/build-cf.cjs'],{cwd:root,env:{...base,ADSENSE_ENABLED:'true'},stdio:'pipe'}),/ADSENSE_CLIENT|Phase A build/);
+ // Restore the default clean bundle for later tests.
+ execFileSync(process.execPath,['scripts/build-cf.cjs'],{cwd:root,env:base});
+});

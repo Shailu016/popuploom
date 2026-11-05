@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Add a Popup to Shopify | PopupLoom</title>
+<meta name="description" content="Install a PopupLoom popup in a Shopify theme, with a theme duplicate, theme.liquid placement, checkout limits and a published-store test.">
+<link rel="canonical" href="https://popuploom.com/guides/shopify-popup.html">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="stylesheet" href="/ui.css"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="wrap" style="padding:24px 26px">
+  <nav aria-label="Main"><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/index.html">Guides</a> · <a href="/about.html">About</a> · <a href="/studio.html?tpl=blank">Open the studio</a></nav>
+  <nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/guides/index.html">Guides</a> › <span>Shopify</span></nav>
+</header>
+<main class="wrap" style="padding:30px 26px 80px;max-width:900px">
+  <article>
+    <h1>Add a PopupLoom popup to Shopify</h1>
+    <p class="mut">Checked against Shopify's official theme-code documentation on 5 November 2026. This guide was not tested on a live Shopify store; themes, plans and checkout extensibility vary, so verify on a development or unpublished theme first.</p>
+
+    <h2>Before you start</h2>
+    <ul>
+      <li>You need theme-code access for the store. Staff permissions and Shopify plans differ.</li>
+      <li>Duplicate the theme before editing. Shopify's theme-code documentation recommends duplicating a theme before deleting or changing files. A duplicate is a snapshot: later edits to one theme do not automatically sync to the other.</li>
+      <li>PopupLoom is installed as theme code, not as a Shopify app. There is no app block or checkout extension provided by PopupLoom.</li>
+      <li>Do not promise popups inside checkout. Checkout script support is restricted and depends on the store's plan and checkout extensibility. Test the actual checkout step separately; do not assume a theme popup carries into checkout.</li>
+    </ul>
+
+    <h2>Step 1: Save the popup and copy its code</h2>
+    <p>Build and save the popup in the <a href="/studio.html?tpl=blank">PopupLoom studio</a>, then copy the two-line install pair from <strong>Publish</strong>. The full explanation is in the <a href="/guides/install-popups.html">installation guide</a>. Use your own saved widget id; do not use a preview id.</p>
+
+    <h2>Step 2: Duplicate the theme</h2>
+    <p>In Shopify admin, open <strong>Online Store → Themes</strong>. Duplicate the live theme, or create a development copy, and work there first. The duplicate is a separate snapshot; changes you make to one theme are not automatically copied to the live theme. When the duplicate is ready, publish it as the live theme. If the change is wrong, you can switch back to the previous theme without rebuilding the storefront.</p>
+
+    <h2>Step 3: Edit theme.liquid</h2>
+    <ol>
+      <li>Open <strong>Online Store → Themes</strong>.</li>
+      <li>Open the theme actions menu and choose <strong>Edit code</strong>. Shopify's official guide describes this code editor.</li>
+      <li>Find <code>layout/theme.liquid</code>. Most themes use it as the outer document layout.</li>
+      <li>Paste the PopupLoom div and script immediately before the closing <code>&lt;/body&gt;</code> tag.</li>
+      <li>Save the file.</li>
+      <li>Preview the unpublished theme and test the trigger on a published preview URL or a development store.</li>
+    </ol>
+    <p>If your theme does not use <code>layout/theme.liquid</code>, use the layout file that contains the closing body tag. Do not place the script inside a product description, a section setting that escapes HTML, or a metafield that is rendered as text.</p>
+
+    <h2>Step 4: Test the published storefront</h2>
+    <ul>
+      <li>Open a private window on the published domain, not the theme editor preview.</li>
+      <li>Confirm the script and widget div are in the page source.</li>
+      <li>Perform the real trigger and test one form response with fake data.</li>
+      <li>Check the lead inbox and the browser console.</li>
+      <li>Test mobile separately. Some themes change the footer or inject scripts only on certain templates.</li>
+      <li>If the change does not appear after publishing, confirm that the edited theme is the theme currently published as live (not merely a preview or a different duplicate). Inspect the published page source for the snippet, then request the page in a fresh private window. Shopify does not expose a generic theme/CDN purge control. If the published source still lacks the change, contact Shopify Support with the theme name and the file you edited.</li>
+    </ul>
+
+    <h2>Shopify-specific problems</h2>
+    <ul>
+      <li><strong>The code appears as text.</strong> The setting or section escaped it. Use theme code, not a rich-text field.</li>
+      <li><strong>The popup appears in the preview but not on the live domain.</strong> The theme may not be published, or the live theme is different from the one you edited.</li>
+      <li><strong>It disappears on checkout.</strong> The checkout step has separate extensibility and script rules. Do not claim checkout coverage from a theme.liquid install.</li>
+      <li><strong>A theme update affects the change.</strong> Shopify's theme-update guidance says code edits that do not conflict with the update are included with the updated theme; conflicting edits are not included and must be copied to the new version manually. Do not assume every update removes or preserves the snippet. Keep the exact snippet and its location, and compare the published source after an update.</li>
+      <li><strong>Content Security Policy blocks the script.</strong> A theme or app may add a CSP. Allowlist the PopupLoom runtime origin or contact the theme/app provider; do not remove CSP globally.</li>
+    </ul>
+
+    <h2>Removing the popup</h2>
+    <p>Remove the two lines from <code>layout/theme.liquid</code>, save the file, and restore the theme duplicate if anything else changed. Deleting the hosted widget separately removes its configuration and leads.</p>
+
+    <h2>Official references</h2>
+    <ul>
+      <li><a href="https://help.shopify.com/en/manual/online-store/themes/customizing-themes/edit-code/edit-theme-code">Shopify Help Center: Editing theme code</a></li>
+      <li><a href="https://help.shopify.com/en/manual/online-store/themes/customizing-themes/edit-code">Shopify Help Center: Editing your theme with code</a></li>
+      <li><a href="https://help.shopify.com/en/manual/online-store/themes/managing-themes/updating-themes">Shopify Help Center: Updating themes</a></li>
+      <li><a href="https://shopify.dev/docs/storefronts/themes/architecture/layouts/theme-liquid">Shopify Developer docs: theme.liquid layout</a></li>
+    </ul>
+
+    <p class="mut">The PopupLoom install code and product behavior were checked on the local build. Shopify plan, checkout and theme behavior must be verified on your store. See <a href="/about.html">About</a>, <a href="/privacy.html">privacy</a>, <a href="/terms.html">terms</a> or <a href="/contact.html">contact</a>.</p>
+  </article>
+</main>
+<footer class="wrap" style="padding:24px 26px"><a href="/">PopupLoom — free website popup builder</a> · <a href="/guides/index.html">Guides</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></footer>
+</body>
+</html>

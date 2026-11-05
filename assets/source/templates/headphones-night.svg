@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="733" viewBox="0 0 1100 733" role="img" aria-label="Headphones illustration">
+<title>Headphones illustration</title>
+<desc>Original PopupLoom vector artwork authored for this project on 2026-11-05. Over-ear headphones with a mint rim light on a dark background.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#05090D"/><stop offset="1" stop-color="#0B2A22"/></linearGradient>
+  <radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#35F0B0" stop-opacity=".7"/><stop offset=".6" stop-color="#35F0B0" stop-opacity=".18"/><stop offset="1" stop-color="#35F0B0" stop-opacity="0"/></radialGradient>
+  <radialGradient id="vig" cx="50%" cy="44%" r="76%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".42"/></radialGradient>
+  <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse"><path d="M44 0H0V44" fill="none" stroke="#fff" stroke-opacity=".035"/></pattern>
+</defs>
+<rect width="1100" height="733" fill="url(#bg)"/>
+<rect width="1100" height="733" fill="url(#grid)"/>
+<circle cx="820" cy="160" r="330" fill="url(#glow)"/>
+
+  <ellipse cx="550" cy="634" rx="260" ry="30" fill="#000" opacity=".5"/>
+  <path d="M355 390 C355 190 745 190 745 390" fill="none" stroke="#1A2B2A" stroke-width="44" stroke-linecap="round"/>
+  <path d="M355 390 C355 190 745 190 745 390" fill="none" stroke="#35F0B0" stroke-width="8" stroke-linecap="round" opacity=".85"/>
+  <rect x="296" y="352" width="118" height="216" rx="58" fill="#111B1E" stroke="#35F0B0" stroke-width="5"/>
+  <rect x="686" y="352" width="118" height="216" rx="58" fill="#111B1E" stroke="#35F0B0" stroke-width="5"/>
+  <rect x="317" y="374" width="76" height="172" rx="38" fill="#1B2A2C"/>
+  <rect x="707" y="374" width="76" height="172" rx="38" fill="#1B2A2C"/>
+  <ellipse cx="355" cy="460" rx="22" ry="48" fill="#35F0B0" opacity=".22"/>
+  <ellipse cx="745" cy="460" rx="22" ry="48" fill="#35F0B0" opacity=".22"/>
+  <path d="M785 545 C840 610 760 660 700 620 C670 600 660 570 680 550" fill="none" stroke="#35F0B0" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="680" cy="550" r="10" fill="#35F0B0"/>
+  <path d="M190 230 C260 170 330 150 410 160" stroke="#35F0B0" stroke-width="3" fill="none" opacity=".3"/>
+
+<rect width="1100" height="733" fill="url(#vig)"/>
+</svg>

@@ -39,8 +39,26 @@ test('private files stay private including encoded separators and extensions',as
   const r=await api(url);assert.ok(r.status===404||r.headers.get('content-type').includes('text/html'),url);
   assert.ok(!String(r.data).includes('SQLite format 3')&&!String(r.data).includes('JWT_SECRET=')&&!String(r.data).includes('const JWT_SECRET'),url);
  }
- for(const url of ['/','/templates.html','/guides/install-popups.html','/migration.html','/studio.html','/profile.html','/demo.html','/reset-password.html','/about.html','/contact.html','/terms.html','/.well-known/security.txt','/app.js','/lead-csv.js','/studio.js','/reset-password.js','/popuploom.js','/popforge.js','/ui.css','/robots.txt','/sitemap.xml','/llms.txt','/llms-full.txt','/assets/winter-gift.jpg','/assets/favicon.svg','/assets/og-popuploom.png'])assert.equal((await api(url)).status,200,url);
+ for(const url of ['/','/templates.html','/guides/index.html','/guides/install-popups.html','/guides/wordpress-popup.html','/guides/shopify-popup.html','/guides/webflow-popup.html','/guides/collect-and-export-leads.html','/guides/popup-not-showing.html','/migration.html','/studio.html','/profile.html','/demo.html','/reset-password.html','/about.html','/contact.html','/terms.html','/.well-known/security.txt','/app.js','/lead-csv.js','/studio.js','/reset-password.js','/popuploom.js','/popforge.js','/ui.css','/robots.txt','/sitemap.xml','/llms.txt','/llms-full.txt','/assets/winter-gift.jpg','/assets/favicon.svg','/assets/og-popuploom.png'])assert.equal((await api(url)).status,200,url);
 });
+test('publisher verification is public without enabling ads and ads.txt requires a valid ID',async()=>{
+ const home=await api('/');
+ assert.match(home.data,/<meta name="google-adsense-account" content="ca-pub-8947829712444522">/);
+ assert.ok(!/adsbygoogle\.js|pagead2\.googlesyndication/.test(home.data));
+ const previous=process.env.ADSENSE_PUBLISHER_ID;
+ try{
+  delete process.env.ADSENSE_PUBLISHER_ID;
+  assert.equal((await api('/ads.txt')).status,404);
+  process.env.ADSENSE_PUBLISHER_ID='pub-8947829712444522';
+  const record=await api('/ads.txt');
+  assert.equal(record.status,200);
+  assert.match(record.headers.get('content-type'),/^text\/plain/);
+  assert.equal(record.data,'google.com, pub-8947829712444522, DIRECT, f08c47fec0942fa0\n');
+  process.env.ADSENSE_PUBLISHER_ID='invalid';
+  assert.equal((await api('/ads.txt')).status,404);
+ }finally{if(previous===undefined)delete process.env.ADSENSE_PUBLISHER_ID;else process.env.ADSENSE_PUBLISHER_ID=previous;}
+});
+
 test('every template asset reference points at a shipped file',()=>{
  const src=fs.readFileSync(path.join(root,'app.js'),'utf8');
  const refs=[...src.matchAll(/@assets\/([A-Za-z0-9._-]+\.(?:jpg|jpeg|png|svg|webp|gif))/g)].map(m=>m[1]);
@@ -228,7 +246,7 @@ test('legacy database migration preserves accounts and revokes old Google sessio
 function runtime(){
  let response={ok:true,json:async()=>({ok:true})};const timers=[];
  const box={window:{},document:{readyState:'loading',querySelector:()=>null,querySelectorAll:()=>[],addEventListener(){},createElement:()=>({setAttribute(){}})},location:{href:'https://shop.example/shop/item?ref=x',pathname:'/shop/item'},console,URL,TextEncoder,TextDecoder,setTimeout:fn=>timers.push(fn),clearTimeout(){},setInterval:()=>1,clearInterval(){},addEventListener(){},removeEventListener(){},localStorage:{getItem(){throw Error('blocked');},setItem(){}},fetch:async()=>{if(response instanceof Error)throw response;return response;}};
- const src=fs.readFileSync(path.join(root,'popuploom.js'),'utf8').replace('  function boot() {','  window.checks={PopupInstance,cardHTML,recordSubmission,submitLike,wireSpin};\n  function boot() {');
+ const src=fs.readFileSync(path.join(root,'popuploom.js'),'utf8').replace('  function boot() {','  window.checks={PopupInstance,cardHTML,recordSubmission,submitLike,wireSpin,proofHTML};\n  function boot() {');
  vm.runInNewContext(src,box);return {box,c:box.window.checks,timers,setResponse:r=>response=r};
 }
 test('targeting, untrusted rendering, storage restrictions and explicit test mode',async()=>{
@@ -242,6 +260,13 @@ test('targeting, untrusted rendering, storage restrictions and explicit test mod
  const started=Date.now();assert.equal(p.pageOk.call({cfg:{pages:{mode:'include',include:['/shop/'+('*a'.repeat(40))+'b']}}}),false);assert.ok(Date.now()-started<1000);
  const bad=c.cardHTML({cfg:{content:{videoEmbed:'https://untrusted.example/steal'}}});assert.ok(!bad.includes('<iframe'));
  const good=c.cardHTML({cfg:{content:{videoEmbed:'https://www.youtube.com/watch?v=abcdefghijk'}}});assert.ok(good.includes('sandbox="allow-scripts allow-same-origin allow-presentation"'));
+ const inert=c.cardHTML({cfg:{content:{buttonText:'Demo CTA',buttonUrl:'',links:[{label:'Demo link',url:''}]}}});
+ assert.ok(inert.includes('pf-btn-demo')&&!inert.includes('href="#"'));
+ assert.ok(inert.includes('pf-link-demo')&&inert.includes('Demo button - set a real destination'));
+ const sample=c.proofHTML({cfg:{theme:{},content:{proof:{enabled:true,demo:true,items:[{name:'Maya',action:'sample action',ago:'2 min ago'}]}}}});
+ assert.ok(sample.includes('Sample activity')&&sample.includes('Maya'));
+ const emptyProof=c.proofHTML({cfg:{theme:{},content:{proof:{enabled:true,demo:false,items:[]}}}});
+ assert.ok(emptyProof.includes('No activity configured')&&!emptyProof.includes('Maya'));
 });
 test('one widget API override does not change the default API for other widgets',()=>{
  const box={window:{},document:{readyState:'loading',querySelector:()=>({getAttribute:()=> 'https://override.example'}),querySelectorAll:selector=>selector.startsWith('script')?[{src:'https://default.example/popforge.js'}]:[],addEventListener(){}},URL,console};
@@ -545,6 +570,15 @@ test('webhook delivery retries transient failures and stops on 4xx',async()=>{
   assert.equal(stopped.ok,false);assert.equal(stopped.attempts,1);assert.equal(stopped.status,400);assert.equal(calls.stop,1);
  }finally{await new Promise(r=>receiver.close(r));}
 });
+test('advertising allowlist excludes private and customer surfaces',async()=>{
+ const {isAdPage,AD_PAGES}=require('../shared/ad-pages');
+ assert.ok(AD_PAGES.size>=6);
+ for(const p of ['/guides/install-popups.html','/guides/wordpress-popup.html','/guides/shopify-popup.html','/guides/webflow-popup.html','/guides/collect-and-export-leads.html','/guides/popup-not-showing.html'])assert.ok(isAdPage(p),p);
+ for(const p of ['/','/index.html','/templates.html','/studio.html','/profile.html','/leads.html','/reset-password.html','/migration.html','/privacy.html','/about.html','/contact.html','/terms.html','/popuploom.js','/popforge.js','/api/widgets/x/submit'])assert.ok(!isAdPage(p),p);
+ const runtime=require('node:fs').readFileSync(require('node:path').join(root,'popuploom.js'),'utf8');
+ assert.ok(!/adsbygoogle|googlesyndication|doubleclick|fundingchoicesmessages/i.test(runtime),'customer runtime has no ad code');
+ const adsTxt=await api('/ads.txt');assert.equal(adsTxt.status,404,'ads.txt is absent until a real publisher id is configured');
+});
 const browserPath=process.env.POPFORGE_BROWSER||['C:/Program Files/Google/Chrome/Application/chrome.exe','C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'].find(p=>fs.existsSync(p));
 test('browser: all templates, save failures, installation, test mode, delete and hostile imports',{skip:!browserPath,timeout:120000},async()=>{
  const puppeteer=require('puppeteer-core');const browser=await puppeteer.launch({executablePath:browserPath,headless:true,args:['--no-sandbox'],userDataDir:path.join(temp,'browser')});
@@ -600,6 +634,19 @@ test('browser: all templates, save failures, installation, test mode, delete and
   }
   await page.goto(base,{waitUntil:'domcontentloaded'});
   await page.evaluate(token=>localStorage.setItem('pf.token',token),account.token);
+  for(const width of [320,360,390,768]){
+   await page.setViewport({width,height:900});
+   await page.goto(base,{waitUntil:'networkidle0'});
+   await page.waitForFunction(()=>document.querySelectorAll('#dashRows tr').length>0);
+   const dash=await page.evaluate(()=>{
+    const vw=document.documentElement.clientWidth;
+    const buttons=Array.from(document.querySelectorAll('.sec-title-actions .btn')).map(b=>{const r=b.getBoundingClientRect();return {text:b.textContent.trim(),right:Math.round(r.right)};});
+    return {scrollWidth:document.documentElement.scrollWidth,clientWidth:vw,buttons};
+   });
+   assert.ok(dash.scrollWidth<=dash.clientWidth+1,'dashboard has no document overflow at '+width+': '+JSON.stringify(dash));
+   for(const b of dash.buttons)assert.ok(b.right<=dash.clientWidth+1,b.text+' fits at '+width);
+  }
+  await page.setViewport({width:1000,height:900});
   await page.goto(base+'/studio.html?tpl=age18',{waitUntil:'networkidle0'});
   await page.waitForSelector('#stage .pf-card');
   let rejectSave=true;await page.setRequestInterception(true);page.on('request',req=>{if(rejectSave&&req.method()==='POST'&&new URL(req.url()).pathname==='/api/widgets')req.abort();else req.continue();});

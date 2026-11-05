@@ -11,6 +11,7 @@
     "deploy:cf": "node scripts/check-cf.cjs && wrangler deploy",
     "db:migrate:local": "wrangler d1 migrations apply popforge --local",
     "db:export": "node scripts/export-db.js",
+    "art:generate": "node scripts/generate-project-art.cjs",
     "test:cf": "node --test tests/cf-unit.test.cjs",
     "test:cf:integration": "wrangler deploy --dry-run --outdir .cf-build && node tests/cf-integration.cjs"
   },
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "puppeteer-core": "^25.16.0",
+    "sharp": "0.35.5",
     "wrangler": "^4.156.0"
   },
   "allowScripts": {

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="733" viewBox="0 0 1100 733" role="img" aria-label="Prize bundle illustration">
+<title>Prize bundle illustration</title>
+<desc>Original PopupLoom vector artwork authored for this project on 2026-11-05. Gift boxes, ribbons and confetti arranged as a prize bundle.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0D0B10"/><stop offset="1" stop-color="#2A1308"/></linearGradient>
+  <radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#F59E0B" stop-opacity=".7"/><stop offset=".6" stop-color="#F59E0B" stop-opacity=".18"/><stop offset="1" stop-color="#F59E0B" stop-opacity="0"/></radialGradient>
+  <radialGradient id="vig" cx="50%" cy="44%" r="76%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".42"/></radialGradient>
+  <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse"><path d="M44 0H0V44" fill="none" stroke="#fff" stroke-opacity=".035"/></pattern>
+</defs>
+<rect width="1100" height="733" fill="url(#bg)"/>
+<rect width="1100" height="733" fill="url(#grid)"/>
+<circle cx="820" cy="160" r="330" fill="url(#glow)"/>
+
+  <ellipse cx="550" cy="650" rx="300" ry="30" fill="#000" opacity=".5"/>
+  <g transform="rotate(-8 470 460)">
+    <rect x="330" y="380" width="270" height="220" rx="18" fill="#F59E0B"/>
+    <rect x="330" y="380" width="270" height="58" rx="18" fill="#FFC65C"/>
+    <rect x="450" y="380" width="30" height="220" fill="#7C3D08"/>
+    <path d="M465 380 C410 330 370 300 345 330 C320 360 375 395 465 380Z" fill="#FF6A1F"/>
+    <path d="M465 380 C520 330 560 300 585 330 C610 360 555 395 465 380Z" fill="#FF6A1F"/>
+  </g>
+  <g transform="rotate(7 730 500)">
+    <rect x="610" y="430" width="210" height="170" rx="16" fill="#FFF3E2"/>
+    <rect x="610" y="430" width="210" height="46" rx="16" fill="#FFC65C"/>
+    <rect x="700" y="430" width="26" height="170" fill="#FF6A1F"/>
+  </g>
+  <g fill="#FFC65C"><circle cx="260" cy="250" r="8"/><circle cx="840" cy="220" r="12"/><circle cx="900" cy="350" r="7"/><circle cx="200" cy="420" r="5"/></g>
+  <g fill="#FF6A1F"><circle cx="760" cy="160" r="6"/><circle cx="310" cy="200" r="5"/><circle cx="180" cy="330" r="9"/></g>
+  <path d="M240 520l18-38 18 38-38-24h44z" fill="#FFF3E2" opacity=".85"/>
+
+<rect width="1100" height="733" fill="url(#vig)"/>
+</svg>

@@ -6,6 +6,10 @@
 - [Overview and FAQ](https://popuploom.com/): features, account requirements, supported triggers and limitations.
 - [Template catalog](https://popuploom.com/templates.html): all 45 starting designs grouped by purpose.
 - [Installation guide](https://popuploom.com/guides/install-popups.html): installation, platform constraints and troubleshooting.
+- [Guides hub](https://popuploom.com/guides/index.html): all original installation, lead and troubleshooting guides.
+- [WordPress guide](https://popuploom.com/guides/wordpress-popup.html), [Shopify guide](https://popuploom.com/guides/shopify-popup.html), [Webflow guide](https://popuploom.com/guides/webflow-popup.html): platform-specific placement and caveats.
+- [Collect and export leads](https://popuploom.com/guides/collect-and-export-leads.html): lead inbox, CSV, browser and server webhooks.
+- [Popup not showing](https://popuploom.com/guides/popup-not-showing.html): diagnostic sequence for saved widgets.
 - [About PopupLoom](https://popuploom.com/about.html): who operates the product and how templates should be understood.
 - [Contact](https://popuploom.com/contact.html): support, privacy, security and blocklist questions.
 - [Terms of use](https://popuploom.com/terms.html): accounts, acceptable use, lead data and liability.
