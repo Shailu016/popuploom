@@ -14,6 +14,9 @@ process.env.TRUST_PROXY='';
 process.env.DOMAIN_CUTOVER_ENABLED='false';
 process.env.GOOGLE_CLIENT_ID='';
 process.env.ALLOW_INSECURE_WEBHOOKS='true';
+// Baseline fixtures must not inherit production publisher configuration from CI.
+// The publisher-specific test below explicitly exercises configured/invalid IDs.
+process.env.ADSENSE_PUBLISHER_ID='';
 const app=require('../server/index');
 let server,base,account,widget;
 async function api(url,{method='GET',body,token,headers={}}={}){
