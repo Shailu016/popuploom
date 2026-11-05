@@ -2,9 +2,51 @@
 const { object, validateConfig, validateShape } = require("./validation");
 const { ApiError } = require("./auth");
 const { json, all, rateLimit } = require("./http");
+const webhook = require("../shared/webhook");
 
 const viewLimit = rateLimit("view", 600, 60000);
 const submitLimit = rateLimit("submit", 120, 60000);
+const webhookTestLimit = rateLimit("webhook-test", 10, 60000);
+
+function allowInsecureWebhooks(env) {
+  return env.ALLOW_INSECURE_WEBHOOKS === "true";
+}
+
+async function ownedWidget(c) {
+  return c.env.DB.prepare("SELECT id, name FROM widgets WHERE id = ? AND user_id = ?").bind(c.params.id, c.user.id).first();
+}
+
+function webhookJson(row) {
+  if (!row) return null;
+  return {
+    url: row.url,
+    secret: row.secret,
+    enabled: !!row.enabled,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at
+  };
+}
+
+async function logDelivery(env, widgetId, event, submissionId, result) {
+  try {
+    await env.DB.prepare("INSERT INTO webhook_deliveries (id, widget_id, submission_id, event, test, status, attempts, response_status, error, completed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))")
+      .bind(event.id, widgetId, submissionId || null, event.event, event.test ? 1 : 0, result.ok ? "success" : "failed", result.attempts || 0, result.status || null, result.error ? String(result.error).slice(0, 500) : null).run();
+    await env.DB.prepare("DELETE FROM webhook_deliveries WHERE widget_id = ? AND rowid NOT IN (SELECT rowid FROM webhook_deliveries WHERE widget_id = ? ORDER BY rowid DESC LIMIT 100)").bind(widgetId, widgetId).run();
+  } catch (e) {
+    console.error("[popuploom] could not record webhook delivery:", e.message);
+  }
+}
+
+// Runs after the lead response through ctx.waitUntil. Duplicate request IDs are
+// filtered by the INSERT itself, so only genuinely new rows are delivered.
+async function deliverLead(c, widgetId, submissionId, data) {
+  const widget = await c.env.DB.prepare("SELECT id, name FROM widgets WHERE id = ?").bind(widgetId).first();
+  const endpoint = await c.env.DB.prepare("SELECT url, secret FROM webhook_endpoints WHERE widget_id = ? AND enabled = 1").bind(widgetId).first();
+  if (!widget || !endpoint) return;
+  const event = webhook.payload(widget, { id: submissionId, createdAt: new Date().toISOString(), data: data }, { id: webhook.randomId() });
+  const result = await webhook.deliver(endpoint, event);
+  await logDelivery(c.env, widgetId, event, submissionId, result);
+}
 
 function randomWidgetId() {
   return "wan_" + [...crypto.getRandomValues(new Uint8Array(12))].map(b => b.toString(16).padStart(2, "0")).join("");
@@ -94,7 +136,83 @@ async function updateWidget(c) {
 async function deleteWidget(c) {
   const res = await c.env.DB.prepare("DELETE FROM widgets WHERE id = ? AND user_id = ?").bind(c.params.id, c.user.id).run();
   if (res.meta.changes === 0) return json({ error: "Widget not found" }, 404);
+  await c.env.DB.prepare("DELETE FROM webhook_deliveries WHERE widget_id = ?").bind(c.params.id).run();
+  await c.env.DB.prepare("DELETE FROM webhook_endpoints WHERE widget_id = ?").bind(c.params.id).run();
   return json({ ok: true });
+}
+
+// ---- Lead webhooks (owner only) ----
+
+async function getWebhook(c) {
+  const w = await ownedWidget(c);
+  if (!w) return json({ error: "Widget not found" }, 404);
+  const row = await c.env.DB.prepare("SELECT url, secret, enabled, created_at, updated_at FROM webhook_endpoints WHERE widget_id = ?").bind(w.id).first();
+  return json({ webhook: webhookJson(row) });
+}
+
+async function putWebhook(c) {
+  const w = await ownedWidget(c);
+  if (!w) return json({ error: "Widget not found" }, 404);
+  const body = c.body || {};
+  const invalid = webhook.validateUrl(body.url, { allowInsecure: allowInsecureWebhooks(c.env) });
+  if (invalid) return json({ error: invalid }, 400);
+  if (body.enabled !== undefined && typeof body.enabled !== "boolean") return json({ error: "enabled must be true or false" }, 400);
+  if (body.rotateSecret !== undefined && typeof body.rotateSecret !== "boolean") return json({ error: "rotateSecret must be true or false" }, 400);
+  const url = String(body.url).trim();
+  const enabled = body.enabled === false ? 0 : 1;
+  const existing = await c.env.DB.prepare("SELECT secret FROM webhook_endpoints WHERE widget_id = ?").bind(w.id).first();
+  const secret = (!existing || body.rotateSecret) ? webhook.randomSecret() : existing.secret;
+  if (existing) {
+    await c.env.DB.prepare("UPDATE webhook_endpoints SET url = ?, secret = ?, enabled = ?, updated_at = datetime('now') WHERE widget_id = ?")
+      .bind(url, secret, enabled, w.id).run();
+  } else {
+    await c.env.DB.prepare("INSERT INTO webhook_endpoints (widget_id, url, secret, enabled) VALUES (?, ?, ?, ?)")
+      .bind(w.id, url, secret, enabled).run();
+  }
+  const row = await c.env.DB.prepare("SELECT url, secret, enabled, created_at, updated_at FROM webhook_endpoints WHERE widget_id = ?").bind(w.id).first();
+  return json({ webhook: webhookJson(row) });
+}
+
+async function deleteWebhook(c) {
+  const w = await ownedWidget(c);
+  if (!w) return json({ error: "Widget not found" }, 404);
+  await c.env.DB.prepare("DELETE FROM webhook_endpoints WHERE widget_id = ?").bind(w.id).run();
+  await c.env.DB.prepare("DELETE FROM webhook_deliveries WHERE widget_id = ?").bind(w.id).run();
+  return json({ ok: true });
+}
+
+async function testWebhook(c) {
+  await webhookTestLimit(c.request, c.env);
+  const w = await ownedWidget(c);
+  if (!w) return json({ error: "Widget not found" }, 404);
+  const endpoint = await c.env.DB.prepare("SELECT url, secret FROM webhook_endpoints WHERE widget_id = ?").bind(w.id).first();
+  if (!endpoint) return json({ error: "Configure a webhook first" }, 400);
+  const event = webhook.payload(w, { id: null, createdAt: new Date().toISOString(), data: { email: "test@example.com", message: "PopupLoom test delivery" } }, { id: webhook.randomId(), test: true });
+  const result = await webhook.deliver(endpoint, event);
+  await logDelivery(c.env, w.id, event, null, result);
+  return json({ ok: result.ok, status: result.status, attempts: result.attempts, error: result.error });
+}
+
+async function listWebhookDeliveries(c) {
+  const w = await ownedWidget(c);
+  if (!w) return json({ error: "Widget not found" }, 404);
+  const limit = c.query.limit === undefined ? 20 : Number(c.query.limit);
+  if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100) return json({ error: "Invalid limit" }, 400);
+  const rows = await all(c.env.DB.prepare("SELECT id, submission_id, event, test, status, attempts, response_status, error, created_at, completed_at FROM webhook_deliveries WHERE widget_id = ? ORDER BY rowid DESC LIMIT ?").bind(w.id, limit));
+  return json(rows.map(function (r) {
+    return {
+      id: r.id,
+      submissionId: r.submission_id,
+      event: r.event,
+      test: !!r.test,
+      status: r.status,
+      attempts: r.attempts,
+      responseStatus: r.response_status,
+      error: r.error,
+      createdAt: r.created_at,
+      completedAt: r.completed_at
+    };
+  }));
 }
 
 // ---- Public events (called by the embedded runtime on third-party sites) ----
@@ -125,8 +243,15 @@ async function recordSubmit(c) {
   if (!object(data) || validateShape(data) || new TextEncoder().encode(JSON.stringify(data)).length > 16384) return json({ error: "Submission must be an object up to 16 KB" }, 400);
   const requestId = c.body && c.body.requestId;
   if (requestId !== undefined && (typeof requestId !== "string" || !/^[A-Za-z0-9_-]{8,100}$/.test(requestId))) return json({ error: "Invalid request ID" }, 400);
-  await c.env.DB.prepare("INSERT INTO submissions (widget_id, data, request_id) VALUES (?, ?, ?) ON CONFLICT(widget_id, request_id) WHERE request_id IS NOT NULL DO NOTHING")
+  const inserted = await c.env.DB.prepare("INSERT INTO submissions (widget_id, data, request_id) VALUES (?, ?, ?) ON CONFLICT(widget_id, request_id) WHERE request_id IS NOT NULL DO NOTHING")
     .bind(c.params.id, JSON.stringify(data), requestId || null).run();
+  if (inserted.meta.changes > 0) {
+    const delivery = deliverLead(c, c.params.id, inserted.meta.last_row_id, data).catch(function (e) {
+      console.error("[popuploom] webhook delivery failed:", e && e.message);
+    });
+    if (c.ctx && typeof c.ctx.waitUntil === "function") c.ctx.waitUntil(delivery);
+    else await delivery;
+  }
   return json({ ok: true }, 201);
 }
 
@@ -142,4 +267,4 @@ async function listSubmissions(c) {
   return json(rows.map(x => ({ id: x.id, data: JSON.parse(x.data), createdAt: x.created_at })));
 }
 
-module.exports = { listWidgets, getWidgetConfig, getWidget, createWidget, updateWidget, deleteWidget, recordView, recordSubmit, listSubmissions };
+module.exports = { listWidgets, getWidgetConfig, getWidget, createWidget, updateWidget, deleteWidget, getWebhook, putWebhook, deleteWebhook, testWebhook, listWebhookDeliveries, recordView, recordSubmit, listSubmissions };

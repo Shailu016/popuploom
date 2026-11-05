@@ -131,6 +131,11 @@ Notes:
 | `DELETE /api/widgets/:id` | Bearer | Delete widget (+ its submissions) |
 | `GET /api/widgets/:id/config` | public | Live config for the embedded runtime (no owner data) |
 | `GET /api/widgets/:id/submissions` | Bearer | List captured leads (default 200, max 500; use limit and before ID for pagination) |
+| `GET /api/widgets/:id/webhook` | Bearer | Read the popup's server-side lead webhook (URL, signing secret, enabled state) |
+| `PUT /api/widgets/:id/webhook` | Bearer | Create or update the webhook URL; pass `rotateSecret: true` to rotate the secret |
+| `DELETE /api/widgets/:id/webhook` | Bearer | Remove the webhook and its delivery log |
+| `POST /api/widgets/:id/webhook/test` | Bearer | Send a signed test `lead.created` event |
+| `GET /api/widgets/:id/webhook/deliveries` | Bearer | Recent delivery statuses (default 20, max 100) |
 | `POST /api/widgets/:id/view` | public | Increment view counter (called by the embed runtime) |
 | `POST /api/widgets/:id/submit` | public | Store a lead (called by the embed runtime) |
 | `GET /api/health` | None | Liveness check |
@@ -170,7 +175,7 @@ Public endpoints keep their permissive CORS behavior so embeds on external sites
 | Page targeting | all · include list · exclude list, each line a glob (`/shop/*`) |
 | Devices | separate desktop/mobile switches; exit-intent self-disables on touch |
 | Content blocks | badge · headline · body · image · video (YouTube/Vimeo, auto-embedded) · live countdown · tap-to-copy coupon · tap-meter choices · form (multi-field) · prize wheel (spin-to-win) · age gate (18+ verify) · social-proof toasts · CTA · link tiles · fine print |
-| Forms | submissions stored in SQLite (owner sees counts + leads on the dashboard), optional webhook POST (`no-cors`) |
+| Forms | submissions stored in SQLite (owner sees counts + leads on the dashboard), optional client-side webhook (`no-cors`), plus server-side `lead.created` webhooks with HMAC signing, retries and a delivery log |
 | Prize wheel | conic-gradient wheel rendered from config segments; weighted-looking stop, 4.3s ease-out spin; the landed prize is logged with the widget's leads |
 | Age gate | allow passes through (logs a verified event, then auto-closes); deny shows a message or redirects to a configurable URL |
 | Social proof | bottom-left corner card that cycles through configured activity items on an interval |
@@ -284,6 +289,40 @@ See [CLOUDFLARE.md](CLOUDFLARE.md) for build, tests, D1 migration, private data 
 Open **My popups → Leads** for any saved popup. The inbox shows 100 responses per page; **Export all leads as CSV** follows every 500-row API page, includes all captured fields, supports cancellation, and escapes spreadsheet formula prefixes. API ownership checks remain enforced. Empty, expired-session and request-error states are explicit. The CSV is a browser download: keep exported personal data private.
 
 **My popups → Export leads (.csv)** downloads one combined file for the whole workspace. It includes the popup name and id on every row, pages each popup at 500 leads, escapes spreadsheet formula prefixes, and is the only bulk export that contains visitor responses. The `.json` backup beside it stores popup configurations, not leads.
+
+## Lead webhooks
+
+Open a popup's **Lead inbox** to configure **Webhook events**. Unlike the optional in-popup webhook field, this endpoint is called by the server after the lead is safely stored, with retries, an HMAC signature and a delivery log. The URL and signing secret are owner-only and are never included in the public widget config.
+
+Each stored lead sends one `lead.created` event:
+
+```json
+{
+  "event": "lead.created",
+  "id": "delivery id",
+  "createdAt": "2026-11-05T12:00:00.000Z",
+  "test": false,
+  "popup": { "id": "wan_…", "name": "48-Hour Drop" },
+  "lead": { "id": 42, "createdAt": "2026-11-05T12:00:00.000Z", "data": { "email": "maya@example.com" } }
+}
+```
+
+Headers include `X-PopupLoom-Event`, `X-PopupLoom-Delivery`, `X-PopupLoom-Timestamp` and:
+
+```
+X-PopupLoom-Signature: t=<unix seconds>,v1=<hex HMAC-SHA256>
+```
+
+The signed value is `timestamp + "." + rawBody`, using the secret shown in the Lead inbox. A Node receiver can verify it like this:
+
+```js
+const crypto = require("crypto");
+const [t, v1] = signature.split(",").map((part) => part.split("=")[1]);
+const expected = crypto.createHmac("sha256", secret).update(t + "." + rawBody).digest("hex");
+if (!crypto.timingSafeEqual(Buffer.from(v1, "hex"), Buffer.from(expected, "hex"))) throw new Error("Bad signature");
+```
+
+Delivery rules: HTTPS only, private/localhost addresses rejected, redirects not followed, 6-second timeout, up to three attempts with short backoff, retrying network errors, 408, 429 and 5xx responses. `POST /webhook/test` sends a sample event, and the delivery table records status, attempts, HTTP response and errors. Disabled endpoints receive nothing, and duplicate `requestId` submissions do not deliver twice. This is retried background delivery, not a durable queue; use the delivery log to detect failures. `ALLOW_INSECURE_WEBHOOKS=true` is only for local testing and permits HTTP (including loopback).
 
 Your account supports password changes and permanent account deletion after current-password verification, or a matching Google identity for Google-only account deletion. Password changes invalidate existing sessions. Account deletion cascades to saved widgets and their leads. Export before deleting.
 

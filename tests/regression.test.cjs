@@ -13,6 +13,7 @@ process.env.NODE_ENV='test';
 process.env.TRUST_PROXY='';
 process.env.DOMAIN_CUTOVER_ENABLED='false';
 process.env.GOOGLE_CLIENT_ID='';
+process.env.ALLOW_INSECURE_WEBHOOKS='true';
 const app=require('../server/index');
 let server,base,account,widget;
 async function api(url,{method='GET',body,token,headers={}}={}){
@@ -20,6 +21,7 @@ async function api(url,{method='GET',body,token,headers={}}={}){
  const text=await res.text();let data;try{data=JSON.parse(text);}catch{data=text;}
  return {status:res.status,data,headers:res.headers};
 }
+async function until(check,ms=5000){const started=Date.now();while(!check()){if(Date.now()-started>ms)throw new Error('Timed out waiting for webhook delivery');await new Promise(r=>setTimeout(r,25));}}
 before(async()=>{
  server=await new Promise(resolve=>{const s=app.listen(0,'127.0.0.1',()=>resolve(s));});
  base='http://127.0.0.1:'+server.address().port;
@@ -475,6 +477,74 @@ test('CSV preserves Unicode and escapes spreadsheet formulas, quotes and multili
  assert.ok(combined.includes('"Popup A","wan_a","1","2026-01-01"'));
  assert.ok(combined.includes("'=1+1"));assert.ok(text.includes('line1\nline2'));
 });
+test('lead webhooks deliver once, sign payloads, log attempts and stay private',async()=>{
+ const http=require('node:http');
+ const received=[];
+ const receiver=http.createServer(async(req,res)=>{const chunks=[];for await(const c of req)chunks.push(c);received.push({headers:req.headers,body:Buffer.concat(chunks).toString('utf8')});res.writeHead(200,{'Content-Type':'text/plain'});res.end('ok');});
+ await new Promise(r=>receiver.listen(0,'127.0.0.1',r));
+ try{
+  const hookWidget=(await api('/api/widgets',{method:'POST',token:account.token,body:{name:'Hook test',config:{content:{title:'Hook'}}}})).data;
+  const hook='/api/widgets/'+hookWidget.id+'/webhook';
+  const saved=await api(hook,{method:'PUT',token:account.token,body:{url:'http://127.0.0.1:'+receiver.address().port+'/hook',enabled:true}});
+  assert.equal(saved.status,200);assert.match(saved.data.webhook.secret,/^[a-f0-9]{64}$/);
+  const requestId='req-'+Date.now();
+  const submit=(data,id=requestId)=>api('/api/widgets/'+hookWidget.id+'/submit',{method:'POST',body:{data,requestId:id}});
+  assert.equal((await submit({email:'lead@example.com',note:'first'})).status,201);
+  await until(()=>received.length===1);
+  const event=JSON.parse(received[0].body);
+  assert.equal(event.event,'lead.created');assert.equal(event.popup.id,hookWidget.id);assert.equal(event.popup.name,'Hook test');assert.equal(event.lead.data.email,'lead@example.com');assert.equal(event.test,false);
+  const signature=received[0].headers['x-popuploom-signature'];assert.ok(signature&&signature.startsWith('t='));
+  const parts=Object.fromEntries(signature.split(',').map(part=>part.split('=')));
+  const expected=crypto.createHmac('sha256',saved.data.webhook.secret).update(parts.t+'.'+received[0].body).digest('hex');
+  assert.equal(parts.v1,expected);
+  assert.equal((await submit({email:'lead@example.com',note:'first'})).status,201);
+  await new Promise(r=>setTimeout(r,200));assert.equal(received.length,1,'duplicate request IDs do not deliver twice');
+  await new Promise(r=>setTimeout(r,100));
+  const deliveries=await api(hook+'/deliveries',{token:account.token});
+  assert.equal(deliveries.status,200);assert.equal(deliveries.data.length,1);assert.equal(deliveries.data[0].status,'success');assert.equal(deliveries.data[0].attempts,1);assert.equal(deliveries.data[0].responseStatus,200);assert.equal(deliveries.data[0].submissionId,event.lead.id);
+  const tested=await api(hook+'/test',{method:'POST',token:account.token});
+  assert.equal(tested.status,200);assert.equal(tested.data.ok,true);assert.equal(received.length,2);assert.equal(JSON.parse(received[1].body).test,true);
+  const disabled=await api(hook,{method:'PUT',token:account.token,body:{url:'http://127.0.0.1:'+receiver.address().port+'/hook',enabled:false}});
+  assert.equal(disabled.status,200);assert.equal(disabled.data.webhook.enabled,false);
+  await submit({email:'disabled@example.com'},'req-'+(Date.now()+1));await new Promise(r=>setTimeout(r,200));assert.equal(received.length,2);
+  const invalidPrivate=await api(hook,{method:'PUT',token:account.token,body:{url:'https://10.0.0.1/hook'}});
+  assert.equal(invalidPrivate.status,400);
+  const invalidCreds=await api(hook,{method:'PUT',token:account.token,body:{url:'https://user:pass@example.com/hook'}});
+  assert.equal(invalidCreds.status,400);
+  const other=(await api('/api/auth/register',{method:'POST',body:{email:'webhook-other@example.com',password:'other-password-123'}})).data;
+  assert.equal((await api(hook,{token:other.token})).status,404);
+  assert.equal((await api(hook,{method:'PUT',token:other.token,body:{url:'https://example.com/hook'}})).status,404);
+  const removed=await api(hook,{method:'DELETE',token:account.token});assert.equal(removed.status,200);
+  assert.equal((await api(hook,{token:account.token})).data.webhook,null);
+ }finally{await new Promise(r=>receiver.close(r));}
+});
+test('webhook URL validation blocks insecure and private destinations',()=>{
+ const {validateUrl}=require('../shared/webhook');
+ for(const url of ['http://example.com/hook','https://127.0.0.1/hook','https://2130706433/hook','https://0177.0.0.1/hook','https://127.1/hook','https://[::1]/hook','https://user:pass@example.com/hook','https://10.0.0.1/hook','https://192.168.1.1/hook','ftp://example.com/hook'])assert.ok(validateUrl(url,{allowInsecure:false}),url);
+ assert.equal(validateUrl('https://example.com/hook',{allowInsecure:false}),null);
+ assert.equal(validateUrl('http://127.0.0.1:8080/hook',{allowInsecure:true}),null);
+ assert.ok(validateUrl('http://10.0.0.1/hook',{allowInsecure:true}));
+});
+test('webhook delivery retries transient failures and stops on 4xx',async()=>{
+ const http=require('node:http');
+ const {deliver}=require('../shared/webhook');
+ const calls={retry:0,stop:0};
+ const receiver=http.createServer((req,res)=>{
+  req.resume();
+  if(req.url==='/retry'){calls.retry++;res.writeHead(calls.retry<3?500:200);}
+  else{calls.stop++;res.writeHead(400);}
+  res.end('result');
+ });
+ await new Promise(r=>receiver.listen(0,'127.0.0.1',r));
+ try{
+  const base='http://127.0.0.1:'+receiver.address().port;
+  const event={event:'lead.created',id:'evt_test'};
+  const retried=await deliver({url:base+'/retry',secret:'a'.repeat(64)},event,{delays:[0,0,0]});
+  assert.equal(retried.ok,true);assert.equal(retried.attempts,3);assert.equal(retried.status,200);assert.equal(calls.retry,3);
+  const stopped=await deliver({url:base+'/stop',secret:'a'.repeat(64)},event,{delays:[0,0,0]});
+  assert.equal(stopped.ok,false);assert.equal(stopped.attempts,1);assert.equal(stopped.status,400);assert.equal(calls.stop,1);
+ }finally{await new Promise(r=>receiver.close(r));}
+});
 const browserPath=process.env.POPFORGE_BROWSER||['C:/Program Files/Google/Chrome/Application/chrome.exe','C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'].find(p=>fs.existsSync(p));
 test('browser: all templates, save failures, installation, test mode, delete and hostile imports',{skip:!browserPath,timeout:120000},async()=>{
  const puppeteer=require('puppeteer-core');const browser=await puppeteer.launch({executablePath:browserPath,headless:true,args:['--no-sandbox'],userDataDir:path.join(temp,'browser')});
@@ -575,6 +645,12 @@ test('browser: all templates, save failures, installation, test mode, delete and
   await page.evaluate(token=>localStorage.setItem('pf.token',token),account.token);
   await page.goto(base+'/leads.html?id='+inboxWidget.id,{waitUntil:'networkidle0'});
   await page.waitForFunction(()=>document.querySelectorAll('#leadsTable tbody tr').length===100);
+  await page.waitForFunction(()=>document.querySelector('#webhookPanel').hidden===false);
+  assert.equal(await page.$eval('#webhookStatus',e=>e.textContent),'No webhook configured yet.');
+  await page.$eval('#webhookUrl',e=>{e.value='https://example.com/hook';});
+  await page.click('#webhookSave');
+  await page.waitForFunction(()=>document.querySelector('#webhookStatus').textContent==='Webhook saved.');
+  assert.match(await page.$eval('#webhookSecret',e=>e.textContent),/^[a-f0-9]{64}$/);
   await page.click('#more');await page.waitForFunction(()=>document.querySelectorAll('#leadsTable tbody tr').length===200);
   assert.equal(await page.evaluate(()=>window.leadXss),undefined);
   await page.evaluate(()=>{URL.createObjectURL=blob=>{blob.text().then(t=>window.exportedCSV=t);return 'blob:qa-export';};HTMLAnchorElement.prototype.click=function(){};});

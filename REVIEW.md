@@ -44,6 +44,6 @@ Restart the server to load the changes. Startup automatically adds the session-v
 
 For reverse proxy deployment, configure TRUST_PROXY with trusted proxy IPs/subnets. Keep JWT_SECRET configured with a unique random secret of at least 32 characters.
 
-The live Google consent/token exchange and delivery to a real external webhook receiver were not exercised. Authentication linking was tested with verified-profile fixtures. Production traffic capacity and deployment-specific TLS/proxy behavior were not load-tested.
+The live Google consent/token exchange and delivery to a real third-party webhook provider were not exercised; webhook signing, retries and private-address rejection were tested against local receivers. Authentication linking was tested with verified-profile fixtures. Production traffic capacity and deployment-specific TLS/proxy behavior were not load-tested.
 
 Release follow-up: legacy redirects now require an explicit cutover flag; production enables it only after DNS/TLS and the live rebrand checks passed. Backup imports assign fresh IDs so recovered data cannot overwrite newer matching drafts. Browser coverage verifies preservation of the existing draft and the imported copy.

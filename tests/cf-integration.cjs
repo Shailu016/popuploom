@@ -1,6 +1,6 @@
 const fs=require('fs'),path=require('path'),http=require('http'),assert=require('assert/strict'),{spawn}=require('child_process'),{DatabaseSync}=require('node:sqlite');
-(async()=>{const root=path.resolve(__dirname,'..');const {default:worker}=await import(require('url').pathToFileURL(path.join(root,'.cf-build/index.js')));const db=new DatabaseSync(':memory:');for(const f of ['0001_init.sql','0003_rate_limits.sql','0004_password_reset_tokens.sql'])db.exec(fs.readFileSync(path.join(root,'worker/migrations',f),'utf8'));
-const env={JWT_SECRET:require('crypto').randomBytes(32).toString('hex'),RESEND_API_KEY:'test-resend-key',RESET_EMAIL_FROM:'PopupLoom <reset@popuploom.com>',PUBLIC_ORIGIN:'https://popuploom.com',DB:{prepare(sql){return {bind(...args){return {first:async()=>db.prepare(sql).get(...args),run:async()=>{const r=db.prepare(sql).run(...args);return {meta:{changes:r.changes,last_row_id:r.lastInsertRowid}};},all:async()=>({results:db.prepare(sql).all(...args)})};}};}},ASSETS:{fetch:async r=>{const file=path.join(root,'.cf-build/public',new URL(r.url).pathname);return fs.existsSync(file)&&fs.statSync(file).isFile()?new Response(fs.readFileSync(file),{headers:{'Content-Type':file.endsWith('.html')?'text/html':'application/octet-stream'}}):new Response('',{status:404});}}};
+(async()=>{const root=path.resolve(__dirname,'..');const {default:worker}=await import(require('url').pathToFileURL(path.join(root,'.cf-build/index.js')));const db=new DatabaseSync(':memory:');for(const f of ['0001_init.sql','0003_rate_limits.sql','0004_password_reset_tokens.sql','0005_webhooks.sql'])db.exec(fs.readFileSync(path.join(root,'worker/migrations',f),'utf8'));
+const env={JWT_SECRET:require('crypto').randomBytes(32).toString('hex'),RESEND_API_KEY:'test-resend-key',RESET_EMAIL_FROM:'PopupLoom <reset@popuploom.com>',PUBLIC_ORIGIN:'https://popuploom.com',ALLOW_INSECURE_WEBHOOKS:'true',DB:{prepare(sql){return {bind(...args){return {first:async()=>db.prepare(sql).get(...args),run:async()=>{const r=db.prepare(sql).run(...args);return {meta:{changes:r.changes,last_row_id:r.lastInsertRowid}};},all:async()=>({results:db.prepare(sql).all(...args)})};}};}},ASSETS:{fetch:async r=>{const file=path.join(root,'.cf-build/public',new URL(r.url).pathname);return fs.existsSync(file)&&fs.statSync(file).isFile()?new Response(fs.readFileSync(file),{headers:{'Content-Type':file.endsWith('.html')?'text/html':'application/octet-stream'}}):new Response('',{status:404});}}};
 for(const flag of [undefined,'false','true']){
  const enabled=flag==='true';
  for(const path of ['/','/studio.html?tpl=cafeClub','/index.html?ref=1']){
@@ -61,6 +61,95 @@ let cancelled=false;const stream=new ReadableStream({pull(c){c.enqueue(new Uint8
   assert.ok(row);assert.match(row.token_hash,/^[a-f0-9]{64}$/);assert.equal(row.used_at,null);
  }finally{globalThis.fetch=realFetch;}
  console.log('PASS Worker reset provider failures stay generic and store only a hash');
+}
+
+{
+  console.log('== lead webhooks ==');
+  const crypto = require('crypto');
+  const wenv = { ...env, ALLOW_INSECURE_WEBHOOKS: 'true' };
+  const call = async (method, pathname, { token, body } = {}) => {
+    const headers = {};
+    if (token) headers.Authorization = 'Bearer ' + token;
+    if (body !== undefined) headers['Content-Type'] = 'application/json';
+    const response = await worker.fetch(new Request('https://popuploom.com' + pathname, {
+      method, headers, body: body === undefined ? undefined : JSON.stringify(body)
+    }), wenv, { waitUntil() {} });
+    const text = await response.text();
+    let data; try { data = JSON.parse(text); } catch { data = text; }
+    return { status: response.status, data };
+  };
+  const received = [];
+  const receiver = http.createServer(async (req, res) => {
+    const chunks = [];
+    for await (const chunk of req) chunks.push(chunk);
+    const body = Buffer.concat(chunks).toString('utf8');
+    received.push({ headers: req.headers, body });
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('ok');
+  });
+  await new Promise(resolve => receiver.listen(0, '127.0.0.1', resolve));
+  try {
+    const account = await call('POST', '/api/auth/register', { body: { email: 'webhook.' + Date.now() + '@example.com', password: 'webhook-password-123' } });
+    assert.equal(account.status, 201);
+    const widget = await call('POST', '/api/widgets', { token: account.data.token, body: { name: 'Webhook test', config: { content: { title: 'Hello' } } } });
+    assert.equal(widget.status, 201);
+    const base = '/api/widgets/' + widget.data.id + '/webhook';
+    const saved = await call('PUT', base, { token: account.data.token, body: { url: 'http://127.0.0.1:' + receiver.address().port + '/hook', enabled: true } });
+    assert.equal(saved.status, 200);
+    assert.match(saved.data.webhook.secret, /^[a-f0-9]{64}$/);
+
+    const pending = [];
+    const submit = async (data, requestId) => {
+      const response = await worker.fetch(new Request('https://popuploom.com/api/widgets/' + widget.data.id + '/submit', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data, requestId })
+      }), wenv, { waitUntil(promise) { pending.push(promise); } });
+      assert.equal(response.status, 201);
+      await Promise.all(pending.splice(0));
+    };
+    const firstRequest = 'req-' + Date.now();
+    await submit({ email: 'lead@example.com', note: 'first' }, firstRequest);
+    assert.equal(received.length, 1, 'one delivery for a stored lead');
+    const event = JSON.parse(received[0].body);
+    assert.equal(event.event, 'lead.created');
+    assert.equal(event.popup.id, widget.data.id);
+    assert.equal(event.lead.data.email, 'lead@example.com');
+    assert.equal(event.test, false);
+    const signature = received[0].headers['x-popuploom-signature'];
+    assert.ok(signature && signature.startsWith('t='));
+    const parts = Object.fromEntries(signature.split(',').map(part => part.split('=')));
+    const expected = crypto.createHmac('sha256', saved.data.webhook.secret).update(parts.t + '.' + received[0].body).digest('hex');
+    assert.equal(parts.v1, expected, 'HMAC signature covers timestamp and body');
+
+    await submit({ email: 'lead@example.com', note: 'first' }, firstRequest);
+    assert.equal(received.length, 1, 'duplicate request IDs do not deliver twice');
+
+    const deliveries = await call('GET', base + '/deliveries', { token: account.data.token });
+    assert.equal(deliveries.status, 200);
+    assert.equal(deliveries.data.length, 1);
+    assert.equal(deliveries.data[0].status, 'success');
+    assert.equal(deliveries.data[0].attempts, 1);
+    assert.equal(deliveries.data[0].responseStatus, 200);
+    assert.equal(deliveries.data[0].submissionId, event.lead.id);
+
+    const tested = await call('POST', base + '/test', { token: account.data.token });
+    assert.equal(tested.status, 200);
+    assert.equal(tested.data.ok, true);
+    assert.equal(received.length, 2);
+    assert.equal(JSON.parse(received[1].body).test, true);
+
+    await call('PUT', base, { token: account.data.token, body: { url: 'http://127.0.0.1:' + receiver.address().port + '/hook', enabled: false } });
+    await submit({ email: 'disabled@example.com' }, 'req-' + (Date.now() + 1));
+    assert.equal(received.length, 2, 'disabled endpoints receive nothing');
+
+    const other = await call('POST', '/api/auth/register', { body: { email: 'webhook-other.' + Date.now() + '@example.com', password: 'webhook-password-123' } });
+    const denied = await call('GET', base, { token: other.data.token });
+    assert.equal(denied.status, 404, 'webhook settings stay private to the owner');
+    const invalid = await call('PUT', base, { token: account.data.token, body: { url: 'https://10.0.0.1/hook' } });
+    assert.equal(invalid.status, 400, 'private addresses are rejected');
+    console.log('PASS server-side lead webhooks sign, retry, log and stay private');
+  } finally {
+    await new Promise(resolve => receiver.close(resolve));
+  }
 }
 
 const server=http.createServer(async(req,res)=>{try{const chunks=[];for await(const c of req)chunks.push(c);const body=Buffer.concat(chunks);const request=new Request('http://'+req.headers.host+req.url,{method:req.method,headers:req.headers,...(!['GET','HEAD'].includes(req.method)?{body}:{} )});const response=await worker.fetch(request,env,{waitUntil:p=>p.catch(()=>{})});res.writeHead(response.status,Object.fromEntries(response.headers));res.end(Buffer.from(await response.arrayBuffer()));}catch(e){res.writeHead(500);res.end(String(e));}});await new Promise(r=>server.listen(0,'127.0.0.1',r));try{const child=spawn(process.execPath,['tests/worker-test.js'],{cwd:root,env:{...process.env,BASE:'http://127.0.0.1:'+server.address().port},stdio:'inherit',windowsHide:true});const code=await new Promise(r=>child.once('exit',r));assert.equal(code,0);}finally{await new Promise(r=>server.close(r));db.close();}})().catch(e=>{console.error(e);process.exitCode=1;});
