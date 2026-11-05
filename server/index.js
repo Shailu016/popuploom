@@ -197,7 +197,7 @@ app.get("/api/health", (req, res) => res.json({ ok: true, version: "2.0" }));
 // ---- Static files (frontend): explicit public allowlist ----
 const publicFiles = new Set([
   "templates.html", "guides/install-popups.html", "robots.txt", "sitemap.xml", "llms.txt", "llms-full.txt", "index.html", "studio.html", "profile.html", "demo.html", "migration.html", "reset-password.html",
-  "leads.html", "privacy.html", "lead-csv.js", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "popuploom.js", "popforge.js", "ui.css"
+  "leads.html", "privacy.html", "about.html", "contact.html", "terms.html", ".well-known/security.txt", "lead-csv.js", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "popuploom.js", "popforge.js", "ui.css"
 ]);
 app.use((req, res, next) => {
   if (req.method !== "GET" && req.method !== "HEAD") return next();

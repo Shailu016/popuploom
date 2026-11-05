@@ -6,6 +6,9 @@
 - [Overview and FAQ](https://popuploom.com/): features, account requirements, supported triggers and limitations.
 - [Template catalog](https://popuploom.com/templates.html): all 45 starting designs grouped by purpose.
 - [Installation guide](https://popuploom.com/guides/install-popups.html): installation, platform constraints and troubleshooting.
+- [About PopupLoom](https://popuploom.com/about.html): who operates the product and how templates should be understood.
+- [Contact](https://popuploom.com/contact.html): support, privacy, security and blocklist questions.
+- [Terms of use](https://popuploom.com/terms.html): accounts, acceptable use, lead data and liability.
 - [Full documentation](https://popuploom.com/llms-full.txt): extended machine-readable product documentation with the builder facts, embed format, limits and FAQ.
 
 ## Product facts

@@ -14,7 +14,7 @@ function browserOrigin(req, res, next) {
   if (origin && !publicRoute && origin !== own && !origins.includes(origin)) return res.status(403).json({ error: "Origin is not allowed" });
   cors({ origin: publicRoute ? "*" : origin || false, credentials: false, methods: ["GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"], allowedHeaders: ["Content-Type", "Authorization"] })(req, res, next);
 }
-const htmlFiles = new Set(["index.html", "studio.html", "profile.html", "demo.html", "templates.html", "guides/install-popups.html", "migration.html", "reset-password.html", "leads.html", "privacy.html"]);
+const htmlFiles = new Set(["index.html", "studio.html", "profile.html", "demo.html", "templates.html", "guides/install-popups.html", "migration.html", "reset-password.html", "leads.html", "privacy.html", "about.html", "contact.html", "terms.html"]);
 const policyCache = new Map();
 const hash = text => "'sha256-" + crypto.createHash("sha256").update(text).digest("base64") + "'";
 function scriptHashes(file) {

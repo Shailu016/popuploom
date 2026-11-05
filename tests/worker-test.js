@@ -260,6 +260,9 @@ function hostReq(host, path, method = "GET", extraHeaders = {}) {
   r=await req('GET','/api/auth/me',{token:cb.data.token});check('deleted account session rejected',r.status===401);
   r=await req('GET','/leads.html',{raw:true});check('lead inbox is served with noindex',r.status===200&&r.headers.get('x-robots-tag').includes('noindex'));
   r=await req('GET','/lead-csv.js',{raw:true});check('shared lead CSV helper is served',r.status===200);
+  r=await req('GET','/about.html',{raw:true});check('about page is served',r.status===200&&String(r.headers.get('content-type')).includes('text/html'));
+  r=await req('GET','/terms.html',{raw:true});check('terms page is served',r.status===200);
+  r=await req('GET','/.well-known/security.txt',{raw:true});check('security.txt is served',r.status===200&&String(r.data).includes('Contact:'));
   console.log("== rate limit (login 40/10min) ==");
   let got429 = false, count = 0;
   for (let i = 0; i < 45; i++) {

@@ -1,5 +1,10 @@
 User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /studio.html
+Disallow: /profile.html
+Disallow: /leads.html
+Disallow: /reset-password.html
+Disallow: /migration.html
 
 Sitemap: https://popuploom.com/sitemap.xml

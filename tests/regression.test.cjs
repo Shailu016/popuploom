@@ -39,7 +39,7 @@ test('private files stay private including encoded separators and extensions',as
   const r=await api(url);assert.ok(r.status===404||r.headers.get('content-type').includes('text/html'),url);
   assert.ok(!String(r.data).includes('SQLite format 3')&&!String(r.data).includes('JWT_SECRET=')&&!String(r.data).includes('const JWT_SECRET'),url);
  }
- for(const url of ['/','/templates.html','/guides/install-popups.html','/migration.html','/studio.html','/profile.html','/demo.html','/reset-password.html','/app.js','/lead-csv.js','/studio.js','/reset-password.js','/popuploom.js','/popforge.js','/ui.css','/robots.txt','/sitemap.xml','/llms.txt','/llms-full.txt','/assets/winter-gift.jpg','/assets/favicon.svg','/assets/og-popuploom.png'])assert.equal((await api(url)).status,200,url);
+ for(const url of ['/','/templates.html','/guides/install-popups.html','/migration.html','/studio.html','/profile.html','/demo.html','/reset-password.html','/about.html','/contact.html','/terms.html','/.well-known/security.txt','/app.js','/lead-csv.js','/studio.js','/reset-password.js','/popuploom.js','/popforge.js','/ui.css','/robots.txt','/sitemap.xml','/llms.txt','/llms-full.txt','/assets/winter-gift.jpg','/assets/favicon.svg','/assets/og-popuploom.png'])assert.equal((await api(url)).status,200,url);
 });
 test('every template asset reference points at a shipped file',()=>{
  const src=fs.readFileSync(path.join(root,'app.js'),'utf8');
