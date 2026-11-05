@@ -243,6 +243,60 @@
   };
 
   /* ------------------------------------------------------------------ */
+  /* Lead export: every popup, paged at the API's 500-row maximum.       */
+  /* ------------------------------------------------------------------ */
+  const Leads = {
+    all: async function (onProgress) {
+      if (!Auth.isAuthed()) throw new Error("Sign in to export captured leads.");
+      const widgets = await Store.loadAll();
+      const rows = [];
+      for (let wi = 0; wi < widgets.length; wi++) {
+        const w = widgets[wi];
+        let before = null;
+        for (;;) {
+          const url = API + "/api/widgets/" + encodeURIComponent(w.id) + "/submissions?limit=500" + (before ? "&before=" + encodeURIComponent(before) : "");
+          let res;
+          try {
+            res = await fetch(url, { headers: Auth.headers(), cache: "no-store" });
+          } catch (e) {
+            throw new Error("Could not export leads. Check your connection and try again.");
+          }
+          if (res.status === 401) throw new Error("Session expired. Sign in again.");
+          if (res.status === 404) break; // popup was deleted while exporting
+          if (!res.ok) throw new Error("Could not export leads. Please try again.");
+          let batch;
+          try { batch = await res.json(); } catch (e) { throw new Error("Invalid lead response."); }
+          if (!Array.isArray(batch)) throw new Error("Invalid lead response.");
+          for (let i = 0; i < batch.length; i++) {
+            rows.push({
+              widgetName: w.name || "Untitled popup",
+              widgetId: w.id,
+              id: batch[i].id,
+              createdAt: batch[i].createdAt,
+              data: batch[i].data || {}
+            });
+          }
+          if (onProgress) onProgress(rows.length, widgets.length, wi + 1);
+          if (batch.length < 500) break;
+          const next = batch[batch.length - 1].id;
+          if (before !== null && !(next < before)) throw new Error("Pagination did not advance; export stopped.");
+          before = next;
+          if (rows.length > 100000) throw new Error("Too many leads for one file. Export a single popup from its lead inbox.");
+        }
+      }
+      rows.sort(function (a, b) {
+        const ta = Date.parse(a.createdAt) || 0, tb = Date.parse(b.createdAt) || 0;
+        return tb - ta || b.id - a.id;
+      });
+      return rows;
+    },
+    csv: function (rows) {
+      if (!window.LeadCsv) throw new Error("Lead export is unavailable. Reload the page.");
+      return window.LeadCsv.csvWithPopup(rows);
+    }
+  };
+
+  /* ------------------------------------------------------------------ */
   /* Template presets: categorized catalog (original designs)            */
   /* "@assets/..." resolves to this server; "@48h"-style countdowns      */
   /* resolve to a live future timestamp at copy time.                    */
@@ -736,6 +790,7 @@
 
   window.PF = {
     store: Store,
+    leads: Leads,
     auth: Auth,
     apiBase: API,
     journeys: JOURNEYS,

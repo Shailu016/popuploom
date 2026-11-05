@@ -156,7 +156,7 @@ Public endpoints keep their permissive CORS behavior so embeds on external sites
 4. Save widget stores it in SQLite under their account (My popups, cloud pill)
 5. Publish tab issues that widget's own install code (`<div data-popuploom="wan_…">` + `popuploom.js`), tied to the account that saved it
 6. Any of their popups can be re-opened, edited, duplicated, or deleted from My popups anytime; edits sync to installed copies
-7. Export all (.json) writes `popuploom-widgets-backup.json`; Import file restores on another machine
+7. **Export leads (.csv)** downloads every captured response across all popups, following the 500-row API pages and adding popup name/id columns; **Backup popups (.json)** writes `popuploom-widgets-backup.json` for configurations only, and Import file restores it on another machine. The JSON backup never contains lead data — use the CSV export or a popup's lead inbox for that
 8. Views and saved leads are tallied per widget. The embedded runtime reports them to the API
 
 ## Runtime feature map
@@ -282,6 +282,8 @@ See [CLOUDFLARE.md](CLOUDFLARE.md) for build, tests, D1 migration, private data 
 ## Lead inbox and account controls
 
 Open **My popups → Leads** for any saved popup. The inbox shows 100 responses per page; **Export all leads as CSV** follows every 500-row API page, includes all captured fields, supports cancellation, and escapes spreadsheet formula prefixes. API ownership checks remain enforced. Empty, expired-session and request-error states are explicit. The CSV is a browser download: keep exported personal data private.
+
+**My popups → Export leads (.csv)** downloads one combined file for the whole workspace. It includes the popup name and id on every row, pages each popup at 500 leads, escapes spreadsheet formula prefixes, and is the only bulk export that contains visitor responses. The `.json` backup beside it stores popup configurations, not leads.
 
 Your account supports password changes and permanent account deletion after current-password verification, or a matching Google identity for Google-only account deletion. Password changes invalidate existing sessions. Account deletion cascades to saved widgets and their leads. Export before deleting.
 

@@ -157,7 +157,8 @@
         <h2 class="h-sec">My popups</h2>
         <div class="sec-title-actions">
           <button class="btn small" id="btnImport">Import file</button>
-          <button class="btn small" id="btnExportAll">Export all (.json)</button>
+          <button class="btn small" id="btnExportLeads">Export leads (.csv)</button>
+          <button class="btn small" id="btnExportAll">Backup popups (.json)</button>
         </div>
       </div>
       <p class="sub" style="max-width:72ch">Your popups live in your account, so they follow you between browsers. Each saved popup gets its own install code, and studio edits sync to the live site.</p>
@@ -254,6 +255,7 @@
 </div>
 
 <script src="./popuploom.js"></script>
+<script src="./lead-csv.js"></script>
 <script src="./app.js"></script>
 <script>
 (function () {
@@ -460,6 +462,33 @@
       } catch (err) { toast(err.message || "Delete failed", false); }
     }
   });
+  document.getElementById("btnExportLeads").onclick = async function () {
+    var btn = document.getElementById("btnExportLeads");
+    var label = btn.textContent;
+    if (!PF.auth.isAuthed()) { toast("Sign in to export captured leads", false); return; }
+    btn.disabled = true;
+    try {
+      btn.textContent = "Preparing leads…";
+      var rows = await PF.leads.all(function (count) {
+        btn.textContent = "Preparing " + count + " leads…";
+      });
+      if (!rows.length) { toast("No leads captured yet", false); return; }
+      var url = URL.createObjectURL(new Blob([PF.leads.csv(rows)], { type: "text/csv;charset=utf-8" }));
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = "popuploom-leads-all-" + new Date().toISOString().slice(0, 10) + ".csv";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      toast("Exported " + rows.length + " leads", true);
+    } catch (err) {
+      toast(err.message || "Could not export leads", false);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = label;
+    }
+  };
   document.getElementById("btnExportAll").onclick = async function () {
     var data = JSON.stringify(await PF.store.loadAll(), null, 2);
     var blob = new Blob([data], { type: "application/json" });

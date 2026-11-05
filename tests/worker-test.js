@@ -259,6 +259,7 @@ function hostReq(host, path, method = "GET", extraHeaders = {}) {
   r=await req('POST','/api/auth/account',{token:cb.data.token,body:{action:'delete',currentPassword:'changed-password-123',confirmation:caEmail}});check('account deletion requires verified credentials and email',r.status===200);
   r=await req('GET','/api/auth/me',{token:cb.data.token});check('deleted account session rejected',r.status===401);
   r=await req('GET','/leads.html',{raw:true});check('lead inbox is served with noindex',r.status===200&&r.headers.get('x-robots-tag').includes('noindex'));
+  r=await req('GET','/lead-csv.js',{raw:true});check('shared lead CSV helper is served',r.status===200);
   console.log("== rate limit (login 40/10min) ==");
   let got429 = false, count = 0;
   for (let i = 0; i < 45; i++) {

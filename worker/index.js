@@ -45,7 +45,7 @@ function clientScheme(request) {
 // Explicit public allowlist, same as the Express server's static middleware.
 const PUBLIC_FILES = new Set([
   "templates.html", "guides/install-popups.html", "robots.txt", "sitemap.xml", "llms.txt", "llms-full.txt", "index.html", "studio.html", "profile.html", "demo.html", "migration.html", "reset-password.html",
-  "leads.html", "privacy.html", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "popuploom.js", "popforge.js", "ui.css"
+  "leads.html", "privacy.html", "lead-csv.js", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "popuploom.js", "popforge.js", "ui.css"
 ]);
 
 // [regex, method, handler, needsAuth]

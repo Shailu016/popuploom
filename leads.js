@@ -1,10 +1,7 @@
 (function () {
   "use strict";
-  function value(v) { return v == null ? "" : typeof v === "object" ? JSON.stringify(v) : String(v); }
-  function cell(v) { var s=value(v); if (/^[\s]*[=+@-]/.test(s)||/^[\t\r\n]/.test(s)) s="'"+s; return '"'+s.replace(/"/g,'""')+'"'; }
-  function fields(rows) { return Array.from(new Set(rows.flatMap(r=>Object.keys(r.data||{})))); }
-  function csv(rows) { var keys=fields(rows); return '\uFEFF'+[['Lead ID','Submitted at (UTC)'].concat(keys.map(k=>'Field: '+k)).map(cell).join(',')].concat(rows.map(r=>[r.id,r.createdAt].concat(keys.map(k=>(r.data||{})[k])).map(cell).join(','))).join('\r\n')+'\r\n'; }
-  if(typeof module!=='undefined'&&module.exports) module.exports={csv:csv};
+  if (typeof module !== "undefined" && module.exports) { module.exports = require("./lead-csv"); return; }
+  var value=LeadCsv.value, cell=LeadCsv.cell, fields=LeadCsv.fields, csv=LeadCsv.csv;
   if(typeof document==='undefined')return;
   var session=PF.auth.getToken();
   var id=new URLSearchParams(location.search).get('id'),rows=[],cursor=null,busy=false,exporting=false,controller;

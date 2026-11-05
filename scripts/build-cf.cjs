@@ -2,7 +2,7 @@ const fs=require('fs'),path=require('path');require('./csp-hashes.js');const out
 // Wipe the previous public bundle so removed/renamed files cannot linger in the
 // deployed asset set. Everything below is copied from the tracked source files.
 fs.rmSync(out,{recursive:true,force:true});fs.mkdirSync(out,{recursive:true});
-for(const f of ['robots.txt','sitemap.xml','llms.txt','llms-full.txt','templates.html','guides/install-popups.html','index.html','studio.html','profile.html','demo.html','migration.html','reset-password.html','leads.html','privacy.html','leads.js','account.js','app.js','studio.js','reset-password.js','popuploom.js','ui.css']){fs.mkdirSync(path.dirname(path.join(out,f)),{recursive:true});fs.copyFileSync(f,path.join(out,f));}
+for(const f of ['robots.txt','sitemap.xml','llms.txt','llms-full.txt','templates.html','guides/install-popups.html','index.html','studio.html','profile.html','demo.html','migration.html','reset-password.html','leads.html','privacy.html','lead-csv.js','leads.js','account.js','app.js','studio.js','reset-password.js','popuploom.js','ui.css']){fs.mkdirSync(path.dirname(path.join(out,f)),{recursive:true});fs.copyFileSync(f,path.join(out,f));}
 // Search Console / Bing verification drop files are owner-provided; copy every
 // one that exists instead of hardcoding names that only the owner can know.
 const verification=require('../shared/verification');

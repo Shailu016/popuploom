@@ -37,7 +37,7 @@ test('private files stay private including encoded separators and extensions',as
   const r=await api(url);assert.ok(r.status===404||r.headers.get('content-type').includes('text/html'),url);
   assert.ok(!String(r.data).includes('SQLite format 3')&&!String(r.data).includes('JWT_SECRET=')&&!String(r.data).includes('const JWT_SECRET'),url);
  }
- for(const url of ['/','/templates.html','/guides/install-popups.html','/migration.html','/studio.html','/profile.html','/demo.html','/reset-password.html','/app.js','/studio.js','/reset-password.js','/popuploom.js','/popforge.js','/ui.css','/robots.txt','/sitemap.xml','/llms.txt','/llms-full.txt','/assets/winter-gift.jpg','/assets/favicon.svg','/assets/og-popuploom.png'])assert.equal((await api(url)).status,200,url);
+ for(const url of ['/','/templates.html','/guides/install-popups.html','/migration.html','/studio.html','/profile.html','/demo.html','/reset-password.html','/app.js','/lead-csv.js','/studio.js','/reset-password.js','/popuploom.js','/popforge.js','/ui.css','/robots.txt','/sitemap.xml','/llms.txt','/llms-full.txt','/assets/winter-gift.jpg','/assets/favicon.svg','/assets/og-popuploom.png'])assert.equal((await api(url)).status,200,url);
 });
 test('every template asset reference points at a shipped file',()=>{
  const src=fs.readFileSync(path.join(root,'app.js'),'utf8');
@@ -468,8 +468,12 @@ test('account changes require reauthentication, revoke sessions and cascade dele
  assert.equal((await api('/api/auth/me',{token:b.token})).status,401);
 });
 test('CSV preserves Unicode and escapes spreadsheet formulas, quotes and multiline data',()=>{
- const {csv}=require('../leads');const text=csv([{id:1,createdAt:'2026-01-01',data:{email:'=HYPERLINK("evil")',name:'Maya, \"hi\"',note:'line1\nline2',unicode:'नमस्ते'}},{id:2,data:{extra:'  +CMD'}}]);
- assert.ok(text.startsWith('\uFEFF'));assert.ok(text.includes("'=HYPERLINK"));assert.ok(text.includes("'  +CMD"));assert.ok(text.includes('नमस्ते'));assert.ok(text.includes('Field: extra'));assert.ok(text.includes('line1\nline2'));
+ const {csv,csvWithPopup}=require('../lead-csv');const text=csv([{id:1,createdAt:'2026-01-01',data:{email:'=HYPERLINK("evil")',name:'Maya, \"hi\"',note:'line1\nline2',unicode:'नमस्ते'}},{id:2,data:{extra:'  +CMD'}}]);
+ assert.ok(text.startsWith('\uFEFF'));assert.ok(text.includes("'=HYPERLINK"));assert.ok(text.includes("'  +CMD"));assert.ok(text.includes('नमस्ते'));assert.ok(text.includes('Field: extra'));
+ const combined=csvWithPopup([{id:1,createdAt:'2026-01-01',widgetName:'Popup A',widgetId:'wan_a',data:{email:'=1+1'}}]);
+ assert.ok(combined.startsWith('\uFEFF"Popup","Popup ID","Lead ID","Submitted at (UTC)","Field: email"'));
+ assert.ok(combined.includes('"Popup A","wan_a","1","2026-01-01"'));
+ assert.ok(combined.includes("'=1+1"));assert.ok(text.includes('line1\nline2'));
 });
 const browserPath=process.env.POPFORGE_BROWSER||['C:/Program Files/Google/Chrome/Application/chrome.exe','C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'].find(p=>fs.existsSync(p));
 test('browser: all templates, save failures, installation, test mode, delete and hostile imports',{skip:!browserPath,timeout:120000},async()=>{
@@ -576,7 +580,17 @@ test('browser: all templates, save failures, installation, test mode, delete and
   await page.evaluate(()=>{URL.createObjectURL=blob=>{blob.text().then(t=>window.exportedCSV=t);return 'blob:qa-export';};HTMLAnchorElement.prototype.click=function(){};});
   await page.click('#export');await page.waitForFunction(()=>window.exportedCSV&&document.querySelector('#status').textContent==='Exported 502 leads.');
   const csv=await page.evaluate(()=>window.exportedCSV);assert.ok(csv.includes('lead0@example.com')&&csv.includes('lead501@example.com'));assert.ok(csv.includes("'=2+2"));
-  await page.evaluate(()=>{localStorage.removeItem('pf.token');dispatchEvent(new StorageEvent('storage',{key:'pf.token',newValue:null}));});await page.waitForFunction(()=>document.querySelector('#leadsTable').hidden);await page.reload({waitUntil:'networkidle0'});assert.equal(await page.$eval('#export',e=>e.disabled),true);assert.equal(await page.$eval('#leadsTable',e=>e.hidden),true);
+  await page.goto(base,{waitUntil:'networkidle0'});
+ await page.evaluate(()=>{URL.createObjectURL=blob=>{blob.text().then(t=>window.exportedLeadsCSV=t);return 'blob:qa-all-leads';};HTMLAnchorElement.prototype.click=function(){};});
+ const expectedLeads=testDb.prepare('SELECT COUNT(*) AS n FROM submissions').get().n;
+ await page.click('#btnExportLeads');
+ await page.waitForFunction(n=>window.exportedLeadsCSV&&document.querySelector('#toast').textContent==='Exported '+n+' leads',{},expectedLeads);
+ const allCsv=await page.evaluate(()=>window.exportedLeadsCSV);
+ assert.ok(allCsv.includes('"Popup","Popup ID","Lead ID","Submitted at (UTC)"'));
+ assert.ok(allCsv.includes('lead0@example.com')&&allCsv.includes('lead501@example.com'));
+ assert.ok(allCsv.includes('Inbox test')&&allCsv.includes("'=2+2"));
+ await page.goto(base+'/leads.html?id='+inboxWidget.id,{waitUntil:'networkidle0'});
+ await page.evaluate(()=>{localStorage.removeItem('pf.token');dispatchEvent(new StorageEvent('storage',{key:'pf.token',newValue:null}));});await page.waitForFunction(()=>document.querySelector('#leadsTable').hidden);await page.reload({waitUntil:'networkidle0'});assert.equal(await page.$eval('#export',e=>e.disabled),true);assert.equal(await page.$eval('#leadsTable',e=>e.hidden),true);
   await page.goto(base,{waitUntil:'networkidle0'});
   const logoutToken=require('../server/auth').signToken(account.user);
   await page.evaluate(token=>{localStorage.setItem('pf.token',token);localStorage.removeItem('pf.widgets');},logoutToken);
