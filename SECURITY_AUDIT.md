@@ -34,8 +34,9 @@ The correct order is: fix the High items and trust gaps, then request reclassifi
 | F-07 password hashing | **Fixed** — PBKDF2 600k, bcrypt 12, rehash on login |
 | F-09 deletion/retention | **Improved** — explicit deletion, retention documented; no scheduled TTL |
 | F-11 CI gates | **Fixed in repo** — audit, secret scan, Dependabot, production environment |
-| F-12 trust page | **Partial** — `/security.html` live; domain aliases pending |
-| F-13 email/DNS | **Partial** — apex SPF `-all`, CAA added; DNSSEC and DMARC reject pending |
+| F-10 monitoring | **Partial** — daily production monitor added; no paging/on-call |
+| F-12 trust page | **Fixed** — `/security.html` live; `security@`/`support@` routed to a verified mailbox |
+| F-13 email/DNS | **Partial** — SPF, DKIM, MX, Email Routing and CAA added; DNSSEC and DMARC reject pending |
 | R-01 reputation | **Evidence gathered** — reclassification not yet requested |
 | F-01, F-05, F-06, F-08, F-10 | **Open** |
 
