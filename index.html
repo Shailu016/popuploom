@@ -112,6 +112,11 @@
     </div>
     <div class="cats" id="catBar"></div>
     <p class="journey-note" id="journeyNote"></p>
+    <div class="tpl-toolbar" role="group" aria-label="Preview device">
+      <span class="tpl-toolbar-label">Preview as</span>
+      <button type="button" class="tpl-device on" data-device="desktop" aria-pressed="true">Desktop</button>
+      <button type="button" class="tpl-device" data-device="mobile" aria-pressed="false">Mobile</button>
+    </div>
     <div id="tplGrid"></div>
   </div>
 </section>
@@ -294,6 +299,41 @@
 
   var stages = {};
   var gridRoot = document.getElementById("tplGrid");
+  // Gallery previews open in desktop view first; the toolbar can switch the
+  // whole gallery to a phone viewport. Using the visitor's own screen width
+  // here made every card look mobile on narrow windows.
+  var previewDevice = "desktop";
+
+  function setDeviceUI(mode) {
+    document.querySelectorAll(".tpl-device").forEach(function (b) {
+      var on = b.getAttribute("data-device") === mode;
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+
+  function applyDevice(stage, mode) {
+    var canvas = stage.querySelector(".tpl-canvas");
+    if (!canvas) return;
+    canvas.setAttribute("data-mode", mode);
+    stage.classList.toggle("tpl-mobile", mode === "mobile");
+    fitMini(stage);
+    requestAnimationFrame(function () { fitMini(stage); });
+  }
+
+  setDeviceUI(previewDevice);
+  var deviceBar = document.querySelector(".tpl-toolbar");
+  if (deviceBar) {
+    deviceBar.addEventListener("click", function (e) {
+      var btn = e.target.closest("[data-device]");
+      if (!btn) return;
+      previewDevice = btn.getAttribute("data-device");
+      setDeviceUI(previewDevice);
+      gridRoot.querySelectorAll(".tpl-stage").forEach(function (stage) {
+        applyDevice(stage, previewDevice);
+      });
+    });
+  }
 
   PF.journeys.forEach(function (j) {
     var list = PF.templates.filter(function (t) { return t.journey === j.id; })
@@ -318,10 +358,12 @@
       el.setAttribute("data-journey", t.journey);
       el.innerHTML =
         '<div class="tpl-stage pf-stage" id="stg_' + t.id + '">' +
-          '<div class="stage-faux-page">' +
-            '<div class="fx-nav"><i></i><span></span><span></span><span></span><em></em></div>' +
-            '<div class="fx-hero"><b></b><b></b><u></u><a></a></div>' +
-            '<div class="fx-cards"><div></div><div></div><div></div></div>' +
+          '<div class="tpl-canvas" data-mode="' + previewDevice + '">' +
+            '<div class="stage-faux-page">' +
+              '<div class="fx-nav"><i></i><span></span><span></span><span></span><em></em></div>' +
+              '<div class="fx-hero"><b></b><b></b><u></u><a></a></div>' +
+              '<div class="fx-cards"><div></div><div></div><div></div></div>' +
+            '</div>' +
           '</div>' +
         '</div>' +
         '<div class="tpl-meta">' +
@@ -335,19 +377,23 @@
       holder.appendChild(el);
 
       var stage = el.querySelector(".tpl-stage");
+      var canvas = el.querySelector(".tpl-canvas");
+      applyDevice(stage, previewDevice);
       var cfg = PF.cfgFor(t.id);
       cfg.name = t.name;
-      stages[t.id] = PopupLoom.preview(stage, cfg);
+      stages[t.id] = PopupLoom.preview(canvas, cfg);
       fitMini(stage);
       watchStage(stage);
     });
   });
 
   function watchStage(stage) {
-    var card = stage.querySelector(".pf-card");
+    var canvas = stage.querySelector(".tpl-canvas");
+    var surface = canvas || stage;
+    var card = surface.querySelector(".pf-card");
     if (window.ResizeObserver) {
       if (card) new ResizeObserver(function () { fitMini(stage); }).observe(card);
-      new ResizeObserver(function () { fitMini(stage); }).observe(stage);
+      new ResizeObserver(function () { fitMini(stage); }).observe(surface);
     }
     stage.querySelectorAll("img, iframe").forEach(function (el) {
       if (el.tagName === "IMG" && el.complete && el.naturalWidth) { fitMini(stage); return; }
@@ -356,19 +402,32 @@
   }
 
   function fitMini(stage) {
+    var canvas = stage.querySelector(".tpl-canvas");
+    if (canvas) {
+      // The preview is a fixed-size virtual viewport (desktop 800x680,
+      // mobile 390x720) scaled to fit the card. Scaling the whole page keeps
+      // the popup laid out at real breakpoints instead of just shrinking text.
+      var sw = stage.clientWidth, sh = stage.clientHeight;
+      var cw = canvas.offsetWidth, ch = canvas.offsetHeight;
+      if (!cw || !ch || !sw || !sh) return;
+      var scale = Math.min(sw / cw, sh / ch) * 0.96;
+      if (scale <= 0.02) return;
+      stage.style.setProperty("--ms", scale.toFixed(4));
+      return;
+    }
     var card = stage.querySelector(".pf-card");
     var holder = stage.querySelector(".pf-holder");
     if (!card || !holder) return;
-    var sw = stage.clientWidth, sh = stage.clientHeight;
-    var cw = card.offsetWidth, ch = card.offsetHeight;
-    if (!cw || !ch || !sw || !sh) return;
+    var sw2 = stage.clientWidth, sh2 = stage.clientHeight;
+    var cw2 = card.offsetWidth, ch2 = card.offsetHeight;
+    if (!cw2 || !ch2 || !sw2 || !sh2) return;
     var isCorner = holder.classList.contains("pf-corner");
     // corner holders keep their real-world 22px inset on both axes,
     // anchored to their corner, so the available box is the stage minus both insets
-    var ax = sw - (isCorner ? 44 : 0);
-    var ay = sh - (isCorner ? 44 : 0);
-    var s = Math.min(1, (ax * 0.94) / cw, (ay * 0.94) / ch);
-    if (isCorner) s = Math.min(s, (ax * 0.55) / cw);
+    var ax = sw2 - (isCorner ? 44 : 0);
+    var ay = sh2 - (isCorner ? 44 : 0);
+    var s = Math.min(1, (ax * 0.94) / cw2, (ay * 0.94) / ch2);
+    if (isCorner) s = Math.min(s, (ax * 0.55) / cw2);
     if (s <= 0.02) return;
     stage.style.setProperty("--mz", s.toFixed(3));
   }
@@ -393,7 +452,7 @@
     }
     var cfg = PF.cfgFor(id);
     cfg.name = t.name;
-    stages[id] = PopupLoom.preview(stage, cfg);
+    stages[id] = PopupLoom.preview(stage.querySelector(".tpl-canvas") || stage, cfg);
     fitMini(stage);
     watchStage(stage);
     if (btn) btn.textContent = "Hide";
