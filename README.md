@@ -63,7 +63,7 @@ Every saved widget gets its own id (`wan_…`) and its own install code:
 ```html
 <!-- PopupLoom: paste once, before </body> -->
 <div data-popuploom="wan_your_widget_id"></div>
-<script src="https://popuploom.com/popuploom.js"></script>
+<script src="https://popuploom.com/embed/1.1.0/popuploom.js"></script>
 ```
 
 The snippet carries only the id. `popuploom.js` fetches the live config from `GET /api/widgets/:id/config` when the page loads, so saving in the studio updates every installed copy without re-pasting. Old inline base64 snippets still work.
@@ -72,7 +72,7 @@ The snippet carries only the id. `popuploom.js` fetches the live config from `GE
 
 The previous brand shipped `<div data-popforge="…"></div>` and `/popforge.js`. Both continue to work:
 
-- `/popforge.js` is the same runtime bytes as `/popuploom.js`; neither path redirects across domains.
+- `/embed/1.1.0/popuploom.js` is the immutable, checksum-published release. `/popuploom.js`, `/popforge.js` and `/embed/1.1.0/popforge.js` remain compatibility aliases with the same bytes; none redirects across domains.
 - The runtime accepts `data-popuploom` and `data-popforge`. If a node carries both, `data-popuploom` wins and only one popup is mounted.
 - `data-popforge-ready` / `data-popuploom-ready` are both written as mount markers, so repeated scans stay idempotent.
 - `window.PopupLoom` and `window.PopForge` are the same object, exposing `show`, `preview`, `scan`, `encodeCfg`, `version`, `API`, `snippet` and the instance registry.
@@ -189,7 +189,7 @@ Public endpoints keep their permissive CORS behavior so embeds on external sites
 ```html
 <!-- PopupLoom install. Paste once, before </body> -->
 <div data-popuploom="wan_your_widget_id"></div>
-<script src="https://popuploom.com/popuploom.js"></script>
+<script src="https://popuploom.com/embed/1.1.0/popuploom.js"></script>
 ```
 
 Each account-owned widget has its own id in that `data-popuploom` attribute. The runtime resolves it against `GET /api/widgets/:id/config`, so the site never needs re-editing after a design change. The studio fills in the absolute script URL for you.

@@ -42,7 +42,7 @@ test('private files stay private including encoded separators and extensions',as
   const r=await api(url);assert.ok(r.status===404||r.headers.get('content-type').includes('text/html'),url);
   assert.ok(!String(r.data).includes('SQLite format 3')&&!String(r.data).includes('JWT_SECRET=')&&!String(r.data).includes('const JWT_SECRET'),url);
  }
- for(const url of ['/','/templates.html','/faq.html','/press.html','/guides/index.html','/guides/install-popups.html','/guides/wordpress-popup.html','/guides/shopify-popup.html','/guides/webflow-popup.html','/guides/collect-and-export-leads.html','/guides/popup-not-showing.html','/guides/popup-builder-for-ecommerce.html','/guides/popup-builder-for-quick-commerce.html','/guides/popup-builder-for-lead-generation.html','/migration.html','/studio.html','/profile.html','/demo.html','/reset-password.html','/about.html','/contact.html','/terms.html','/.well-known/security.txt','/app.js','/lead-csv.js','/studio.js','/reset-password.js','/popuploom.js','/popforge.js','/ui.css','/robots.txt','/sitemap.xml','/llms.txt','/llms-full.txt','/ccf2a9f45165c635253d22748df4a573.txt','/assets/winter-gift.jpg','/assets/favicon.svg','/assets/og-popuploom.png'])assert.equal((await api(url)).status,200,url);
+ for(const url of ['/','/templates.html','/faq.html','/press.html','/security.html','/guides/index.html','/guides/install-popups.html','/guides/wordpress-popup.html','/guides/shopify-popup.html','/guides/webflow-popup.html','/guides/collect-and-export-leads.html','/guides/popup-not-showing.html','/guides/popup-builder-for-ecommerce.html','/guides/popup-builder-for-quick-commerce.html','/guides/popup-builder-for-lead-generation.html','/migration.html','/studio.html','/profile.html','/demo.html','/reset-password.html','/about.html','/contact.html','/terms.html','/.well-known/security.txt','/app.js','/lead-csv.js','/studio.js','/reset-password.js','/popuploom.js','/popforge.js','/embed/1.1.0/popuploom.js','/embed/1.1.0/popforge.js','/embed/1.1.0/SHA256SUMS','/ui.css','/robots.txt','/sitemap.xml','/llms.txt','/llms-full.txt','/ccf2a9f45165c635253d22748df4a573.txt','/assets/winter-gift.jpg','/assets/favicon.svg','/assets/og-popuploom.png'])assert.equal((await api(url)).status,200,url);
 });
 test('publisher verification is public without enabling ads and ads.txt requires a valid ID',async()=>{
  const home=await api('/');
@@ -271,6 +271,11 @@ test('targeting, untrusted rendering, storage restrictions and explicit test mod
  const emptyProof=c.proofHTML({cfg:{theme:{},content:{proof:{enabled:true,demo:false,items:[]}}}});
  assert.ok(emptyProof.includes('No activity configured')&&!emptyProof.includes('Maya'));
 });
+test('embed runtime never persists submitted lead payloads in host storage',()=>{
+ const src=fs.readFileSync(path.join(root,'popuploom.js'),'utf8');
+ assert.ok(!src.includes('var sk = "pfsubs."'),'no new pfsubs writes');
+ assert.ok(src.includes('clearLegacyLeadCache'),'legacy cached leads are removed');
+});
 test('one widget API override does not change the default API for other widgets',()=>{
  const box={window:{},document:{readyState:'loading',querySelector:()=>({getAttribute:()=> 'https://override.example'}),querySelectorAll:selector=>selector.startsWith('script')?[{src:'https://default.example/popforge.js'}]:[],addEventListener(){}},URL,console};
  const src=fs.readFileSync(path.join(root,'popuploom.js'),'utf8').replace('  function boot() {','  window.checkApi=apiFor;\n  function boot() {');
@@ -435,6 +440,7 @@ test('identity, metadata and crawler files agree on the apex origin',async()=>{
   '/templates.html':['Free Website Popup Templates | PopupLoom','https://popuploom.com/templates.html'],
   '/faq.html':['PopupLoom FAQ: Free Popup Builder Questions | PopupLoom','https://popuploom.com/faq.html'],
   '/press.html':['PopupLoom Press Kit and Brand Facts | PopupLoom','https://popuploom.com/press.html'],
+  '/security.html':['Security and Responsible Disclosure | PopupLoom','https://popuploom.com/security.html'],
   '/guides/install-popups.html':['How to Add a Popup to Your Website | PopupLoom','https://popuploom.com/guides/install-popups.html'],
   '/guides/popup-builder-for-ecommerce.html':['Free Popup Builder for Ecommerce Stores | PopupLoom','https://popuploom.com/guides/popup-builder-for-ecommerce.html'],
   '/guides/popup-builder-for-quick-commerce.html':['Free Popup Builder for Quick Commerce | PopupLoom','https://popuploom.com/guides/popup-builder-for-quick-commerce.html'],
@@ -466,7 +472,7 @@ test('identity, metadata and crawler files agree on the apex origin',async()=>{
  const sitemap=(await api('/sitemap.xml')).data;
  assert.ok(!sitemap.includes('popforge'));
  assert.ok(!sitemap.includes('studio.html')&&!sitemap.includes('migration.html'));
- for(const u of ['/faq.html','/press.html','/guides/popup-builder-for-ecommerce.html','/guides/popup-builder-for-quick-commerce.html','/guides/popup-builder-for-lead-generation.html'])assert.ok(sitemap.includes('https://popuploom.com'+u),u);
+ for(const u of ['/faq.html','/press.html','/security.html','/guides/popup-builder-for-ecommerce.html','/guides/popup-builder-for-quick-commerce.html','/guides/popup-builder-for-lead-generation.html'])assert.ok(sitemap.includes('https://popuploom.com'+u),u);
  assert.ok(robots.includes('User-agent: GPTBot')&&robots.includes('User-agent: OAI-SearchBot')&&robots.includes('User-agent: PerplexityBot'),'AI crawlers explicitly allowed');
  const llms=(await api('/llms.txt')).data;
  assert.ok(llms.startsWith('# PopupLoom')&&llms.includes('https://popuploom.com/'));
@@ -477,7 +483,17 @@ test('identity, metadata and crawler files agree on the apex origin',async()=>{
  const home=(await api('/')).data;
  assert.ok(home.includes('popuploom-widgets-backup.json'));
  assert.ok(home.includes('data-popuploom="wan_your_widget_id"'));
- assert.ok(home.includes('https://popuploom.com/popuploom.js'));
+ assert.ok(home.includes('https://popuploom.com/embed/1.1.0/popuploom.js'));
+});
+test('versioned embed is immutable and its checksum matches the served runtime',async()=>{
+ const runtime=await api('/embed/1.1.0/popuploom.js');
+ assert.equal(runtime.status,200);
+ assert.match(String(runtime.headers.get('cache-control')||''),/immutable/);
+ const sums=await api('/embed/1.1.0/SHA256SUMS');
+ assert.equal(sums.status,200);
+ const expected=require('crypto').createHash('sha256').update(runtime.data).digest('hex');
+ assert.ok(String(sums.data).startsWith(expected+'  popuploom.js'),'published checksum matches the immutable bytes');
+ assert.ok(String(runtime.data).includes('Runtime.version = "1.1.0"'));
 });
 test('failed leads preserve entered data, retry safely, escape success text, and keep spin prize',async()=>{
  const {c,setResponse,timers}=runtime();let body={innerHTML:'form',querySelector:()=>null,appendChild(el){this.error=el;}};
@@ -500,6 +516,9 @@ test('closing a popup during submission does not reject or lose a stored lead',a
 test('account changes require reauthentication, revoke sessions and cascade deletion',async()=>{
  const a=(await api('/api/auth/register',{method:'POST',body:{email:'controls@example.com',password:'original-password-123'}})).data;
  const w=(await api('/api/widgets',{method:'POST',token:a.token,body:{name:'Controls',config:{content:{title:'Hello'}}}})).data;
+ await api('/api/widgets/'+w.id+'/submit',{method:'POST',body:{data:{email:'delete-me@example.com'}}});
+ const db=require('../server/db');
+ assert.equal(db.prepare('SELECT COUNT(*) AS n FROM submissions WHERE widget_id=?').get(w.id).n,1);
  assert.equal((await api('/api/auth/account',{method:'POST',token:a.token,body:{action:'delete',currentPassword:'wrong',confirmation:a.user.email}})).status,400);
  assert.equal((await api('/api/auth/account',{method:'POST',token:a.token,body:{action:'password',currentPassword:'original-password-123',newPassword:'new-password-12345'}})).status,200);
  assert.equal((await api('/api/auth/me',{token:a.token})).status,401);
@@ -507,6 +526,8 @@ test('account changes require reauthentication, revoke sessions and cascade dele
  assert.equal((await api('/api/auth/account',{method:'POST',token:b.token,body:{action:'delete',currentPassword:'new-password-12345',confirmation:'wrong@example.com'}})).status,400);
  assert.equal((await api('/api/auth/account',{method:'POST',token:b.token,body:{action:'delete',currentPassword:'new-password-12345',confirmation:a.user.email}})).status,200);
  assert.equal((await api('/api/widgets/'+w.id+'/config')).status,404);
+ assert.equal(db.prepare('SELECT COUNT(*) AS n FROM submissions WHERE widget_id=?').get(w.id).n,0);
+ assert.equal(db.prepare('SELECT COUNT(*) AS n FROM widgets WHERE user_id=?').get(a.user.id).n,0);
  assert.equal((await api('/api/auth/me',{token:b.token})).status,401);
 });
 test('CSV preserves Unicode and escapes spreadsheet formulas, quotes and multiline data',()=>{
@@ -565,6 +586,21 @@ test('webhook URL validation blocks insecure and private destinations',()=>{
  assert.equal(validateUrl('http://127.0.0.1:8080/hook',{allowInsecure:true}),null);
  assert.ok(validateUrl('http://10.0.0.1/hook',{allowInsecure:true}));
 });
+test('webhook DNS validation blocks hostnames that resolve to private addresses',async()=>{
+ const {validateUrlResolved,deliver}=require('../shared/webhook');
+ const msg='Webhook URL cannot target a private or local address';
+ for(const [url,addresses] of [
+  ['https://127.0.0.1.nip.io/hook',['127.0.0.1']],
+  ['https://169.254.169.254.nip.io/latest/meta-data/',['169.254.169.254']],
+  ['https://10.0.0.1.sslip.io/hook',['10.0.0.1']],
+  ['https://localtest.me/hook',['127.0.0.1']],
+ ]) assert.equal(await validateUrlResolved(url,{resolve:async()=>addresses}),msg,url);
+ assert.equal(await validateUrlResolved('https://hooks.example.com/x',{resolve:async()=>['93.184.216.34']}),null);
+ assert.equal(await validateUrlResolved('https://hooks.example.com/x',{resolve:async()=>{throw new Error('dns failed')}}),'Webhook host could not be resolved');
+ const blocked=await deliver({url:'https://127.0.0.1.nip.io/hook',secret:'a'.repeat(64)},{event:'lead.created',id:'evt_dns'},{resolve:async()=>['127.0.0.1']});
+ assert.equal(blocked.ok,false);
+ assert.match(blocked.error,/private or local/);
+});
 test('webhook delivery retries transient failures and stops on 4xx',async()=>{
  const http=require('node:http');
  const {deliver}=require('../shared/webhook');
@@ -579,9 +615,9 @@ test('webhook delivery retries transient failures and stops on 4xx',async()=>{
  try{
   const base='http://127.0.0.1:'+receiver.address().port;
   const event={event:'lead.created',id:'evt_test'};
-  const retried=await deliver({url:base+'/retry',secret:'a'.repeat(64)},event,{delays:[0,0,0]});
+  const retried=await deliver({url:base+'/retry',secret:'a'.repeat(64)},event,{delays:[0,0,0],allowInsecure:true});
   assert.equal(retried.ok,true);assert.equal(retried.attempts,3);assert.equal(retried.status,200);assert.equal(calls.retry,3);
-  const stopped=await deliver({url:base+'/stop',secret:'a'.repeat(64)},event,{delays:[0,0,0]});
+  const stopped=await deliver({url:base+'/stop',secret:'a'.repeat(64)},event,{delays:[0,0,0],allowInsecure:true});
   assert.equal(stopped.ok,false);assert.equal(stopped.attempts,1);assert.equal(stopped.status,400);assert.equal(calls.stop,1);
  }finally{await new Promise(r=>receiver.close(r));}
 });

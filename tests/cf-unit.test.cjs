@@ -84,6 +84,7 @@ test('production build copies an owner verification drop file placed at the root
  assert.equal(fs.existsSync(out),owned,'final build matches the repository state');
 });
 test('private snapshots and credentials are excluded from packaging',()=>{const files=fs.readdirSync(path.join(root,'.cf-build/public'));assert.ok(files.includes('llms.txt')&&files.includes('llms-full.txt'));assert.ok(!files.some(f=>f.includes('.env')||f==='worker'||f==='private-data'||f==='node_modules'));assert.ok(fs.readFileSync(path.join(root,'.gitignore'),'utf8').includes('private-data/'));});
+test('the immutable embed release ships with a matching checksum',()=>{const dir=path.join(root,'.cf-build/public/embed/1.1.0');const bytes=fs.readFileSync(path.join(dir,'popuploom.js'));const hash=require('crypto').createHash('sha256').update(bytes).digest('hex');assert.ok(fs.readFileSync(path.join(dir,'SHA256SUMS'),'utf8').startsWith(hash+'  popuploom.js'));assert.ok(bytes.toString('utf8').includes('Runtime.version = "1.1.0"'));});
 
 test('worker password reset stores only a hash, is single-use and revokes sessions',async()=>{
  const {db,env}=setup();const reset=require('../worker/password-reset');const email=require('../shared/email');const sent=[];const original=email.sendPasswordResetEmail;

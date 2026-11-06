@@ -32,7 +32,7 @@
 
     <h2>The installation model</h2>
     <p>PopupLoom separates the design from the installation. A saved popup gets a permanent widget id. Your website contains two short lines: a div with that id and the shared runtime script. The visitor's browser fetches the live configuration from PopupLoom, so edits you save in the studio reach installed copies without replacing the snippet.</p>
-    <p>You need permission to add custom HTML or theme code to the site. The site must be able to load <code>https://popuploom.com/popuploom.js</code> unless you deliberately self-host that file. A popup placed inside an iframe cannot draw outside that iframe.</p>
+    <p>You need permission to add custom HTML or theme code to the site. The site must be able to load <code>https://popuploom.com/embed/1.1.0/popuploom.js</code> unless you deliberately self-host that file. A popup placed inside an iframe cannot draw outside that iframe.</p>
 
     <figure>
       <img src="/assets/guides/studio-editor-desktop.png" alt="PopupLoom studio with the 48-Hour Drop template open and the demo preview badge visible" style="max-width:100%;height:auto;border-radius:12px;border:1px solid rgba(127,127,127,.25)">
@@ -53,7 +53,7 @@
 
     <h2>3. Paste the code</h2>
     <pre class="code" style="white-space:pre-wrap;overflow-wrap:anywhere;overflow-x:auto;max-width:100%">&lt;div data-popuploom="YOUR_SAVED_WIDGET_ID"&gt;&lt;/div&gt;
-&lt;script src="https://popuploom.com/popuploom.js"&gt;&lt;/script&gt;</pre>
+&lt;script src="https://popuploom.com/embed/1.1.0/popuploom.js"&gt;&lt;/script&gt;</pre>
     <p>Paste both lines before the closing <code>&lt;/body&gt;</code> tag where the platform permits it. Keep the div and the script together. Do not copy the widget id from a preview page; copy the id shown in the Publish tab for the saved popup.</p>
     <p>Old installations that use <code>data-popforge</code> and <code>/popforge.js</code> still work. New installations should use the current attributes and the canonical domain.</p>
 

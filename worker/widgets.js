@@ -12,6 +12,10 @@ function allowInsecureWebhooks(env) {
   return env.ALLOW_INSECURE_WEBHOOKS === "true";
 }
 
+function webhookOptions(env) {
+  return { allowInsecure: allowInsecureWebhooks(env), resolve: webhook.dohResolve };
+}
+
 async function ownedWidget(c) {
   return c.env.DB.prepare("SELECT id, name FROM widgets WHERE id = ? AND user_id = ?").bind(c.params.id, c.user.id).first();
 }
@@ -44,7 +48,7 @@ async function deliverLead(c, widgetId, submissionId, data) {
   const endpoint = await c.env.DB.prepare("SELECT url, secret FROM webhook_endpoints WHERE widget_id = ? AND enabled = 1").bind(widgetId).first();
   if (!widget || !endpoint) return;
   const event = webhook.payload(widget, { id: submissionId, createdAt: new Date().toISOString(), data: data }, { id: webhook.randomId() });
-  const result = await webhook.deliver(endpoint, event);
+  const result = await webhook.deliver(endpoint, event, webhookOptions(c.env));
   await logDelivery(c.env, widgetId, event, submissionId, result);
 }
 
@@ -136,6 +140,9 @@ async function updateWidget(c) {
 async function deleteWidget(c) {
   const res = await c.env.DB.prepare("DELETE FROM widgets WHERE id = ? AND user_id = ?").bind(c.params.id, c.user.id).run();
   if (res.meta.changes === 0) return json({ error: "Widget not found" }, 404);
+  // Explicit cleanup keeps deletion correct even if a deployment or restored
+  // database has foreign-key enforcement disabled.
+  await c.env.DB.prepare("DELETE FROM submissions WHERE widget_id = ?").bind(c.params.id).run();
   await c.env.DB.prepare("DELETE FROM webhook_deliveries WHERE widget_id = ?").bind(c.params.id).run();
   await c.env.DB.prepare("DELETE FROM webhook_endpoints WHERE widget_id = ?").bind(c.params.id).run();
   return json({ ok: true });
@@ -154,7 +161,7 @@ async function putWebhook(c) {
   const w = await ownedWidget(c);
   if (!w) return json({ error: "Widget not found" }, 404);
   const body = c.body || {};
-  const invalid = webhook.validateUrl(body.url, { allowInsecure: allowInsecureWebhooks(c.env) });
+  const invalid = await webhook.validateUrlResolved(body.url, webhookOptions(c.env));
   if (invalid) return json({ error: invalid }, 400);
   if (body.enabled !== undefined && typeof body.enabled !== "boolean") return json({ error: "enabled must be true or false" }, 400);
   if (body.rotateSecret !== undefined && typeof body.rotateSecret !== "boolean") return json({ error: "rotateSecret must be true or false" }, 400);
@@ -188,7 +195,7 @@ async function testWebhook(c) {
   const endpoint = await c.env.DB.prepare("SELECT url, secret FROM webhook_endpoints WHERE widget_id = ?").bind(w.id).first();
   if (!endpoint) return json({ error: "Configure a webhook first" }, 400);
   const event = webhook.payload(w, { id: null, createdAt: new Date().toISOString(), data: { email: "test@example.com", message: "PopupLoom test delivery" } }, { id: webhook.randomId(), test: true });
-  const result = await webhook.deliver(endpoint, event);
+  const result = await webhook.deliver(endpoint, event, webhookOptions(c.env));
   await logDelivery(c.env, w.id, event, null, result);
   return json({ ok: result.ok, status: result.status, attempts: result.attempts, error: result.error });
 }

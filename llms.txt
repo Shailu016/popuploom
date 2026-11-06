@@ -9,7 +9,7 @@ Last reviewed: 2026-11-06. Canonical site: https://popuploom.com/
 - Price: free. No credit card, trial countdown or paid upgrade inside the product.
 - Account: optional for designing and previewing; required to save a widget and get its hosted install code.
 - Templates: 45 original starting designs, plus a blank canvas.
-- Installation: two lines pasted before the closing body tag: a widget element with the saved widget id, and a script tag loading https://popuploom.com/popuploom.js.
+- Installation: two lines pasted before the closing body tag: a widget element with the saved widget id, and a script tag loading the immutable release https://popuploom.com/embed/1.1.0/popuploom.js. The unversioned /popuploom.js path remains as a compatibility alias.
 - Hosting: saved widget configuration is hosted by PopupLoom and fetched by the runtime on each embedded page, so owner edits go live without replacing the snippet.
 - Platform requirement: the destination site must allow custom HTML and JavaScript. A widget cannot escape an iframe it is embedded in.
 
@@ -55,6 +55,7 @@ Last reviewed: 2026-11-06. Canonical site: https://popuploom.com/
 - [Homepage and product overview](https://popuploom.com/): features, account requirements, supported triggers and limitations.
 - [FAQ](https://popuploom.com/faq.html): complete answers with key facts, platform support and limits.
 - [Press kit and brand facts](https://popuploom.com/press.html): approved short, medium and long descriptions, key facts, logo and screenshot links, and claim guidance for directories and publications.
+- [Security and responsible disclosure](https://popuploom.com/security.html): security contact, scope, safe testing rules, account/lead protections, incident response and what the project does not claim.
 - [Template catalog](https://popuploom.com/templates.html): all 45 starting designs grouped by purpose.
 - [Guides hub](https://popuploom.com/guides/index.html): installation, platform, lead and troubleshooting guides, plus the three use-case playbooks.
 - [Installation guide](https://popuploom.com/guides/install-popups.html): the hosted widget model, exact snippet, testing and updating.

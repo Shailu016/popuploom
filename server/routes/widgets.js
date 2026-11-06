@@ -7,10 +7,21 @@ const { object, validateConfig, validateShape } = require("../validation");
 const rateLimit = require("../limits");
 const webhook = require("../../shared/webhook");
 const crypto = require("crypto");
+const dns = require("node:dns").promises;
 const router = express.Router();
 
 function allowInsecureWebhooks() {
   return process.env.ALLOW_INSECURE_WEBHOOKS === "true";
+}
+
+function webhookOptions() {
+  return {
+    allowInsecure: allowInsecureWebhooks(),
+    resolve: async function (host) {
+      const rows = await dns.lookup(host, { all: true, verbatim: true });
+      return rows.map(function (row) { return row.address; });
+    }
+  };
 }
 
 function ownedWidget(req) {
@@ -50,7 +61,7 @@ function dispatchLead(widgetId, submissionId, data) {
   }
   if (!widget || !endpoint) return;
   const event = webhook.payload(widget, { id: submissionId, createdAt: new Date().toISOString(), data: data }, { id: webhook.randomId() });
-  webhook.deliver(endpoint, event).then(function (result) {
+  webhook.deliver(endpoint, event, webhookOptions()).then(function (result) {
     logDelivery(widgetId, event, submissionId, result);
   }, function () {});
 }
@@ -135,7 +146,8 @@ router.put("/:id", authMiddleware, (req, res) => {
 router.delete("/:id", authMiddleware, (req, res) => {
   const r = db.prepare("DELETE FROM widgets WHERE id = ? AND user_id = ?").run(req.params.id, req.user.id);
   if (r.changes === 0) return res.status(404).json({ error: "Widget not found" });
-  // Clean up webhook state even if foreign-key cascades are unavailable.
+  // Clean up lead and webhook state even if foreign-key cascades are unavailable.
+  db.prepare("DELETE FROM submissions WHERE widget_id = ?").run(req.params.id);
   db.prepare("DELETE FROM webhook_deliveries WHERE widget_id = ?").run(req.params.id);
   db.prepare("DELETE FROM webhook_endpoints WHERE widget_id = ?").run(req.params.id);
   res.json({ ok: true });
@@ -150,11 +162,11 @@ router.get("/:id/webhook", authMiddleware, (req, res) => {
   res.json({ webhook: webhookJson(row) });
 });
 
-router.put("/:id/webhook", authMiddleware, (req, res) => {
+router.put("/:id/webhook", authMiddleware, async (req, res) => {
   const w = ownedWidget(req);
   if (!w) return res.status(404).json({ error: "Widget not found" });
   const body = req.body || {};
-  const invalid = webhook.validateUrl(body.url, { allowInsecure: allowInsecureWebhooks() });
+  const invalid = await webhook.validateUrlResolved(body.url, webhookOptions());
   if (invalid) return res.status(400).json({ error: invalid });
   if (body.enabled !== undefined && typeof body.enabled !== "boolean") return res.status(400).json({ error: "enabled must be true or false" });
   if (body.rotateSecret !== undefined && typeof body.rotateSecret !== "boolean") return res.status(400).json({ error: "rotateSecret must be true or false" });
@@ -187,7 +199,7 @@ router.post("/:id/webhook/test", authMiddleware, rateLimit("webhook-test", 10, 6
   const endpoint = db.prepare("SELECT url, secret FROM webhook_endpoints WHERE widget_id = ?").get(w.id);
   if (!endpoint) return res.status(400).json({ error: "Configure a webhook first" });
   const event = webhook.payload(w, { id: null, createdAt: new Date().toISOString(), data: { email: "test@example.com", message: "PopupLoom test delivery" } }, { id: webhook.randomId(), test: true });
-  const result = await webhook.deliver(endpoint, event);
+  const result = await webhook.deliver(endpoint, event, webhookOptions());
   logDelivery(w.id, event, null, result);
   res.json({ ok: result.ok, status: result.status, attempts: result.attempts, error: result.error });
 });

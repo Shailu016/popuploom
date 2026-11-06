@@ -6,7 +6,7 @@ const { SignJWT, jwtVerify, createRemoteJWKSet } = require("jose");
 const GOOGLE_ISSUER = "https://accounts.google.com";
 const GOOGLE_CERTS = new URL("https://www.googleapis.com/oauth2/v3/certs");
 const JWT_EXPIRES = "30d";
-const PBKDF2_ITERATIONS = 100000;
+const PBKDF2_ITERATIONS = 600000;
 
 class ApiError extends Error {
   constructor(status, message, code, headers) {
@@ -145,6 +145,10 @@ async function login(env, email, password) {
   const valid = await verifyPassword(passwordString, stored);
   if (!canMatch || !valid) throw new ApiError(401, "Invalid email or password");
   if (/^\$2[aby]\$/.test(row.password_hash)) {
+    const upgraded = await hashPassword(password);
+    await env.DB.prepare("UPDATE users SET password_hash = ? WHERE id = ? AND password_hash = ?").bind(upgraded, row.id, row.password_hash).run();
+  } else if (String(row.password_hash).indexOf("pbkdf2$") === 0 && Number(String(row.password_hash).split("$")[1]) < PBKDF2_ITERATIONS) {
+    // Rehash older PBKDF2 work factors after a successful login.
     const upgraded = await hashPassword(password);
     await env.DB.prepare("UPDATE users SET password_hash = ? WHERE id = ? AND password_hash = ?").bind(upgraded, row.id, row.password_hash).run();
   }
@@ -287,6 +291,14 @@ async function manageAccount(env, id, body) {
     await env.DB.prepare("UPDATE users SET password_hash = ?, token_version = token_version + 1 WHERE id = ?").bind(await hashPassword(body.newPassword),id).run();
   } else if(body.action === 'delete') {
     if(body.confirmation!==row.email)throw new Error("Type your account email to confirm deletion");
+    // Explicitly remove dependent rows before the user row. This preserves the
+    // privacy promise even if a restored database has cascades disabled.
+    const owned = "SELECT id FROM widgets WHERE user_id = ?";
+    await env.DB.prepare("DELETE FROM submissions WHERE widget_id IN (" + owned + ")").bind(id).run();
+    await env.DB.prepare("DELETE FROM webhook_deliveries WHERE widget_id IN (" + owned + ")").bind(id).run();
+    await env.DB.prepare("DELETE FROM webhook_endpoints WHERE widget_id IN (" + owned + ")").bind(id).run();
+    await env.DB.prepare("DELETE FROM widgets WHERE user_id = ?").bind(id).run();
+    await env.DB.prepare("DELETE FROM password_reset_tokens WHERE user_id = ?").bind(id).run();
     await env.DB.prepare("DELETE FROM users WHERE id = ?").bind(id).run();
   } else throw new Error("Invalid account action");
   return {ok:true};

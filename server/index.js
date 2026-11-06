@@ -1,6 +1,7 @@
 // server/index.js — Express app: API + static file serving
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 
 // Load .env (Node's built-in parser) before any module reads process.env.
 // GOOGLE_CLIENT_ID, JWT_SECRET and PORT are all read at module load.
@@ -204,8 +205,8 @@ app.get('/ads.txt', (req, res, next) => {
   res.type('text/plain').send('google.com, ' + publisher + ', DIRECT, f08c47fec0942fa0\n');
 });
 const publicFiles = new Set([
-  "templates.html", "faq.html", "press.html", "guides/install-popups.html", "guides/index.html", "guides/wordpress-popup.html", "guides/shopify-popup.html", "guides/webflow-popup.html", "guides/collect-and-export-leads.html", "guides/popup-not-showing.html", "guides/popup-builder-for-ecommerce.html", "guides/popup-builder-for-quick-commerce.html", "guides/popup-builder-for-lead-generation.html", "ccf2a9f45165c635253d22748df4a573.txt", "robots.txt", "sitemap.xml", "llms.txt", "llms-full.txt", "index.html", "studio.html", "profile.html", "demo.html", "migration.html", "reset-password.html",
-  "leads.html", "privacy.html", "about.html", "contact.html", "terms.html", ".well-known/security.txt", "lead-csv.js", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "popuploom.js", "popforge.js", "ui.css", "ads.txt"
+  "templates.html", "faq.html", "press.html", "security.html", "guides/install-popups.html", "guides/index.html", "guides/wordpress-popup.html", "guides/shopify-popup.html", "guides/webflow-popup.html", "guides/collect-and-export-leads.html", "guides/popup-not-showing.html", "guides/popup-builder-for-ecommerce.html", "guides/popup-builder-for-quick-commerce.html", "guides/popup-builder-for-lead-generation.html", "ccf2a9f45165c635253d22748df4a573.txt", "robots.txt", "sitemap.xml", "llms.txt", "llms-full.txt", "index.html", "studio.html", "profile.html", "demo.html", "migration.html", "reset-password.html",
+  "leads.html", "privacy.html", "about.html", "contact.html", "terms.html", ".well-known/security.txt", "lead-csv.js", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "popuploom.js", "popforge.js", "embed/1.1.0/popuploom.js", "embed/1.1.0/popforge.js", "embed/1.1.0/SHA256SUMS", "ui.css", "ads.txt"
 ]);
 app.use((req, res, next) => {
   if (req.method !== "GET" && req.method !== "HEAD") return next();
@@ -225,14 +226,21 @@ app.use((req, res, next) => {
     if (!dropStat || !dropStat.isFile()) return next();
   }
   const file = pathname === "/popforge.js" ? "/popuploom.js" : pathname;
-  res.setHeader("Cache-Control", "no-store");
+  res.setHeader("Cache-Control", file.startsWith("/embed/") ? "public, max-age=31536000, immutable" : "no-store");
   const adConfig = ads.config(process.env);
   const adNonce = file.endsWith(".html") && adConfig.enabled && ads.isAdPage(pathname) ? ads.nonce() : "";
   if (file.endsWith(".html")) {
     security.htmlHeaders(res, file.slice(1), { adsEnabled: !!adNonce, adsNonce: adNonce });
     if (file === "/migration.html" || file === "/reset-password.html" || file === "/studio.html" || file === "/profile.html" || file === "/leads.html") res.setHeader("X-Robots-Tag", "noindex, nofollow");
   }
-  const diskPath = path.join(__dirname, "..", file.slice(1));
+  // The immutable embed path is materialised by the Cloudflare build. The
+  // Express runtime serves the same bytes from the canonical source file.
+  if (file === "/embed/1.1.0/SHA256SUMS") {
+    const digest = crypto.createHash("sha256").update(fs.readFileSync(path.join(__dirname, "..", "popuploom.js"))).digest("hex");
+    return res.type("text/plain").send(digest + "  popuploom.js\n" + digest + "  popforge.js\n");
+  }
+  const sourceFile = (file === "/embed/1.1.0/popuploom.js" || file === "/embed/1.1.0/popforge.js") ? "/popuploom.js" : file;
+  const diskPath = path.join(__dirname, "..", sourceFile.slice(1));
   if (!fs.existsSync(diskPath)) return next();
   if (adNonce) {
     const html = fs.readFileSync(diskPath, "utf8");

@@ -45,8 +45,8 @@ function clientScheme(request) {
 
 // Explicit public allowlist, same as the Express server's static middleware.
 const PUBLIC_FILES = new Set([
-  "templates.html", "faq.html", "press.html", "guides/install-popups.html", "guides/index.html", "guides/wordpress-popup.html", "guides/shopify-popup.html", "guides/webflow-popup.html", "guides/collect-and-export-leads.html", "guides/popup-not-showing.html", "guides/popup-builder-for-ecommerce.html", "guides/popup-builder-for-quick-commerce.html", "guides/popup-builder-for-lead-generation.html", "ccf2a9f45165c635253d22748df4a573.txt", "robots.txt", "sitemap.xml", "llms.txt", "llms-full.txt", "index.html", "studio.html", "profile.html", "demo.html", "migration.html", "reset-password.html",
-  "leads.html", "privacy.html", "about.html", "contact.html", "terms.html", ".well-known/security.txt", "lead-csv.js", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "popuploom.js", "popforge.js", "ui.css", "ads.txt"
+  "templates.html", "faq.html", "press.html", "security.html", "guides/install-popups.html", "guides/index.html", "guides/wordpress-popup.html", "guides/shopify-popup.html", "guides/webflow-popup.html", "guides/collect-and-export-leads.html", "guides/popup-not-showing.html", "guides/popup-builder-for-ecommerce.html", "guides/popup-builder-for-quick-commerce.html", "guides/popup-builder-for-lead-generation.html", "ccf2a9f45165c635253d22748df4a573.txt", "robots.txt", "sitemap.xml", "llms.txt", "llms-full.txt", "index.html", "studio.html", "profile.html", "demo.html", "migration.html", "reset-password.html",
+  "leads.html", "privacy.html", "about.html", "contact.html", "terms.html", ".well-known/security.txt", "lead-csv.js", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "popuploom.js", "popforge.js", "embed/1.1.0/popuploom.js", "embed/1.1.0/popforge.js", "embed/1.1.0/SHA256SUMS", "ui.css", "ads.txt"
 ]);
 
 // [regex, method, handler, needsAuth]
@@ -283,7 +283,7 @@ async function serveStatic(request, env, pathname, sec, cors, headOnly) {
     const asset = await env.ASSETS.fetch(new Request(new URL(file, request.url)));
     if (asset.status === 404) return new Response("Not found", { status: 404, headers: { ...sec, ...cors } });
     const headers = new Headers(asset.headers);
-    headers.set("Cache-Control", "no-store");
+    headers.set("Cache-Control", file.startsWith("/embed/") ? "public, max-age=31536000, immutable" : "no-store");
     if (["/leads.html", "/studio.html", "/profile.html", "/demo.html", "/migration.html", "/reset-password.html"].includes(file)) headers.set("X-Robots-Tag", ["/migration.html", "/reset-password.html", "/studio.html", "/profile.html", "/leads.html"].includes(file) ? "noindex, nofollow" : "noindex, follow");
     const adConfig = ads.config(env);
     const adNonce = file.endsWith(".html") && adConfig.enabled && ads.isAdPage(file) ? ads.nonce() : "";

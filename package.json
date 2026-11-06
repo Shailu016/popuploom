@@ -14,7 +14,8 @@
     "art:generate": "node scripts/generate-project-art.cjs",
     "test:cf": "node --test tests/cf-unit.test.cjs",
     "test:cf:integration": "wrangler deploy --dry-run --outdir .cf-build && node tests/cf-integration.cjs",
-    "indexnow": "node scripts/indexnow.cjs"
+    "indexnow": "node scripts/indexnow.cjs",
+    "security:scan": "node scripts/secret-scan.cjs"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

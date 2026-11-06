@@ -16,6 +16,7 @@ if (!configuredSecret && process.env.NODE_ENV === "production") {
 // Local development can start without configuration; tokens expire on restart.
 const JWT_SECRET = configuredSecret || crypto.randomBytes(32).toString("hex");
 const JWT_EXPIRES = "30d";
+const BCRYPT_ROUNDS = 12;
 
 function signToken(user) {
   const row = db.prepare("SELECT token_version FROM users WHERE id = ?").get(user.id);
@@ -55,7 +56,7 @@ function register(email, password, name) {
   if (password.length < 12) throw new Error("Password must be at least 12 characters");
   const existing = db.prepare("SELECT id FROM users WHERE email = ?").get(email);
   if (existing) throw new Error("An account with that email already exists");
-  const hash = bcrypt.hashSync(password, 10);
+  const hash = bcrypt.hashSync(password, BCRYPT_ROUNDS);
   name = String(name || "").trim().slice(0, 60);
   const info = db.prepare("INSERT INTO users (email, password_hash, name) VALUES (?, ?, ?)").run(email, hash, name || null);
   const user = { id: info.lastInsertRowid, email, name: name || null, avatarUrl: null };
@@ -67,7 +68,7 @@ function register(email, password, name) {
 // disclosed which emails are registered. Generated once per process.
 let dummyHash = null;
 function dummyPasswordHash() {
-  if (!dummyHash) dummyHash = bcrypt.hashSync(crypto.randomBytes(16).toString("hex"), 10);
+  if (!dummyHash) dummyHash = bcrypt.hashSync(crypto.randomBytes(16).toString("hex"), BCRYPT_ROUNDS);
   return dummyHash;
 }
 
@@ -81,6 +82,12 @@ function login(email, password) {
   // unknown emails. Both still pay the same comparison cost before failing.
   const valid = bcrypt.compareSync(passwordString, canMatch ? row.password_hash : dummyPasswordHash());
   if (!canMatch || !valid) throw new Error("Invalid email or password");
+  // Rehash older cost-10 bcrypt hashes after a successful login. The update is
+  // conditional so a concurrent password change is never overwritten.
+  if (/^\$2[aby]\$/.test(row.password_hash) && bcrypt.getRounds(row.password_hash) < BCRYPT_ROUNDS) {
+    const upgraded = bcrypt.hashSync(password, BCRYPT_ROUNDS);
+    db.prepare("UPDATE users SET password_hash = ? WHERE id = ? AND password_hash = ?").run(upgraded, row.id, row.password_hash);
+  }
   const user = { id: row.id, email: row.email, name: row.name || null, avatarUrl: row.avatar_url || null };
   return { user, token: signToken(user) };
 }
@@ -119,12 +126,12 @@ function findOrCreateGoogleUser(profile) {
         throw new Error("Sign in with your existing email and password. Google cannot verify current ownership of this email for account linking.");
       }
       // Verified email ownership replaces unverified credentials and revokes prior sessions.
-      const unusableHash = bcrypt.hashSync(crypto.randomBytes(32).toString("hex"), 10);
+      const unusableHash = bcrypt.hashSync(crypto.randomBytes(32).toString("hex"), BCRYPT_ROUNDS);
       db.prepare("UPDATE users SET google_id = ?, password_hash = ?, token_version = token_version + 1, name = COALESCE(name, ?), avatar_url = COALESCE(avatar_url, ?) WHERE id = ?")
         .run(sub, unusableHash, name, avatar, row.id);
       row = db.prepare("SELECT * FROM users WHERE id = ?").get(row.id);
     } else {
-      const randomHash = bcrypt.hashSync(crypto.randomBytes(32).toString("hex"), 10);
+      const randomHash = bcrypt.hashSync(crypto.randomBytes(32).toString("hex"), BCRYPT_ROUNDS);
       const info = db.prepare(
         "INSERT INTO users (email, password_hash, google_id, name, avatar_url) VALUES (?, ?, ?, ?, ?)"
       ).run(email, randomHash, sub, name, avatar);
@@ -169,9 +176,15 @@ async function manageAccount(id, body) {
   if (body.action === 'password') {
     if(row.google_id) throw new Error("This account uses Google sign-in. Manage its password with Google.");
     if(typeof body.newPassword!=='string'||body.newPassword.length<12||Buffer.byteLength(body.newPassword)>72)throw new Error("New password must be 12 characters or more and at most 72 UTF-8 bytes");
-    db.prepare("UPDATE users SET password_hash = ?, token_version = token_version + 1 WHERE id = ?").run(bcrypt.hashSync(body.newPassword,10),id);
+    db.prepare("UPDATE users SET password_hash = ?, token_version = token_version + 1 WHERE id = ?").run(bcrypt.hashSync(body.newPassword,BCRYPT_ROUNDS),id);
   } else if(body.action === 'delete') {
     if(body.confirmation!==row.email)throw new Error("Type your account email to confirm deletion");
+    const owned = "SELECT id FROM widgets WHERE user_id = ?";
+    db.prepare("DELETE FROM submissions WHERE widget_id IN (" + owned + ")").run(id);
+    db.prepare("DELETE FROM webhook_deliveries WHERE widget_id IN (" + owned + ")").run(id);
+    db.prepare("DELETE FROM webhook_endpoints WHERE widget_id IN (" + owned + ")").run(id);
+    db.prepare("DELETE FROM widgets WHERE user_id = ?").run(id);
+    db.prepare("DELETE FROM password_reset_tokens WHERE user_id = ?").run(id);
     db.prepare("DELETE FROM users WHERE id = ?").run(id);
   } else throw new Error("Invalid account action");
   return {ok:true};

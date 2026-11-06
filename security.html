@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Security and Responsible Disclosure | PopupLoom</title>
+<meta name="description" content="How PopupLoom protects accounts, popups and leads, and how to report a security vulnerability or a false-positive security warning.">
+<link rel="canonical" href="https://popuploom.com/security.html">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PopupLoom">
+<meta property="og:title" content="Security and Responsible Disclosure | PopupLoom">
+<meta property="og:description" content="How PopupLoom protects accounts, popups and leads, and how to report a security vulnerability or a false-positive security warning.">
+<meta property="og:url" content="https://popuploom.com/security.html">
+<meta property="og:image" content="https://popuploom.com/assets/og-popuploom.png">
+<meta property="og:image:alt" content="PopupLoom: free website popup builder with 45 templates">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Security and Responsible Disclosure | PopupLoom">
+<meta name="twitter:description" content="How PopupLoom protects accounts, popups and leads, and how to report a security vulnerability or a false-positive security warning.">
+<meta name="twitter:image" content="https://popuploom.com/assets/og-popuploom.png">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="Machine-readable PopupLoom summary">
+<link rel="stylesheet" href="/ui.css"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png"><link rel="icon" href="/assets/favicon-16.png" sizes="16x16" type="image/png"><link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://popuploom.com/"},{"@type":"ListItem","position":2,"name":"Security","item":"https://popuploom.com/security.html"}]},{"@type":"WebPage","@id":"https://popuploom.com/security.html#webpage","url":"https://popuploom.com/security.html","name":"Security and responsible disclosure","description":"How PopupLoom protects accounts, popups and leads, and how to report a security vulnerability or a false-positive security warning.","isPartOf":{"@id":"https://popuploom.com/#website"},"about":{"@id":"https://popuploom.com/#app"},"dateModified":"2026-11-06"}]}</script>
+</head>
+<body>
+<header class="wrap" style="padding:24px 26px">
+  <nav aria-label="Main"><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/index.html">Guides</a> · <a href="/faq.html">FAQ</a> · <a href="/about.html">About</a> · <a href="/studio.html?tpl=blank">Open the studio</a></nav>
+  <nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <span>Security</span></nav>
+</header>
+<main class="wrap" style="padding:30px 26px 80px;max-width:900px">
+  <article>
+    <h1>Security and responsible disclosure</h1>
+    <p class="mut">Last reviewed 6 November 2026. This page describes the current security model and how to report a problem. It is not a certification, a penetration-test report or a promise that no vulnerability exists.</p>
+
+    <h2>Report a security issue</h2>
+    <p>Email <a href="mailto:shailu3597@gmail.com?subject=PopupLoom%20security%20report">shailu3597@gmail.com</a> with the subject “PopupLoom security report”. This is the monitored security contact for the project.</p>
+    <p>Please include:</p>
+    <ul>
+      <li>the affected URL, endpoint or widget id;</li>
+      <li>a short description of the issue and its impact;</li>
+      <li>reproduction steps or a minimal proof of concept;</li>
+      <li>the date and time of your test;</li>
+      <li>whether any personal data was accessed, and if so, what you did with it.</li>
+    </ul>
+    <p>Do not include other people's personal data, passwords, session tokens or live payment details. If you need to demonstrate a data exposure, use a test account you control and redact the evidence.</p>
+    <p><strong>Response targets (best effort, not a legal guarantee):</strong> acknowledge a complete report within 3 business days; provide an initial assessment within 10 business days; agree a disclosure timeline after the issue is validated. Complex reports or reports requiring account-owner cooperation may take longer.</p>
+
+    <h2>Scope</h2>
+    <p>In scope:</p>
+    <ul>
+      <li><code>https://popuploom.com/</code> and its public pages;</li>
+      <li>the authentication and account APIs;</li>
+      <li>widget configuration, view and submission APIs;</li>
+      <li>the embedded <code>popuploom.js</code> runtime on a test page you control;</li>
+      <li>server-side webhook configuration and delivery;</li>
+      <li>the password-reset flow.</li>
+    </ul>
+    <p>Out of scope:</p>
+    <ul>
+      <li>denial-of-service or load testing against production;</li>
+      <li>social engineering of the operator or users;</li>
+      <li>reports that only show a missing security header without a demonstrated impact;</li>
+      <li>third-party services (Cloudflare, Google, Resend) outside PopupLoom's configuration;</li>
+      <li>testing against a customer's website or popup without that owner's permission.</li>
+    </ul>
+
+    <h2>Safe testing rules</h2>
+    <ul>
+      <li>Use accounts and websites you own or have explicit permission to test.</li>
+      <li>Do not access, modify, delete or exfiltrate another user's popups or leads.</li>
+      <li>Stop as soon as you have enough evidence to demonstrate the issue.</li>
+      <li>Do not run automated scanners at a rate that degrades the service.</li>
+      <li>Do not publicly disclose an unresolved issue before a fix or an agreed timeline.</li>
+    </ul>
+    <p>PopupLoom will not pursue legal action for good-faith research that follows these rules, but this page is not a legal safe-harbour statement and does not override applicable law. Consult your own legal advice if you need a formal agreement.</p>
+
+    <h2>How PopupLoom protects accounts</h2>
+    <ul>
+      <li>Passwords are stored as one-way hashes, never plaintext. The Worker uses PBKDF2-SHA256; the Express runtime uses bcrypt and upgrades legacy hashes on login.</li>
+      <li>Session tokens are signed server-side, expire, and can be revoked. Changing a password or resetting it invalidates existing sessions through a token version.</li>
+      <li>Login and password-reset responses are deliberately generic so they do not confirm whether an email address has an account.</li>
+      <li>Password-reset tokens are random, single-use, expire after 30 minutes and are stored only as a SHA-256 hash. The raw token stays in the email link fragment and is removed from the address bar.</li>
+      <li>Private API routes require a bearer token and reject untrusted browser origins.</li>
+      <li>Rate limits are applied to login, registration, password reset, lead submission, view events and general API traffic.</li>
+    </ul>
+
+    <h2>How PopupLoom protects popups and leads</h2>
+    <ul>
+      <li>Widget and lead queries are scoped to the signed-in owner. Changing another user's widget id does not grant access.</li>
+      <li>Widget ids are generated server-side from 96 random bits; a client cannot choose or reclaim an id.</li>
+      <li>Popup configuration is validated for size, depth and unsafe keys before it is stored.</li>
+      <li>The embed escapes text, attributes and URLs before rendering. Video embeds are limited to HTTPS YouTube/Vimeo hosts and run in a sandboxed iframe.</li>
+      <li>The current runtime does not write submitted form responses to the customer site's browser storage. It removes legacy <code>pfsubs.*</code> entries when it loads.</li>
+      <li>Server-side webhook URLs and signing secrets are stored separately from public widget configuration and are available only to the signed-in owner.</li>
+      <li>Webhook deliveries are signed with HMAC-SHA256, use a timestamp, do not follow redirects, and reject private or local destinations. Hostnames are resolved and rechecked before delivery.</li>
+      <li>CSV exports escape spreadsheet formulas and preserve quotes and Unicode.</li>
+    </ul>
+
+    <h2>Infrastructure and data</h2>
+    <ul>
+      <li>The public site and API run on Cloudflare Workers with D1 storage. Traffic uses HTTPS; HTML responses include CSP, HSTS, framing, MIME-sniffing and referrer protections.</li>
+      <li>Advertising is disabled. The AdSense integration is fail-closed and does not load until an approved account, a real slot and a published Google CMP configuration exist.</li>
+      <li>Password-reset email is sent through Resend. The API key is a server-side secret and is never sent to a browser.</li>
+      <li>Popup owners are the controllers of the lead data they collect. See the <a href="/privacy.html">privacy and data handling page</a> for storage, browser storage, webhooks and deletion.</li>
+    </ul>
+
+    <h2>Incident response</h2>
+    <p>Security reports and suspected incidents are triaged by severity. The response sequence is: contain the affected service, preserve evidence, identify the root cause, remove unauthorised access or code, rotate affected credentials, restore trusted service, and notify affected users where required. A public post-mortem is published when it would not expose personal data or create additional risk.</p>
+    <p>This is a small independent project; response times vary and are not guaranteed. There is no 24/7 security operations centre.</p>
+
+    <h2>What this page does not claim</h2>
+    <ul>
+      <li>It does not claim ISO 27001, SOC 2, PCI DSS or any other certification.</li>
+      <li>It does not claim that an independent penetration test has been completed.</li>
+      <li>It does not claim that every third-party scanner will agree with this page.</li>
+      <li>It does not guarantee uptime, data recovery or a particular response time.</li>
+    </ul>
+    <p>Security is an ongoing process. The repository's <a href="/.well-known/security.txt">security.txt</a> records the current contact and expiry, and this page is updated when the model changes.</p>
+
+    <h2>If you are a security vendor</h2>
+    <p>If a PopupLoom URL is classified incorrectly, email the same address with the vendor name, the exact warning text, the detected URL and the date. Include any public report URL. We will review the evidence, fix confirmed issues and request re-evaluation through the provider's official channel. We do not ask vendors to remove accurate warnings.</p>
+
+    <h2>Related pages</h2>
+    <ul>
+      <li><a href="/privacy.html">Privacy and data handling</a></li>
+      <li><a href="/terms.html">Terms of use</a></li>
+      <li><a href="/contact.html">Contact</a></li>
+      <li><a href="/faq.html">FAQ</a></li>
+      <li><a href="/about.html">About PopupLoom</a></li>
+    </ul>
+  </article>
+</main>
+<footer class="wrap" style="padding:24px 26px"><a href="/">PopupLoom — free website popup builder</a> · <a href="/security.html">Security</a> · <a href="/faq.html">FAQ</a> · <a href="/press.html">Press kit</a> · <a href="/guides/index.html">Guides</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></footer>
+</body>
+</html>

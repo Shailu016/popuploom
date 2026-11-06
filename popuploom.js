@@ -203,7 +203,7 @@
   display: inline-flex; align-items: center; justify-content: center;
 }
 .pf-link-demo { cursor: default; opacity: .82; }
-.pf-preview-tag { position: absolute; z-index: 2147483646; top: 10px; left: 10px; padding: 4px 8px; border-radius: 999px; background: rgba(10,12,16,.82); color: #fff; font: 700 10px/1.2 ui-sans-serif, system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; pointer-events: none; }
+.pf-preview-tag { position: absolute; z-index: 2147483646; top: 0; left: 50%; transform: translateX(-50%); padding: 7px 14px; border-radius: 0 0 10px 10px; background: #FF6A1F; color: #1A1005; font: 800 10.5px/1.2 ui-sans-serif, system-ui, sans-serif; letter-spacing: .1em; text-transform: uppercase; pointer-events: none; white-space: nowrap; box-shadow: 0 8px 24px rgba(0,0,0,.35); }
 .pf-links a:hover { border-color: #F99A1F; }
 .pf-note { font-size: 11.5px; opacity: .55; margin-top: 12px; text-align: center; }
 .pf-thanks { text-align: center; padding: 14px 0 6px; }
@@ -490,7 +490,7 @@
       if (this.preview) {
         var previewTag = document.createElement("div");
         previewTag.className = "pf-preview-tag";
-        previewTag.textContent = "Demo preview";
+        previewTag.textContent = "Demo preview — not a live offer";
         holder.appendChild(previewTag);
       }
 
@@ -874,12 +874,9 @@
       await recordSubmission(self, data);
       var mc = self.cfg.content || {}, formCfg = mc.form || {};
       if (!self.preview && !self.test) {
-        try {
-          var sk = "pfsubs." + (self.cfg.id || hash(self.cfg.name || "w"));
-          var arr = JSON.parse(localStorage.getItem(sk) || "[]");
-          arr.unshift({ at: Date.now(), data: data });
-          localStorage.setItem(sk, JSON.stringify(arr.slice(0, 200)));
-        } catch (e) {}
+        // Do not persist submitted lead data on the customer's origin. The
+        // server inbox is the source of truth; browser storage could expose
+        // PII to every other script running on that page.
         if (formCfg.webhookUrl) {
           apiFetch("", { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" },
             body: JSON.stringify({ popup: self.cfg.name, id: self.cfg.id, at: Date.now(), data: data })
@@ -939,7 +936,7 @@
 
   window.PopupLoom = Runtime;
   window.PopForge = Runtime;
-  Runtime.version = "1.1";
+  Runtime.version = "1.1.0";
   Runtime.show = function (cfg, options) {
     if (!Runtime.EncodeDemo) Runtime.encodeCfg = encodeCfg;
     var inst = new PopupInstance(cfg, null);
@@ -1035,7 +1032,20 @@
       });
   }
 
+  function clearLegacyLeadCache() {
+    // Older runtime builds cached up to 200 submitted responses under
+    // pfsubs.<widget>. Remove them so a visitor's PII does not remain readable
+    // by unrelated scripts on the host page after this update.
+    try {
+      for (var i = localStorage.length - 1; i >= 0; i--) {
+        var key = localStorage.key(i);
+        if (key && key.indexOf("pfsubs.") === 0) localStorage.removeItem(key);
+      }
+    } catch (e) {}
+  }
+
   function boot() {
+    clearLegacyLeadCache();
     document.querySelectorAll("[data-popuploom], [data-popforge]").forEach(function (node) {
       if (isReady(node)) return;
       setReady(node, "loading");

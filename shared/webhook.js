@@ -49,7 +49,7 @@
       if (a === 169 && b === 254) return true;
       if (a === 172 && b >= 16 && b <= 31) return true;
       if (a === 192 && b === 168) return true;
-      if (a === 192 && (b === 0 || b === 2)) return true;
+      if (a === 192 && (b === 0 || b === 2 || b === 88)) return true;
       if (a === 198 && (b === 18 || b === 19 || b === 51)) return true;
       if (a === 203 && b === 0) return true;
       if (a >= 224) return true;
@@ -61,8 +61,41 @@
     var v6 = host.replace(/^\[|\]$/g, "").toLowerCase();
     if (v6 === "::1" || v6 === "::") return true;
     if (/^fe[89ab][0-9a-f]:/.test(v6) || /^f[cd][0-9a-f]{2}:/.test(v6) || /^ff[0-9a-f]{2}:/.test(v6)) return true;
+    if (/^2001:db8:/.test(v6)) return true;
     var mapped = v6.match(/^::ffff:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/);
     if (mapped) return privateHost(mapped[1]);
+    return false;
+  }
+
+  // Parses a resolved address and rejects loopback, private, link-local,
+  // multicast, documentation and reserved ranges. Unknown values fail closed.
+  function privateAddress(address) {
+    var host = String(address || "").trim().toLowerCase().replace(/^\[|\]$/g, "");
+    if (!host) return true;
+    if (host.indexOf(":") !== -1) {
+      if (host === "::" || host === "::1") return true;
+      if (/^fe[89ab][0-9a-f]:/.test(host) || /^f[cd][0-9a-f]{2}:/.test(host) || /^ff[0-9a-f]{2}:/.test(host)) return true;
+      if (/^2001:db8:/.test(host)) return true;
+      var mapped = host.match(/^::ffff:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/);
+      if (mapped) return privateAddress(mapped[1]);
+      return false;
+    }
+    var v4 = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+    if (!v4) return true;
+    for (var i = 1; i <= 4; i++) {
+      var n = Number(v4[i]);
+      if (!Number.isInteger(n) || n < 0 || n > 255) return true;
+      if (v4[i].length > 1 && v4[i][0] === "0") return true;
+    }
+    var a = Number(v4[1]), b = Number(v4[2]);
+    if (a === 0 || a === 10 || a === 127) return true;
+    if (a === 100 && b >= 64 && b <= 127) return true;
+    if (a === 169 && b === 254) return true;
+    if (a === 172 && b >= 16 && b <= 31) return true;
+    if (a === 192 && (b === 168 || b === 0 || b === 2 || b === 88)) return true;
+    if (a === 198 && (b === 18 || b === 19 || b === 51)) return true;
+    if (a === 203 && b === 0) return true;
+    if (a >= 224) return true;
     return false;
   }
 
@@ -83,6 +116,53 @@
     var host = url.hostname.toLowerCase();
     if (!allowInsecure && privateHost(host)) return "Webhook URL cannot target a private or local address";
     if (allowInsecure && !loopback(host) && privateHost(host)) return "Webhook URL cannot target a private address";
+    return null;
+  }
+
+  // DNS-over-HTTPS resolver used by the Worker, where the node:dns module is
+  // unavailable. Express injects node:dns instead (see routes/widgets.js).
+  async function dohResolve(host) {
+    var addresses = [];
+    for (var type of ["A", "AAAA"]) {
+      var response = await fetch("https://cloudflare-dns.com/dns-query?name=" + encodeURIComponent(host) + "&type=" + type, {
+        headers: { Accept: "application/dns-json" }
+      });
+      if (!response.ok) throw new Error("DNS lookup failed");
+      var data = await response.json();
+      for (var answer of (data && data.Answer) || []) {
+        if (answer && (answer.type === 1 || answer.type === 28) && typeof answer.data === "string") addresses.push(answer.data);
+      }
+    }
+    return addresses;
+  }
+
+  // Resolves the hostname and rejects any private/reserved address. This closes
+  // the DNS-name bypass (nip.io, sslip.io, localtest.me) that literal-IP checks
+  // miss. Delivery re-runs this check immediately before each attempt. DNS
+  // rebinding between this lookup and the platform's own lookup remains a
+  // residual risk and is documented in SECURITY_AUDIT.md.
+  async function validateUrlResolved(value, options) {
+    options = options || {};
+    var error = validateUrl(value, options);
+    if (error) return error;
+    var url = new URL(String(value).trim());
+    var host = url.hostname.toLowerCase();
+    if (options.allowInsecure && loopback(host)) return null;
+    if (privateHost(host)) return "Webhook URL cannot target a private or local address";
+
+    // A literal public IP needs no resolver.
+    if (/^[0-9.]+$/.test(host) || host.indexOf(":") !== -1) {
+      return privateAddress(host) ? "Webhook URL cannot target a private or local address" : null;
+    }
+
+    if (typeof options.resolve !== "function") return "Webhook host could not be verified";
+    var addresses;
+    try { addresses = await options.resolve(host); }
+    catch (e) { return "Webhook host could not be resolved"; }
+    if (!Array.isArray(addresses) || !addresses.length) return "Webhook host could not be resolved";
+    for (var address of addresses) {
+      if (privateAddress(address)) return "Webhook URL cannot target a private or local address";
+    }
     return null;
   }
 
@@ -121,6 +201,8 @@
     for (var i = 0; i < attempts; i++) {
       if (i && delays[i]) await sleep(delays[i]);
       last.attempts = i + 1;
+      var check = await validateUrlResolved(endpoint.url, options);
+      if (check) { last.status = null; last.error = check; return last; }
       var timestamp = String(Math.floor(Date.now() / 1000));
       try {
         var signed = await signature(endpoint.secret, timestamp, body);
@@ -160,6 +242,9 @@
 
   return {
     validateUrl: validateUrl,
+    validateUrlResolved: validateUrlResolved,
+    privateAddress: privateAddress,
+    dohResolve: dohResolve,
     signature: signature,
     deliver: deliver,
     payload: payload,

@@ -2,7 +2,7 @@ const fs=require('fs'),path=require('path');require('./csp-hashes.js');const out
 // Wipe the previous public bundle so removed/renamed files cannot linger in the
 // deployed asset set. Everything below is copied from the tracked source files.
 fs.rmSync(out,{recursive:true,force:true});fs.mkdirSync(out,{recursive:true});
-for(const f of ['ccf2a9f45165c635253d22748df4a573.txt','robots.txt','sitemap.xml','llms.txt','llms-full.txt','templates.html','faq.html','press.html','guides/install-popups.html','guides/index.html','guides/wordpress-popup.html','guides/shopify-popup.html','guides/webflow-popup.html','guides/collect-and-export-leads.html','guides/popup-not-showing.html','guides/popup-builder-for-ecommerce.html','guides/popup-builder-for-quick-commerce.html','guides/popup-builder-for-lead-generation.html','index.html','studio.html','profile.html','demo.html','migration.html','reset-password.html','leads.html','privacy.html','about.html','contact.html','terms.html','.well-known/security.txt','lead-csv.js','leads.js','account.js','app.js','studio.js','reset-password.js','popuploom.js','ui.css']){fs.mkdirSync(path.dirname(path.join(out,f)),{recursive:true});fs.copyFileSync(f,path.join(out,f));}
+for(const f of ['ccf2a9f45165c635253d22748df4a573.txt','robots.txt','sitemap.xml','llms.txt','llms-full.txt','templates.html','faq.html','press.html','security.html','guides/install-popups.html','guides/index.html','guides/wordpress-popup.html','guides/shopify-popup.html','guides/webflow-popup.html','guides/collect-and-export-leads.html','guides/popup-not-showing.html','guides/popup-builder-for-ecommerce.html','guides/popup-builder-for-quick-commerce.html','guides/popup-builder-for-lead-generation.html','index.html','studio.html','profile.html','demo.html','migration.html','reset-password.html','leads.html','privacy.html','about.html','contact.html','terms.html','.well-known/security.txt','lead-csv.js','leads.js','account.js','app.js','studio.js','reset-password.js','popuploom.js','ui.css']){fs.mkdirSync(path.dirname(path.join(out,f)),{recursive:true});fs.copyFileSync(f,path.join(out,f));}
 // Search Console / Bing verification drop files are owner-provided; copy every
 // one that exists instead of hardcoding names that only the owner can know.
 const verification=require('../shared/verification');
@@ -30,6 +30,16 @@ if(metaTags){
 // The legacy filename is a byte-for-byte build alias of the one runtime, so an
 // old installed snippet and a new one can never drift apart.
 fs.copyFileSync('popuploom.js',path.join(out,'popforge.js'));
+
+// Immutable embed release. Customers can pin this path and verify the hash;
+// the live configuration still syncs through the API, so content edits do not
+// require a new script URL.
+const embedVersion='1.1.0',embedDir=path.join(out,'embed',embedVersion);
+fs.mkdirSync(embedDir,{recursive:true});
+fs.copyFileSync('popuploom.js',path.join(embedDir,'popuploom.js'));
+fs.copyFileSync('popuploom.js',path.join(embedDir,'popforge.js'));
+const embedHash=require('crypto').createHash('sha256').update(fs.readFileSync('popuploom.js')).digest('hex');
+fs.writeFileSync(path.join(embedDir,'SHA256SUMS'),embedHash+'  popuploom.js\n'+embedHash+'  popforge.js\n');
 fs.cpSync('assets',path.join(out,'assets'),{recursive:true});
 
 // ---- Advertising readiness (enabled only by a complete reviewed config) ----
