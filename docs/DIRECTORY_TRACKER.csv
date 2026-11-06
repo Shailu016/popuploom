@@ -1,0 +1,28 @@
+Priority,Tier,Platform,Submit URL,Cost,Account needed,Category,Status,Date submitted,Profile URL,Notes
+1,0,Bing Webmaster Tools,https://www.bing.com/webmasters,Free,Microsoft,Search engine,Not started,,,Import from Google Search Console; confirm sitemap; submit URLs
+1,0,IndexNow,https://api.indexnow.org/indexnow,Free,No,Search engine,Ready,,,Run npm run indexnow after deploy
+1,1,Product Hunt,https://www.producthunt.com/posts/new,Free,Yes,Launch,Not started,,,One launch only; prepare assets and first comment
+1,1,AlternativeTo,https://alternativeto.net/manage/submit/,Free,Yes,Software directory,Not started,,,Add as free alternative to real competitors
+1,1,SaaSHub,https://www.saashub.com/submit,Free,Yes,SaaS directory,Not started,,,Verify after approval
+2,1,G2,https://www.g2.com/products/new,Free listing,Yes,Review platform,Not started,,,Reviews must come from real users
+2,1,Capterra,https://www.capterra.com/vendors/sign-up,Free listing,Yes,Review platform,Not started,,,One Gartner vendor account covers GetApp and Software Advice
+2,1,GetApp,https://www.getapp.com/vendors/sign-up/,Free listing,Yes,Review platform,Not started,,,Use Gartner vendor account
+2,1,Software Advice,https://www.softwareadvice.com/vendors/,Free listing,Yes,Review platform,Not started,,,Use Gartner vendor account
+2,1,Crunchbase,https://www.crunchbase.com/,Free,Yes,Company database,Not started,,,Founder and category fields
+2,1,Trustpilot,https://business.trustpilot.com/,Free,Yes,Review platform,Not started,,,Verify domain; invite real users only
+2,1,TrustRadius,https://www.trustradius.com/vendor,Free listing,Yes,Review platform,Not started,,,Reviews must come from real users
+3,2,Uneed,https://www.uneed.best/submit,Free queue,Yes,Launch directory,Not started,,,Badge may be requested
+3,2,MicroLaunch,https://microlaunch.net/submit,Free,Yes,Launch directory,Not started,,,Outcome-led copy
+3,2,TinyLaunch,https://www.tinylaunch.com/,Free tier,Yes,Launch directory,Not started,,,Check current rules
+3,2,LaunchIgniter,https://launchigniter.com/submit,Free,Yes,Launch directory,Not started,,,Daily board
+3,2,Peerlist Launchpad,https://peerlist.io/launchpad,Free,Yes,Launch directory,Not started,,,Developer audience
+3,2,Indie Hackers,https://www.indiehackers.com/products,Free,Yes,Founder community,Not started,,,Post a genuine build story
+3,2,F6S,https://www.f6s.com/,Free,Yes,Startup platform,Not started,,,Startup profile
+4,3,DivByZero,https://divbyzero.com/blog/popup-software,Free,No,Listicle outreach,Not started,,,Independent popup software roundup
+4,3,Maestra,https://maestra.io/blog/comparisons/best-popup-apps,Free,No,Listicle outreach,Not started,,,Broad comparison page
+4,3,Kiwistic,https://www.kiwistic.com/top-exit-intent-plugins-wordpress-2025,Free,No,Listicle outreach,Not started,,,WordPress exit-intent roundup
+4,3,FS Code,https://www.fs-code.com/blog/best-wordpress-popup-plugins,Free,No,Listicle outreach,Not started,,,WordPress plugin roundup
+4,3,LearnPress LMS,https://learnpresslms.com/blog/best-popup-maker-wordpress-plugin-picks,Free,No,Listicle outreach,Not started,,,WordPress roundup
+4,3,TeamUpdraft,https://teamupdraft.com/blog/best-popup-plugin-wordpress,Free,No,Listicle outreach,Not started,,,WordPress roundup
+4,3,HostPapa,https://www.hostpapa.com/blog/web-design-development/best-free-exit-intent-popups-for-wordpress,Free,No,Listicle outreach,Not started,,,Free-focused roundup
+4,3,Navona,https://navona.ai/blog/best-exit-intent-popup-apps-for-shopify-2026,Free,No,Listicle outreach,Not started,,,Shopify comparison

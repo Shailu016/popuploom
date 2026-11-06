@@ -54,6 +54,7 @@ Last reviewed: 2026-11-06. Canonical site: https://popuploom.com/
 ## Canonical pages
 - [Homepage and product overview](https://popuploom.com/): features, account requirements, supported triggers and limitations.
 - [FAQ](https://popuploom.com/faq.html): complete answers with key facts, platform support and limits.
+- [Press kit and brand facts](https://popuploom.com/press.html): approved short, medium and long descriptions, key facts, logo and screenshot links, and claim guidance for directories and publications.
 - [Template catalog](https://popuploom.com/templates.html): all 45 starting designs grouped by purpose.
 - [Guides hub](https://popuploom.com/guides/index.html): installation, platform, lead and troubleshooting guides, plus the three use-case playbooks.
 - [Installation guide](https://popuploom.com/guides/install-popups.html): the hosted widget model, exact snippet, testing and updating.

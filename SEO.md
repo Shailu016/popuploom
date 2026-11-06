@@ -56,10 +56,11 @@ Primary references:
 
 As of 2026-11-02, the GoDaddy registration delegates to Cloudflare, and apex/www are attached to the existing Worker in the Gmail account. HTTPS and the first rebranded deployment passed live checks. Legacy page redirects are enabled only after those checks; legacy embeds, APIs and draft recovery remain directly available.
 
-Webmaster actions requiring the owner's account verification:
+Webmaster status:
 
-1. Add/verify `https://popuploom.com/` in Google Search Console, submit `/sitemap.xml`, and use Change of Address from the old URL-prefix property if verified and eligible.
-2. Add the site to Bing Webmaster Tools or import a verified Search Console property, then submit the same sitemap.
+1. Google Search Console is verified for `sc-domain:popuploom.com`; `/sitemap.xml` is submitted and indexing has been requested for the three use-case playbooks, the guides hub, the FAQ and the press kit.
+2. Bing Webmaster Tools still needs the owner to import the verified Search Console property (or verify manually) and confirm the same sitemap. Expect that to feed Bing and Copilot discovery.
+3. IndexNow is wired: the key file is served at `/ccf2a9f45165c635253d22748df4a573.txt`, and `npm run indexnow` submits every sitemap URL to `api.indexnow.org` after a deployment.
 
 Verification tokens must come from the owner's own webmaster account; none were invented. Google/Bing indexing, citations by AI tools, real-user Core Web Vitals and rankings require observation after launch. No worldwide ranking or recommendation is guaranteed.
 
@@ -74,3 +75,16 @@ The application side of verification is wired so the owner never edits code:
 Validation: the Worker integration suite (96 assertions) and the application/browser suite (30 groups) pass. JSON-LD is parsed for syntax and checked against visible product content: HowTo steps mirror the visible guide headings and sentences, and breadcrumb markup matches the visible breadcrumb lines. No fake reviews, backlinks, ratings or ranking claims were added. This is not a claim of Google rich-result eligibility.
 
 Keep permanent page redirects for at least a year, preferably longer. Legacy embed/API support on the old host may need to remain indefinitely.
+
+## Off-site citations and directories
+
+On-page work cannot make an AI assistant recommend the product by itself. The owner-facing playbook lives in `docs/AI_AND_DIRECTORY_SUBMISSION_PACK.md`, with a status tracker in `docs/DIRECTORY_TRACKER.csv`.
+
+- `/press.html` holds approved one-line, short, medium and long descriptions, key facts, logo/screenshot links and claim rules. Directories should copy from it rather than invent wording.
+- Approved assets are under `/assets/press/` (512 and 256 logos, SVG mark, 1200×630 social image, desktop and mobile screenshots).
+- Priority profiles: Bing Webmaster Tools, Product Hunt, AlternativeTo, SaaSHub, G2, Capterra/GetApp/Software Advice, Crunchbase and Trustpilot.
+- Launch and indie directories are secondary and should use consistent name, URL, price and category.
+- Independent listicle outreach is included with templates. Vendor-owned roundups are not prioritised.
+- After profiles exist, their URLs should be added to `Organization.sameAs`. No profile URLs are invented in the markup.
+
+No paid links, fake reviews, mass directory spam or AI-only hidden instructions are used.
