@@ -1,6 +1,6 @@
 Priority,Tier,Platform,Submit URL,Cost,Account needed,Category,Status,Date submitted,Profile URL,Notes
-1,0,Bing Webmaster Tools,https://www.bing.com/webmasters,Free,Microsoft,Search engine,Not started,,,Import from Google Search Console; confirm sitemap; submit URLs
-1,0,IndexNow,https://api.indexnow.org/indexnow,Free,No,Search engine,Ready,,,Run npm run indexnow after deploy
+1,0,Bing Webmaster Tools,https://www.bing.com/webmasters,Free,Microsoft,Search engine,Done,2026-11-06,,Sitemap resubmitted; 5 URLs requested; Site Scan queued
+1,0,IndexNow,https://api.indexnow.org/indexnow,Free,No,Search engine,Done,2026-11-06,,HTTP 202 for 18 URLs; rerun after each deploy
 1,1,Product Hunt,https://www.producthunt.com/posts/new,Free,Yes,Launch,Not started,,,One launch only; prepare assets and first comment
 1,1,AlternativeTo,https://alternativeto.net/manage/submit/,Free,Yes,Software directory,Not started,,,Add as free alternative to real competitors
 1,1,SaaSHub,https://www.saashub.com/submit,Free,Yes,SaaS directory,Not started,,,Verify after approval

@@ -122,17 +122,25 @@ Work top-down. Do not submit to 100 directories in one day; inconsistent listing
 | Directory | URL | Cost | Time | Notes |
 | --- | --- | --- | --- | --- |
 | Google Search Console | https://search.google.com/search-console | Free | Done | Sitemap submitted; indexing requested |
-| Bing Webmaster Tools | https://www.bing.com/webmasters | Free | 10 min | **Do next.** Import from Google Search Console, confirm sitemap, submit URLs. Feeds Bing and Copilot discovery |
+| Bing Webmaster Tools | https://www.bing.com/webmasters | Free | Done | Connected 2026-11-06. Sitemap resubmitted, 5 priority URLs requested, Site Scan queued. Feeds Bing and Copilot discovery |
 | IndexNow | `npm run indexnow` | Free | 1 min | Run after every deploy |
 
-#### Bing Webmaster setup
+#### Bing Webmaster status
 
-1. Open `https://www.bing.com/webmasters` and sign in with a Microsoft account.
-2. Choose **Import from Google Search Console**.
-3. Grant access and select `popuploom.com`.
-4. Confirm the sitemap `https://popuploom.com/sitemap.xml` is listed under **Sitemaps**.
-5. Use **URL Submission** for the 3 use-case playbooks, `/faq.html` and `/press.html` if they are not discovered.
-6. Optional: enable **IndexNow** in Bing. The key file is already live; `npm run indexnow` also works.
+Completed on 2026-11-06:
+
+1. `popuploom.com` is connected in Bing Webmaster Tools.
+2. `https://popuploom.com/sitemap.xml` was resubmitted and is processing.
+3. **Request indexing** was accepted for:
+   - `https://popuploom.com/guides/popup-builder-for-ecommerce.html`
+   - `https://popuploom.com/guides/popup-builder-for-quick-commerce.html`
+   - `https://popuploom.com/guides/popup-builder-for-lead-generation.html`
+   - `https://popuploom.com/faq.html`
+   - `https://popuploom.com/press.html`
+4. A Site Scan named `PopupLoom public pages 2026-11-06` is queued and reports to the account email.
+5. IndexNow is live. The first production submission returned HTTP 202 for all 18 sitemap URLs.
+
+Review later: Bing **Sitemaps** URL count, **Site Explorer** coverage, **Site Scan** errors/warnings and **AI Performance** citations.
 
 ### Tier 1 — entity, comparison and review profiles
 

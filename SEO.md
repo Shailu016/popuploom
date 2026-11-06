@@ -59,8 +59,8 @@ As of 2026-11-02, the GoDaddy registration delegates to Cloudflare, and apex/www
 Webmaster status:
 
 1. Google Search Console is verified for `sc-domain:popuploom.com`; `/sitemap.xml` is submitted and indexing has been requested for the three use-case playbooks, the guides hub, the FAQ and the press kit.
-2. Bing Webmaster Tools still needs the owner to import the verified Search Console property (or verify manually) and confirm the same sitemap. Expect that to feed Bing and Copilot discovery.
-3. IndexNow is wired: the key file is served at `/ccf2a9f45165c635253d22748df4a573.txt`, and `npm run indexnow` submits every sitemap URL to `api.indexnow.org` after a deployment.
+2. Bing Webmaster Tools is connected for `https://popuploom.com/`. The sitemap was resubmitted on 2026-11-06, indexing was requested for the three use-case playbooks, the FAQ and the press kit, and a Site Scan was queued. Bing feeds Copilot and some third-party answer engines.
+3. IndexNow is wired: the key file is served at `/ccf2a9f45165c635253d22748df4a573.txt`, and `npm run indexnow` submits every sitemap URL to `api.indexnow.org` after a deployment. The first production submission returned HTTP 202 for all 18 URLs.
 
 Verification tokens must come from the owner's own webmaster account; none were invented. Google/Bing indexing, citations by AI tools, real-user Core Web Vitals and rankings require observation after launch. No worldwide ranking or recommendation is guaranteed.
 
