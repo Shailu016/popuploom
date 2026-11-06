@@ -161,6 +161,8 @@ Run after the changes:
 | Live embed checksum | matches `SHA256SUMS` |
 | Live `security.txt` policy | points to `/security.html` |
 | Live homepage | no `workers.dev` migration link; no ad script |
+| Email Routing | status `ready`; destination verified; `security@` and `support@` rules enabled |
+| Daily monitor | `node scripts/monitor.cjs` passed (health, headers, embed hash, DNS) |
 
 ---
 

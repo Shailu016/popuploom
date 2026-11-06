@@ -5,8 +5,8 @@ const crypto = require("crypto");
 const SITE = "https://popuploom.com";
 const failures = [];
 
-async function get(url) {
-  const res = await fetch(url, { headers: { "User-Agent": "PopupLoom-Monitor/1.0" } });
+async function get(url, headers = {}) {
+  const res = await fetch(url, { headers: { "User-Agent": "PopupLoom-Monitor/1.0", ...headers } });
   return { status: res.status, headers: res.headers, text: await res.text() };
 }
 
@@ -48,21 +48,20 @@ function check(name, condition, detail) {
     check(path, r.status === 200, "status " + r.status);
   }
 
-  const spf = await get("https://dns.google/resolve?name=popuploom.com&type=TXT");
-  let spfJson = {};
-  try { spfJson = JSON.parse(spf.text); } catch (e) {}
-  const txt = (spfJson.Answer || []).map((a) => a.data).join(" ");
+  async function doh(name, type) {
+    const r = await get("https://cloudflare-dns.com/dns-query?name=" + encodeURIComponent(name) + "&type=" + type, { Accept: "application/dns-json" });
+    try { return (JSON.parse(r.text).Answer || []); } catch (e) { return []; }
+  }
+
+  const txt = (await doh("popuploom.com", "TXT")).map((a) => a.data).join(" ");
   check("apex SPF", /v=spf1/.test(txt), "no SPF answer");
+  check("single SPF record", (txt.match(/v=spf1/g) || []).length === 1, "multiple SPF records");
 
-  const dmarc = await get("https://dns.google/resolve?name=_dmarc.popuploom.com&type=TXT");
-  let dmarcJson = {};
-  try { dmarcJson = JSON.parse(dmarc.text); } catch (e) {}
-  check("DMARC", (dmarcJson.Answer || []).some((a) => /v=DMARC1/.test(a.data)), "no DMARC answer");
+  const dmarc = (await doh("_dmarc.popuploom.com", "TXT")).map((a) => a.data).join(" ");
+  check("DMARC", /v=DMARC1/.test(dmarc), "no DMARC answer");
 
-  const caa = await get("https://dns.google/resolve?name=popuploom.com&type=CAA");
-  let caaJson = {};
-  try { caaJson = JSON.parse(caa.text); } catch (e) {}
-  check("CAA", (caaJson.Answer || []).length > 0, "no CAA answer");
+  check("CAA", (await doh("popuploom.com", "CAA")).length > 0, "no CAA answer");
+  check("MX", (await doh("popuploom.com", "MX")).length > 0, "no MX answer");
 
   if (failures.length) {
     console.error("\nMonitor failed:\n- " + failures.join("\n- "));

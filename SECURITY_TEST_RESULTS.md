@@ -42,7 +42,8 @@ The regression suite covers, among other things:
 | Homepage | no `workers.dev` migration link, no ad script |
 | `sitemap.xml` | includes `/security.html` |
 | DNS SPF | `v=spf1 include:_spf.mx.cloudflare.net ~all` at apex (Email Routing); `send.popuploom.com` SPF remains |
-| Email Routing | MX active; `security@` and `support@` forward to a verified destination |
+| Email Routing | status `ready`; MX active; destination verified; `security@` and `support@` rules enabled |
+| Daily monitor | `node scripts/monitor.cjs` passed |
 | DNS CAA | issue/issuewild for Google Trust Services, Let's Encrypt, DigiCert, Sectigo; iodef set |
 | DMARC | `p=quarantine`, aggregate reports |
 | RDAP | registration 2026-11-01, expiry 2027-11-01, transfer lock |
