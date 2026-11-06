@@ -11,7 +11,7 @@ Implemented for the production PopupLoom domain:
 - `BreadcrumbList` JSON-LD on the template catalog and guide, each matching a visible `Home › …` breadcrumb line
 - Visible FAQs matching the structured data
 - A static catalog of 45 templates and an installation guide
-- `sitemap.xml` containing only `/`, `/templates.html` and `/guides/install-popups.html`
+- `sitemap.xml` containing only public, indexable pages: the homepage, template catalog, guide hub, nine guides and the four trust pages
 - `robots.txt` advertising the apex sitemap
 - `llms.txt` product summary, explicitly not a ranking or AI-visibility promise
 - `llms-full.txt`: extended machine-readable documentation (builder facts, embed format, limits, verbatim FAQ text), linked from `llms.txt` and served on the public allowlist
@@ -20,7 +20,17 @@ Implemented for the production PopupLoom domain:
 - regenerated per-page CSP hashes
 - optional site-verification wiring (owner-supplied values only; see below)
 
-Public indexing targets: `/`, `/templates.html`, `/guides/install-popups.html`. The sitemap excludes app/account/API routes and the migration page. Unknown paths return 404 rather than duplicate homepage content. Account authorization remains enforced independently of robots.txt.
+Public indexing targets: `/`, `/templates.html`, `/guides/index.html`, the six installation/lead/troubleshooting guides, the three use-case guides and the four trust pages. The sitemap excludes app/account/API routes and the migration page.
+
+## Use-case landing pages
+
+Three original, substantive guides target the site's main buyer types. Each has a unique title, description, canonical, Open Graph/Twitter card, `BreadcrumbList` + `TechArticle` + `FAQPage` JSON-LD, and internal links to the relevant templates, installation guides and sibling use-case pages:
+
+- `/guides/popup-builder-for-ecommerce.html` — first-order offers, cart-page exit intent, free-shipping bars, back-in-stock alerts, review requests, margin and platform limits.
+- `/guides/popup-builder-for-quick-commerce.html` — serviceability and launch notices, app-install prompts, reorder offers, operational updates, and an explicit statement that PopupLoom is a website widget rather than a native app SDK.
+- `/guides/popup-builder-for-lead-generation.html` — lead magnets, webinars, waitlists, demo requests, form-field limits, consent copy, CSV export and webhook paths.
+
+The guides are linked from the homepage use-case section, the guide hub and the template catalog. They are not thin doorway pages: each explains what the product cannot do as well as what it can. Their FAQ markup mirrors the visible FAQ text, and no conversion, revenue or ranking claim is made. Unknown paths return 404 rather than duplicate homepage content. Account authorization remains enforced independently of robots.txt.
 
 Validation: the Worker integration suite (92 assertions) and the application/browser suite (29 groups) pass. JSON-LD is parsed for syntax and checked against visible product content: HowTo steps mirror the visible guide headings and sentences, and breadcrumb markup matches the visible breadcrumb lines. No fake reviews, backlinks, ratings or ranking claims were added. This is not a claim of Google rich-result eligibility.
 

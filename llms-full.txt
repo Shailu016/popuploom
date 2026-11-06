@@ -35,6 +35,17 @@
 - Legacy embeds installed before the domain move keep working unchanged: the data-popforge attribute and the /popforge.js path on the workers.dev host serve the same runtime bytes.
 - The runtime is CORS-open for its public view and submission reporting only; no visitor cookies or credentials are used.
 
+## Scope boundaries
+- A widget is a layer on a website the owner controls. It cannot inject into a native iOS or Android app, a marketplace listing or a third-party checkout.
+- The popup does not read cart contents, cart value or customer accounts, and it cannot display live delivery estimates.
+- PopupLoom does not generate or validate coupon codes, run A/B tests, attribute revenue or score leads.
+- Form fields support text, email, phone, number, date and URL input. Forms do not render a separate consent checkbox; consent copy belongs in visible fine print linked to the owner's privacy policy.
+
+## Use-case playbooks
+- Ecommerce: https://popuploom.com/guides/popup-builder-for-ecommerce.html - first-order offers, cart-page exit intent, free-shipping bars, back-in-stock and review requests.
+- Quick commerce: https://popuploom.com/guides/popup-builder-for-quick-commerce.html - serviceability, launch, app-install and reorder popups for hyperlocal storefronts, with native-app limits stated.
+- Lead generation: https://popuploom.com/guides/popup-builder-for-lead-generation.html - lead magnets, webinars, waitlists, form design, CSV export and signed webhooks.
+
 ## Lead capture
 - Form submissions, survey choices and other responses are stored against the saved widget they came from.
 - Only the widget owner can read stored responses, through an authenticated account API that pages results (default 200 records, up to 500 per request).
@@ -62,7 +73,11 @@
 ## Page map
 - Overview and FAQ: https://popuploom.com/
 - All 45 templates grouped by purpose: https://popuploom.com/templates.html
+- Guides hub: https://popuploom.com/guides/index.html
 - Installation guide for WordPress, Shopify, Webflow and any custom-HTML site: https://popuploom.com/guides/install-popups.html
+- Ecommerce popup playbook: https://popuploom.com/guides/popup-builder-for-ecommerce.html
+- Quick-commerce popup playbook: https://popuploom.com/guides/popup-builder-for-quick-commerce.html
+- Lead-generation popup playbook: https://popuploom.com/guides/popup-builder-for-lead-generation.html
 - Draft recovery for the previous domain: https://popuploom.com/migration.html (kept out of search indexes)
 
 This documentation is optional and machine-readable. Crawler access rules live in https://popuploom.com/robots.txt.

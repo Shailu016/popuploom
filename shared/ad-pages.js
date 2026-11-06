@@ -14,7 +14,10 @@
     "/guides/shopify-popup.html",
     "/guides/webflow-popup.html",
     "/guides/collect-and-export-leads.html",
-    "/guides/popup-not-showing.html"
+    "/guides/popup-not-showing.html",
+    "/guides/popup-builder-for-ecommerce.html",
+    "/guides/popup-builder-for-quick-commerce.html",
+    "/guides/popup-builder-for-lead-generation.html"
   ]);
   function isAdPage(pathname) {
     return AD_PAGES.has(String(pathname || ""));

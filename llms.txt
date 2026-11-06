@@ -10,6 +10,9 @@
 - [WordPress guide](https://popuploom.com/guides/wordpress-popup.html), [Shopify guide](https://popuploom.com/guides/shopify-popup.html), [Webflow guide](https://popuploom.com/guides/webflow-popup.html): platform-specific placement and caveats.
 - [Collect and export leads](https://popuploom.com/guides/collect-and-export-leads.html): lead inbox, CSV, browser and server webhooks.
 - [Popup not showing](https://popuploom.com/guides/popup-not-showing.html): diagnostic sequence for saved widgets.
+- [Ecommerce popup guide](https://popuploom.com/guides/popup-builder-for-ecommerce.html): free playbook for first-order offers, cart rescue, free-shipping bars, back-in-stock and review requests.
+- [Quick-commerce popup guide](https://popuploom.com/guides/popup-builder-for-quick-commerce.html): serviceability, launch, app-install and reorder popups for hyperlocal storefronts.
+- [Lead-generation popup guide](https://popuploom.com/guides/popup-builder-for-lead-generation.html): lead magnets, webinars, waitlists, forms, CSV export and webhooks.
 - [About PopupLoom](https://popuploom.com/about.html): who operates the product and how templates should be understood.
 - [Contact](https://popuploom.com/contact.html): support, privacy, security and blocklist questions.
 - [Terms of use](https://popuploom.com/terms.html): accounts, acceptable use, lead data and liability.
