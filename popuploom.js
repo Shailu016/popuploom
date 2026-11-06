@@ -143,6 +143,15 @@
 .pf-media img { width: 100%; display: block; border-radius: 14px; margin-bottom: 16px; }
 .pf-vid { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 14px; overflow: hidden; margin-bottom: 16px; }
 .pf-vid iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.pf-vid-ph {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 10px;
+  background: linear-gradient(135deg, #1B2029, #0D1015); color: #fff;
+  font: 700 13px/1 var(--pf-font, ui-sans-serif, system-ui, sans-serif); letter-spacing: .02em;
+}
+.pf-vid-ph span {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border-radius: 50%; background: rgba(255, 255, 255, .14); font-size: 12px;
+}
 .pf-countdown { display: flex; gap: 8px; margin-bottom: 18px; }
 .pf-countdown .u {
   flex: 1; text-align: center; padding: 11px 4px 9px; border-radius: 12px;
@@ -654,7 +663,7 @@
     var A = safeColor(th.accent, "#F99A1F");
     if (mc.badge) h += '<div class="pf-badge">' + esc(mc.badge) + "</div>";
     if (mc.image && !split) h += '<div class="pf-media"><img loading="lazy" decoding="async" src="' + escAttr(safeUrl(mc.image, true)) + '" alt=""></div>';
-    if (mc.videoEmbed) h += '<div class="pf-vid">' + videoFrame(mc.videoEmbed) + "</div>";
+    if (mc.videoEmbed) h += '<div class="pf-vid">' + videoFrame(mc.videoEmbed, !!(self.preview && self.stage && self.stage.classList && self.stage.classList.contains("tpl-canvas"))) + "</div>";
     if (mc.title) h += '<div class="pf-title">' + esc(mc.title) + "</div>";
     if (mc.body) h += '<div class="pf-text">' + esc(mc.body) + "</div>";
     if (mc.countdown && mc.countdown.target) h += '<div class="pf-countdown" data-target="' + escAttr(mc.countdown.target) + '"><div class="u"><div class="n d">00</div><div class="l">Days</div></div><div class="u"><div class="n h">00</div><div class="l">Hrs</div></div><div class="u"><div class="n m">00</div><div class="l">Min</div></div><div class="u"><div class="n s">00</div><div class="l">Sec</div></div></div>';
@@ -708,16 +717,19 @@
     return map[a] || "pf-anim-pop";
   }
   function animCls(k) { return ""; } // overlay anim handled on card
-  function videoFrame(url) {
+  function videoFrame(url, placeholder) {
     var m;
     if ((m = String(url).match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/)))
-      url = "https://www.youtube.com/embed/" + m[1];
+      url = "https://www.youtube-nocookie.com/embed/" + m[1];
     else if ((m = String(url).match(/vimeo\.com\/(\d+)/))) url = "https://player.vimeo.com/video/" + m[1];
     try {
       var parsed = new URL(url);
       if (parsed.protocol !== "https:" || ["www.youtube.com", "www.youtube-nocookie.com", "player.vimeo.com"].indexOf(parsed.hostname) === -1) return "";
     } catch (e) { return ""; }
-    return '<iframe sandbox="allow-scripts allow-same-origin allow-presentation" referrerpolicy="strict-origin-when-cross-origin" src="' + escAttr(safeUrl(url, false)) + '" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>';
+    // Gallery thumbnails are inert static previews: drawing a poster avoids
+    // loading a third-party player (and its cookies) 45 times on the homepage.
+    if (placeholder) return '<div class="pf-vid-ph" aria-hidden="true"><span>&#9654;</span><b>Video preview</b></div>';
+    return '<iframe title="Embedded video player" sandbox="allow-scripts allow-same-origin allow-presentation" referrerpolicy="strict-origin-when-cross-origin" src="' + escAttr(safeUrl(url, false)) + '" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>';
   }
   function startCountdown(scope, cd, self) {
     var el = scope.querySelector(".pf-countdown");

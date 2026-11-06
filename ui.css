@@ -505,7 +505,7 @@ section { padding: 92px 0; position: relative; }
   color: var(--acc-ink); border-color: transparent; font-weight: 700;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), 0 10px 24px -14px rgba(255, 106, 31, .7);
 }
-.cat-chip .n { opacity: .6; font-weight: 500; margin-left: 6px; font-size: 12px; font-variant-numeric: tabular-nums; }
+.cat-chip .n { opacity: .85; font-weight: 500; margin-left: 6px; font-size: 12px; font-variant-numeric: tabular-nums; }
 .cat-chip.on .n { opacity: .72; }
 
 .journey-note { color: var(--muted); font-size: 14px; margin: 0 0 30px; min-height: 22px; }
@@ -589,6 +589,7 @@ section { padding: 92px 0; position: relative; }
   border-radius: 8px;
   box-shadow: 0 14px 34px rgba(0, 0, 0, .45);
   will-change: transform;
+  pointer-events: none;
 }
 .tpl-canvas[data-mode="desktop"] { width: 800px; height: 680px; }
 .tpl-canvas[data-mode="mobile"] {
