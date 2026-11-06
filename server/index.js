@@ -16,6 +16,7 @@ const security = require("./security");
 const { register, login, findOrCreateGoogleUser, getUserById, updateProfile, authMiddleware } = require("./auth");
 const { verifyCredential, isConfigured, CLIENT_ID } = require("./google");
 const widgetsRouter = require("./routes/widgets");
+const ads = require("../shared/ads");
 const db = require("./db");
 const hostPolicy = require("../shared/host-policy");
 const verification = require("../shared/verification");
@@ -225,12 +226,19 @@ app.use((req, res, next) => {
   }
   const file = pathname === "/popforge.js" ? "/popuploom.js" : pathname;
   res.setHeader("Cache-Control", "no-store");
+  const adConfig = ads.config(process.env);
+  const adNonce = file.endsWith(".html") && adConfig.enabled && ads.isAdPage(pathname) ? ads.nonce() : "";
   if (file.endsWith(".html")) {
-    security.htmlHeaders(res, file.slice(1));
+    security.htmlHeaders(res, file.slice(1), { adsEnabled: !!adNonce, adsNonce: adNonce });
     if (file === "/migration.html" || file === "/reset-password.html" || file === "/studio.html" || file === "/profile.html" || file === "/leads.html") res.setHeader("X-Robots-Tag", "noindex, nofollow");
   }
   const diskPath = path.join(__dirname, "..", file.slice(1));
   if (!fs.existsSync(diskPath)) return next();
+  if (adNonce) {
+    const html = fs.readFileSync(diskPath, "utf8");
+    res.type("html").send(ads.inject(html, pathname, adConfig, adNonce));
+    return;
+  }
   res.sendFile(diskPath);
 });
 app.use("/assets", express.static(path.join(__dirname, "..", "assets"), {

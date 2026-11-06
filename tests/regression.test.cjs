@@ -573,6 +573,46 @@ test('webhook delivery retries transient failures and stops on 4xx',async()=>{
   assert.equal(stopped.ok,false);assert.equal(stopped.attempts,1);assert.equal(stopped.status,400);assert.equal(calls.stop,1);
  }finally{await new Promise(r=>receiver.close(r));}
 });
+test('advertising config fails closed and injects only on public guides',async()=>{
+ const ads=require('../shared/ads');
+ const base={ADSENSE_PUBLISHER_ID:'pub-8947829712444522'};
+ assert.equal(ads.config(base).enabled,false,'disabled by default');
+ assert.equal(ads.config({...base,ADSENSE_ENABLED:'true'}).reason,'approval_not_confirmed');
+ assert.equal(ads.config({...base,ADSENSE_ENABLED:'true',ADSENSE_APPROVED:'true',ADSENSE_CMP:'google-privacy-messaging'}).reason,'no_valid_ad_slot');
+ assert.equal(ads.config({...base,ADSENSE_ENABLED:'true',ADSENSE_APPROVED:'true',ADSENSE_CMP:'other',ADSENSE_SLOT:'1234567890'}).reason,'cmp_not_google_privacy_messaging');
+ assert.equal(ads.config({...base,ADSENSE_ENABLED:'true',ADSENSE_APPROVED:'true',ADSENSE_CMP:'google-privacy-messaging',ADSENSE_CLIENT:'ca-pub-0000000000000000',ADSENSE_SLOT:'1234567890'}).reason,'invalid_client_id');
+ const full={...base,ADSENSE_ENABLED:'true',ADSENSE_APPROVED:'true',ADSENSE_CLIENT:'ca-pub-8947829712444522',ADSENSE_CMP:'google-privacy-messaging',ADSENSE_SLOT:'1234567890'};
+ const cfg=ads.config(full);assert.equal(cfg.enabled,true);
+ const nonce=ads.nonce();
+ const html='<html><body><article><p>Guide</p></article></body></html>';
+ const injected=ads.inject(html,'/guides/install-popups.html',cfg,nonce);
+ assert.ok(injected.includes('data-pl-ad="1"')&&injected.includes('Advertisement')&&injected.includes('data-ad-slot="1234567890"'));
+ assert.ok(injected.includes('adsbygoogle.js')&&injected.includes('nonce="'+nonce+'"'));
+ const disabledGuide=await api('/guides/install-popups.html');assert.ok(!disabledGuide.data.includes('adsbygoogle.js')&&!disabledGuide.data.includes('data-pl-ad'),'disabled ad response loads nothing');
+ assert.equal(ads.inject(html,'/',cfg,nonce),html);
+ assert.equal(ads.inject(html,'/templates.html',cfg,nonce),html);
+ assert.equal(ads.inject(html,'/studio.html',cfg,nonce),html);
+ assert.equal(ads.inject(injected,'/guides/install-popups.html',cfg,nonce),injected,'idempotent');
+ const csp=ads.cspAdditions(nonce);
+ assert.ok(csp.script.includes("'nonce-"+nonce+"'")&&csp.script.includes("'strict-dynamic'"));
+ assert.ok(!/unsafe-inline|unsafe-eval/.test(csp.script));
+ const previous={};
+ for(const key of ['ADSENSE_ENABLED','ADSENSE_APPROVED','ADSENSE_PUBLISHER_ID','ADSENSE_CLIENT','ADSENSE_CMP','ADSENSE_SLOT','ADSENSE_SLOTS']){previous[key]=process.env[key];}
+ try{
+  Object.assign(process.env,full);
+  const guide=await api('/guides/install-popups.html');
+  assert.ok(guide.data.includes('data-pl-ad="1"')&&guide.data.includes('adsbygoogle.js'));
+  const header=guide.headers.get('content-security-policy')||'';
+  const n=(guide.data.match(/<script nonce="([a-f0-9]+)"/)||[])[1];
+  assert.ok(n&&header.includes("'nonce-"+n+"'")&&header.includes("'strict-dynamic'"));
+  assert.ok(!header.includes("'unsafe-eval'"));
+  const homepage=await api('/');assert.ok(!homepage.data.includes('adsbygoogle.js')&&!homepage.data.includes('data-pl-ad'));
+  const studio=await api('/studio.html');assert.ok(!studio.data.includes('adsbygoogle.js')&&!studio.data.includes('data-pl-ad'));
+ }finally{
+  for(const key of Object.keys(previous)){if(previous[key]===undefined)delete process.env[key];else process.env[key]=previous[key];}
+ }
+});
+
 test('advertising allowlist excludes private and customer surfaces',async()=>{
  const {isAdPage,AD_PAGES}=require('../shared/ad-pages');
  assert.ok(AD_PAGES.size>=6);

@@ -39,6 +39,17 @@ migrations_dir = "worker/migrations"
 # Leave empty to allow only same-origin (and public widget endpoints).
 APP_ORIGINS = ""
 
+# Advertising is prepared but off until the account is approved, the Google
+# Privacy & messaging CMP is published and a real ad slot is supplied.
+ADSENSE_ENABLED = "false"
+ADSENSE_APPROVED = "false"
+ADSENSE_PUBLISHER_ID = "pub-8947829712444522"
+# Google Privacy & messaging (Google CMP) is configured and its European
+# message is published for popuploom.com in the AdSense account.
+ADSENSE_CMP = "google-privacy-messaging"
+# Real display unit created in AdSense: "PopupLoom Guide Responsive" (responsive).
+ADSENSE_SLOT = "4931611985"
+
 # Password reset email. RESEND_API_KEY is an encrypted secret:
 #   wrangler secret put RESEND_API_KEY
 # Free plan: 3,000 emails/month, 100/day. Verify popuploom.com in Resend

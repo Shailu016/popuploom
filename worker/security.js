@@ -1,6 +1,7 @@
 // worker/security.js — CORS/origin allowlist + security headers (port of server/security.js)
 import auth from "./auth.js";
 import hashes from "./csp-hashes.json";
+import ads from "../shared/ads.js";
 
 const { ApiError } = auth;
 
@@ -35,9 +36,9 @@ export function securityHeaders(env, request) {
   return headers;
 }
 
-export function htmlHeaders(env, file = "index.html") {
+export function htmlHeaders(env, file = "index.html", options = {}) {
   const origins = String(env.APP_ORIGINS || "").split(",").map(v => v.trim()).filter(Boolean);
-  const policy = [
+  let policy = [
     "default-src 'self'", "base-uri 'none'", "object-src 'none'", "frame-ancestors 'none'", "form-action 'self'",
     "script-src 'self' 'unsafe-hashes' https://accounts.google.com/gsi/ https://static.cloudflareinsights.com " + (hashes[file] || ""),
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/",
@@ -45,6 +46,13 @@ export function htmlHeaders(env, file = "index.html") {
     "connect-src 'self' https://accounts.google.com/gsi/ https://cloudflareinsights.com " + origins.join(" "),
     "frame-src https://accounts.google.com/gsi/ https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com"
   ].join("; ");
+  if (options.adsEnabled && options.adsNonce) {
+    const additions = ads.cspAdditions(options.adsNonce);
+    policy = policy
+      .replace("script-src ", "script-src " + additions.script + " ")
+      .replace("frame-src ", "frame-src " + additions.frame + " ")
+      .replace("connect-src ", "connect-src " + additions.connect + " ");
+  }
   return {
     "Content-Security-Policy": policy,
     "X-Frame-Options": "DENY",

@@ -1,6 +1,27 @@
 const fs=require('fs'),path=require('path'),http=require('http'),assert=require('assert/strict'),{spawn}=require('child_process'),{DatabaseSync}=require('node:sqlite');
 (async()=>{const root=path.resolve(__dirname,'..');const {default:worker}=await import(require('url').pathToFileURL(path.join(root,'.cf-build/index.js')));const db=new DatabaseSync(':memory:');for(const f of ['0001_init.sql','0003_rate_limits.sql','0004_password_reset_tokens.sql','0005_webhooks.sql'])db.exec(fs.readFileSync(path.join(root,'worker/migrations',f),'utf8'));
 const env={JWT_SECRET:require('crypto').randomBytes(32).toString('hex'),RESEND_API_KEY:'test-resend-key',RESET_EMAIL_FROM:'PopupLoom <reset@popuploom.com>',PUBLIC_ORIGIN:'https://popuploom.com',ALLOW_INSECURE_WEBHOOKS:'true',DB:{prepare(sql){return {bind(...args){return {first:async()=>db.prepare(sql).get(...args),run:async()=>{const r=db.prepare(sql).run(...args);return {meta:{changes:r.changes,last_row_id:r.lastInsertRowid}};},all:async()=>({results:db.prepare(sql).all(...args)})};}};}},ASSETS:{fetch:async r=>{const file=path.join(root,'.cf-build/public',new URL(r.url).pathname);return fs.existsSync(file)&&fs.statSync(file).isFile()?new Response(fs.readFileSync(file),{headers:{'Content-Type':file.endsWith('.html')?'text/html':'application/octet-stream'}}):new Response('',{status:404});}}};
+{
+  console.log('== advertising boundary ==');
+  const adEnv = { ...env, ADSENSE_ENABLED: 'true', ADSENSE_APPROVED: 'true', ADSENSE_PUBLISHER_ID: 'pub-8947829712444522', ADSENSE_CLIENT: 'ca-pub-8947829712444522', ADSENSE_CMP: 'google-privacy-messaging', ADSENSE_SLOT: '1234567890' };
+  const guideRes = await worker.fetch(new Request('https://popuploom.com/guides/install-popups.html'), adEnv, { waitUntil() {} });
+  const guide = await guideRes.text();
+  const policy = guideRes.headers.get('content-security-policy') || '';
+  const nonce = (guide.match(/<script nonce="([a-f0-9]+)"/) || [])[1];
+  assert.equal(guideRes.status, 200);
+  assert.ok(guide.includes('data-pl-ad="1"') && guide.includes('adsbygoogle.js') && guide.includes('Advertisement'));
+  assert.ok(nonce && policy.includes("'nonce-" + nonce + "'") && policy.includes("'strict-dynamic'"));
+  assert.ok(!policy.includes("'unsafe-eval'"));
+  for (const path of ['/', '/studio.html', '/guides/index.html']) {
+    const res = await worker.fetch(new Request('https://popuploom.com' + path), adEnv, { waitUntil() {} });
+    const body = await res.text();
+    assert.ok(!body.includes('adsbygoogle.js') && !body.includes('data-pl-ad'), path + ' must stay ad-free');
+  }
+  const disabled = await worker.fetch(new Request('https://popuploom.com/guides/install-popups.html'), env, { waitUntil() {} });
+  assert.ok(!(await disabled.text()).includes('adsbygoogle.js'), 'disabled advertising must load no ad resource');
+  console.log('PASS advertising boundary and nonce CSP');
+}
+
 for(const flag of [undefined,'false','true']){
  const enabled=flag==='true';
  for(const path of ['/','/studio.html?tpl=cafeClub','/index.html?ref=1']){

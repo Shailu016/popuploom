@@ -2,6 +2,7 @@
 import auth from "./auth.js";
 import http from "./http.js";
 import widgets from "./widgets.js";
+import ads from "../shared/ads.js";
 import passwordReset from "./password-reset.js";
 import sharedReset from "../shared/password-reset.js";
 import email from "../shared/email.js";
@@ -284,7 +285,13 @@ async function serveStatic(request, env, pathname, sec, cors, headOnly) {
     const headers = new Headers(asset.headers);
     headers.set("Cache-Control", "no-store");
     if (["/leads.html", "/studio.html", "/profile.html", "/demo.html", "/migration.html", "/reset-password.html"].includes(file)) headers.set("X-Robots-Tag", ["/migration.html", "/reset-password.html", "/studio.html", "/profile.html", "/leads.html"].includes(file) ? "noindex, nofollow" : "noindex, follow");
-    if (file.endsWith(".html")) for (const [key, value] of Object.entries(htmlHeaders(env, file.slice(1)))) headers.set(key, value);
+    const adConfig = ads.config(env);
+    const adNonce = file.endsWith(".html") && adConfig.enabled && ads.isAdPage(file) ? ads.nonce() : "";
+    if (file.endsWith(".html")) for (const [key, value] of Object.entries(htmlHeaders(env, file.slice(1), { adsEnabled: !!adNonce, adsNonce: adNonce }))) headers.set(key, value);
+    if (adNonce) {
+      const html = await asset.text();
+      return new Response(headOnly ? null : ads.inject(html, file, adConfig, adNonce), { status: asset.status, headers: { ...sec, ...cors, ...Object.fromEntries(headers) } });
+    }
     return new Response(headOnly ? null : asset.body, { status: asset.status, headers: { ...sec, ...cors, ...Object.fromEntries(headers) } });
   }
   if (file.startsWith("/assets/")) {

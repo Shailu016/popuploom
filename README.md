@@ -292,16 +292,18 @@ Open **My popups → Leads** for any saved popup. The inbox shows 100 responses 
 
 ## Advertising readiness
 
-PopupLoom does not currently load AdSense or any advertising script. Phase A prepares the public content, trust pages and eligibility boundary; Phase B requires the owner's real AdSense publisher ID, a Google-certified CMP configuration and a reviewed strict-CSP/consent integration.
+PopupLoom does not currently load AdSense or any advertising script. The site is verified for AdSense and the review request is pending; advertising remains disabled until Google shows the site as approved, the Google Privacy & messaging CMP is published, real ad slots are supplied and Codex reviews activation.
 
-- `shared/ad-pages.js` is the explicit allowlist for future manual ad units. It contains substantive public guides only. The homepage, template catalog, editor, account pages, lead inbox, reset/recovery pages, exports and the customer runtime are excluded.
-- `ADSENSE_ENABLED` must remain `false` in this build. Setting it to `true` deliberately fails the build until the CSP/CMP work is implemented and reviewed.
-- `ADSENSE_PUBLISHER_ID` is used only to generate `/ads.txt` with the exact Google record. Never invent a publisher ID; without a valid value no `ads.txt` is published.
-- The production workflow now sets the owner's verified public publisher ID; the homepage contains the matching ownership meta tag. These connect the site for review without loading advertising. Express serves the same record when `ADSENSE_PUBLISHER_ID` is configured.
-- `ADSENSE_CLIENT` and `ADSENSE_CMP` are placeholders for Phase B. No owner values are committed.
+- `shared/ad-pages.js` is the explicit allowlist for manual ad units. It contains substantive public guides only. The homepage, template catalog, editor, account pages, lead inbox, reset/recovery pages, exports and the customer runtime are excluded.
+- `shared/ads.js` implements the fail-closed gate, per-response nonce, CSP additions and single-slot HTML injection used by both Express and the Worker.
+- Ads require all of: `ADSENSE_ENABLED=true`, `ADSENSE_APPROVED=true` (only after Google shows Ready/approved), a valid `ADSENSE_PUBLISHER_ID`/`ADSENSE_CLIENT`, `ADSENSE_CMP=google-privacy-messaging` and at least one real `ADSENSE_SLOT`/`ADSENSE_SLOTS` value. Any missing gate produces no ad markup and no advertising resource.
+- `ADSENSE_PUBLISHER_ID` generates the exact `/ads.txt` record. The production workflow sets the owner's verified public publisher ID; the homepage contains the matching ownership meta tag.
+- The selected consent solution is Google Privacy & messaging (Google CMP, TCF ID 300), configured in the AdSense account. This code does not create a custom banner, invent TC strings or treat Consent Mode as a CMP. Google CMP handles choice, rejection, management and revocation in its own UI.
+- Ad markup is one responsive, labelled unit with reserved space, inserted after guide content. It is not inserted on thin, private or transactional pages or near navigation/form controls.
+- Eligible ad responses add a per-response `script-src 'nonce-…' 'strict-dynamic'` and narrowly scoped Google frame/connect hosts; they do not add `unsafe-inline`, `unsafe-eval` or a blanket `https:` script source. Ineligible and disabled responses keep the existing CSP unchanged.
 - Original template illustrations and brand assets can be regenerated with `npm run art:generate`; the pinned Sharp development dependency and SVG sources are recorded in `ASSET_PROVENANCE.md`. Legacy image URLs remain supported.
-- Google's current [AdSense CSP guidance](https://support.google.com/adsense/answer/16283098) supports a strict nonce-based policy rather than a rolling host allowlist. Phase B must implement and test that integration; do not add `unsafe-inline`, `unsafe-eval` or blanket hosts to the existing policy just to silence ad errors.
-- The privacy page describes advertising as planned, not active, and links to Google's data-use and ad-settings pages. Do not change it to present tense until ads are actually enabled.
+- Google's current [AdSense CSP guidance](https://support.google.com/adsense/answer/16283098) is the basis for the nonce/strict-dynamic approach. It must still be validated against the approved account and real CMP before activation.
+- The privacy page describes advertising as planned, not active. Update it to present tense only when ads are actually enabled.
 - No ad code is included in `popuploom.js`, the customer embed, private pages, lead inbox, exports or reset flows.
 
 See `ASSET_PROVENANCE.md` for the source/generation evidence, full asset manifest and the retained external-video license.

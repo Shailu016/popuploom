@@ -164,7 +164,11 @@ test('production build keeps advertising disabled and gates ads.txt',()=>{
  assert.ok(!/adsbygoogle|googlesyndication|doubleclick|fundingchoicesmessages/i.test(runtime),'customer runtime contains no advertising code');
  execFileSync(process.execPath,['scripts/build-cf.cjs'],{cwd:root,env:{...base,ADSENSE_PUBLISHER_ID:'pub-1234567890123456'}});
  assert.equal(fs.readFileSync(path.join(out,'ads.txt'),'utf8'),'google.com, pub-1234567890123456, DIRECT, f08c47fec0942fa0\n');
- assert.throws(()=>execFileSync(process.execPath,['scripts/build-cf.cjs'],{cwd:root,env:{...base,ADSENSE_ENABLED:'true'},stdio:'pipe'}),/ADSENSE_CLIENT|Phase A build/);
+ assert.throws(()=>execFileSync(process.execPath,['scripts/build-cf.cjs'],{cwd:root,env:{...base,ADSENSE_ENABLED:'true'},stdio:'pipe'}),/ADSENSE_CLIENT|ADSENSE_SLOT|approval|CMP/);
+ const valid={...base,ADSENSE_ENABLED:'true',ADSENSE_APPROVED:'true',ADSENSE_PUBLISHER_ID:'pub-1234567890123456',ADSENSE_CLIENT:'ca-pub-1234567890123456',ADSENSE_CMP:'google-privacy-messaging',ADSENSE_SLOT:'1234567890'};
+ execFileSync(process.execPath,['scripts/build-cf.cjs'],{cwd:root,env:valid});
+ assert.ok(fs.existsSync(path.join(out,'ads.txt')),'valid publisher build keeps ads.txt');
+ assert.ok(!/adsbygoogle|googlesyndication|doubleclick|fundingchoicesmessages/i.test(fs.readFileSync(path.join(out,'guides/install-popups.html'),'utf8')),'build injects no ad code; it is runtime-gated');
  // Restore the default clean bundle for later tests.
  execFileSync(process.execPath,['scripts/build-cf.cjs'],{cwd:root,env:base});
 });

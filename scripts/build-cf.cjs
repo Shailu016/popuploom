@@ -32,19 +32,18 @@ if(metaTags){
 fs.copyFileSync('popuploom.js',path.join(out,'popforge.js'));
 fs.cpSync('assets',path.join(out,'assets'),{recursive:true});
 
-// ---- Advertising readiness (Phase B is disabled by default) ----
+// ---- Advertising readiness (enabled only by a complete reviewed config) ----
 // ads.txt is published only when the owner supplies a real publisher ID.
-// Ad code/CMP activation is intentionally blocked in this Phase A build until
-// the account-specific CSP, CMP and consent work is reviewed.
+// Runtime ad injection is fail-closed in shared/ads.js; this build validates
+// that an explicitly enabled configuration has every account/CMP/slot gate.
 const publisherId=String(process.env.ADSENSE_PUBLISHER_ID||'').trim();
 if(publisherId){
   if(!/^pub-\d{16}$/.test(publisherId)) throw new Error('ADSENSE_PUBLISHER_ID must look like pub-0000000000000000');
   fs.writeFileSync(path.join(out,'ads.txt'),'google.com, '+publisherId+', DIRECT, f08c47fec0942fa0\n');
   console.log('wrote ads.txt for the configured publisher ID');
 }
-if(process.env.ADSENSE_ENABLED==='true'){
-  const client=String(process.env.ADSENSE_CLIENT||'').trim();
-  const cmp=String(process.env.ADSENSE_CMP||'').trim();
-  if(!/^ca-pub-\d{16}$/.test(client)||!cmp) throw new Error('ADSENSE_ENABLED requires a valid ADSENSE_CLIENT and ADSENSE_CMP');
-  throw new Error('Phase A build: live advertising is not implemented. Complete the CSP/CMP integration and Codex review before enabling it.');
+const ads=require('../shared/ads');
+const adConfig=ads.config(process.env);
+if(process.env.ADSENSE_ENABLED==='true' && !adConfig.enabled){
+  throw new Error('ADSENSE_ENABLED requires a valid ADSENSE_CLIENT, ADSENSE_SLOT, ADSENSE_APPROVED=true and ADSENSE_CMP=google-privacy-messaging (reason: '+adConfig.reason+')');
 }

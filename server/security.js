@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const cors = require("cors");
+const ads = require("../shared/ads");
 const origins = String(process.env.APP_ORIGINS || "").split(",").filter(Boolean).map(value => {
   const url = new URL(value.trim());
   if (!["https:", "http:"].includes(url.protocol)) throw new Error("APP_ORIGINS must contain HTTP(S) origins");
@@ -46,8 +47,16 @@ function headers(req, res, next) {
   if (process.env.NODE_ENV === "production" && req.secure) res.setHeader("Strict-Transport-Security", "max-age=31536000");
   next();
 }
-function htmlHeaders(res, file = "index.html") {
-  res.setHeader("Content-Security-Policy", policy.replace("SCRIPT_HASHES", scriptHashes(file)));
+function htmlHeaders(res, file = "index.html", options = {}) {
+  let contentPolicy = policy.replace("SCRIPT_HASHES", scriptHashes(file));
+  if (options.adsEnabled && options.adsNonce) {
+    const additions = ads.cspAdditions(options.adsNonce);
+    contentPolicy = contentPolicy
+      .replace("script-src ", "script-src " + additions.script + " ")
+      .replace("frame-src ", "frame-src " + additions.frame + " ")
+      .replace("connect-src ", "connect-src " + additions.connect + " ");
+  }
+  res.setHeader("Content-Security-Policy", contentPolicy);
   res.setHeader("X-Frame-Options", "DENY");
   res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
   res.setHeader("Cache-Control", "no-store");

@@ -125,7 +125,7 @@ The template media and branding-rights gap is resolved by replacement with origi
 
 Still outstanding for advertising:
 
-1. Real AdSense publisher ID, client ID and verification values.
+1. Independently verify the externally supplied publisher ID/meta and AdSense account ownership/eligibility; obtain the AdSense client ID, verification values and ad unit IDs.
 2. A Google-certified CMP, consent/choice configuration and regional settings.
 3. Phase B strict-CSP/CMP integration and review.
 4. Owner decision on the retained Big Buck Bunny demo video and attribution.
