@@ -42,7 +42,7 @@ test('private files stay private including encoded separators and extensions',as
   const r=await api(url);assert.ok(r.status===404||r.headers.get('content-type').includes('text/html'),url);
   assert.ok(!String(r.data).includes('SQLite format 3')&&!String(r.data).includes('JWT_SECRET=')&&!String(r.data).includes('const JWT_SECRET'),url);
  }
- for(const url of ['/','/templates.html','/guides/index.html','/guides/install-popups.html','/guides/wordpress-popup.html','/guides/shopify-popup.html','/guides/webflow-popup.html','/guides/collect-and-export-leads.html','/guides/popup-not-showing.html','/guides/popup-builder-for-ecommerce.html','/guides/popup-builder-for-quick-commerce.html','/guides/popup-builder-for-lead-generation.html','/migration.html','/studio.html','/profile.html','/demo.html','/reset-password.html','/about.html','/contact.html','/terms.html','/.well-known/security.txt','/app.js','/lead-csv.js','/studio.js','/reset-password.js','/popuploom.js','/popforge.js','/ui.css','/robots.txt','/sitemap.xml','/llms.txt','/llms-full.txt','/assets/winter-gift.jpg','/assets/favicon.svg','/assets/og-popuploom.png'])assert.equal((await api(url)).status,200,url);
+ for(const url of ['/','/templates.html','/faq.html','/guides/index.html','/guides/install-popups.html','/guides/wordpress-popup.html','/guides/shopify-popup.html','/guides/webflow-popup.html','/guides/collect-and-export-leads.html','/guides/popup-not-showing.html','/guides/popup-builder-for-ecommerce.html','/guides/popup-builder-for-quick-commerce.html','/guides/popup-builder-for-lead-generation.html','/migration.html','/studio.html','/profile.html','/demo.html','/reset-password.html','/about.html','/contact.html','/terms.html','/.well-known/security.txt','/app.js','/lead-csv.js','/studio.js','/reset-password.js','/popuploom.js','/popforge.js','/ui.css','/robots.txt','/sitemap.xml','/llms.txt','/llms-full.txt','/assets/winter-gift.jpg','/assets/favicon.svg','/assets/og-popuploom.png'])assert.equal((await api(url)).status,200,url);
 });
 test('publisher verification is public without enabling ads and ads.txt requires a valid ID',async()=>{
  const home=await api('/');
@@ -433,6 +433,7 @@ test('identity, metadata and crawler files agree on the apex origin',async()=>{
  const pages={
   '/':['PopupLoom — Free Popup Builder for Websites','https://popuploom.com/'],
   '/templates.html':['Free Website Popup Templates | PopupLoom','https://popuploom.com/templates.html'],
+  '/faq.html':['PopupLoom FAQ: Free Popup Builder Questions | PopupLoom','https://popuploom.com/faq.html'],
   '/guides/install-popups.html':['How to Add a Popup to Your Website | PopupLoom','https://popuploom.com/guides/install-popups.html'],
   '/guides/popup-builder-for-ecommerce.html':['Free Popup Builder for Ecommerce Stores | PopupLoom','https://popuploom.com/guides/popup-builder-for-ecommerce.html'],
   '/guides/popup-builder-for-quick-commerce.html':['Free Popup Builder for Quick Commerce | PopupLoom','https://popuploom.com/guides/popup-builder-for-quick-commerce.html'],
@@ -464,10 +465,12 @@ test('identity, metadata and crawler files agree on the apex origin',async()=>{
  const sitemap=(await api('/sitemap.xml')).data;
  assert.ok(!sitemap.includes('popforge'));
  assert.ok(!sitemap.includes('studio.html')&&!sitemap.includes('migration.html'));
- for(const u of ['/guides/popup-builder-for-ecommerce.html','/guides/popup-builder-for-quick-commerce.html','/guides/popup-builder-for-lead-generation.html'])assert.ok(sitemap.includes('https://popuploom.com'+u),u);
+ for(const u of ['/faq.html','/guides/popup-builder-for-ecommerce.html','/guides/popup-builder-for-quick-commerce.html','/guides/popup-builder-for-lead-generation.html'])assert.ok(sitemap.includes('https://popuploom.com'+u),u);
+ assert.ok(robots.includes('User-agent: GPTBot')&&robots.includes('User-agent: OAI-SearchBot')&&robots.includes('User-agent: PerplexityBot'),'AI crawlers explicitly allowed');
  const llms=(await api('/llms.txt')).data;
  assert.ok(llms.startsWith('# PopupLoom')&&llms.includes('https://popuploom.com/'));
  assert.ok(llms.includes('https://popuploom.com/llms-full.txt'));
+ assert.ok(llms.includes('https://popuploom.com/faq.html'),'llms links FAQ');
  const llmsFull=(await api('/llms-full.txt')).data;
  assert.ok(llmsFull.startsWith('# PopupLoom')&&llmsFull.includes('45 templates')&&llmsFull.includes('data-popuploom')&&!llmsFull.includes('<!doctype'));
  const home=(await api('/')).data;

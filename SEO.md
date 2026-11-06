@@ -30,7 +30,18 @@ Three original, substantive guides target the site's main buyer types. Each has 
 - `/guides/popup-builder-for-quick-commerce.html` — serviceability and launch notices, app-install prompts, reorder offers, operational updates, and an explicit statement that PopupLoom is a website widget rather than a native app SDK.
 - `/guides/popup-builder-for-lead-generation.html` — lead magnets, webinars, waitlists, demo requests, form-field limits, consent copy, CSV export and webhook paths.
 
-The guides are linked from the homepage use-case section, the guide hub and the template catalog. They are not thin doorway pages: each explains what the product cannot do as well as what it can. Their FAQ markup mirrors the visible FAQ text, and no conversion, revenue or ranking claim is made. Unknown paths return 404 rather than duplicate homepage content. Account authorization remains enforced independently of robots.txt.
+The guides are linked from the homepage use-case section, the guide hub and the template catalog. They are not thin doorway pages: each explains what the product cannot do as well as what it can. Their FAQ markup mirrors the visible FAQ text, and no conversion, revenue or ranking claim is made.
+
+## AI and LLM discovery
+
+Search and answer engines see the same public HTML as ordinary crawlers. The site does not use cloaking, hidden text or AI-specific instructions.
+
+- `robots.txt` names the major retrieval and answer crawlers explicitly (`GPTBot`, `OAI-SearchBot`, `ChatGPT-User`, `PerplexityBot`, `ClaudeBot`, `Google-Extended`, `Applebot-Extended`, `CCBot` and others) and allows public pages while keeping app, account, lead and recovery surfaces excluded.
+- `llms.txt` is a structured, factual product summary: pricing, account rules, capabilities, limitations, use cases, common questions and canonical links. `llms-full.txt` adds builder facts, embed format, scope boundaries and limits. Both are served as `text/plain` and linked from key pages with `<link rel="alternate" type="text/plain">`.
+- `/faq.html` is a dedicated, indexable FAQ with 21 visible answers and matching `FAQPage` JSON-LD, plus a visible key-facts table. It covers free pricing, account requirements, templates, triggers, WordPress/Shopify/Webflow/Wix support, leads, CSV, webhooks, technical limits and what the product does not do.
+- The homepage `Organization` and `SoftwareApplication` markup now state the product description, subcategory and `isAccessibleForFree`.
+
+This improves machine readability and retrieval. It does **not** guarantee that ChatGPT, Gemini, Claude, Perplexity or Copilot will recommend PopupLoom. Model answers are influenced heavily by third-party sources: search-index inclusion, independent listicles, directories, reviews, community mentions and the model's own training data. No `llms.txt` file is an official ranking standard. The owner still needs to earn external mentions and keep public facts consistent. Unknown paths return 404 rather than duplicate homepage content. Account authorization remains enforced independently of robots.txt.
 
 Validation: the Worker integration suite (92 assertions) and the application/browser suite (29 groups) pass. JSON-LD is parsed for syntax and checked against visible product content: HowTo steps mirror the visible guide headings and sentences, and breadcrumb markup matches the visible breadcrumb lines. No fake reviews, backlinks, ratings or ranking claims were added. This is not a claim of Google rich-result eligibility.
 

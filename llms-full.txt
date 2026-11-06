@@ -73,6 +73,7 @@
 ## Page map
 - Overview and FAQ: https://popuploom.com/
 - All 45 templates grouped by purpose: https://popuploom.com/templates.html
+- FAQ with key facts, platform support and limits: https://popuploom.com/faq.html
 - Guides hub: https://popuploom.com/guides/index.html
 - Installation guide for WordPress, Shopify, Webflow and any custom-HTML site: https://popuploom.com/guides/install-popups.html
 - Ecommerce popup playbook: https://popuploom.com/guides/popup-builder-for-ecommerce.html
