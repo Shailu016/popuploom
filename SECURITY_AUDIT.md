@@ -24,6 +24,23 @@ The material risks are:
 
 The correct order is: fix the High items and trust gaps, then request reclassification from URLScan/SOCRadar/Gridinsoft with evidence. Do not submit repeated removal requests before the fixes are live.
 
+### Remediation status (2026-11-07)
+
+| Finding | Status |
+| --- | --- |
+| F-02 mutable embed | **Fixed** — immutable `/embed/1.1.0/` plus SHA-256 |
+| F-03 webhook SSRF | **Fixed in code** — DNS resolution and private-address rejection |
+| F-04 lead PII in host storage | **Fixed** — runtime no longer writes `pfsubs.*`; legacy keys cleared |
+| F-07 password hashing | **Fixed** — PBKDF2 600k, bcrypt 12, rehash on login |
+| F-09 deletion/retention | **Improved** — explicit deletion, retention documented; no scheduled TTL |
+| F-11 CI gates | **Fixed in repo** — audit, secret scan, Dependabot, production environment |
+| F-12 trust page | **Partial** — `/security.html` live; domain aliases pending |
+| F-13 email/DNS | **Partial** — apex SPF `-all`, CAA added; DNSSEC and DMARC reject pending |
+| R-01 reputation | **Evidence gathered** — reclassification not yet requested |
+| F-01, F-05, F-06, F-08, F-10 | **Open** |
+
+See `SECURITY_REMEDIATION.md` for exact changes, tests and rollback. DNS values in Section 5/F-13 were captured before the remediation; the current apex SPF is `v=spf1 -all` and CAA records now exist.
+
 ---
 
 ## 2. Architecture observed
@@ -393,7 +410,7 @@ This does **not** prove PopupLoom is safe in every respect; it means the public 
 | Area | Current state | Gap |
 | --- | --- | --- |
 | About | Exists; states independent operator Shailu; no invented company details | Could add product history and a clearer “who is behind it” section |
-| Contact | Email only (`shailu3597@gmail.com`); no response target | Add `support@`/`security@`, expected response window, abuse channel |
+| Contact | `support@popuploom.com` and `security@popuploom.com` are routed through Cloudflare Email Routing to a verified destination; response targets on `/security.html` | Add a monitored abuse/legal channel if volume requires |
 | Privacy | Covers accounts, leads, browser storage, webhooks, Resend, Cloudflare, ads status | No per-category retention schedule, no incident-notification section, vague local-storage disclosure |
 | Terms | Covers acceptable use, accounts, leads, integrations, suspension, liability | Legal review still needed; no explicit data-export/deletion procedure |
 | Security page | Missing | Publish disclosure policy, scope, safe harbour (if reviewed), contact, response targets |

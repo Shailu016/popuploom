@@ -1,6 +1,8 @@
 # Security review
 
-Reviewed: 2026-11-01. Scope: this repository, local API, Cloudflare Worker and browser runtime.
+Reviewed: 2026-11-01. Updated: 2026-11-07. Scope: this repository, local API, Cloudflare Worker and browser runtime.
+
+Current status and remaining work: `SECURITY_AUDIT.md` and `SECURITY_REMEDIATION.md`. Live headers and controls: `SECURITY_HEADERS.md`, `EMBED_SECURITY.md`, `WEBHOOK_SECURITY.md`.
 
 ## Rebrand migration boundaries
 
