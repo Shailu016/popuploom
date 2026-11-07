@@ -28,7 +28,7 @@ This document records what was actually changed, what was tested, and what remai
 | F-14 | Header/runtime consistency | Low | **Partial** — Express CSP list updated; HSTS/COOP/CORP unchanged |
 | F-15 | Email enumeration on registration | Low | **Open** |
 | F-16 | Inflatable view counts | Low | **Open** |
-| R-01 | Gridinsoft phishing false positive | High (business) | **Evidence gathered; reclassification not yet requested** |
+| R-01 | Gridinsoft phishing false positive | High (business) | **Requests sent** — URLScan, SOCRadar and Gridinsoft contacted 2026-11-07; no verdict change yet |
 
 ---
 

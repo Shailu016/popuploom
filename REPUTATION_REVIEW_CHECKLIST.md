@@ -24,6 +24,16 @@ This is the evidence pack for correcting the Gridinsoft/SOCRadar phishing classi
 | VirusTotal | HTTP 429 at audit time; not verified |
 | SOCRadar portal | Not available without an account |
 
+## Requests sent
+
+On 2026-11-07, the evidence summary was sent from the monitored Gmail account to:
+
+- `support@urlscan.io` — review of the eight user-applied tags;
+- `contact@socradar.io` — request for the exact detection/evidence and re-evaluation;
+- `legal@gridinsoft.com` — re-evaluation request and owner-portal guidance.
+
+No response or verdict change had been observed when this file was updated. Follow up once after 7–10 business days; do not send repeated requests.
+
 ## What to send
 
 - Domain name and canonical URL.
