@@ -61,7 +61,7 @@ test('signup verification makes new and existing addresses indistinguishable',as
   assert.equal(duplicate.verificationRequired,true);
   assert.equal(duplicate.existing,true);
   assert.equal(duplicate.token,undefined,'no verification token for an existing account');
-  await assert.rejects(auth.login(v,'verify@example.com','verify-password-123'),e=>e.status===403&&/Verify your email/.test(e.message));
+  await assert.rejects(auth.login(v,'verify@example.com','verify-password-123'),e=>e.status===401&&/Invalid email or password/.test(e.message));
   const verified=await auth.verifyEmail(v,first.token);
   assert.ok(verified.token,'verification signs the user in');
   await assert.rejects(auth.verifyEmail(v,first.token),e=>e.status===400,'token is single use');

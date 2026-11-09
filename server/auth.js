@@ -140,10 +140,9 @@ function login(email, password) {
   const valid = bcrypt.compareSync(passwordString, canMatch ? row.password_hash : dummyPasswordHash());
   if (!canMatch || !valid) throw new Error("Invalid email or password");
   if (verificationRequired() && Number(row.email_verified) === 0) {
-    const error = new Error(verifyShared.NOT_VERIFIED_MESSAGE);
-    error.code = verifyShared.NOT_VERIFIED_CODE;
-    error.status = 403;
-    throw error;
+    // Same response as a wrong password: a distinct status would leak whether
+    // the address was newly registered.
+    throw new Error("Invalid email or password");
   }
   // Rehash older cost-10 bcrypt hashes after a successful login. The update is
   // conditional so a concurrent password change is never overwritten.

@@ -14,7 +14,7 @@ try {
 
 const express = require("express");
 const security = require("./security");
-const { register, login, findOrCreateGoogleUser, getUserById, updateProfile, authMiddleware, verifyEmail } = require("./auth");
+const { register, login, findOrCreateGoogleUser, getUserById, updateProfile, authMiddleware, verifyEmail, verificationRequired } = require("./auth");
 const { verifyCredential, isConfigured, CLIENT_ID } = require("./google");
 const widgetsRouter = require("./routes/widgets");
 const ads = require("../shared/ads");
@@ -82,11 +82,15 @@ app.post("/api/auth/register", async (req, res) => {
     const { email: rawEmail, password, name } = req.body || {};
     const limited = rateLimit.checkEmailLimit("register-email", 5, 15 * 60 * 1000, rawEmail);
     if (limited.limited) return res.status(429).json({ error: "Too many requests. Try again later.", code: "RATE_LIMITED" });
+    let config = null;
+    if (verificationRequired()) {
+      config = email.readConfig(process.env, process.env.PUBLIC_ORIGIN || ("http://localhost:" + (process.env.PORT || 3000)));
+      if (!config.configured) return res.status(503).json({ error: "Signup email verification is not configured on this server." });
+    }
     const result = register(rawEmail, password, name);
     if (result && result.verificationRequired) {
       try {
-        const config = email.readConfig(process.env, process.env.PUBLIC_ORIGIN || ("http://localhost:" + (process.env.PORT || 3000)));
-        if (config.configured) {
+        if (config && config.configured) {
           if (result.existing) await email.sendExistingAccountEmail(config, { to: result.to });
           else await email.sendVerificationEmail(config, { to: result.to, token: result.token });
         }

@@ -42,10 +42,10 @@ function scriptHashes(file) {
 }
 const policy = [
   "default-src 'self'", "base-uri 'none'", "object-src 'none'", "frame-ancestors 'none'", "form-action 'self'",
-  "script-src 'self' 'unsafe-hashes' https://accounts.google.com/gsi/ https://static.cloudflareinsights.com SCRIPT_HASHES",
+  "script-src 'self' 'unsafe-hashes' https://accounts.google.com/gsi/ https://static.cloudflareinsights.com https://www.googletagmanager.com SCRIPT_HASHES",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/",
-  "font-src 'self' https://fonts.gstatic.com", "img-src 'self' https: http: data:",
-  "connect-src 'self' https://accounts.google.com/gsi/ https://cloudflareinsights.com " + origins.join(" "),
+  "font-src 'self' https://fonts.gstatic.com", "img-src 'self' https: http: data: https://*.google-analytics.com https://*.googletagmanager.com",
+  "connect-src 'self' https://accounts.google.com/gsi/ https://cloudflareinsights.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com " + origins.join(" "),
   "frame-src https://accounts.google.com/gsi/ https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com"
 ].join("; ");
 function headers(req, res, next) {

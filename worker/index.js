@@ -11,7 +11,7 @@ import { originCheck, securityHeaders, htmlHeaders } from "./security.js";
 import hostPolicy from "../shared/host-policy.js";
 import { verificationFile } from "../shared/verification.js";
 
-const { ApiError, register, login, findOrCreateGoogleUser, verifyCredential, getUserById, updateProfile, authMiddleware, revokeToken, verifyEmail } = auth;
+const { ApiError, register, login, findOrCreateGoogleUser, verifyCredential, getUserById, updateProfile, authMiddleware, revokeToken, verifyEmail, verificationRequired } = auth;
 const { json, rateLimit } = http;
 
 const registerLimit = rateLimit("register", 40, 10 * 60 * 1000);
@@ -107,13 +107,21 @@ async function registerRoute(c) {
   try {
     const { email: emailAddress, password, name } = c.body || {};
     await registerEmailLimit(c.request, c.env, emailAddress);
+    // Fail closed before creating an account if the verification email cannot
+    // be sent; otherwise the new user would be permanently locked out.
+    let config = null;
+    if (verificationRequired(c.env)) {
+      config = email.readConfig(c.env, "https://popuploom.com");
+      if (!config.configured) {
+        return json({ error: "Signup email verification is not configured on this server." }, 503);
+      }
+    }
     const result = await register(c.env, emailAddress, password, name);
     if (result && result.verificationRequired) {
       // Both new and existing addresses get the same response. Email delivery
       // is best-effort: a provider failure must not reveal account existence.
       try {
-        const config = email.readConfig(c.env, "https://popuploom.com");
-        if (config.configured) {
+        if (config && config.configured) {
           if (result.existing) await email.sendExistingAccountEmail(config, { to: result.to });
           else await email.sendVerificationEmail(config, { to: result.to, token: result.token });
         }

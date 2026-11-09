@@ -222,7 +222,9 @@ async function login(env, email, password) {
   const valid = await verifyPassword(passwordString, stored);
   if (!canMatch || !valid) throw new ApiError(401, "Invalid email or password");
   if (verificationRequired(env) && Number(row.email_verified) === 0) {
-    throw new ApiError(403, verifyShared.NOT_VERIFIED_MESSAGE, verifyShared.NOT_VERIFIED_CODE);
+    // Same response as a wrong password on purpose: a distinct 403 would let
+    // an attacker learn that a freshly registered address was new.
+    throw new ApiError(401, "Invalid email or password");
   }
   if (/^\$2[aby]\$/.test(row.password_hash)) {
     const upgraded = await hashPassword(password);
