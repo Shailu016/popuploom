@@ -88,3 +88,16 @@ On-page work cannot make an AI assistant recommend the product by itself. The ow
 - After profiles exist, their URLs should be added to `Organization.sameAs`. No profile URLs are invented in the markup.
 
 No paid links, fake reviews, mass directory spam or AI-only hidden instructions are used.
+
+## Search Console "new reasons preventing indexing" (2026-11-09)
+
+Search Console emailed an alert listing three exclusion reasons. All three are expected and none affects a public page:
+
+- **Excluded by 'noindex' tag / header:** `/studio.html`, `/profile.html`, `/leads.html`, `/reset-password.html`, `/migration.html` and `/demo.html` carry `noindex` on purpose. They are app, account, recovery and demo surfaces. The API is blocked in `robots.txt` at the same time.
+- **Blocked by robots.txt:** `/api/` plus the private pages above. This is the intended crawl boundary; removing it would expose account and lead surfaces to search.
+- **Page with redirect:** `http://` → `https://`, `www.` → apex and `/index.html` → `/` are single-hop permanent redirects. Google indexes the destination, not the redirect.
+
+Verification on 2026-11-09: all 19 sitemap URLs returned `200`, `meta robots=index,follow` and no `X-Robots-Tag: noindex`. The only real defect found was `/guides/` returning a soft 404; the Worker and Express static layers now resolve a trailing-slash directory to its allowlisted `index.html` (`/guides/` → `/guides/index.html`, canonical unchanged), covered by both test suites.
+
+Do not "fix" the private-page exclusions to quiet this alert. The alert repeats whenever Google discovers new URL groups and does not indicate a penalty or a manual action.
+
