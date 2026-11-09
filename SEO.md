@@ -101,3 +101,15 @@ Verification on 2026-11-09: all 19 sitemap URLs returned `200`, `meta robots=ind
 
 Do not "fix" the private-page exclusions to quiet this alert. The alert repeats whenever Google discovers new URL groups and does not indicate a penalty or a manual action.
 
+
+## Page architecture map (2026-11-10)
+
+The scoped page-by-page map lives in `docs/SEO_PAGE_MAP.md`. It keeps the existing 19 URLs, marks one intent per URL, and caps the next batch at six pages: four platform guides (Squarespace, Wix, Carrd, static HTML) and two feature pages (exit intent, email signup).
+
+Rules adopted:
+
+- The homepage owns "free popup builder"; no duplicate landing page.
+- No integrations page while no native integrations exist.
+- No direct competitor "vs" pages until brand demand exists.
+- New pages join the ad allowlist only after they contain real, tested content.
+- Search Console impressions, not paid-tool guesses, decide keep/merge after 8 weeks.

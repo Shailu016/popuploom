@@ -111,11 +111,14 @@ These are known findings from `SECURITY_AUDIT.md`. Each is a separate, testable 
 
 ---
 
-## Priority 6 — ads QA (ME, 15 min) — partially verified
+## Priority 6 - ads QA - measured
 
 - [x] Ad slot positioned above `<footer>` (below the fold)
-- [x] Fixed height reserved in `ui.css` (`min-height: 280px` desktop, `260px` mobile) to avoid layout shift
-- [ ] Run Lighthouse desktop + mobile on `/` to measure the actual ad impact (not run yet)
+- [x] Fixed height reserved in `ui.css` (`min-height: 280px` desktop, `260px` mobile), CLS 0
+- [x] Lighthouse mobile: accessibility **100**, SEO **100**
+- [x] Performance measured: **62–92** depending on run; LCP 2.9–3.9s. Remaining cost is AdSense third-party scripts plus render-blocking fonts. Best practices 79 because AdSense sets third-party cookies.
+- [x] Fixed two real regressions: ad-page scripts were blocked by `strict-dynamic`, and the Google CMP beacon was blocked by CSP.
+- [ ] Optional next: inline critical CSS or trim font weights to lift mobile LCP; do not remove ads to win the score.
 
 ---
 
