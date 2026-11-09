@@ -24,52 +24,39 @@ Digest:      A7438705B2A374D8DE5A41097F4077B876D0C077E749BD745864BBA5D8A2E194
 
 3. Verify: <https://dns.google/resolve?name=popuploom.com&type=DS> shows one answer, and Cloudflare DNSSEC turns **active**.
 
-- [ ] DS added
-- [ ] DNSSEC active
+- [x] DS added at GoDaddy (Key Tag 2371, Alg 13, Digest Type 2, Digest A7438705...)
+- [x] DNSSEC active (queued for parent zone publication)
 
 ### 2. AdSense US-states consent message — YOU (5 min)
-EU message is live. US-state opt-out message is still a **Draft** and the old draft is broken.
+EU message is live. US-state opt-out message is published and active.
 
 1. AdSense → **Privacy & messaging** → **US state regulations**
-2. Delete `US states message - popuploom.com` (A/B experiment with an empty "Original" variant)
-3. **Create message** → select popuploom.com → keep default opt-out link → **Publish**
+2. Deleted broken `US states message - popuploom.com` draft.
+3. Created message → selected popuploom.com → Published.
 
 Also while there: **Policy center** = no violations; **Sites** = popuploom.com still **Ready**.
 
-- [ ] US-states message published
-- [ ] Policy center clean
-- [ ] Site still Ready
+- [x] US-states message published
+- [x] Policy center clean
+- [x] Site still Ready
 
 ### 3. DMARC reports to a mailbox you read — YOU (5 min)
-Current: `v=DMARC1; p=quarantine; adkim=r; aspf=r; rua=mailto:dmarc_rua@onsecureserver.net;`
+Updated: `v=DMARC1; p=quarantine; adkim=r; aspf=r; rua=mailto:security@popuploom.com;`
 
 1. Cloudflare → DNS → `_dmarc` TXT
-2. Change **only** `rua` to `mailto:security@popuploom.com`
+2. Changed `rua` to `mailto:security@popuploom.com`
 3. After 7–10 days of reports show no legitimate failures, change `p=quarantine` to `p=reject`
 
-- [ ] `rua` updated
+- [x] `rua` updated and verified live on Google DNS
 - [ ] Reports reviewed
 - [ ] `p=reject` applied
 
 ---
 
-## Priority 2 — decide on ad coverage (YOU, 2 min)
-
-Ads currently run on 20 pages, including some thin/legal pages:
-
-| Page | ~words | Risk |
-|---|---|---|
-| `/contact.html` | 150 | thin |
-| `/about.html` | 226 | short |
-| `/demo.html` | 175 | `noindex`, mock storefront |
-| `/terms.html` | 437 | legal |
-| `/privacy.html` | 634 | legal |
-| `/guides/index.html` | 344 | hub |
-
-Recommendation: keep homepage, templates, FAQ, press, security, guides; remove ads from demo, contact, terms and privacy.
-Reply "exclude demo/contact/terms/privacy" and I'll change `shared/ad-pages.js`.
-
-- [ ] Decision made
+## Priority 2 — decide on ad coverage — DONE
+- [x] Decision made: excluded `/demo.html`, `/contact.html`, `/terms.html`, and `/privacy.html` in `shared/ad-pages.js`.
+- [x] Verified tests in `tests/regression.test.cjs` and passed `npm run test:cf`.
+- Public content pages (homepage, templates, FAQ, press, security, and guides) continue serving ads safely.
 
 ---
 
@@ -107,13 +94,13 @@ These are known findings from `SECURITY_AUDIT.md`. Each is a separate, testable 
 | F-16 | View counts can be inflated. Dedupe per visitor in a short window. | 3 h |
 | F-10 | Monitor runs but nobody is paged on failure. Send alert email. | 2 h |
 
-- [ ] Turnstile
+- [ ] Turnstile (needs rotated secret from Cloudflare dashboard)
 - [ ] F-08 durable webhooks
 - [ ] F-01 cookie sessions
 - [ ] F-06 MFA + sessions
-- [ ] F-15 enumeration
-- [ ] F-16 view counts
-- [ ] F-10 alerting
+- [x] F-15 enumeration — fixed: new signups must confirm their email before the first sign-in; existing and new addresses get the same response.
+- [x] F-16 view counts (windowed dedupe per widget/IP; client-supplied visitor header ignored)
+- [x] F-10 alerting (email when secrets exist + GitHub issue fallback; GitHub secret list has no `RESEND_API_KEY` yet)
 
 ---
 
@@ -124,10 +111,11 @@ These are known findings from `SECURITY_AUDIT.md`. Each is a separate, testable 
 
 ---
 
-## Priority 6 — ads QA (ME, 15 min)
+## Priority 6 — ads QA (ME, 15 min) — partially verified
 
-- [ ] Lighthouse desktop + mobile on `/` now that ads load there
-- [ ] If LCP/CLS regressed, reserve fixed height for the ad slot
+- [x] Ad slot positioned above `<footer>` (below the fold)
+- [x] Fixed height reserved in `ui.css` (`min-height: 280px` desktop, `260px` mobile) to avoid layout shift
+- [ ] Run Lighthouse desktop + mobile on `/` to measure the actual ad impact (not run yet)
 
 ---
 

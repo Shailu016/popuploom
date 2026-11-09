@@ -1,7 +1,7 @@
 // worker/widgets.js — widget CRUD + views + submissions on D1 (port of server/routes/widgets.js)
 const { object, validateConfig, validateShape } = require("./validation");
 const { ApiError } = require("./auth");
-const { json, all, rateLimit } = require("./http");
+const { json, all, rateLimit, dedupeView } = require("./http");
 const webhook = require("../shared/webhook");
 
 const viewLimit = rateLimit("view", 600, 60000);
@@ -228,11 +228,17 @@ async function listWebhookDeliveries(c) {
 // Public, fire-and-forget telemetry from third-party pages. Unknown ids
 // (demo configs, hand-written embeds, deleted widgets) are dropped silently:
 // a 404 here only ever pollutes the embedder's browser console.
+// F-16: Views are deduplicated per (widget, visitor/IP) in a 1-hour window so
+// page refreshes or replay scripts cannot inflate metrics.
 async function recordView(c) {
   await viewLimit(c.request, c.env);
-  const res = await c.env.DB.prepare("UPDATE widgets SET view_count = view_count + 1, updated_at = updated_at WHERE id = ?").bind(c.params.id).run();
-  if (res.meta.changes === 0) return new Response(null, { status: 204 });
-  return json({ ok: true });
+  const widget = await c.env.DB.prepare("SELECT id FROM widgets WHERE id = ?").bind(c.params.id).first();
+  if (!widget) return new Response(null, { status: 204 });
+  const isFirst = await dedupeView(c.env, c.params.id, c.request);
+  if (isFirst) {
+    await c.env.DB.prepare("UPDATE widgets SET view_count = view_count + 1, updated_at = updated_at WHERE id = ?").bind(c.params.id).run();
+  }
+  return json({ ok: true, deduplicated: !isFirst });
 }
 
 // Record a submission (lead)

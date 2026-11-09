@@ -14,10 +14,12 @@ try {
 
 const express = require("express");
 const security = require("./security");
-const { register, login, findOrCreateGoogleUser, getUserById, updateProfile, authMiddleware } = require("./auth");
+const { register, login, findOrCreateGoogleUser, getUserById, updateProfile, authMiddleware, verifyEmail } = require("./auth");
 const { verifyCredential, isConfigured, CLIENT_ID } = require("./google");
 const widgetsRouter = require("./routes/widgets");
 const ads = require("../shared/ads");
+const email = require("../shared/email");
+const verifyShared = require("../shared/email-verification");
 const db = require("./db");
 const hostPolicy = require("../shared/host-policy");
 const verification = require("../shared/verification");
@@ -60,6 +62,7 @@ app.use("/api/auth/google", rateLimit("google", 30, 10 * 60 * 1000));
 // limit after the body is parsed.
 app.use("/api/auth/forgot-password", rateLimit("forgot-password", 20, 15 * 60 * 1000));
 app.use("/api/auth/reset-password", rateLimit("reset-password", 30, 15 * 60 * 1000));
+app.use("/api/auth/verify-email", rateLimit("verify-email", 30, 15 * 60 * 1000));
 app.use("/api", (req, res, next) => { res.setHeader("Cache-Control", "no-store"); next(); });
 app.use("/api", rateLimit("api", 1200, 60000));
 // Reject oversized/compressed JSON after cheap origin and rate checks.
@@ -74,14 +77,40 @@ app.post('/api/auth/account', rateLimit('account-action',10,60000), authMiddlewa
   catch(e){res.status(400).json({error:e.message});}
 });
 // ---- Auth routes ----
-app.post("/api/auth/register", (req, res) => {
+app.post("/api/auth/register", async (req, res) => {
   try {
-    const { email, password, name } = req.body || {};
-    const result = register(email, password, name);
+    const { email: rawEmail, password, name } = req.body || {};
+    const limited = rateLimit.checkEmailLimit("register-email", 5, 15 * 60 * 1000, rawEmail);
+    if (limited.limited) return res.status(429).json({ error: "Too many requests. Try again later.", code: "RATE_LIMITED" });
+    const result = register(rawEmail, password, name);
+    if (result && result.verificationRequired) {
+      try {
+        const config = email.readConfig(process.env, process.env.PUBLIC_ORIGIN || ("http://localhost:" + (process.env.PORT || 3000)));
+        if (config.configured) {
+          if (result.existing) await email.sendExistingAccountEmail(config, { to: result.to });
+          else await email.sendVerificationEmail(config, { to: result.to, token: result.token });
+        }
+      } catch (e) {
+        console.error("[popuploom] verification email failed:", e && e.message);
+      }
+      noStore(res);
+      return res.status(201).json({ ok: true, verificationRequired: true, message: verifyShared.GENERIC_REGISTER_MESSAGE });
+    }
     noStore(res);
     res.status(201).json(result);
   } catch (e) {
-    res.status(400).json({ error: e.message });
+    res.status(e.status || 400).json({ error: e.message, code: e.code });
+  }
+});
+
+app.post("/api/auth/verify-email", (req, res) => {
+  try {
+    const token = req.body && req.body.token;
+    const result = verifyEmail(token);
+    noStore(res);
+    res.json(result);
+  } catch (e) {
+    res.status(e.status || 400).json({ error: e.message, code: e.code || verifyShared.INVALID_VERIFY_CODE });
   }
 });
 
@@ -92,7 +121,7 @@ app.post("/api/auth/login", (req, res) => {
     noStore(res);
     res.json(result);
   } catch (e) {
-    res.status(401).json({ error: e.message });
+    res.status(e.status || 401).json({ error: e.message, code: e.code });
   }
 });
 
@@ -206,7 +235,7 @@ app.get('/ads.txt', (req, res, next) => {
 });
 const publicFiles = new Set([
   "templates.html", "faq.html", "press.html", "security.html", "guides/install-popups.html", "guides/index.html", "guides/wordpress-popup.html", "guides/shopify-popup.html", "guides/webflow-popup.html", "guides/collect-and-export-leads.html", "guides/popup-not-showing.html", "guides/popup-builder-for-ecommerce.html", "guides/popup-builder-for-quick-commerce.html", "guides/popup-builder-for-lead-generation.html", "ccf2a9f45165c635253d22748df4a573.txt", "robots.txt", "sitemap.xml", "llms.txt", "llms-full.txt", "index.html", "studio.html", "profile.html", "demo.html", "migration.html", "reset-password.html",
-  "leads.html", "privacy.html", "about.html", "contact.html", "terms.html", ".well-known/security.txt", "lead-csv.js", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "popuploom.js", "popforge.js", "embed/1.1.0/popuploom.js", "embed/1.1.0/popforge.js", "embed/1.1.0/SHA256SUMS", "ui.css", "ads.txt"
+  "leads.html", "privacy.html", "about.html", "contact.html", "terms.html", ".well-known/security.txt", "lead-csv.js", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "verify-email.html", "verify-email.js", "popuploom.js", "popforge.js", "embed/1.1.0/popuploom.js", "embed/1.1.0/popforge.js", "embed/1.1.0/SHA256SUMS", "ui.css", "ads.txt"
 ]);
 app.use((req, res, next) => {
   if (req.method !== "GET" && req.method !== "HEAD") return next();
@@ -234,7 +263,7 @@ app.use((req, res, next) => {
   const adNonce = file.endsWith(".html") && adConfig.enabled && ads.isAdPage(pathname) ? ads.nonce() : "";
   if (file.endsWith(".html")) {
     security.htmlHeaders(res, file.slice(1), { adsEnabled: !!adNonce, adsNonce: adNonce });
-    if (file === "/migration.html" || file === "/reset-password.html" || file === "/studio.html" || file === "/profile.html" || file === "/leads.html") res.setHeader("X-Robots-Tag", "noindex, nofollow");
+    if (file === "/migration.html" || file === "/reset-password.html" || file === "/verify-email.html" || file === "/studio.html" || file === "/profile.html" || file === "/leads.html") res.setHeader("X-Robots-Tag", "noindex, nofollow");
   }
   // The immutable embed path is materialised by the Cloudflare build. The
   // Express runtime serves the same bytes from the canonical source file.

@@ -47,6 +47,25 @@ function checkEmailLimit(scope, max, windowMs, email) {
   return consume(scope, emailSubject(normalized), max, windowMs);
 }
 
+// Windowed view deduplication per (widget, visitor/IP). Returns true on the
+// first view in the window so the counter is incremented, and false on repeats.
+function dedupeView(widgetId, subject, windowMs = 3600000) {
+  const now = Date.now(), key = "view_dedupe:" + widgetId + ":" + subject;
+  let bucket = buckets.get(key);
+  if (!bucket || bucket.until <= now) {
+    if (buckets.size >= 10000) {
+      for (const [k, v] of buckets) if (v.until <= now) buckets.delete(k);
+      // Never let the process grow without bound; skip the increment rather
+      // than inflate counts when the map is saturated.
+      if (buckets.size >= 10000) return false;
+    }
+    buckets.set(key, { count: 1, until: now + windowMs });
+    return true;
+  }
+  return false;
+}
+
 module.exports = rateLimit;
 module.exports.rateLimit = rateLimit;
 module.exports.checkEmailLimit = checkEmailLimit;
+module.exports.dedupeView = dedupeView;

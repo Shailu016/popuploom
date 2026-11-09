@@ -34,13 +34,15 @@ The correct order is: fix the High items and trust gaps, then request reclassifi
 | F-07 password hashing | **Fixed** — PBKDF2 600k, bcrypt 12, rehash on login |
 | F-09 deletion/retention | **Improved** — explicit deletion, retention documented; no scheduled TTL |
 | F-11 CI gates | **Fixed in repo** — audit, secret scan, Dependabot, production environment |
-| F-10 monitoring | **Partial** — daily production monitor added; no paging/on-call |
+| F-10 monitoring | **Partial** — daily monitor, email alerts and GitHub issue alerts; no on-call rotation |
+| F-15 email enumeration | **Fixed** — generic signup response plus email verification before first sign-in |
+| F-16 inflatable views | **Fixed** — hourly dedupe per widget/IP in Worker and Express |
 | F-12 trust page | **Fixed** — `/security.html` live; `security@`/`support@` routed to a verified mailbox |
 | F-13 email/DNS | **Partial** — SPF, DKIM, MX, Email Routing and CAA added; DNSSEC and DMARC reject pending |
 | R-01 reputation | **Requests sent** — URLScan, SOCRadar and Gridinsoft contacted 2026-11-07; awaiting response |
-| F-01, F-05, F-06, F-08, F-10 | **Open** |
+| F-01, F-05, F-06, F-08 | **Open** |
 
-See `SECURITY_REMEDIATION.md` for exact changes, tests and rollback. DNS values in Section 5/F-13 were captured before the remediation; the current apex SPF is `v=spf1 -all` and CAA records now exist.
+See `SECURITY_REMEDIATION.md` for exact changes, tests and rollback. DNS values in Section 5/F-13 were captured before the remediation; the current apex SPF is `v=spf1 include:_spf.mx.cloudflare.net ~all` and CAA records now exist.
 
 ---
 

@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  issues: write
 
 jobs:
   monitor:
@@ -23,3 +24,33 @@ jobs:
           node-version: "24"
       - name: Check production health, headers, embed integrity and DNS
         run: node scripts/monitor.cjs
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          ALERT_EMAIL_TO: ${{ secrets.ALERT_EMAIL_TO }}
+          RESET_EMAIL_FROM: ${{ secrets.RESET_EMAIL_FROM }}
+      # Guaranteed alert path: the repository secret list currently has no
+      # RESEND_API_KEY, so the script's email step is skipped. A GitHub issue
+      # still notifies the owner without any extra secret.
+      - name: Open or update a monitoring alert issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create monitor-alert --color B60205 --description "Automated production monitor failure" --force >/dev/null 2>&1 || true
+          existing=$(gh issue list --label monitor-alert --state open --limit 1 --json number --jq '.[0].number')
+          body="Production monitor failed at $(date -u +%Y-%m-%dT%H:%M:%SZ). Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "Production monitor failure" --body "$body" --label monitor-alert
+          fi
+      - name: Close the monitoring alert issue after recovery
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          existing=$(gh issue list --label monitor-alert --state open --limit 1 --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "Monitor recovered at $(date -u +%Y-%m-%dT%H:%M:%SZ)."
+            gh issue close "$existing"
+          fi

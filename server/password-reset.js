@@ -89,7 +89,7 @@ function resetPassword(rawToken, newPassword) {
 
   const passwordHash = bcrypt.hashSync(newPassword, 10);
   // token_version invalidation revokes every existing bearer session.
-  db.prepare("UPDATE users SET password_hash = ?, token_version = token_version + 1 WHERE id = ?").run(passwordHash, row.user_id);
+  db.prepare("UPDATE users SET password_hash = ?, token_version = token_version + 1, email_verified = 1 WHERE id = ?").run(passwordHash, row.user_id);
   db.prepare("UPDATE password_reset_tokens SET used_at = ? WHERE user_id = ? AND used_at IS NULL").run(now, row.user_id);
   return shared.resetSuccessResponse();
 }

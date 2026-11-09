@@ -8,6 +8,7 @@
 // never make a provider request.
 const RESEND_ENDPOINT = "https://api.resend.com/emails";
 const { RESET_TOKEN_TTL_MINUTES } = require("./password-reset");
+const { VERIFY_TOKEN_TTL_MINUTES, buildVerifyUrl } = require("./email-verification");
 
 function addressOf(from) {
   const match = /<([^<>]+)>\s*$/.exec(String(from || "").trim());
@@ -77,9 +78,7 @@ function renderResetEmail({ resetUrl }) {
   return { subject, text, html };
 }
 
-async function sendPasswordResetEmail(config, { to, token }) {
-  const resetUrl = buildResetUrl(config.origin, token);
-  const message = renderResetEmail({ resetUrl });
+async function postEmail(config, to, message) {
   const signal = typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function"
     ? AbortSignal.timeout(10000)
     : undefined;
@@ -100,9 +99,77 @@ async function sendPasswordResetEmail(config, { to, token }) {
   });
   if (!response.ok) {
     // Never include the recipient, token or response body in the error.
-    throw new Error("Email provider rejected the reset message (status " + response.status + ")");
+    throw new Error("Email provider rejected the message (status " + response.status + ")");
   }
   return { ok: true };
+}
+
+async function sendPasswordResetEmail(config, { to, token }) {
+  const resetUrl = buildResetUrl(config.origin, token);
+  const message = renderResetEmail({ resetUrl });
+  return postEmail(config, to, message);
+}
+
+function renderVerifyEmail({ verifyUrl }) {
+  const minutes = VERIFY_TOKEN_TTL_MINUTES;
+  const subject = "Verify your email for PopupLoom";
+  const text = [
+    "Confirm your email to finish creating your PopupLoom account.",
+    "",
+    "Open this link to verify. It expires in " + minutes + " minutes and can be used once:",
+    verifyUrl,
+    "",
+    "If you did not create this account, you can ignore this email."
+  ].join("\n");
+  const html = [
+    '<!doctype html><html lang="en"><body style="margin:0;padding:24px;background:#0A0B10;color:#F5F5F7;font-family:system-ui,-apple-system,Segoe UI,sans-serif">',
+    '<div style="max-width:520px;margin:0 auto;background:#13151D;border:1px solid #262A36;border-radius:14px;padding:28px">',
+    '<p style="margin:0 0 18px;font-size:18px;font-weight:600">Verify your email</p>',
+    '<p style="margin:0 0 20px;line-height:1.6;color:#C9CCD6">Confirm your email to finish creating your PopupLoom account. The link expires in ' + minutes + ' minutes and can be used once.</p>',
+    '<p style="margin:0 0 22px"><a href="' + escapeHtml(verifyUrl) + '" style="display:inline-block;padding:12px 20px;border-radius:10px;background:#FF6A1F;color:#1A1005;font-weight:700;text-decoration:none">Verify my email</a></p>',
+    '<p style="margin:0 0 8px;font-size:12px;color:#9DA0AC">If the button does not work, paste this link into your browser:</p>',
+    '<p style="margin:0 0 20px;font-size:12px;color:#9DA0AC;word-break:break-all">' + escapeHtml(verifyUrl) + '</p>',
+    '<p style="margin:0;font-size:12px;color:#9DA0AC">If you did not create this account, you can ignore this email.</p>',
+    '</div></body></html>'
+  ].join("");
+  return { subject, text, html };
+}
+
+async function sendVerificationEmail(config, { to, token }) {
+  const verifyUrl = buildVerifyUrl(config.origin, token);
+  return postEmail(config, to, renderVerifyEmail({ verifyUrl }));
+}
+
+function renderExistingAccountEmail({ origin }) {
+  const signInUrl = String(origin).replace(/\/+$/, "") + "/index.html";
+  const resetUrl = String(origin).replace(/\/+$/, "") + "/reset-password.html";
+  const subject = "Someone tried to create a PopupLoom account with your email";
+  const text = [
+    "Someone entered your email address on the PopupLoom sign-up form.",
+    "",
+    "You already have an account, so nothing was created. Sign in here:",
+    signInUrl,
+    "",
+    "Forgot your password?",
+    resetUrl,
+    "",
+    "If this was not you, no action is needed."
+  ].join("\n");
+  const html = [
+    '<!doctype html><html lang="en"><body style="margin:0;padding:24px;background:#0A0B10;color:#F5F5F7;font-family:system-ui,-apple-system,Segoe UI,sans-serif">',
+    '<div style="max-width:520px;margin:0 auto;background:#13151D;border:1px solid #262A36;border-radius:14px;padding:28px">',
+    '<p style="margin:0 0 18px;font-size:18px;font-weight:600">You already have an account</p>',
+    '<p style="margin:0 0 20px;line-height:1.6;color:#C9CCD6">Someone entered your email on the PopupLoom sign-up form. Nothing was created because this address already has an account.</p>',
+    '<p style="margin:0 0 12px"><a href="' + escapeHtml(signInUrl) + '" style="display:inline-block;padding:12px 20px;border-radius:10px;background:#FF6A1F;color:#1A1005;font-weight:700;text-decoration:none">Sign in</a></p>',
+    '<p style="margin:0 0 20px;font-size:13px;color:#9DA0AC">Forgot your password? <a href="' + escapeHtml(resetUrl) + '" style="color:#FF6A1F">Reset it here</a>.</p>',
+    '<p style="margin:0;font-size:12px;color:#9DA0AC">If this was not you, no action is needed.</p>',
+    '</div></body></html>'
+  ].join("");
+  return { subject, text, html };
+}
+
+async function sendExistingAccountEmail(config, { to }) {
+  return postEmail(config, to, renderExistingAccountEmail({ origin: config.origin }));
 }
 
 module.exports = {
@@ -113,5 +180,9 @@ module.exports = {
   setupMessage,
   buildResetUrl,
   renderResetEmail,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  renderVerifyEmail,
+  sendVerificationEmail,
+  renderExistingAccountEmail,
+  sendExistingAccountEmail
 };

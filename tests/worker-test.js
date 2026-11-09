@@ -180,6 +180,8 @@ function hostReq(host, path, method = "GET", extraHeaders = {}) {
   check("reset enforces the 12 character minimum", r.status === 400 && r.data.code === "WEAK_PASSWORD", r);
   r = await req("GET", "/reset-password.html", { raw: true });
   check("reset page noindex + CSP + no-store", r.status === 200 && /noindex, nofollow/.test(r.headers.get("x-robots-tag") || "") && /content-security-policy/i.test(Array.from(r.headers.keys()).join(",")) && r.headers.get("cache-control") === "no-store");
+  r = await req("GET", "/verify-email.html", { raw: true });
+  check("verify page noindex + CSP + no-store", r.status === 200 && /noindex, nofollow/.test(r.headers.get("x-robots-tag") || "") && /content-security-policy/i.test(Array.from(r.headers.keys()).join(",")) && r.headers.get("cache-control") === "no-store");
 
   console.log("== widgets CRUD ==");
   r = await req("POST", "/api/widgets", { token, body: { name: "Test Widget", template: "blank", config: { v: 1, theme: { accent: "#123456" } } } });

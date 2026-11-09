@@ -6,20 +6,23 @@ import ads from "../shared/ads.js";
 import passwordReset from "./password-reset.js";
 import sharedReset from "../shared/password-reset.js";
 import email from "../shared/email.js";
+import verifyShared from "../shared/email-verification.js";
 import { originCheck, securityHeaders, htmlHeaders } from "./security.js";
 import hostPolicy from "../shared/host-policy.js";
 import { verificationFile } from "../shared/verification.js";
 
-const { ApiError, register, login, findOrCreateGoogleUser, verifyCredential, getUserById, updateProfile, authMiddleware, revokeToken } = auth;
+const { ApiError, register, login, findOrCreateGoogleUser, verifyCredential, getUserById, updateProfile, authMiddleware, revokeToken, verifyEmail } = auth;
 const { json, rateLimit } = http;
 
 const registerLimit = rateLimit("register", 40, 10 * 60 * 1000);
+const registerEmailLimit = http.emailRateLimit("register-email", 5, 15 * 60 * 1000);
 const accountLimit = rateLimit("account-action",10,60000);
 const loginLimit = rateLimit("login", 40, 10 * 60 * 1000);
 const googleLimit = rateLimit("google", 30, 10 * 60 * 1000);
 const forgotLimit = rateLimit("forgot-password", 20, 15 * 60 * 1000);
 const forgotEmailLimit = http.emailRateLimit("forgot-password-email", 5, 15 * 60 * 1000);
 const resetLimit = rateLimit("reset-password", 30, 15 * 60 * 1000);
+const verifyLimit = rateLimit("verify-email", 30, 15 * 60 * 1000);
 const apiLimit = rateLimit("api", 1200, 60000);
 
 const JSON_LIMIT = 192 * 1024;
@@ -46,7 +49,7 @@ function clientScheme(request) {
 // Explicit public allowlist, same as the Express server's static middleware.
 const PUBLIC_FILES = new Set([
   "templates.html", "faq.html", "press.html", "security.html", "guides/install-popups.html", "guides/index.html", "guides/wordpress-popup.html", "guides/shopify-popup.html", "guides/webflow-popup.html", "guides/collect-and-export-leads.html", "guides/popup-not-showing.html", "guides/popup-builder-for-ecommerce.html", "guides/popup-builder-for-quick-commerce.html", "guides/popup-builder-for-lead-generation.html", "ccf2a9f45165c635253d22748df4a573.txt", "robots.txt", "sitemap.xml", "llms.txt", "llms-full.txt", "index.html", "studio.html", "profile.html", "demo.html", "migration.html", "reset-password.html",
-  "leads.html", "privacy.html", "about.html", "contact.html", "terms.html", ".well-known/security.txt", "lead-csv.js", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "popuploom.js", "popforge.js", "embed/1.1.0/popuploom.js", "embed/1.1.0/popforge.js", "embed/1.1.0/SHA256SUMS", "ui.css", "ads.txt"
+  "leads.html", "privacy.html", "about.html", "contact.html", "terms.html", ".well-known/security.txt", "lead-csv.js", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "verify-email.html", "verify-email.js", "popuploom.js", "popforge.js", "embed/1.1.0/popuploom.js", "embed/1.1.0/popforge.js", "embed/1.1.0/SHA256SUMS", "ui.css", "ads.txt"
 ]);
 
 // [regex, method, handler, needsAuth]
@@ -102,11 +105,35 @@ async function parseJsonBody(request) {
 
 async function registerRoute(c) {
   try {
-    const { email, password, name } = c.body || {};
-    const result = await register(c.env, email, password, name);
+    const { email: emailAddress, password, name } = c.body || {};
+    await registerEmailLimit(c.request, c.env, emailAddress);
+    const result = await register(c.env, emailAddress, password, name);
+    if (result && result.verificationRequired) {
+      // Both new and existing addresses get the same response. Email delivery
+      // is best-effort: a provider failure must not reveal account existence.
+      try {
+        const config = email.readConfig(c.env, "https://popuploom.com");
+        if (config.configured) {
+          if (result.existing) await email.sendExistingAccountEmail(config, { to: result.to });
+          else await email.sendVerificationEmail(config, { to: result.to, token: result.token });
+        }
+      } catch (e) {
+        console.error("[popuploom] verification email failed:", e && e.message);
+      }
+      return json({ ok: true, verificationRequired: true, message: verifyShared.GENERIC_REGISTER_MESSAGE }, 201);
+    }
     return json(result, 201);
   } catch (e) {
     return json({ error: e.message }, e instanceof ApiError ? e.status : 400);
+  }
+}
+
+async function verifyEmailRoute(c) {
+  try {
+    const token = c.body && c.body.token;
+    return json(await verifyEmail(c.env, token));
+  } catch (e) {
+    return json({ error: e.message, code: e.code }, e instanceof ApiError ? e.status : 400);
   }
 }
 
@@ -213,6 +240,8 @@ async function handleApi(request, env, ctx, pathname, method, cors) {
     matched = { handler: forgotRoute, limit: forgotLimit };
   } else if (pathname === "/api/auth/reset-password" && method === "POST") {
     matched = { handler: resetRoute, limit: resetLimit };
+  } else if (pathname === "/api/auth/verify-email" && method === "POST") {
+    matched = { handler: verifyEmailRoute, limit: verifyLimit };
   } else if (pathname === "/api/auth/logout" && method === "POST") {
     matched = { handler: logoutRoute, needsAuth: true };
   } else if (pathname === "/api/auth/config" && method === "GET") {
@@ -287,7 +316,7 @@ async function serveStatic(request, env, pathname, sec, cors, headOnly) {
     if (asset.status === 404) return new Response("Not found", { status: 404, headers: { ...sec, ...cors } });
     const headers = new Headers(asset.headers);
     headers.set("Cache-Control", file.startsWith("/embed/") ? "public, max-age=31536000, immutable" : "no-store");
-    if (["/leads.html", "/studio.html", "/profile.html", "/demo.html", "/migration.html", "/reset-password.html"].includes(file)) headers.set("X-Robots-Tag", ["/migration.html", "/reset-password.html", "/studio.html", "/profile.html", "/leads.html"].includes(file) ? "noindex, nofollow" : "noindex, follow");
+    if (["/leads.html", "/studio.html", "/profile.html", "/demo.html", "/migration.html", "/reset-password.html", "/verify-email.html"].includes(file)) headers.set("X-Robots-Tag", ["/migration.html", "/reset-password.html", "/verify-email.html", "/studio.html", "/profile.html", "/leads.html"].includes(file) ? "noindex, nofollow" : "noindex, follow");
     const adConfig = ads.config(env);
     const adNonce = file.endsWith(".html") && adConfig.enabled && ads.isAdPage(file) ? ads.nonce() : "";
     if (file.endsWith(".html")) for (const [key, value] of Object.entries(htmlHeaders(env, file.slice(1), { adsEnabled: !!adNonce, adsNonce: adNonce }))) headers.set(key, value);

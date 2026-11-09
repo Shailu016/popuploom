@@ -21,13 +21,13 @@ This document records what was actually changed, what was tested, and what remai
 | F-07 | Password hashing below guidance | Medium | **Fixed** — PBKDF2 600k, bcrypt 12, rehash on login |
 | F-08 | Webhook delivery not durable | Medium | **Open** — still `waitUntil` + 3 in-memory attempts |
 | F-09 | Retention/deletion gaps | Medium | **Improved** — explicit deletion of submissions/webhooks/reset tokens; retention documented; no scheduled TTL |
-| F-10 | No monitoring/incident response | Medium | **Partial** — incident runbook added; monitoring not wired |
+| F-10 | No monitoring/incident response | Medium | **Partial** — incident runbook, daily monitor, email + GitHub issue alerts; no on-call rotation |
 | F-11 | CI security gates missing | Medium | **Fixed in repo** — npm audit, secret scan, Dependabot, production environment |
 | F-12 | Trust surface incomplete | Medium | **Fixed** — `/security.html`, security.txt policy, footer links, `security@` and `support@` routed to a verified mailbox |
-| F-13 | Email/DNS hardening | Medium | **Partial** — apex SPF `-all`, CAA added; DNSSEC and DMARC reject pending |
+| F-13 | Email/DNS hardening | Medium | **Partial** — apex SPF `include:_spf.mx.cloudflare.net ~all`, CAA added; DNSSEC and DMARC reject pending |
 | F-14 | Header/runtime consistency | Low | **Partial** — Express CSP list updated; HSTS/COOP/CORP unchanged |
-| F-15 | Email enumeration on registration | Low | **Open** |
-| F-16 | Inflatable view counts | Low | **Open** |
+| F-15 | Email enumeration on registration | Low | **Fixed** — generic signup response plus email verification before the first sign-in |
+| F-16 | Inflatable view counts | Low | **Fixed** — hourly dedupe per widget/IP in Worker and Express |
 | R-01 | Gridinsoft phishing false positive | High (business) | **Requests sent** — URLScan, SOCRadar and Gridinsoft contacted 2026-11-07; no verdict change yet |
 
 ---

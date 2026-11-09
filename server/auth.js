@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const db = require("./db");
+const verifyShared = require("../shared/email-verification");
 
 const configuredSecret = String(process.env.JWT_SECRET || "").trim();
 if (configuredSecret && (configuredSecret.length < 32 || [
@@ -54,13 +55,69 @@ function register(email, password, name) {
   if (typeof password !== "string" || !password) throw new Error("Email and password are required");
   if (Buffer.byteLength(password, "utf8") > 72) throw new Error("Password must be at most 72 UTF-8 bytes");
   if (password.length < 12) throw new Error("Password must be at least 12 characters");
-  const existing = db.prepare("SELECT id FROM users WHERE email = ?").get(email);
-  if (existing) throw new Error("An account with that email already exists");
+  const existing = db.prepare("SELECT id, email FROM users WHERE email = ?").get(email);
+  // F-15: Always derive the hash before branching so response timing does not
+  // disclose whether an account already exists for the given email address.
   const hash = bcrypt.hashSync(password, BCRYPT_ROUNDS);
+  const verifying = verificationRequired();
+  if (existing) {
+    if (!verifying) throw new Error("An account with that email already exists");
+    // Same generic response as a new signup; the route sends a notification.
+    return { ok: true, verificationRequired: true, existing: true, to: existing.email || email };
+  }
   name = String(name || "").trim().slice(0, 60);
-  const info = db.prepare("INSERT INTO users (email, password_hash, name) VALUES (?, ?, ?)").run(email, hash, name || null);
+  const info = db.prepare("INSERT INTO users (email, password_hash, name, email_verified) VALUES (?, ?, ?, ?)")
+    .run(email, hash, name || null, verifying ? 0 : 1);
   const user = { id: info.lastInsertRowid, email, name: name || null, avatarUrl: null };
-  return { user, token: signToken(user) };
+  if (!verifying) return { user, token: signToken(user) };
+
+  const token = crypto.randomBytes(verifyShared.VERIFY_TOKEN_BYTES).toString("base64url");
+  const now = Math.floor(Date.now() / 1000);
+  db.prepare("DELETE FROM email_verification_tokens WHERE expires_at <= ?").run(now);
+  db.prepare("UPDATE email_verification_tokens SET used_at = ? WHERE user_id = ? AND used_at IS NULL").run(now, user.id);
+  db.prepare("INSERT INTO email_verification_tokens (token_hash, user_id, email, created_at, expires_at) VALUES (?, ?, ?, ?, ?)")
+    .run(hashToken(token), user.id, email, now, now + verifyShared.VERIFY_TOKEN_TTL_SECONDS);
+  return { ok: true, verificationRequired: true, existing: false, to: email, token };
+}
+
+function verificationRequired() {
+  return String(process.env.REQUIRE_EMAIL_VERIFICATION || "").trim().toLowerCase() === "true";
+}
+
+function hashToken(token) {
+  return crypto.createHash("sha256").update(token).digest("hex");
+}
+
+/** Consume a single-use signup verification token and sign the user in. */
+function verifyEmail(rawToken) {
+  if (!verifyShared.isVerifyTokenFormat(rawToken)) {
+    const error = new Error(verifyShared.INVALID_VERIFY_MESSAGE);
+    error.code = verifyShared.INVALID_VERIFY_CODE;
+    throw error;
+  }
+  const now = Math.floor(Date.now() / 1000);
+  const tokenHash = hashToken(rawToken);
+  const row = db.prepare("SELECT id, token_hash, user_id, email, expires_at, used_at FROM email_verification_tokens WHERE token_hash = ?").get(tokenHash);
+  if (!row || row.used_at !== null || row.expires_at <= now) {
+    const error = new Error(verifyShared.INVALID_VERIFY_MESSAGE);
+    error.code = verifyShared.INVALID_VERIFY_CODE;
+    throw error;
+  }
+  const consumed = db.prepare("UPDATE email_verification_tokens SET used_at = ? WHERE id = ? AND used_at IS NULL AND expires_at > ?").run(now, row.id, now);
+  if (!consumed.changes) {
+    const error = new Error(verifyShared.INVALID_VERIFY_MESSAGE);
+    error.code = verifyShared.INVALID_VERIFY_CODE;
+    throw error;
+  }
+  db.prepare("UPDATE users SET email_verified = 1 WHERE id = ?").run(row.user_id);
+  const userRow = db.prepare("SELECT id, email, name, avatar_url FROM users WHERE id = ?").get(row.user_id);
+  if (!userRow) {
+    const error = new Error(verifyShared.INVALID_VERIFY_MESSAGE);
+    error.code = verifyShared.INVALID_VERIFY_CODE;
+    throw error;
+  }
+  const user = { id: userRow.id, email: userRow.email, name: userRow.name || null, avatarUrl: userRow.avatar_url || null };
+  return { user, token: signToken(user), message: verifyShared.VERIFY_SUCCESS_MESSAGE };
 }
 
 // Failing logins still perform one bcrypt comparison. Without this, a missing
@@ -74,7 +131,7 @@ function dummyPasswordHash() {
 
 function login(email, password) {
   email = String(email || "").trim().toLowerCase();
-  const row = db.prepare("SELECT id, email, name, avatar_url, password_hash, google_id FROM users WHERE email = ?").get(email);
+  const row = db.prepare("SELECT id, email, name, avatar_url, password_hash, google_id, email_verified FROM users WHERE email = ?").get(email);
   const passwordString = typeof password === "string" ? password : "";
   const canMatch = !!row && !row.google_id && typeof password === "string"
     && Buffer.byteLength(passwordString, "utf8") <= 72;
@@ -82,6 +139,12 @@ function login(email, password) {
   // unknown emails. Both still pay the same comparison cost before failing.
   const valid = bcrypt.compareSync(passwordString, canMatch ? row.password_hash : dummyPasswordHash());
   if (!canMatch || !valid) throw new Error("Invalid email or password");
+  if (verificationRequired() && Number(row.email_verified) === 0) {
+    const error = new Error(verifyShared.NOT_VERIFIED_MESSAGE);
+    error.code = verifyShared.NOT_VERIFIED_CODE;
+    error.status = 403;
+    throw error;
+  }
   // Rehash older cost-10 bcrypt hashes after a successful login. The update is
   // conditional so a concurrent password change is never overwritten.
   if (/^\$2[aby]\$/.test(row.password_hash) && bcrypt.getRounds(row.password_hash) < BCRYPT_ROUNDS) {
@@ -127,13 +190,13 @@ function findOrCreateGoogleUser(profile) {
       }
       // Verified email ownership replaces unverified credentials and revokes prior sessions.
       const unusableHash = bcrypt.hashSync(crypto.randomBytes(32).toString("hex"), BCRYPT_ROUNDS);
-      db.prepare("UPDATE users SET google_id = ?, password_hash = ?, token_version = token_version + 1, name = COALESCE(name, ?), avatar_url = COALESCE(avatar_url, ?) WHERE id = ?")
+      db.prepare("UPDATE users SET google_id = ?, password_hash = ?, token_version = token_version + 1, email_verified = 1, name = COALESCE(name, ?), avatar_url = COALESCE(avatar_url, ?) WHERE id = ?")
         .run(sub, unusableHash, name, avatar, row.id);
       row = db.prepare("SELECT * FROM users WHERE id = ?").get(row.id);
     } else {
       const randomHash = bcrypt.hashSync(crypto.randomBytes(32).toString("hex"), BCRYPT_ROUNDS);
       const info = db.prepare(
-        "INSERT INTO users (email, password_hash, google_id, name, avatar_url) VALUES (?, ?, ?, ?, ?)"
+        "INSERT INTO users (email, password_hash, google_id, name, avatar_url, email_verified) VALUES (?, ?, ?, ?, ?, 1)"
       ).run(email, randomHash, sub, name, avatar);
       row = db.prepare("SELECT * FROM users WHERE id = ?").get(info.lastInsertRowid);
     }
@@ -162,7 +225,7 @@ function authMiddleware(req, res, next) {
   }
 }
 
-module.exports = { register, login, findOrCreateGoogleUser, getUserById, updateProfile, authMiddleware, signToken };
+module.exports = { register, login, findOrCreateGoogleUser, getUserById, updateProfile, authMiddleware, signToken, verifyEmail, verificationRequired };
 
 async function manageAccount(id, body) {
   const row = db.prepare("SELECT * FROM users WHERE id = ?").get(id);
@@ -185,6 +248,7 @@ async function manageAccount(id, body) {
     db.prepare("DELETE FROM webhook_endpoints WHERE widget_id IN (" + owned + ")").run(id);
     db.prepare("DELETE FROM widgets WHERE user_id = ?").run(id);
     db.prepare("DELETE FROM password_reset_tokens WHERE user_id = ?").run(id);
+    db.prepare("DELETE FROM email_verification_tokens WHERE user_id = ?").run(id);
     db.prepare("DELETE FROM users WHERE id = ?").run(id);
   } else throw new Error("Invalid account action");
   return {ok:true};

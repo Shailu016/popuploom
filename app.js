@@ -40,7 +40,7 @@
       const res = await fetch(API + "/api/auth/register", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password, name }) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Registration failed");
-      this.setToken(data.token);
+      if (data.token) this.setToken(data.token);
       return data;
     },
     login: async function (email, password) {
@@ -673,6 +673,14 @@
           ? await Auth.login(email, pass)
           : await Auth.register(email, pass, (nameEl && nameEl.value || "").trim());
         if (passEl) passEl.value = "";
+        if (data && data.verificationRequired && !data.token) {
+          // Signup no longer returns a session when email verification is on.
+          setMode("login");
+          if (emailEl) emailEl.value = email;
+          showErr(data.message || "Check your email to verify your account, then sign in.");
+          if (typeof window.toast === "function") window.toast("Check your email to verify your account", true);
+          return;
+        }
         finish(data, mode === "register");
       } catch (e) {
         showErr(e.message || "Something went wrong");

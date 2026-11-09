@@ -2,6 +2,7 @@
 // New passwords use WebCrypto PBKDF2-SHA256; legacy bcrypt upgrades on login.
 // (crypto.subtle is exempt from CPU metering). JWTs and Google verification use jose.
 const { SignJWT, jwtVerify, createRemoteJWKSet } = require("jose");
+const verifyShared = require("../shared/email-verification");
 
 const GOOGLE_ISSUER = "https://accounts.google.com";
 const GOOGLE_CERTS = new URL("https://www.googleapis.com/oauth2/v3/certs");
@@ -115,13 +116,60 @@ async function register(env, email, password, name) {
   if (typeof password !== "string" || !password) throw new ApiError(400, "Email and password are required");
   if (new TextEncoder().encode(password).length > 72) throw new ApiError(400, "Password must be at most 72 UTF-8 bytes");
   if (password.length < 12) throw new ApiError(400, "Password must be at least 12 characters");
-  const existing = await env.DB.prepare("SELECT id FROM users WHERE email = ?").bind(email).first();
-  if (existing) throw new ApiError(400, "An account with that email already exists");
+  const existing = await env.DB.prepare("SELECT id, email FROM users WHERE email = ?").bind(email).first();
+  // F-15: always derive the key before branching so response timing does not
+  // disclose whether an account already exists for the given address.
   const hash = await hashPassword(password);
+  if (existing) {
+    if (!verificationRequired(env)) throw new ApiError(400, "An account with that email already exists");
+    // Same generic response as a new signup. The route sends a notification
+    // email; no account is created and no session is issued.
+    return { ok: true, verificationRequired: true, existing: true, to: existing.email || email };
+  }
   name = String(name || "").trim().slice(0, 60);
-  const info = await env.DB.prepare("INSERT INTO users (email, password_hash, name) VALUES (?, ?, ?)").bind(email, hash, name || null).run();
+  const verified = verificationRequired(env) ? 0 : 1;
+  const info = await env.DB.prepare("INSERT INTO users (email, password_hash, name, email_verified) VALUES (?, ?, ?, ?)")
+    .bind(email, hash, name || null, verified).run();
   const user = { id: info.meta.last_row_id, email, name: name || null, avatarUrl: null };
+  if (!verified) {
+    // Verification is on: no session until the emailed link is opened.
+    const token = randomVerifyToken();
+    const now = Math.floor(Date.now() / 1000);
+    await env.DB.prepare("DELETE FROM email_verification_tokens WHERE expires_at <= ?").bind(now).run();
+    await env.DB.prepare("UPDATE email_verification_tokens SET used_at = ? WHERE user_id = ? AND used_at IS NULL").bind(now, user.id).run();
+    await env.DB.prepare("INSERT INTO email_verification_tokens (token_hash, user_id, email, created_at, expires_at) VALUES (?, ?, ?, ?, ?)")
+      .bind(await sha256Hex(token), user.id, email, now, now + verifyShared.VERIFY_TOKEN_TTL_SECONDS).run();
+    return { ok: true, verificationRequired: true, existing: false, to: email, token };
+  }
   return { user, token: await signToken(env, user) };
+}
+
+function verificationRequired(env) {
+  return String((env && env.REQUIRE_EMAIL_VERIFICATION) || "").trim().toLowerCase() === "true";
+}
+
+function randomVerifyToken() {
+  const bytes = crypto.getRandomValues(new Uint8Array(verifyShared.VERIFY_TOKEN_BYTES));
+  let text = "";
+  for (const byte of bytes) text += String.fromCharCode(byte);
+  return btoa(text).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+// Consume a single-use signup verification token and sign the user in.
+async function verifyEmail(env, rawToken) {
+  secretKey(env);
+  if (!verifyShared.isVerifyTokenFormat(rawToken)) throw new ApiError(400, verifyShared.INVALID_VERIFY_MESSAGE, verifyShared.INVALID_VERIFY_CODE);
+  const now = Math.floor(Date.now() / 1000);
+  const tokenHash = await sha256Hex(rawToken);
+  const row = await env.DB.prepare("SELECT id, token_hash, user_id, email, expires_at, used_at FROM email_verification_tokens WHERE token_hash = ?").bind(tokenHash).first();
+  if (!row || row.used_at != null || row.expires_at <= now) throw new ApiError(400, verifyShared.INVALID_VERIFY_MESSAGE, verifyShared.INVALID_VERIFY_CODE);
+  const consumed = await env.DB.prepare("UPDATE email_verification_tokens SET used_at = ? WHERE id = ? AND used_at IS NULL AND expires_at > ?").bind(now, row.id, now).run();
+  if (!consumed.meta.changes) throw new ApiError(400, verifyShared.INVALID_VERIFY_MESSAGE, verifyShared.INVALID_VERIFY_CODE);
+  await env.DB.prepare("UPDATE users SET email_verified = 1 WHERE id = ?").bind(row.user_id).run();
+  const userRow = await env.DB.prepare("SELECT id, email, name, avatar_url FROM users WHERE id = ?").bind(row.user_id).first();
+  if (!userRow) throw new ApiError(400, verifyShared.INVALID_VERIFY_MESSAGE, verifyShared.INVALID_VERIFY_CODE);
+  const user = { id: userRow.id, email: userRow.email, name: userRow.name || null, avatarUrl: userRow.avatar_url || null };
+  return { user, token: await signToken(env, user), message: verifyShared.VERIFY_SUCCESS_MESSAGE };
 }
 
 // Failing logins still perform one PBKDF2 verification. Without this, a missing
@@ -135,7 +183,7 @@ function dummyPasswordHash() {
 
 async function login(env, email, password) {
   email = String(email || "").trim().toLowerCase();
-  const row = await env.DB.prepare("SELECT id, email, name, avatar_url, password_hash, google_id FROM users WHERE email = ?").bind(email).first();
+  const row = await env.DB.prepare("SELECT id, email, name, avatar_url, password_hash, google_id, email_verified FROM users WHERE email = ?").bind(email).first();
   const passwordString = typeof password === "string" ? password : "";
   const canMatch = !!row && !row.google_id && typeof password === "string"
     && new TextEncoder().encode(passwordString).length <= 72;
@@ -144,6 +192,9 @@ async function login(env, email, password) {
   const stored = canMatch ? row.password_hash : await dummyPasswordHash();
   const valid = await verifyPassword(passwordString, stored);
   if (!canMatch || !valid) throw new ApiError(401, "Invalid email or password");
+  if (verificationRequired(env) && Number(row.email_verified) === 0) {
+    throw new ApiError(403, verifyShared.NOT_VERIFIED_MESSAGE, verifyShared.NOT_VERIFIED_CODE);
+  }
   if (/^\$2[aby]\$/.test(row.password_hash)) {
     const upgraded = await hashPassword(password);
     await env.DB.prepare("UPDATE users SET password_hash = ? WHERE id = ? AND password_hash = ?").bind(upgraded, row.id, row.password_hash).run();
@@ -188,12 +239,12 @@ async function findOrCreateGoogleUser(env, profile) {
       }
       // Verified email ownership replaces unverified credentials and revokes prior sessions.
       const unusableHash = await hashPassword(crypto.randomUUID());
-      await env.DB.prepare("UPDATE users SET google_id = ?, password_hash = ?, token_version = token_version + 1, name = COALESCE(name, ?), avatar_url = COALESCE(avatar_url, ?) WHERE id = ?")
+      await env.DB.prepare("UPDATE users SET google_id = ?, password_hash = ?, token_version = token_version + 1, email_verified = 1, name = COALESCE(name, ?), avatar_url = COALESCE(avatar_url, ?) WHERE id = ?")
         .bind(sub, unusableHash, name, avatar, row.id).run();
       row = await env.DB.prepare("SELECT * FROM users WHERE id = ?").bind(row.id).first();
     } else {
       const randomHash = await hashPassword(crypto.randomUUID());
-      const info = await env.DB.prepare("INSERT INTO users (email, password_hash, google_id, name, avatar_url) VALUES (?, ?, ?, ?, ?)")
+      const info = await env.DB.prepare("INSERT INTO users (email, password_hash, google_id, name, avatar_url, email_verified) VALUES (?, ?, ?, ?, ?, 1)")
         .bind(email, randomHash, sub, name, avatar).run();
       row = await env.DB.prepare("SELECT * FROM users WHERE id = ?").bind(info.meta.last_row_id).first();
     }
@@ -273,7 +324,9 @@ module.exports = {
   signToken,
   revokeToken,
   hashPassword,
-  sha256Hex
+  sha256Hex,
+  verifyEmail,
+  verificationRequired
 };
 
 async function manageAccount(env, id, body) {
@@ -299,6 +352,7 @@ async function manageAccount(env, id, body) {
     await env.DB.prepare("DELETE FROM webhook_endpoints WHERE widget_id IN (" + owned + ")").bind(id).run();
     await env.DB.prepare("DELETE FROM widgets WHERE user_id = ?").bind(id).run();
     await env.DB.prepare("DELETE FROM password_reset_tokens WHERE user_id = ?").bind(id).run();
+    await env.DB.prepare("DELETE FROM email_verification_tokens WHERE user_id = ?").bind(id).run();
     await env.DB.prepare("DELETE FROM users WHERE id = ?").bind(id).run();
   } else throw new Error("Invalid account action");
   return {ok:true};

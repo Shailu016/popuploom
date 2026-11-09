@@ -39,6 +39,9 @@ migrations_dir = "worker/migrations"
 # Leave empty to allow only same-origin (and public widget endpoints).
 APP_ORIGINS = ""
 
+# F-15: new password accounts must confirm their email before the first sign-in.
+REQUIRE_EMAIL_VERIFICATION = "true"
+
 # Advertising is live: AdSense approved popuploom.com ("Ready") on 2026-11-09,
 # the Google Privacy & messaging CMP is published and a real ad slot exists.
 ADSENSE_ENABLED = "true"

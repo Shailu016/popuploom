@@ -48,4 +48,26 @@ function emailRateLimit(scope, max, windowMs) {
   };
 }
 
-module.exports = { json, all, rateLimit, emailRateLimit, sha256Hex };
+// Windowed view deduplication per (widget, visitor/IP). Uses D1 rate_limits.
+// Returns true on the first view in the window so the counter is incremented,
+// and false on repeats within windowMs.
+// The client-supplied x-visitor-id header is deliberately ignored: it is
+// attacker-controlled and would let a replay script mint a new bucket per
+// request by rotating the header. Cloudflare's CF-Connecting-IP is the only
+// address source here.
+async function dedupeView(env, widgetId, request, windowMs = 3600000) {
+  const address = request.headers.get("CF-Connecting-IP") || "local";
+  const hash = await sha256Hex("dedupe:view:" + widgetId + ":" + address);
+  const key = "vdedupe:" + hash;
+  const now = Date.now(), until = now + windowMs;
+  const row = await env.DB.prepare(
+    "INSERT INTO rate_limits (key, count, expires_at) VALUES (?, 1, ?) " +
+    "ON CONFLICT(key) DO UPDATE SET " +
+    "count = CASE WHEN rate_limits.expires_at <= ? THEN 1 ELSE rate_limits.count + 1 END, " +
+    "expires_at = CASE WHEN rate_limits.expires_at <= ? THEN excluded.expires_at ELSE rate_limits.expires_at END " +
+    "RETURNING count"
+  ).bind(key, until, now, now).first();
+  return row.count === 1;
+}
+
+module.exports = { json, all, rateLimit, emailRateLimit, dedupeView, sha256Hex };

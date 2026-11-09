@@ -64,7 +64,7 @@ async function resetPassword(env, rawToken, newPassword) {
 
   const passwordHash = await hashPassword(newPassword);
   // Invalidating token_version revokes every existing bearer session.
-  await env.DB.prepare("UPDATE users SET password_hash = ?, token_version = token_version + 1 WHERE id = ?").bind(passwordHash, row.user_id).run();
+  await env.DB.prepare("UPDATE users SET password_hash = ?, token_version = token_version + 1, email_verified = 1 WHERE id = ?").bind(passwordHash, row.user_id).run();
   await env.DB.prepare("UPDATE password_reset_tokens SET used_at = ? WHERE user_id = ? AND used_at IS NULL").bind(now, row.user_id).run();
   return shared.resetSuccessResponse();
 }

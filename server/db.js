@@ -51,7 +51,8 @@ const userColumns = db.prepare("PRAGMA table_info(users)").all().map(function (c
   ["token_version", "token_version INTEGER NOT NULL DEFAULT 0"],
   ["google_id", "google_id TEXT"],
   ["name", "name TEXT"],
-  ["avatar_url", "avatar_url TEXT"]
+  ["avatar_url", "avatar_url TEXT"],
+  ["email_verified", "email_verified INTEGER NOT NULL DEFAULT 1"]
 ].forEach(function (col) {
   if (userColumns.indexOf(col[0]) === -1) db.exec("ALTER TABLE users ADD COLUMN " + col[1]);
 });
@@ -74,6 +75,10 @@ db.exec("CREATE INDEX IF NOT EXISTS idx_revoked_expiry ON revoked_tokens(expires
 db.exec("CREATE TABLE IF NOT EXISTS password_reset_tokens (id INTEGER PRIMARY KEY AUTOINCREMENT, token_hash TEXT NOT NULL UNIQUE, user_id INTEGER NOT NULL, email TEXT NOT NULL, created_at INTEGER NOT NULL, expires_at INTEGER NOT NULL, used_at INTEGER, FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)");
 db.exec("CREATE INDEX IF NOT EXISTS idx_reset_tokens_user ON password_reset_tokens(user_id)");
 db.exec("CREATE INDEX IF NOT EXISTS idx_reset_tokens_expiry ON password_reset_tokens(expires_at)");
+
+// Email verification for new password accounts. Existing accounts are verified.
+db.exec("CREATE TABLE IF NOT EXISTS email_verification_tokens (id INTEGER PRIMARY KEY AUTOINCREMENT, token_hash TEXT NOT NULL UNIQUE, user_id INTEGER NOT NULL, email TEXT NOT NULL, created_at INTEGER NOT NULL, expires_at INTEGER NOT NULL, used_at INTEGER, FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)");
+db.exec("CREATE INDEX IF NOT EXISTS idx_email_verification_expiry ON email_verification_tokens(expires_at)");
 
 // Server-side lead webhooks. URLs and signing secrets intentionally live apart
 // from the public widget config, which visitors can read.

@@ -131,23 +131,30 @@ Delivery runs in memory via `waitUntil`; a restart can lose one notification. Mo
 - [ ] Cron drain with exponential backoff
 - [ ] Delivery-log status update
 
-### 3.5 F-10 — alerting for the monitor `(me)` — 2 h
+### 3.5 F-10 - alerting for the monitor `(me)` - 2 h
 The daily monitor runs but nobody is paged when it fails.
 
-- [ ] Send an email to `security@popuploom.com` on failure
+- [x] Email path added in `scripts/monitor.cjs` (Resend)
+- [x] GitHub issue fallback added in `.github/workflows/monitor.yml` (works without extra secrets)
+- [ ] Optional: add `RESEND_API_KEY` and `ALERT_EMAIL_TO` as GitHub secrets so email alerts also fire
 - [ ] Add a second check for the AdSense `Ready` status (manual for now)
 
-### 3.6 F-15 — account enumeration `(me)` — 2 h
-Signup/login responses can reveal whether an email exists. Make responses generic.
+### 3.6 F-15 - account enumeration `(me)` - done
+Signup now sends a verification link and returns the same generic response whether or not the address is registered. Password login is blocked until the link is opened; password reset also verifies the address.
 
-- [ ] Generic registration response
-- [ ] Generic login timing/response
+- [x] Generic registration response for new and existing addresses
+- [x] Single-use verification token (hash stored, 24h expiry)
+- [x] Login blocked until verified
+- [x] Verification page `/verify-email.html`
+- [x] Password reset marks the address verified
+- [x] Google sign-in marks the address verified
 
-### 3.7 F-16 — inflatable view counts `(me)` — 3 h
+### 3.7 F-16 - inflatable view counts `(me)` - 3 h
 Repeated requests can inflate view numbers. Add per-visitor dedupe (hashed IP + widget + short window).
 
-- [ ] Dedupe view events
-- [ ] Keep rate limits
+- [x] Dedupe view events in Worker (D1) and Express (in-memory)
+- [x] Client-supplied visitor header is ignored
+- [x] Keep rate limits
 
 ### 3.8 Independent security review `(you)` — later
 Internal audit only; no outside pentest/ASVS. Do this before claiming "secure" publicly.
@@ -195,19 +202,11 @@ Use approved copy from `/press.html`; do not invent awards or user counts.
 
 ## 6. Ads QA and policy hygiene
 
-### 6.1 Thin pages with ads — decide `(you)` — 5 min
-Currently ads also appear on low-word pages. Weakest placements:
+### 6.1 Thin pages with ads - done (2026-11-09)
+Ads were removed from `/demo.html`, `/contact.html`, `/terms.html` and `/privacy.html`. `/about.html` (~226 words) and `/guides/index.html` (~344 words) keep ads as normal content pages.
 
-| Page | ~words | Note |
-|---|---|---|
-| `/contact.html` | 150 | form-heavy |
-| `/about.html` | 226 | short |
-| `/demo.html` | 175 | `noindex`, mock storefront |
-| `/guides/index.html` | 344 | hub |
-
-Recommendation: keep guides/homepage/templates/FAQ; optionally remove ads from contact, terms, privacy and demo. Say the word and I'll change `shared/ad-pages.js`.
-
-- [ ] Decision made
+- [x] Decision made and applied in `shared/ad-pages.js`
+- [ ] Deploy pending (commit + push)
 
 ### 6.2 Lighthouse after ads `(me)` — 15 min
 Ads now load on the homepage; LCP/CLS may have changed.

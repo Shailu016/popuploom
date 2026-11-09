@@ -44,9 +44,10 @@ Requires Node 22.13+ (built and tested on Node 24). The server uses `node:sqlite
 | `DB_PATH` | `<project>/popforge.db` | SQLite file location |
 | `JWT_SECRET` | random per-process development secret | Required in production; use a unique random secret of at least 32 characters. Signs 30-day login tokens |
 | `GOOGLE_CLIENT_ID` | empty | Enables Sign in with Google. Empty = the Google button is hidden and `/api/auth/google` answers 503 |
-| `RESEND_API_KEY` | empty | Resend API key used to send password reset links. Empty = reset email stays disabled with a clear 503 setup message |
+| `RESEND_API_KEY` | empty | Resend API key used to send password reset and signup verification links. Empty = those emails stay disabled with a clear 503 setup message |
 | `RESET_EMAIL_FROM` | empty | Verified sender, e.g. `PopupLoom <reset@popuploom.com>` |
-| `PUBLIC_ORIGIN` | `http://localhost:PORT` locally, `https://popuploom.com` in production | Origin used to build the reset link. Must be HTTPS outside local development |
+| `PUBLIC_ORIGIN` | `http://localhost:PORT` locally, `https://popuploom.com` in production | Origin used to build reset and verification links. Must be HTTPS outside local development |
+| `REQUIRE_EMAIL_VERIFICATION` | off (local) / on in `wrangler.toml` | New password accounts must confirm their email before the first sign-in; also the F-15 enumeration fix |
 
 Example production start:
 
@@ -116,7 +117,8 @@ Notes:
 
 | Method + path | Auth | What it does |
 |---|---|---|
-| `POST /api/auth/register` | None | Create account, returns `{ user, token }` |
+| `POST /api/auth/register` | None | Create account. With `REQUIRE_EMAIL_VERIFICATION=true`, sends a verification link and returns the same `{ ok, verificationRequired }` response for new and existing addresses; otherwise returns `{ user, token }` |
+| `POST /api/auth/verify-email` | None | Consume a single-use signup verification token and sign in |
 | `POST /api/auth/login` | None | Sign in, returns `{ user, token }` |
 | `POST /api/auth/forgot-password` | None | Request a single-use reset link. Always the same generic response for unknown, Google-only and existing accounts |
 | `POST /api/auth/reset-password` | None | Consume a reset token and set a new password; revokes existing sessions |
@@ -292,9 +294,9 @@ Open **My popups → Leads** for any saved popup. The inbox shows 100 responses 
 
 ## Advertising readiness
 
-PopupLoom does not currently load AdSense or any advertising script. The site is verified for AdSense and the review request is pending; advertising remains disabled until Google shows the site as approved, the Google Privacy & messaging CMP is published, real ad slots are supplied and Codex reviews activation.
+PopupLoom serves Google AdSense on the public content allowlist. Google approved the site on 2026-11-09, the Google Privacy & messaging CMP is published and `/ads.txt` is authorized. Ads stay off the editor, account, lead inbox, reset/recovery pages, exports and customer embeds.
 
-- `shared/ad-pages.js` is the explicit allowlist for ad units. It covers public content pages (homepage, template catalog, FAQ, press, security, about, contact, legal pages, demo and guides). The editor, account, lead inbox, reset/recovery pages, exports and the customer runtime are excluded.
+- `shared/ad-pages.js` is the explicit allowlist for ad units. It covers public content pages (homepage, template catalog, FAQ, press, security, about and guides). Contact, legal and demo pages are excluded, along with the editor, account, lead inbox, reset/recovery pages, exports and the customer runtime.
 - `shared/ads.js` implements the fail-closed gate, per-response nonce, CSP additions and single-slot HTML injection used by both Express and the Worker.
 - Ads require all of: `ADSENSE_ENABLED=true`, `ADSENSE_APPROVED=true` (only after Google shows Ready/approved), a valid `ADSENSE_PUBLISHER_ID`/`ADSENSE_CLIENT`, `ADSENSE_CMP=google-privacy-messaging` and at least one real `ADSENSE_SLOT`/`ADSENSE_SLOTS` value. Any missing gate produces no ad markup and no advertising resource.
 - `ADSENSE_PUBLISHER_ID` generates the exact `/ads.txt` record. The production workflow sets the owner's verified public publisher ID; the homepage contains the matching ownership meta tag.

@@ -1,5 +1,5 @@
 const fs=require('fs'),path=require('path'),http=require('http'),assert=require('assert/strict'),{spawn}=require('child_process'),{DatabaseSync}=require('node:sqlite');
-(async()=>{const root=path.resolve(__dirname,'..');const {default:worker}=await import(require('url').pathToFileURL(path.join(root,'.cf-build/index.js')));const db=new DatabaseSync(':memory:');for(const f of ['0001_init.sql','0003_rate_limits.sql','0004_password_reset_tokens.sql','0005_webhooks.sql'])db.exec(fs.readFileSync(path.join(root,'worker/migrations',f),'utf8'));
+(async()=>{const root=path.resolve(__dirname,'..');const {default:worker}=await import(require('url').pathToFileURL(path.join(root,'.cf-build/index.js')));const db=new DatabaseSync(':memory:');for(const f of ['0001_init.sql','0003_rate_limits.sql','0004_password_reset_tokens.sql','0005_webhooks.sql','0006_email_verification.sql'])db.exec(fs.readFileSync(path.join(root,'worker/migrations',f),'utf8'));
 const env={JWT_SECRET:require('crypto').randomBytes(32).toString('hex'),RESEND_API_KEY:'test-resend-key',RESET_EMAIL_FROM:'PopupLoom <reset@popuploom.com>',PUBLIC_ORIGIN:'https://popuploom.com',ALLOW_INSECURE_WEBHOOKS:'true',DB:{prepare(sql){return {bind(...args){return {first:async()=>db.prepare(sql).get(...args),run:async()=>{const r=db.prepare(sql).run(...args);return {meta:{changes:r.changes,last_row_id:r.lastInsertRowid}};},all:async()=>({results:db.prepare(sql).all(...args)})};}};}},ASSETS:{fetch:async r=>{const file=path.join(root,'.cf-build/public',new URL(r.url).pathname);return fs.existsSync(file)&&fs.statSync(file).isFile()?new Response(fs.readFileSync(file),{headers:{'Content-Type':file.endsWith('.html')?'text/html':'application/octet-stream'}}):new Response('',{status:404});}}};
 {
   console.log('== advertising boundary ==');
@@ -176,6 +176,29 @@ let cancelled=false;const stream=new ReadableStream({pull(c){c.enqueue(new Uint8
   } finally {
     await new Promise(resolve => receiver.close(resolve));
   }
+}
+
+{
+  const vEnv = { ...env, REQUIRE_EMAIL_VERIFICATION: 'true', RESEND_API_KEY: '' };
+  const registerReq = () => new Request('https://popuploom.com/api/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: 'enum-check@example.com', password: 'enum-check-password-123' })
+  });
+  const first = await worker.fetch(registerReq(), vEnv, { waitUntil() {} });
+  const second = await worker.fetch(registerReq(), vEnv, { waitUntil() {} });
+  const firstBody = await first.text(), secondBody = await second.text();
+  assert.equal(first.status, 201);
+  assert.equal(second.status, 201);
+  assert.equal(firstBody, secondBody, 'new and existing signups share one response');
+  assert.ok(!/"token"/.test(firstBody), 'no session is returned before verification');
+  const blocked = await worker.fetch(new Request('https://popuploom.com/api/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: 'enum-check@example.com', password: 'enum-check-password-123' })
+  }), vEnv, { waitUntil() {} });
+  assert.equal(blocked.status, 403, 'unverified password login is blocked');
+  console.log('PASS signup verification hides account existence');
 }
 
 const server=http.createServer(async(req,res)=>{try{const chunks=[];for await(const c of req)chunks.push(c);const body=Buffer.concat(chunks);const request=new Request('http://'+req.headers.host+req.url,{method:req.method,headers:req.headers,...(!['GET','HEAD'].includes(req.method)?{body}:{} )});const response=await worker.fetch(request,env,{waitUntil:p=>p.catch(()=>{})});res.writeHead(response.status,Object.fromEntries(response.headers));res.end(Buffer.from(await response.arrayBuffer()));}catch(e){res.writeHead(500);res.end(String(e));}});await new Promise(r=>server.listen(0,'127.0.0.1',r));try{const child=spawn(process.execPath,['tests/worker-test.js'],{cwd:root,env:{...process.env,BASE:'http://127.0.0.1:'+server.address().port},stdio:'inherit',windowsHide:true});const code=await new Promise(r=>child.once('exit',r));assert.equal(code,0);}finally{await new Promise(r=>server.close(r));db.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

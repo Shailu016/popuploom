@@ -232,10 +232,17 @@ router.get("/:id/webhook/deliveries", authMiddleware, (req, res) => {
 // Public, fire-and-forget telemetry from third-party pages. Unknown ids
 // (demo configs, hand-written embeds, deleted widgets) are dropped silently:
 // a 404 here only ever pollutes the embedder's browser console.
+// F-16: Views are deduplicated per (widget, visitor/IP) in a 1-hour window so
+// page refreshes or replay scripts cannot inflate metrics.
 router.post("/:id/view", rateLimit("view", 600, 60000), (req, res) => {
-  const r = db.prepare("UPDATE widgets SET view_count = view_count + 1, updated_at = updated_at WHERE id = ?").run(req.params.id);
-  if (r.changes === 0) return res.status(204).end();
-  res.json({ ok: true });
+  const widget = db.prepare("SELECT id FROM widgets WHERE id = ?").get(req.params.id);
+  if (!widget) return res.status(204).end();
+  const visitor = req.headers["x-visitor-id"] || req.ip || (req.socket && req.socket.remoteAddress) || "local";
+  const isFirst = rateLimit.dedupeView(req.params.id, visitor);
+  if (isFirst) {
+    db.prepare("UPDATE widgets SET view_count = view_count + 1, updated_at = updated_at WHERE id = ?").run(req.params.id);
+  }
+  res.json({ ok: true, deduplicated: !isFirst });
 });
 
 // Record a submission (lead)
