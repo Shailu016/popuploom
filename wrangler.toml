@@ -39,10 +39,10 @@ migrations_dir = "worker/migrations"
 # Leave empty to allow only same-origin (and public widget endpoints).
 APP_ORIGINS = ""
 
-# Advertising is prepared but off until the account is approved, the Google
-# Privacy & messaging CMP is published and a real ad slot is supplied.
-ADSENSE_ENABLED = "false"
-ADSENSE_APPROVED = "false"
+# Advertising is live: AdSense approved popuploom.com ("Ready") on 2026-11-09,
+# the Google Privacy & messaging CMP is published and a real ad slot exists.
+ADSENSE_ENABLED = "true"
+ADSENSE_APPROVED = "true"
 ADSENSE_PUBLISHER_ID = "pub-8947829712444522"
 # Google Privacy & messaging (Google CMP) is configured and its European
 # message is published for popuploom.com in the AdSense account.

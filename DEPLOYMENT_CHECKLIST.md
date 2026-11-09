@@ -32,7 +32,7 @@ Use this before and after every production deployment.
 - [ ] `RESET_EMAIL_FROM` uses the verified domain.
 - [ ] `PUBLIC_ORIGIN=https://popuploom.com`.
 - [ ] `ALLOW_INSECURE_WEBHOOKS` is not `true`.
-- [ ] `ADSENSE_ENABLED=false` until approval, CMP and a real slot are verified.
+- [x] `ADSENSE_ENABLED=true` and `ADSENSE_APPROVED=true` only while Google shows the site Ready, the CMP message is published and the slot is real (verified 2026-11-09).
 - [ ] Cloudflare API token is stored only in GitHub secrets.
 
 ## Database

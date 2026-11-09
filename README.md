@@ -302,8 +302,8 @@ PopupLoom does not currently load AdSense or any advertising script. The site is
 - Ad markup is one responsive, labelled unit with reserved space, inserted after guide content. It is not inserted on thin, private or transactional pages or near navigation/form controls.
 - Eligible ad responses add a per-response `script-src 'nonce-…' 'strict-dynamic'` and narrowly scoped Google frame/connect hosts; they do not add `unsafe-inline`, `unsafe-eval` or a blanket `https:` script source. Ineligible and disabled responses keep the existing CSP unchanged.
 - Original template illustrations and brand assets can be regenerated with `npm run art:generate`; the pinned Sharp development dependency and SVG sources are recorded in `ASSET_PROVENANCE.md`. Legacy image URLs remain supported.
-- Google's current [AdSense CSP guidance](https://support.google.com/adsense/answer/16283098) is the basis for the nonce/strict-dynamic approach. It must still be validated against the approved account and real CMP before activation.
-- The privacy page describes advertising as planned, not active. Update it to present tense only when ads are actually enabled.
+- Google's current [AdSense CSP guidance](https://support.google.com/adsense/answer/16283098) is the basis for the nonce/strict-dynamic approach. Each deploy re-checks that the unit appears only on guide pages with the nonce and that excluded pages load no ad resource.
+- The privacy page describes advertising in the present tense because ads are live on the guide allowlist (activated 2026-11-09 after AdSense showed the site as Ready).
 - No ad code is included in `popuploom.js`, the customer embed, private pages, lead inbox, exports or reset flows.
 
 See `ASSET_PROVENANCE.md` for the source/generation evidence, full asset manifest and the retained external-video license.
