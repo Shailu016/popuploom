@@ -645,6 +645,7 @@ test('advertising config fails closed and injects only on public content pages',
  assert.equal(ads.inject(injected,'/guides/install-popups.html',cfg,nonce),injected,'idempotent');
  const csp=ads.cspAdditions(nonce);
  assert.ok(csp.script.includes("'nonce-"+nonce+"'")&&csp.script.includes("'strict-dynamic'"));
+ assert.ok(csp.connect.includes("fundingchoicesmessages.google.com")&&csp.frame.includes("fundingchoicesmessages.google.com"),'Google CMP beacon and iframe are allowed');
  assert.ok(!/unsafe-inline|unsafe-eval/.test(csp.script));
  const previous={};
  for(const key of ['ADSENSE_ENABLED','ADSENSE_APPROVED','ADSENSE_PUBLISHER_ID','ADSENSE_CLIENT','ADSENSE_CMP','ADSENSE_SLOT','ADSENSE_SLOTS']){previous[key]=process.env[key];}
