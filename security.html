@@ -99,8 +99,8 @@
     <h2>Infrastructure and data</h2>
     <ul>
       <li>The public site and API run on Cloudflare Workers with D1 storage. Traffic uses HTTPS; HTML responses include CSP, HSTS, framing, MIME-sniffing and referrer protections.</li>
-      <li>Advertising is disabled. The AdSense integration is fail-closed and does not load until an approved account, a real slot and a published Google CMP configuration exist.</li>
-      <li>Password-reset email is sent through Resend. The API key is a server-side secret and is never sent to a browser.</li>
+      <li>Advertising is live only on public content pages. The AdSense integration is fail-closed: it loads nothing unless the account is approved, a valid slot exists, and the Google Privacy &amp; messaging CMP is configured. The editor, account pages, lead inbox, password-reset and verification pages, and customer embeds are excluded.</li>
+      <li>Password-reset and signup-verification email is sent through Resend. The API key is a server-side secret and is never sent to a browser.</li>
       <li>Popup owners are the controllers of the lead data they collect. See the <a href="/privacy.html">privacy and data handling page</a> for storage, browser storage, webhooks and deletion.</li>
     </ul>
 
