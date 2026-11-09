@@ -125,7 +125,10 @@
   // scripts. Add the per-response nonce to every external script tag so the
   // page's own app scripts keep working on ad-enabled pages.
   function addNonceToScripts(text, nonceValue) {
-    return String(text).replace(/<script(?![^>]*\bnonce=)(?=[^>]*\bsrc=)([^>]*)>/gi, '<script nonce="' + nonceValue + '"$1>');
+    // Only real tags with a concrete src. A src that starts with a quote
+    // fragment ("' + PF.apiBase + ...") is a string inside inline JS, such as
+    // the install-code template; it must not be rewritten.
+    return String(text).replace(/<script(?![^>]*\bnonce=)([^>]*\bsrc="(?![+'])[^"]*"[^>]*)>/gi, '<script nonce="' + nonceValue + '"$1>');
   }
 
   // Inject at most one unit into an eligible guide. Excluded pages and

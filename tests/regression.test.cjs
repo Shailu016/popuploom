@@ -641,6 +641,9 @@ test('advertising config fails closed and injects only on public content pages',
  const appHtml='<html><head><title>x</title><script src="/app.js"></script></head><body><article>x</article></body></html>';
  const withApp=ads.inject(appHtml,'/guides/install-popups.html',cfg,nonce);
  assert.ok(withApp.includes('<script nonce="'+nonce+'" src="/app.js"></script>'),'external scripts receive the ad nonce so strict-dynamic does not block them');
+ const snippetHtml='<html><head><title>x</title></head><body><script>var t=\'<script src="\' + PF.apiBase + \'/embed/x.js">\';</script><article>x</article></body></html>';
+ const withSnippet=ads.inject(snippetHtml,'/guides/install-popups.html',cfg,nonce);
+ assert.ok(withSnippet.includes('src="\' + PF.apiBase'),'install-code string inside inline JS is not rewritten');
  const disabledGuide=await api('/guides/install-popups.html');assert.ok(!disabledGuide.data.includes('adsbygoogle.js')&&!disabledGuide.data.includes('data-pl-ad'),'disabled ad response loads nothing');
  assert.equal(ads.inject(html,'/studio.html',cfg,nonce),html);
  for(const p of ['/studio.html','/profile.html','/leads.html','/reset-password.html','/migration.html','/api/widgets/x/submit','/demo.html','/contact.html','/terms.html','/privacy.html'])assert.equal(ads.inject(html,p,cfg,nonce),html,p);
