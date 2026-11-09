@@ -1,7 +1,7 @@
 # What is left to do
 
-Updated: **2026-11-09**. Only outstanding items. Done work is not repeated here.
-Status today: site live, AdSense approved and ads serving, Search Console clean, 19/19 sitemap URLs indexable.
+Updated: **2026-11-10**. Only outstanding items. Done work is not repeated here.
+Status today: site live, AdSense approved and ads serving on 17 content pages, email-verified signup live, Search Console clean, 19/19 sitemap URLs indexable.
 
 Who: **YOU** = needs your account/password. **ME** = code work I can ship.
 

@@ -206,7 +206,7 @@ Use approved copy from `/press.html`; do not invent awards or user counts.
 Ads were removed from `/demo.html`, `/contact.html`, `/terms.html` and `/privacy.html`. `/about.html` (~226 words) and `/guides/index.html` (~344 words) keep ads as normal content pages.
 
 - [x] Decision made and applied in `shared/ad-pages.js`
-- [ ] Deploy pending (commit + push)
+- [x] Deployed; live check confirms the four pages are ad-free
 
 ### 6.2 Lighthouse after ads `(me)` — 15 min
 Ads now load on the homepage; LCP/CLS may have changed.
