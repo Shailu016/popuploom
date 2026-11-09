@@ -12,10 +12,15 @@ const env={JWT_SECRET:require('crypto').randomBytes(32).toString('hex'),RESEND_A
   assert.ok(guide.includes('data-pl-ad="1"') && guide.includes('adsbygoogle.js') && guide.includes('Advertisement'));
   assert.ok(nonce && policy.includes("'nonce-" + nonce + "'") && policy.includes("'strict-dynamic'"));
   assert.ok(!policy.includes("'unsafe-eval'"));
-  for (const path of ['/', '/studio.html', '/guides/index.html']) {
+  for (const path of ['/studio.html', '/profile.html', '/leads.html', '/reset-password.html', '/migration.html']) {
     const res = await worker.fetch(new Request('https://popuploom.com' + path), adEnv, { waitUntil() {} });
     const body = await res.text();
     assert.ok(!body.includes('adsbygoogle.js') && !body.includes('data-pl-ad'), path + ' must stay ad-free');
+  }
+  for (const path of ['/', '/templates.html', '/faq.html', '/guides/index.html']) {
+    const res = await worker.fetch(new Request('https://popuploom.com' + path), adEnv, { waitUntil() {} });
+    const body = await res.text();
+    assert.ok(body.includes('adsbygoogle.js') && body.includes('data-pl-ad'), path + ' must carry the ad unit');
   }
   const disabled = await worker.fetch(new Request('https://popuploom.com/guides/install-popups.html'), env, { waitUntil() {} });
   assert.ok(!(await disabled.text()).includes('adsbygoogle.js'), 'disabled advertising must load no ad resource');

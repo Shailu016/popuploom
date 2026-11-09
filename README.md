@@ -294,7 +294,7 @@ Open **My popups → Leads** for any saved popup. The inbox shows 100 responses 
 
 PopupLoom does not currently load AdSense or any advertising script. The site is verified for AdSense and the review request is pending; advertising remains disabled until Google shows the site as approved, the Google Privacy & messaging CMP is published, real ad slots are supplied and Codex reviews activation.
 
-- `shared/ad-pages.js` is the explicit allowlist for manual ad units. It contains substantive public guides only. The homepage, template catalog, editor, account pages, lead inbox, reset/recovery pages, exports and the customer runtime are excluded.
+- `shared/ad-pages.js` is the explicit allowlist for ad units. It covers public content pages (homepage, template catalog, FAQ, press, security, about, contact, legal pages, demo and guides). The editor, account, lead inbox, reset/recovery pages, exports and the customer runtime are excluded.
 - `shared/ads.js` implements the fail-closed gate, per-response nonce, CSP additions and single-slot HTML injection used by both Express and the Worker.
 - Ads require all of: `ADSENSE_ENABLED=true`, `ADSENSE_APPROVED=true` (only after Google shows Ready/approved), a valid `ADSENSE_PUBLISHER_ID`/`ADSENSE_CLIENT`, `ADSENSE_CMP=google-privacy-messaging` and at least one real `ADSENSE_SLOT`/`ADSENSE_SLOTS` value. Any missing gate produces no ad markup and no advertising resource.
 - `ADSENSE_PUBLISHER_ID` generates the exact `/ads.txt` record. The production workflow sets the owner's verified public publisher ID; the homepage contains the matching ownership meta tag.

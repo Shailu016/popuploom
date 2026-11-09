@@ -134,6 +134,10 @@
     if (at !== -1) return text.slice(0, at) + block + text.slice(at);
     at = text.lastIndexOf("</main>");
     if (at !== -1) return text.slice(0, at) + block + text.slice(at);
+    // Pages without a semantic article/main wrapper (homepage, catalog) get
+    // the unit immediately before the site footer, not after it.
+    at = text.lastIndexOf("<footer");
+    if (at !== -1) return text.slice(0, at) + block + text.slice(at);
     at = text.lastIndexOf("</body>");
     return at !== -1 ? text.slice(0, at) + block + text.slice(at) : text;
   }

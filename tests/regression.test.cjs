@@ -621,7 +621,7 @@ test('webhook delivery retries transient failures and stops on 4xx',async()=>{
   assert.equal(stopped.ok,false);assert.equal(stopped.attempts,1);assert.equal(stopped.status,400);assert.equal(calls.stop,1);
  }finally{await new Promise(r=>receiver.close(r));}
 });
-test('advertising config fails closed and injects only on public guides',async()=>{
+test('advertising config fails closed and injects only on public content pages',async()=>{
  const ads=require('../shared/ads');
  const base={ADSENSE_PUBLISHER_ID:'pub-8947829712444522'};
  assert.equal(ads.config(base).enabled,false,'disabled by default');
@@ -639,9 +639,9 @@ test('advertising config fails closed and injects only on public guides',async()
  assert.ok(injected.indexOf('adsbygoogle.js')<injected.indexOf('</head>'),'loader sits in head');
  assert.ok(injected.indexOf('data-pl-ad="1"')>injected.indexOf('</head>'),'unit sits in the body');
  const disabledGuide=await api('/guides/install-popups.html');assert.ok(!disabledGuide.data.includes('adsbygoogle.js')&&!disabledGuide.data.includes('data-pl-ad'),'disabled ad response loads nothing');
- assert.equal(ads.inject(html,'/',cfg,nonce),html);
- assert.equal(ads.inject(html,'/templates.html',cfg,nonce),html);
  assert.equal(ads.inject(html,'/studio.html',cfg,nonce),html);
+ for(const p of ['/studio.html','/profile.html','/leads.html','/reset-password.html','/migration.html','/api/widgets/x/submit'])assert.equal(ads.inject(html,p,cfg,nonce),html,p);
+ for(const p of ['/','/index.html','/templates.html','/faq.html','/press.html','/security.html','/about.html','/contact.html','/terms.html','/privacy.html','/demo.html','/guides/index.html'])assert.ok(ads.inject(html,p,cfg,nonce).includes('data-pl-ad="1"'),p);
  assert.equal(ads.inject(injected,'/guides/install-popups.html',cfg,nonce),injected,'idempotent');
  const csp=ads.cspAdditions(nonce);
  assert.ok(csp.script.includes("'nonce-"+nonce+"'")&&csp.script.includes("'strict-dynamic'"));
@@ -656,18 +656,19 @@ test('advertising config fails closed and injects only on public guides',async()
   const n=(guide.data.match(/<script nonce="([a-f0-9]+)"/)||[])[1];
   assert.ok(n&&header.includes("'nonce-"+n+"'")&&header.includes("'strict-dynamic'"));
   assert.ok(!header.includes("'unsafe-eval'"));
-  const homepage=await api('/');assert.ok(!homepage.data.includes('adsbygoogle.js')&&!homepage.data.includes('data-pl-ad'));
+  const homepage=await api('/');assert.ok(homepage.data.includes('adsbygoogle.js')&&homepage.data.includes('data-pl-ad'));
   const studio=await api('/studio.html');assert.ok(!studio.data.includes('adsbygoogle.js')&&!studio.data.includes('data-pl-ad'));
+  const profile=await api('/profile.html');assert.ok(!profile.data.includes('adsbygoogle.js')&&!profile.data.includes('data-pl-ad'));
  }finally{
   for(const key of Object.keys(previous)){if(previous[key]===undefined)delete process.env[key];else process.env[key]=previous[key];}
  }
 });
 
-test('advertising allowlist excludes private and customer surfaces',async()=>{
+test('advertising allowlist covers public content and excludes private surfaces',async()=>{
  const {isAdPage,AD_PAGES}=require('../shared/ad-pages');
- assert.ok(AD_PAGES.size>=6);
- for(const p of ['/guides/install-popups.html','/guides/wordpress-popup.html','/guides/shopify-popup.html','/guides/webflow-popup.html','/guides/collect-and-export-leads.html','/guides/popup-not-showing.html','/guides/popup-builder-for-ecommerce.html','/guides/popup-builder-for-quick-commerce.html','/guides/popup-builder-for-lead-generation.html'])assert.ok(isAdPage(p),p);
- for(const p of ['/','/index.html','/templates.html','/studio.html','/profile.html','/leads.html','/reset-password.html','/migration.html','/privacy.html','/about.html','/contact.html','/terms.html','/popuploom.js','/popforge.js','/api/widgets/x/submit'])assert.ok(!isAdPage(p),p);
+ assert.ok(AD_PAGES.size>=15);
+ for(const p of ['/','/index.html','/templates.html','/faq.html','/press.html','/security.html','/about.html','/contact.html','/terms.html','/privacy.html','/demo.html','/guides/index.html','/guides/install-popups.html','/guides/wordpress-popup.html','/guides/shopify-popup.html','/guides/webflow-popup.html','/guides/collect-and-export-leads.html','/guides/popup-not-showing.html','/guides/popup-builder-for-ecommerce.html','/guides/popup-builder-for-quick-commerce.html','/guides/popup-builder-for-lead-generation.html'])assert.ok(isAdPage(p),p);
+ for(const p of ['/studio.html','/profile.html','/leads.html','/reset-password.html','/migration.html','/popuploom.js','/popforge.js','/api/widgets/x/submit'])assert.ok(!isAdPage(p),p);
  const runtime=require('node:fs').readFileSync(require('node:path').join(root,'popuploom.js'),'utf8');
  assert.ok(!/adsbygoogle|googlesyndication|doubleclick|fundingchoicesmessages/i.test(runtime),'customer runtime has no ad code');
  const adsTxt=await api('/ads.txt');assert.equal(adsTxt.status,404,'ads.txt is absent until a real publisher id is configured');
