@@ -687,7 +687,7 @@ test('browser: all templates, save failures, installation, test mode, delete and
   const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(base,{waitUntil:'networkidle0'});
   await page.evaluate(()=>openAuthModal());
-  await page.click('#authModal a[onclick*="closeAuthModal"]');
+  await page.click('#authModal [onclick*="closeAuthModal"]');
   assert.equal(await page.$eval('#authModal',el=>el.style.display),'none');
   const injections=await page.evaluate(()=>{const s=document.createElement('script');s.textContent='window.injectedScriptRan=true';document.body.appendChild(s);const b=document.createElement('button');b.setAttribute('onclick','window.injectedHandlerRan=true');document.body.appendChild(b);b.click();return [!!window.injectedScriptRan,!!window.injectedHandlerRan];});
   assert.deepEqual(injections,[false,false]);

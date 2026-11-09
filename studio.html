@@ -453,10 +453,10 @@
     <button class="btn primary" style="width:100%;margin-bottom:12px" id="authSubmit" onclick="submitAuth()">Sign in</button>
     <div style="text-align:center;font-size:13.5px" class="mut">
       <span id="authSwitchText">New to PopupLoom?</span>
-      <a href="#" onclick="toggleAuthMode();return false" style="color:var(--acc);font-weight:600;text-decoration:none" id="authSwitchLink">Create one</a>
+      <button type="button" onclick="toggleAuthMode()" style="border:0;background:none;padding:0;cursor:pointer;color:var(--acc);font-weight:600;font-size:inherit;font-family:inherit" id="authSwitchLink">Create one</button>
     </div>
     <div style="text-align:center;margin-top:16px">
-      <a href="#" onclick="closeAuthModal();return false" class="mut" style="font-size:12.5px;text-decoration:none">Keep designing as a guest</a>
+      <button type="button" onclick="closeAuthModal()" class="mut" style="border:0;background:none;padding:0;cursor:pointer;font-size:12.5px;font-family:inherit">Keep designing as a guest</button>
     </div>
   </div>
 </div>
