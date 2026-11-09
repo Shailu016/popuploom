@@ -638,6 +638,9 @@ test('advertising config fails closed and injects only on public content pages',
  assert.ok(injected.includes('adsbygoogle.js')&&injected.includes('nonce="'+nonce+'"'));
  assert.ok(injected.indexOf('adsbygoogle.js')<injected.indexOf('</head>'),'loader sits in head');
  assert.ok(injected.indexOf('data-pl-ad="1"')>injected.indexOf('</head>'),'unit sits in the body');
+ const appHtml='<html><head><title>x</title><script src="/app.js"></script></head><body><article>x</article></body></html>';
+ const withApp=ads.inject(appHtml,'/guides/install-popups.html',cfg,nonce);
+ assert.ok(withApp.includes('<script nonce="'+nonce+'" src="/app.js"></script>'),'external scripts receive the ad nonce so strict-dynamic does not block them');
  const disabledGuide=await api('/guides/install-popups.html');assert.ok(!disabledGuide.data.includes('adsbygoogle.js')&&!disabledGuide.data.includes('data-pl-ad'),'disabled ad response loads nothing');
  assert.equal(ads.inject(html,'/studio.html',cfg,nonce),html);
  for(const p of ['/studio.html','/profile.html','/leads.html','/reset-password.html','/migration.html','/api/widgets/x/submit','/demo.html','/contact.html','/terms.html','/privacy.html'])assert.equal(ads.inject(html,p,cfg,nonce),html,p);

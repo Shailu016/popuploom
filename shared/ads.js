@@ -121,6 +121,13 @@
     return '<script nonce="' + nonceValue + '" async crossorigin="anonymous" src="' + AD_SCRIPT + '?client=' + cfg.client + '"></script>';
   }
 
+  // With a nonce + 'strict-dynamic', browsers ignore 'self' for parser-inserted
+  // scripts. Add the per-response nonce to every external script tag so the
+  // page's own app scripts keep working on ad-enabled pages.
+  function addNonceToScripts(text, nonceValue) {
+    return String(text).replace(/<script(?![^>]*\bnonce=)(?=[^>]*\bsrc=)([^>]*)>/gi, '<script nonce="' + nonceValue + '"$1>');
+  }
+
   // Inject at most one unit into an eligible guide. Excluded pages and
   // incomplete configs return the original HTML unchanged.
   function inject(html, pathname, cfg, nonceValue) {
@@ -130,6 +137,7 @@
     if (text.indexOf("data-pl-ad=") !== -1 || text.indexOf("adsbygoogle.js") !== -1) return text;
     var block = markup(cfg, pathname, nonceValue);
     if (!block) return text;
+    text = addNonceToScripts(text, nonceValue);
     var headAt = text.indexOf("</head>");
     if (headAt !== -1) text = text.slice(0, headAt) + loader(cfg, nonceValue) + text.slice(headAt);
     var at = text.lastIndexOf("</article>");
