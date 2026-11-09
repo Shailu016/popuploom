@@ -278,7 +278,10 @@ async function serveIndex(env, request, sec, cors, headOnly) {
 }
 
 async function serveStatic(request, env, pathname, sec, cors, headOnly) {
-  const file = pathname === "/" ? "/index.html" : pathname;
+  let file = pathname === "/" ? "/index.html" : pathname;
+  // Directory URLs ending in a slash resolve to their allowlisted index page,
+  // so /guides/ is a real page instead of a soft 404.
+  if (file.endsWith("/") && PUBLIC_FILES.has((file + "index.html").slice(1))) file += "index.html";
   if (PUBLIC_FILES.has(file.slice(1))) {
     const asset = await env.ASSETS.fetch(new Request(new URL(file, request.url)));
     if (asset.status === 404) return new Response("Not found", { status: 404, headers: { ...sec, ...cors } });

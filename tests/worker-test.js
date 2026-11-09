@@ -263,6 +263,7 @@ function hostReq(host, path, method = "GET", extraHeaders = {}) {
   r=await req('GET','/about.html',{raw:true});check('about page is served',r.status===200&&String(r.headers.get('content-type')).includes('text/html'));
   r=await req('GET','/terms.html',{raw:true});check('terms page is served',r.status===200);
   r=await req('GET','/guides/index.html',{raw:true});check('guides hub is served',r.status===200);
+  r=await req('GET','/guides/',{raw:true});check('guides directory URL serves the hub',r.status===200&&String(r.headers.get('content-type')).includes('text/html'));
   r=await req('GET','/guides/wordpress-popup.html',{raw:true});check('WordPress guide is served',r.status===200);
   r=await req('GET','/guides/shopify-popup.html',{raw:true});check('Shopify guide is served',r.status===200);
   r=await req('GET','/guides/webflow-popup.html',{raw:true});check('Webflow guide is served',r.status===200);

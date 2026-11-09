@@ -214,6 +214,9 @@ app.use((req, res, next) => {
   try { pathname = decodeURIComponent(req.path); }
   catch (e) { return res.status(400).end(); }
   if (pathname === "/") pathname = "/index.html";
+  // Directory URLs ending in a slash resolve to their allowlisted index page,
+  // so /guides/ is a real page instead of a soft 404.
+  if (pathname.endsWith("/") && publicFiles.has((pathname + "index.html").slice(1))) pathname += "index.html";
   if (!publicFiles.has(pathname.slice(1))) {
     // Verification drop files are served only when the owner actually placed
     // the file; a pattern-matching name with no file falls through to the same
