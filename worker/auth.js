@@ -116,6 +116,7 @@ async function register(env, email, password, name) {
   if (typeof password !== "string" || !password) throw new ApiError(400, "Email and password are required");
   if (new TextEncoder().encode(password).length > 72) throw new ApiError(400, "Password must be at most 72 UTF-8 bytes");
   if (password.length < 12) throw new ApiError(400, "Password must be at least 12 characters");
+  if (verificationRequired(env)) await ensureVerificationSchema(env);
   const existing = await env.DB.prepare("SELECT id, email FROM users WHERE email = ?").bind(email).first();
   // F-15: always derive the key before branching so response timing does not
   // disclose whether an account already exists for the given address.
@@ -148,6 +149,32 @@ function verificationRequired(env) {
   return String((env && env.REQUIRE_EMAIL_VERIFICATION) || "").trim().toLowerCase() === "true";
 }
 
+// D1 migrations are normally applied by wrangler, but the CI token used for
+// deploys does not have D1 edit permission. This idempotent guard creates the
+// same schema on first use, so verification can never crash on a database that
+// has not been migrated yet. It runs at most once per isolate.
+let verificationSchemaReady = false;
+async function ensureVerificationSchema(env) {
+  if (verificationSchemaReady) return;
+  try {
+    const info = await env.DB.prepare("PRAGMA table_info(users)").bind().all();
+    const columns = (info && info.results ? info.results : info || []).map((c) => c.name);
+    if (columns.indexOf("email_verified") === -1) {
+      await env.DB.prepare("ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 1").bind().run();
+    }
+    await env.DB.prepare("CREATE TABLE IF NOT EXISTS email_verification_tokens (id INTEGER PRIMARY KEY AUTOINCREMENT, token_hash TEXT NOT NULL UNIQUE, user_id INTEGER NOT NULL, email TEXT NOT NULL, created_at INTEGER NOT NULL, expires_at INTEGER NOT NULL, used_at INTEGER)").bind().run();
+    await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_email_verification_expiry ON email_verification_tokens(expires_at)").bind().run();
+    verificationSchemaReady = true;
+  } catch (e) {
+    // A concurrent isolate may have created the column first.
+    if (/duplicate column/i.test(String(e && e.message))) {
+      verificationSchemaReady = true;
+      return;
+    }
+    throw e;
+  }
+}
+
 function randomVerifyToken() {
   const bytes = crypto.getRandomValues(new Uint8Array(verifyShared.VERIFY_TOKEN_BYTES));
   let text = "";
@@ -159,6 +186,7 @@ function randomVerifyToken() {
 async function verifyEmail(env, rawToken) {
   secretKey(env);
   if (!verifyShared.isVerifyTokenFormat(rawToken)) throw new ApiError(400, verifyShared.INVALID_VERIFY_MESSAGE, verifyShared.INVALID_VERIFY_CODE);
+  await ensureVerificationSchema(env);
   const now = Math.floor(Date.now() / 1000);
   const tokenHash = await sha256Hex(rawToken);
   const row = await env.DB.prepare("SELECT id, token_hash, user_id, email, expires_at, used_at FROM email_verification_tokens WHERE token_hash = ?").bind(tokenHash).first();
@@ -183,6 +211,7 @@ function dummyPasswordHash() {
 
 async function login(env, email, password) {
   email = String(email || "").trim().toLowerCase();
+  if (verificationRequired(env)) await ensureVerificationSchema(env);
   const row = await env.DB.prepare("SELECT id, email, name, avatar_url, password_hash, google_id, email_verified FROM users WHERE email = ?").bind(email).first();
   const passwordString = typeof password === "string" ? password : "";
   const canMatch = !!row && !row.google_id && typeof password === "string"
