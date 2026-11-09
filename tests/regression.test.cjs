@@ -632,10 +632,12 @@ test('advertising config fails closed and injects only on public guides',async()
  const full={...base,ADSENSE_ENABLED:'true',ADSENSE_APPROVED:'true',ADSENSE_CLIENT:'ca-pub-8947829712444522',ADSENSE_CMP:'google-privacy-messaging',ADSENSE_SLOT:'1234567890'};
  const cfg=ads.config(full);assert.equal(cfg.enabled,true);
  const nonce=ads.nonce();
- const html='<html><body><article><p>Guide</p></article></body></html>';
+ const html='<html><head><title>Guide</title></head><body><article><p>Guide</p></article></body></html>';
  const injected=ads.inject(html,'/guides/install-popups.html',cfg,nonce);
  assert.ok(injected.includes('data-pl-ad="1"')&&injected.includes('Advertisement')&&injected.includes('data-ad-slot="1234567890"'));
  assert.ok(injected.includes('adsbygoogle.js')&&injected.includes('nonce="'+nonce+'"'));
+ assert.ok(injected.indexOf('adsbygoogle.js')<injected.indexOf('</head>'),'loader sits in head');
+ assert.ok(injected.indexOf('data-pl-ad="1"')>injected.indexOf('</head>'),'unit sits in the body');
  const disabledGuide=await api('/guides/install-popups.html');assert.ok(!disabledGuide.data.includes('adsbygoogle.js')&&!disabledGuide.data.includes('data-pl-ad'),'disabled ad response loads nothing');
  assert.equal(ads.inject(html,'/',cfg,nonce),html);
  assert.equal(ads.inject(html,'/templates.html',cfg,nonce),html);

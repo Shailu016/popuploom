@@ -109,8 +109,14 @@
       '<div class="pl-ad-label">Advertisement</div>' +
       '<ins class="adsbygoogle" style="display:block" data-ad-client="' + client + '" data-ad-slot="' + slot + '" data-ad-format="auto" data-full-width-responsive="true"></ins>' +
       '</section>' +
-      '<script nonce="' + nonceValue + '" async crossorigin="anonymous" src="' + AD_SCRIPT + '?client=' + client + '"></script>' +
       '<script nonce="' + nonceValue + '">(adsbygoogle=window.adsbygoogle||[]).push({});</script>';
+  }
+
+  // Google's documented placement: the loader belongs in <head>. It is added
+  // only to eligible guide responses, so private and app pages stay ad-free.
+  function loader(cfg, nonceValue) {
+    if (!cfg.enabled || !nonceValue) return "";
+    return '<script nonce="' + nonceValue + '" async crossorigin="anonymous" src="' + AD_SCRIPT + '?client=' + cfg.client + '"></script>';
   }
 
   // Inject at most one unit into an eligible guide. Excluded pages and
@@ -122,6 +128,8 @@
     if (text.indexOf("data-pl-ad=") !== -1 || text.indexOf("adsbygoogle.js") !== -1) return text;
     var block = markup(cfg, pathname, nonceValue);
     if (!block) return text;
+    var headAt = text.indexOf("</head>");
+    if (headAt !== -1) text = text.slice(0, headAt) + loader(cfg, nonceValue) + text.slice(headAt);
     var at = text.lastIndexOf("</article>");
     if (at !== -1) return text.slice(0, at) + block + text.slice(at);
     at = text.lastIndexOf("</main>");
