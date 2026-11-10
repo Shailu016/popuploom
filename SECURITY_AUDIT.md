@@ -39,7 +39,7 @@ The correct order is: fix the High items and trust gaps, then request reclassifi
 | F-16 inflatable views | **Fixed** — hourly dedupe per widget/IP in Worker and Express |
 | F-12 trust page | **Fixed** — `/security.html` live; `security@`/`support@` routed to a verified mailbox |
 | F-13 email/DNS | **Partial** — SPF, DKIM, MX, Email Routing and CAA added; DNSSEC and DMARC reject pending |
-| R-01 reputation | **Requests sent** — URLScan, SOCRadar and Gridinsoft contacted 2026-11-07; awaiting response |
+| R-01 reputation | **Partial** - Gridinsoft removed its Phishing detection on 2026-11-10 (Inconclusive, 53/100); Norton dispute submitted; SOCRadar warning remains |
 | F-01, F-05, F-06, F-08 | **Open** |
 
 See `SECURITY_REMEDIATION.md` for exact changes, tests and rollback. DNS values in Section 5/F-13 were captured before the remediation; the current apex SPF is `v=spf1 include:_spf.mx.cloudflare.net ~all` and CAA records now exist.

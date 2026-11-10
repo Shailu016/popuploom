@@ -74,8 +74,11 @@ Do **not** send passwords, user data, session tokens or unredacted logs.
    - removed all explicit "18+" / "21+" wording from public pages and templates (the report listed "18+" and "adult material");
    - added "what PopupLoom never asks for" statements to `/about.html` and `/security.html`;
    - verified no payment-card, bank-credential, one-time-code or Google-password requests exist.
-5. Do not promise a particular score.
-6. Record the response and recheck date. Public report: `https://gridinsoft.com/online-virus-scanner/url/popuploom-com`.
+5. **Outcome 2026-11-10:** Gridinsoft removed its Phishing detection. Report is now **Inconclusive, 53/100**, because the editor lets users configure their own links and form destinations; they did not find a phishing URL or require a site change.
+6. Remaining separate warnings named by Gridinsoft: **SOCRadar** and **Norton**.
+   - Norton false-positive dispute submitted 2026-11-10; review within 48 business hours.
+   - SOCRadar: email-only process; need a request from a monitored domain address to `contact@socradar.io` / `vt@socradar.io` with the VirusTotal scan URL.
+7. Public report: `https://gridinsoft.com/online-virus-scanner/url/popuploom-com`.
 
 ## Follow-up cadence
 

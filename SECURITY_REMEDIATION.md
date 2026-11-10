@@ -28,7 +28,7 @@ This document records what was actually changed, what was tested, and what remai
 | F-14 | Header/runtime consistency | Low | **Partial** — Express CSP list updated; HSTS/COOP/CORP unchanged |
 | F-15 | Email enumeration on registration | Low | **Fixed** — generic signup response plus email verification before the first sign-in |
 | F-16 | Inflatable view counts | Low | **Fixed** — hourly dedupe per widget/IP in Worker and Express |
-| R-01 | Gridinsoft phishing false positive | High (business) | **Requests sent** — URLScan, SOCRadar and Gridinsoft contacted 2026-11-07; no verdict change yet |
+| R-01 | Gridinsoft phishing false positive | High (business) | **Partial** - Gridinsoft removed its Phishing detection on 2026-11-10 (report now Inconclusive, 53/100); Norton dispute submitted; SOCRadar warning remains |
 
 ---
 

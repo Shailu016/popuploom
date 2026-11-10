@@ -76,7 +76,10 @@ Use the copy on `/press.html`; do not invent awards or user counts.
 - [x] Requests sent 2026-11-07 (URLScan, SOCRadar, Gridinsoft)
 - [x] Gridinsoft domain verified in portal (2026-11-10) and ticket `GS-E7485CEE38ED` opened
 - [x] Removed explicit 18+/21+ wording that Gridinsoft listed as "adult material"; rescan no longer lists 18+
-- [ ] Recheck `https://gridinsoft.com/online-virus-scanner/url/popuploom-com` after the ticket response
+- [x] **Gridinsoft removed its Phishing detection** (2026-11-10); report is now Inconclusive, 53/100
+- [x] Norton Safe Web false-positive dispute submitted (2026-11-10); review within 48 business hours
+- [ ] SOCRadar still lists a separate warning; email request from a monitored domain address needed
+- [ ] Recheck the Gridinsoft and Norton reports after their review windows
 - [ ] Follow up once around **2026-11-17** if no reply
 - [ ] Do not send repeated requests
 
