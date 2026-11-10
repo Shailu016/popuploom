@@ -77,7 +77,7 @@ Do **not** send passwords, user data, session tokens or unredacted logs.
 5. **Outcome 2026-11-10:** Gridinsoft removed its Phishing detection. Report is now **Inconclusive, 53/100**, because the editor lets users configure their own links and form destinations; they did not find a phishing URL or require a site change.
 6. Remaining separate warnings named by Gridinsoft: **SOCRadar** and **Norton**.
    - Norton false-positive dispute submitted 2026-11-10; review within 48 business hours.
-   - SOCRadar: email-only process; need a request from a monitored domain address to `contact@socradar.io` / `vt@socradar.io` with the VirusTotal scan URL.
+   - SOCRadar: follow-up email sent 2026-11-10 to `contact@socradar.io` and `vt@socradar.io` from the owner's monitored Gmail, including the VirusTotal link, Gridinsoft outcome, Norton dispute and ownership proof. Awaiting reply.
 7. Public report: `https://gridinsoft.com/online-virus-scanner/url/popuploom-com`.
 
 ## Follow-up cadence
