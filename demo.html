@@ -21,7 +21,7 @@
   <h1 style="font-size:40px;letter-spacing:-.03em;margin:0 0 12px">Tools that outlive the job site.</h1>
   <p style="font-size:16px;color:#5B616B;max-width:620px;line-height:1.6">A fake storefront to show hand-built popups landing on a real-looking page. Five widgets are wired up here:</p>
   <ul style="font-size:14px;color:#5B616B;line-height:2">
-    <li><b>Eighteen Check</b>. Age gate on arrival. Allow passes you through, deny explains.</li>
+    <li><b>Age Declaration</b>. Age gate on arrival. Allow passes you through, deny explains.</li>
     <li><b>Spin to Win</b>. Prize wheel fires about 9s in, one spin per visitor.</li>
     <li><b>48-Hour Drop</b>. Flash deal with a live countdown and sticky button, about 18s in.</li>
     <li><b>Proof Pulse</b>. Social-proof toasts in the bottom-left corner, rotating.</li>
@@ -59,9 +59,9 @@
     document.body.appendChild(div);
   }
 
-  // ---- Eighteen Check: on load, always ----
+  // ---- Age Declaration: on load, always ----
   arm({
-    v: 1, id: "demo_age", name: "Eighteen Check", template: "age18",
+    v: 1, id: "demo_age", name: "Age Declaration", template: "age18",
     placement: "modal",
     trigger: { type: "load" },
     frequency: "always",
@@ -71,14 +71,14 @@
     theme: { style: "ink", accent: "#F99A1F", accentText: "#261303", text: "#EFEDEB", bg: "#0F1117", radius: 20, animation: "pop", overlay: true },
     content: {
       badge: "Age notice",
-      title: "Are you 18\nor older?",
+      title: "Confirm your age",
       body: "This demo shop carries sharp things. One tap and you're through. We don't store your answer.",
       ageGate: {
         enabled: true, minAge: 18,
-        allowLabel: "Yes, I'm 18 or older",
+        allowLabel: "Yes, continue",
         denyLabel: "No, take me back",
         denyUrl: "",
-        denyMessage: "Sorry, you must be 18 or older to enter.",
+        denyMessage: "You must meet the age requirement to enter.",
         allowMessage: "Welcome in."
       },
       note: "A courtesy gate, not a profile."
