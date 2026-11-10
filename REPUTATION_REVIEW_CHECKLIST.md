@@ -67,11 +67,15 @@ Do **not** send passwords, user data, session tokens or unredacted logs.
 
 ## Gridinsoft
 
-1. Claim the domain profile through `portal.gridinsoft.com`.
-2. Add verified operator/contact details.
-3. Request re-evaluation with the same evidence.
-4. Do not promise a particular score.
-5. Record the response and recheck date.
+1. Claim the domain profile through `portal.gridinsoft.com`. **Done 2026-11-10** — domain verified with the `gridinsoft-key` meta tag.
+2. Add verified operator/contact details. **Done** — profile tied to the verified domain.
+3. Request re-evaluation with the same evidence. **Ticket `GS-E7485CEE38ED` opened 2026-11-10.**
+4. Site changes made before the appeal:
+   - removed all explicit "18+" / "21+" wording from public pages and templates (the report listed "18+" and "adult material");
+   - added "what PopupLoom never asks for" statements to `/about.html` and `/security.html`;
+   - verified no payment-card, bank-credential, one-time-code or Google-password requests exist.
+5. Do not promise a particular score.
+6. Record the response and recheck date. Public report: `https://gridinsoft.com/online-virus-scanner/url/popuploom-com`.
 
 ## Follow-up cadence
 

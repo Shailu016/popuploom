@@ -73,9 +73,11 @@ Use the copy on `/press.html`; do not invent awards or user counts.
 - [ ] Crunchbase — <https://www.crunchbase.com/>
 
 ### Reputation
-- [x] Removal requests sent 2026-11-07 (URLScan, SOCRadar, Gridinsoft)
+- [x] Requests sent 2026-11-07 (URLScan, SOCRadar, Gridinsoft)
+- [x] Gridinsoft domain verified in portal (2026-11-10) and ticket `GS-E7485CEE38ED` opened
+- [x] Removed explicit 18+/21+ wording that Gridinsoft listed as "adult material"; rescan no longer lists 18+
+- [ ] Recheck `https://gridinsoft.com/online-virus-scanner/url/popuploom-com` after the ticket response
 - [ ] Follow up once around **2026-11-17** if no reply
-- [ ] Recheck <https://www.gridinsoft.com/site/popuploom.com>
 - [ ] Do not send repeated requests
 
 ---
