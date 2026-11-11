@@ -4,7 +4,7 @@ Free website popup builder with a visual editor, popup templates, hosted embeds,
 
 Canonical site: **https://popuploom.com/**
 
-> The private repository, project folder, Worker service, D1 database and CI token keep their original `popforge` names. Those are infrastructure identifiers, not visible branding. Keeping them preserves existing deployments and data.
+> The private repository is named `popuploom`. The local project folder, Worker service, D1 database and CI token keep their original `popforge` identifiers. Those are infrastructure names, not visible branding, and keeping them preserves existing deployments and data.
 
 ---
 
@@ -30,7 +30,7 @@ Canonical site: **https://popuploom.com/**
 ## Run it
 
 ```bash
-cd popforge
+cd popuploom
 npm install
 npm start
 # → http://localhost:3000   (API: /api, DB: popforge.db)

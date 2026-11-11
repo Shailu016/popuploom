@@ -46,7 +46,7 @@ The domain remains registered at GoDaddy. With owner approval, delegation change
 
 Cloudflare Free zone: `a8ba7d253a7c97dd33d22504bfd5e7aa`, in the existing Gmail account. Both custom domains attach to the existing `popforge` Worker, use issued TLS certificates, and are declared with the exact zone ID in `wrangler.toml`. Keep `workers_dev = true` for compatibility.
 
-The first rebranded GitHub deployment passed all tests, custom-domain publishing and live health checks: https://github.com/Shailu016/popforge/actions/runs/41374596216 . Live public pages passed desktop/mobile checks, and a third-party-origin test loaded the old and new scripts together without duplicate mounting or customer-data writes. Backup imports create copies rather than overwriting matching newer drafts.
+The first rebranded GitHub deployment passed all tests, custom-domain publishing and live health checks: https://github.com/Shailu016/popuploom/actions/runs/41374596216 . Live public pages passed desktop/mobile checks, and a third-party-origin test loaded the old and new scripts together without duplicate mounting or customer-data writes. Backup imports create copies rather than overwriting matching newer drafts.
 
 ## Live deployment record
 
