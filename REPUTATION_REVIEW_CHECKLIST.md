@@ -76,8 +76,25 @@ Do **not** send passwords, user data, session tokens or unredacted logs.
    - verified no payment-card, bank-credential, one-time-code or Google-password requests exist.
 5. **Outcome 2026-11-10:** Gridinsoft removed its Phishing detection. Report is now **Inconclusive, 53/100**, because the editor lets users configure their own links and form destinations; they did not find a phishing URL or require a site change.
 6. Remaining separate warnings named by Gridinsoft: **SOCRadar** and **Norton**.
-   - Norton false-positive dispute submitted 2026-11-10; review within 48 business hours.
+   - Norton: false-positive dispute submitted 2026-11-10. **Cleared 2026-11-10/11** — Norton's live Safe Web API returns `rating: "g"` (safe), no categories, no global restriction for `popuploom.com`, `www.popuploom.com` and the `https://` form. Norton's public report page is JS-rendered, so the API result is the reliable check.
    - SOCRadar: follow-up email sent 2026-11-10 to `contact@socradar.io` and `vt@socradar.io` from the owner's monitored Gmail, including the VirusTotal link, Gridinsoft outcome, Norton dispute and ownership proof. Awaiting reply.
+
+## SOCRadar trust timeline (2026-11-10 05:32)
+
+Owner-supplied screenshot of the SOCRadar domain timeline shows a 4-change event:
+
+| Change | Meaning |
+|---|---|
+| Trust score `1 → 53` | Large positive jump after the site fixes and the Gridinsoft phishing removal |
+| Tag added: `Claimed Company Profile` | Ownership verification recognised |
+| Tag removed: `Blacklisted` | The blacklist flag is gone |
+| Detection added: `Norton / malicious` | A **sourced** detection ingested from Norton's feed — not a SOCRadar finding |
+
+Interpretation:
+
+- The remaining warning on that timeline is **third-party data**, not a SOCRadar verdict. It is Norton's older crawler verdict, ingested before Norton cleared the dispute.
+- Norton's live API now returns safe, so this detection is **stale** and should drop on SOCRadar's next crawl/refresh.
+- Nothing on the site needs changing for this. Do not re-submit the SOCRadar form repeatedly; wait for their reply, then ask for a re-scan quoting the Norton API result.
 7. Public report: `https://gridinsoft.com/online-virus-scanner/url/popuploom-com`.
 
 ## Follow-up cadence
