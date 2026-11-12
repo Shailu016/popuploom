@@ -128,6 +128,19 @@ These are known findings from `SECURITY_AUDIT.md`. Each is a separate, testable 
 
 ---
 
+## Distribution — shipped 2026-11-12
+
+- [x] Four new guides: Squarespace/Wix, exit intent, email signup, and a dated free-builder comparison
+- [x] WordPress guide rewritten around real Search Console queries; Shopify and Webflow expanded with “without an app” sections
+- [x] WordPress plugin code + readme + ZIP build (`wordpress-plugin/`)
+- [x] Public helper repo: <https://github.com/Shailu016/popuploom-embed>
+- [x] Optional “Popup by PopupLoom” credit toggle (off by default)
+- [ ] **YOU:** submit the plugin ZIP at <https://wordpress.org/plugins/developers/add/> (weeks of review, not days)
+- [ ] **YOU:** enable Cloudflare → Agent Readiness → Markdown for Agents
+- [ ] Decide later: publish `popuploom-embed` to npm, and how to measure badge referrals
+
+---
+
 ## Waiting on other people (no action for you)
 
 - Gridinsoft / URLScan / SOCRadar replies

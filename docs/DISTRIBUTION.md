@@ -45,26 +45,29 @@ Checklist before submitting:
 
 ## Embed helper package
 
-Location: `integrations/popuploom-embed/`
+Location in this repository: `integrations/popuploom-embed/`  
+Public repository: <https://github.com/Shailu016/popuploom-embed> (MIT)
 
 Dependency-free ESM helper plus React, Vue and Astro wrappers. Tests:
 `npm test --prefix integrations/popuploom-embed` (4 tests).
 
-Publishing (owner): create the public repository, then:
+The public repository was created on 2026-11-12. The copy inside this private
+repository is the source of truth for review; keep the two in sync when the
+helper changes:
 
-```bash
-cd integrations/popuploom-embed
-git init
+```powershell
+$tmp = Join-Path $env:TEMP "opencode\popuploom-embed"
+Copy-Item -Recurse -Force integrations\popuploom-embed\* $tmp
+Push-Location $tmp
 git add .
-git commit -m "popuploom-embed 1.0.0"
-git branch -M main
-git remote add origin https://github.com/Shailu016/popuploom-embed.git
-git push -u origin main
+git commit -m "Sync embed helpers"
+git push
+Pop-Location
 ```
 
-The package is not published to npm. Running `npm publish` would create a public
-package under the `popuploom` name; do that only after deciding who owns the npm
-scope and adding a release process.
+The package is **not** published to npm. Running `npm publish` would create a
+public package under the `popuploom-embed` name; do that only after deciding who
+owns the npm name and adding a release process.
 
 ## Optional brand credit
 
