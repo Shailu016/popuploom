@@ -66,8 +66,8 @@ function hostReq(host, path, method = "GET", extraHeaders = {}) {
   r = await req("GET", "/", { raw: true });
   check("homepage Link advertises api-catalog + ard", /rel="api-catalog"/.test(r.headers.get("link") || "") && /rel="ard"/.test(r.headers.get("link") || ""));
   check("content-signal header present", /ai-train=yes/.test(r.headers.get("content-signal") || ""));
-  r = await req("GET", "/robots.txt", { raw: true });
-  check("robots.txt Content-Signal + Agentmap", typeof r.data === "string" && /Content-Signal: ai-train=yes/.test(r.data) && /Agentmap: https:\/\/popuploom\.com\/\.well-known\/ard\.json/.test(r.data));
+  const robotsText = await (await fetch(BASE + "/robots.txt")).text();
+  check("robots.txt Content-Signal + Agentmap", /Content-Signal: ai-train=yes/.test(robotsText) && /Agentmap: https:\/\/popuploom\.com\/\.well-known\/ard\.json/.test(robotsText));
   r = await req("GET", "/migration.html", { raw: true });
   check("migration page noindex + CSP", r.status === 200 && /noindex, nofollow/.test(r.headers.get("x-robots-tag") || "") && /content-security-policy/i.test(Array.from(r.headers.keys()).join(",")));
   r = await req("GET", "/server/index.js");

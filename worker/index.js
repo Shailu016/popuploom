@@ -335,7 +335,6 @@ async function serveStatic(request, env, pathname, sec, cors, headOnly) {
     headers.set("Cache-Control", file.startsWith("/embed/") ? "public, max-age=31536000, immutable" : "no-store");
     if (AGENT_FILES[file]) {
       headers.set("Content-Type", AGENT_FILES[file]);
-      headers.set("Access-Control-Allow-Origin", "*");
     }
     if (["/leads.html", "/studio.html", "/profile.html", "/demo.html", "/migration.html", "/reset-password.html", "/verify-email.html"].includes(file)) headers.set("X-Robots-Tag", ["/migration.html", "/reset-password.html", "/verify-email.html", "/studio.html", "/profile.html", "/leads.html"].includes(file) ? "noindex, nofollow" : "noindex, follow");
     const adConfig = ads.config(env);
