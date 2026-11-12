@@ -16,8 +16,23 @@ Location: `wordpress-plugin/popuploom/`
 Build the upload ZIP:
 
 ```powershell
-Compress-Archive -Path wordpress-plugin\popuploom -DestinationPath wordpress-plugin\popuploom-1.0.0.zip -Force
+Compress-Archive -Path wordpress-plugin\popuploom -DestinationPath wordpress-plugin\popuploom-1.0.1.zip -Force
 ```
+
+Status: **submitted 2026-11-12**, slug `popuploom`, version 1.0.1, awaiting review.
+The form reported "Awaiting Review"; the review email arrives at the WordPress.org
+account address. Do not resubmit while it is pending.
+
+Plugin Check evidence: run against a local WordPress 7.1 + SQLite install with the
+official Plugin Check plugin. Final result: **no errors found**. Two findings were
+fixed before submission:
+
+- raw `<script src>` output → `wp_enqueue_script()` on `wp_enqueue_scripts`;
+- readme `Tested up to` updated to 7.1.
+
+The initial slug was `popuploom-free-popup-builder-embeds`; that produced a
+text-domain mismatch in the automated scan. The slug was changed to `popuploom`
+(free), matching the text domain, and version 1.0.1 was uploaded for review.
 
 Lint before shipping:
 

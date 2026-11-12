@@ -290,6 +290,15 @@ function hostReq(host, path, method = "GET", extraHeaders = {}) {
   check('email signup guide is served', /welcome popup/i.test(emailSignup));
   const comparison = await (await fetch(BASE + '/guides/free-popup-builders-without-pageview-limits.html')).text();
   check('free popup builders comparison is served', comparison.includes('12 November 2026'));
+  // Content negotiation: markdown for agents, HTML by default, HTML for private pages.
+  const mdRes = await fetch(BASE + '/guides/wordpress-popup.html', { headers: { Accept: 'text/markdown' } });
+  const mdText = await mdRes.text();
+  check('markdown negotiation returns text/markdown', mdRes.status === 200 && /text\/markdown/.test(mdRes.headers.get('content-type') || '') && mdText.includes('# Add a popup to WordPress') && !mdText.includes('<html'));
+  check('markdown response varies on Accept', /accept/i.test(mdRes.headers.get('vary') || ''));
+  const htmlRes = await fetch(BASE + '/guides/wordpress-popup.html', { headers: { Accept: 'text/html' } });
+  check('HTML stays the default', /text\/html/.test(htmlRes.headers.get('content-type') || ''));
+  const privateRes = await fetch(BASE + '/profile.html', { headers: { Accept: 'text/markdown' } });
+  check('private page stays HTML', /text\/html/.test(privateRes.headers.get('content-type') || ''));
   r=await req('GET','/guides/collect-and-export-leads.html',{raw:true});check('lead guide is served',r.status===200);
   r=await req('GET','/guides/popup-not-showing.html',{raw:true});check('troubleshooting guide is served',r.status===200);
   r=await req('GET','/.well-known/security.txt',{raw:true});check('security.txt is served',r.status===200&&String(r.data).includes('Contact:'));

@@ -2,9 +2,9 @@
 Contributors: shailu3597
 Tags: popup, popup builder, exit intent, lead capture, email signup
 Requires at least: 6.0
-Tested up to: 6.8
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -66,6 +66,10 @@ The embedded runtime requests the saved popup configuration and records views an
 1. Settings > PopupLoom with the widget ID field.
 
 == Changelog ==
+
+= 1.0.1 =
+* Match the text domain to the approved plugin slug.
+* Enqueue the hosted runtime through the WordPress script API instead of printing a raw script tag.
 
 = 1.0.0 =
 * First release. Single widget ID, footer output, validation, settings link.

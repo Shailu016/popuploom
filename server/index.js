@@ -22,6 +22,7 @@ const email = require("../shared/email");
 const verifyShared = require("../shared/email-verification");
 const db = require("./db");
 const hostPolicy = require("../shared/host-policy");
+const markdown = require("../shared/markdown");
 const verification = require("../shared/verification");
 const passwordReset = require("./password-reset");
 const sharedReset = require("../shared/password-reset");
@@ -241,6 +242,11 @@ const publicFiles = new Set([
   "templates.html", "faq.html", "press.html", "security.html", "guides/install-popups.html", "guides/index.html", "guides/wordpress-popup.html", "guides/shopify-popup.html", "guides/webflow-popup.html", "guides/squarespace-wix-popup.html", "guides/exit-intent-popup.html", "guides/email-signup-popup.html", "guides/free-popup-builders-without-pageview-limits.html", "guides/collect-and-export-leads.html", "guides/popup-not-showing.html", "guides/popup-builder-for-ecommerce.html", "guides/popup-builder-for-quick-commerce.html", "guides/popup-builder-for-lead-generation.html", "ccf2a9f45165c635253d22748df4a573.txt", "robots.txt", "sitemap.xml", "llms.txt", "llms-full.txt", "index.html", "studio.html", "profile.html", "demo.html", "migration.html", "reset-password.html",
   "leads.html", "privacy.html", "about.html", "contact.html", "terms.html", ".well-known/security.txt", ".well-known/api-catalog", ".well-known/ard.json", ".well-known/ai-catalog.json", "openapi.json", "lead-csv.js", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "verify-email.html", "verify-email.js", "popuploom.js", "popforge.js", "embed/1.1.0/popuploom.js", "embed/1.1.0/popforge.js", "embed/1.1.0/SHA256SUMS", "ui.css", "ads.txt"
 ]);
+// Private/app surfaces stay HTML-only for markdown negotiation.
+const noMarkdown = new Set([
+  "/studio.html", "/profile.html", "/leads.html", "/reset-password.html",
+  "/verify-email.html", "/migration.html"
+]);
 app.use((req, res, next) => {
   if (req.method !== "GET" && req.method !== "HEAD") return next();
   let pathname;
@@ -288,6 +294,12 @@ app.use((req, res, next) => {
   const sourceFile = (file === "/embed/1.1.0/popuploom.js" || file === "/embed/1.1.0/popforge.js") ? "/popuploom.js" : file;
   const diskPath = path.join(__dirname, "..", sourceFile.slice(1));
   if (!fs.existsSync(diskPath)) return next();
+  if (file.endsWith(".html") && !noMarkdown.has(file) && /\btext\/markdown\b/i.test(req.get("Accept") || "")) {
+    const html = fs.readFileSync(diskPath, "utf8");
+    res.setHeader("Vary", "Accept");
+    res.type("text/markdown").send(markdown.fromHtml(html, { url: "https://popuploom.com" + file }));
+    return;
+  }
   if (adNonce) {
     const html = fs.readFileSync(diskPath, "utf8");
     res.type("html").send(ads.inject(html, pathname, adConfig, adNonce));

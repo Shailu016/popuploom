@@ -53,19 +53,35 @@ described: they need a bearer session token and are not for automated third-part
 | WebMCP tools | No authentication-free browser action is safe to expose; `registerTool()` would also be inert until browsers ship the API. |
 | x402, MPP, UCP, ACP | The product is free and has no paid API. Adding payment discovery would misrepresent it. |
 | DNS-AID (`_index._agents`, `_a2a._agents`) | There is no A2A agent or index endpoint to bind to. SVCB records pointing nowhere are noise; the draft spec is also unstable. |
-| Markdown for Agents | Supported by Cloudflare at the zone level, not in origin code. Toggle in **Cloudflare dashboard → Agent Readiness → Markdown for Agents**. Until then the site returns HTML only. |
+| Markdown for Agents | **Implemented at the origin.** Cloudflare's native toggle requires a Pro plan; this zone is Free. The Worker and Express server convert public HTML pages to `text/markdown` when the request sends `Accept: text/markdown`, set `Vary: Accept`, and leave HTML as the default. Private/app pages stay HTML-only. |
 
-## Markdown for Agents (owner action)
+## Markdown for Agents
 
-Cloudflare converts HTML to `text/markdown` at the edge when a client sends
-`Accept: text/markdown`. It is a zone setting:
+Cloudflare's native **Agent Readiness → Markdown for Agents** toggle requires a Pro
+plan. This zone is on Free, so the feature is implemented at the origin instead:
 
-- Dashboard: **Agent Readiness → Markdown for Agents → Serve Markdown to AI agents**
-- API: `PATCH /client/v4/zones/{zone}/settings/content_converter` with `{"value":"on"}`
-  (needs a token with Zone Settings edit)
+- Public HTML pages return `text/markdown; charset=utf-8` when the request sends
+  `Accept: text/markdown`, with `Vary: Accept`.
+- HTML remains the default for browsers and for `Accept: text/html`.
+- `/studio.html`, `/profile.html`, `/leads.html`, `/reset-password.html`,
+  `/verify-email.html` and `/migration.html` stay HTML-only.
+- Conversion is conservative: title/description frontmatter, headings, paragraphs,
+  lists, links (absolute), inline code, fenced code, tables, images, blockquotes.
+  Scripts, styles, navigation, headers, footers and forms are removed.
+- No ads are injected into markdown responses.
 
-No origin change is required. If enabled, Cloudflare preserves the `Link` and
-`Content-Signal` headers on the converted response.
+Test:
+
+```bash
+curl -s https://popuploom.com/guides/wordpress-popup.html \
+  -H "Accept: text/markdown" | head -20
+curl -sI https://popuploom.com/guides/wordpress-popup.html \
+  -H "Accept: text/markdown" | findstr /i "content-type vary"
+```
+
+If the zone is upgraded to Pro later, decide whether to switch to Cloudflare's
+converter or keep the origin implementation. Do not enable both blindly; the
+origin version is the source of truth today.
 
 ## Verification
 

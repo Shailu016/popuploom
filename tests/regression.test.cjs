@@ -246,6 +246,16 @@ test('brand credit is an optional boolean and cannot be a string',()=>{
  assert.equal(validateConfig({content:{},credit:false}),null);
  assert.match(validateConfig({content:{},credit:'yes'}),/credit must be a boolean/);
 });
+test('markdown negotiation keeps text, links and code but drops scripts and private chrome',()=>{
+ const {fromHtml}=require('../shared/markdown');
+ const md=fromHtml('<html><head><title>T</title><meta name="description" content="D"></head><body><nav>Menu</nav><main><h1>Hello</h1><p>See <a href="/x">X</a> and <code>&lt;b&gt;</code>.</p><script>alert(1)</script><ul><li>One</li><li>Two</li></ul></main></body></html>',{url:'https://popuploom.com/a'});
+ assert.ok(md.startsWith('---\ntitle: T'),md.slice(0,40));
+ assert.ok(md.includes('# Hello'));
+ assert.ok(md.includes('[X](https://popuploom.com/x)'));
+ assert.ok(md.includes('`<b>`'));
+ assert.ok(!md.includes('alert(1)')&&!md.includes('<script'));
+ assert.ok(md.includes('- One')&&md.includes('- Two'));
+});
 test('legacy database migration preserves accounts and revokes old Google sessions',()=>{
  const legacy=path.join(temp,'legacy.db');
  const code=`const {DatabaseSync}=require('node:sqlite');const d=new DatabaseSync(process.env.DB_PATH);d.exec("CREATE TABLE users(id INTEGER PRIMARY KEY AUTOINCREMENT,email TEXT UNIQUE NOT NULL,password_hash TEXT NOT NULL,created_at TEXT DEFAULT CURRENT_TIMESTAMP,google_id TEXT,name TEXT,avatar_url TEXT); INSERT INTO users(email,password_hash,google_id) VALUES ('legacy@example.com','legacy-hash','legacy-google')");d.close();const migrated=require('./server/db');const row=migrated.prepare('SELECT * FROM users').get();if(row.email!=='legacy@example.com'||row.token_version!==1)throw Error('Account migration failed');if(!migrated.prepare('PRAGMA table_info(submissions)').all().some(c=>c.name==='request_id'))throw Error('Lead migration failed');migrated.close();`;

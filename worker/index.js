@@ -9,6 +9,7 @@ import email from "../shared/email.js";
 import verifyShared from "../shared/email-verification.js";
 import { originCheck, securityHeaders, htmlHeaders } from "./security.js";
 import hostPolicy from "../shared/host-policy.js";
+import markdown from "../shared/markdown.js";
 import { verificationFile } from "../shared/verification.js";
 
 const { ApiError, register, login, findOrCreateGoogleUser, verifyCredential, getUserById, updateProfile, authMiddleware, revokeToken, verifyEmail, verificationRequired } = auth;
@@ -60,6 +61,13 @@ const AGENT_FILES = {
   "/.well-known/ai-catalog.json": "application/json; charset=utf-8",
   "/openapi.json": "application/json; charset=utf-8"
 };
+
+// Pages that should stay HTML-only when an agent asks for markdown: account,
+// editor, recovery and private surfaces. Public content pages are convertible.
+const NO_MARKDOWN = new Set([
+  "/studio.html", "/profile.html", "/leads.html", "/reset-password.html",
+  "/verify-email.html", "/migration.html"
+]);
 
 // [regex, method, handler, needsAuth]
 const WIDGET_ROUTES = [
@@ -335,6 +343,17 @@ async function serveStatic(request, env, pathname, sec, cors, headOnly) {
     headers.set("Cache-Control", file.startsWith("/embed/") ? "public, max-age=31536000, immutable" : "no-store");
     if (AGENT_FILES[file]) {
       headers.set("Content-Type", AGENT_FILES[file]);
+    }
+    // Content negotiation for agents. HTML stays the default; a request that
+    // explicitly prefers text/markdown gets a plain-markdown rendering of the
+    // same public page. Private/app surfaces stay HTML-only.
+    if (file.endsWith(".html") && !NO_MARKDOWN.has(file) && /\btext\/markdown\b/i.test(request.headers.get("Accept") || "")) {
+      const html = await asset.text();
+      const body = markdown.fromHtml(html, { url: new URL(file, "https://popuploom.com").href });
+      return new Response(headOnly ? null : body, {
+        status: asset.status,
+        headers: { ...sec, ...cors, "Content-Type": "text/markdown; charset=utf-8", "Vary": "Accept", "Cache-Control": "no-store" }
+      });
     }
     if (["/leads.html", "/studio.html", "/profile.html", "/demo.html", "/migration.html", "/reset-password.html", "/verify-email.html"].includes(file)) headers.set("X-Robots-Tag", ["/migration.html", "/reset-password.html", "/verify-email.html", "/studio.html", "/profile.html", "/leads.html"].includes(file) ? "noindex, nofollow" : "noindex, follow");
     const adConfig = ads.config(env);
