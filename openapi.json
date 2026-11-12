@@ -1,0 +1,224 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "PopupLoom public embed API",
+    "version": "2.0.0",
+    "description": "The unauthenticated HTTP endpoints used by a popup embedded on a customer site. These endpoints read a published popup configuration, record a view and accept a captured lead. Account, editor, billing and owner-only endpoints are not described here; they require a bearer session token and are not intended for automated third-party use.",
+    "contact": {
+      "name": "PopupLoom support",
+      "url": "https://popuploom.com/contact.html",
+      "email": "support@popuploom.com"
+    },
+    "license": {
+      "name": "Site terms",
+      "url": "https://popuploom.com/terms.html"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://popuploom.com",
+      "description": "Production"
+    }
+  ],
+  "paths": {
+    "/api/health": {
+      "get": {
+        "operationId": "getHealth",
+        "summary": "Public health check",
+        "description": "Returns a small JSON document when the API is reachable. It does not expose configuration or customer data.",
+        "responses": {
+          "200": {
+            "description": "Service is reachable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["ok", "version"],
+                  "properties": {
+                    "ok": { "type": "boolean", "const": true },
+                    "version": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/widgets/{widgetId}/config": {
+      "get": {
+        "operationId": "getWidgetConfig",
+        "summary": "Read a published popup configuration",
+        "description": "Returns the presentational configuration for one published popup so the embed runtime can render it. No owner identifiers, counters or lead data are returned. Cached briefly at the edge; a configuration read is safe to repeat.",
+        "parameters": [
+          {
+            "name": "widgetId",
+            "in": "path",
+            "required": true,
+            "description": "Public widget id assigned when the popup was saved.",
+            "schema": { "type": "string", "pattern": "^wan_[A-Za-z0-9]{8,64}$" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Published configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["id", "name", "template", "cfg", "updatedAt"],
+                  "properties": {
+                    "id": { "type": "string" },
+                    "name": { "type": "string" },
+                    "template": { "type": ["string", "null"] },
+                    "cfg": {
+                      "type": "object",
+                      "description": "Presentational popup configuration (content blocks, styling, trigger and frequency settings).",
+                      "additionalProperties": true
+                    },
+                    "updatedAt": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/api/widgets/{widgetId}/view": {
+      "post": {
+        "operationId": "recordView",
+        "summary": "Record one popup view",
+        "description": "Counts a view for the popup. Views are deduplicated per widget and visitor within an hour, so repeated calls in a short window are harmless.",
+        "parameters": [
+          {
+            "name": "widgetId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "pattern": "^wan_[A-Za-z0-9]{8,64}$" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "View processed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["ok", "deduplicated"],
+                  "properties": {
+                    "ok": { "type": "boolean" },
+                    "deduplicated": {
+                      "type": "boolean",
+                      "description": "True when this view was suppressed by the deduplication window."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Unknown widget id; accepted silently so a customer page never shows an error."
+          }
+        }
+      }
+    },
+    "/api/widgets/{widgetId}/submit": {
+      "post": {
+        "operationId": "submitLead",
+        "summary": "Submit a captured lead",
+        "description": "Stores the data a visitor entered in a popup form. The body is limited to 16 KB. An optional requestId makes retries idempotent. Unknown widget ids are accepted with 202 so a customer page stays free of console errors, but nothing is stored.",
+        "parameters": [
+          {
+            "name": "widgetId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "pattern": "^wan_[A-Za-z0-9]{8,64}$" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Send either { \"data\": { ... } } or the field map directly; both shapes are accepted.",
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "description": "Field name to submitted value. Flat object, up to 16 KB.",
+                    "additionalProperties": { "type": ["string", "number", "boolean", "null"] }
+                  },
+                  "requestId": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9_-]{8,100}$",
+                    "description": "Optional idempotency key for safe retries."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Lead stored",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["ok"],
+                  "properties": { "ok": { "type": "boolean", "const": true } }
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Unknown widget id; acknowledged without storing anything",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["ok", "stored", "reason"],
+                  "properties": {
+                    "ok": { "type": "boolean", "const": false },
+                    "stored": { "type": "boolean", "const": false },
+                    "reason": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" }
+        }
+      }
+    }
+  },
+  "components": {
+    "responses": {
+      "BadRequest": {
+        "description": "The request could not be processed",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "The widget does not exist",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "required": ["error"],
+        "properties": { "error": { "type": "string" } }
+      }
+    }
+  }
+}

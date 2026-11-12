@@ -3,6 +3,7 @@ const path = require("path");
 const crypto = require("crypto");
 const cors = require("cors");
 const ads = require("../shared/ads");
+const agent = require("../shared/agent-discovery");
 const origins = String(process.env.APP_ORIGINS || "").split(",").filter(Boolean).map(value => {
   const url = new URL(value.trim());
   if (!["https:", "http:"].includes(url.protocol)) throw new Error("APP_ORIGINS must contain HTTP(S) origins");
@@ -51,6 +52,7 @@ const policy = [
 function headers(req, res, next) {
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Content-Signal", agent.CONTENT_SIGNAL);
   if (process.env.NODE_ENV === "production" && req.secure) res.setHeader("Strict-Transport-Security", "max-age=31536000");
   next();
 }
@@ -66,6 +68,7 @@ function htmlHeaders(res, file = "index.html", options = {}) {
   res.setHeader("Content-Security-Policy", contentPolicy);
   res.setHeader("X-Frame-Options", "DENY");
   res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  res.setHeader("Link", agent.LINK);
   res.setHeader("Cache-Control", "no-store");
 }
 module.exports = { browserOrigin, headers, htmlHeaders };

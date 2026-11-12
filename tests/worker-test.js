@@ -55,6 +55,19 @@ function hostReq(host, path, method = "GET", extraHeaders = {}) {
   r = await req("GET", "/popuploom.js", { raw: true });
   check("popuploom.js 200 no-store", r.status === 200 && r.headers.get("cache-control") === "no-store");
   check("runtime alias is byte-identical", (await (await fetch(BASE + "/popuploom.js")).text()) === legacyRuntime);
+  // Agent discovery layer: every advertised target must exist and be readable.
+  r = await req("GET", "/.well-known/api-catalog", { raw: true });
+  check("api-catalog linkset json + CORS", r.status === 200 && /application\/linkset\+json/.test(r.headers.get("content-type") || "") && r.headers.get("access-control-allow-origin") === "*", r.headers.get("content-type"));
+  check("api-catalog points at openapi + status", !!(r.data && Array.isArray(r.data.linkset) && r.data.linkset[0]["service-desc"][0].href.endsWith("/openapi.json") && r.data.linkset[0].status[0].href.endsWith("/api/health")));
+  r = await req("GET", "/.well-known/ard.json", { raw: true });
+  check("ard manifest has a real entry", r.status === 200 && !!(r.data && Array.isArray(r.data.entries) && /^urn:air:popuploom\.com:/.test(r.data.entries[0].identifier)));
+  r = await req("GET", "/openapi.json", { raw: true });
+  check("openapi 3.1 spec", r.status === 200 && r.data.openapi === "3.1.0" && !!r.data.paths["/api/widgets/{widgetId}/submit"]);
+  r = await req("GET", "/", { raw: true });
+  check("homepage Link advertises api-catalog + ard", /rel="api-catalog"/.test(r.headers.get("link") || "") && /rel="ard"/.test(r.headers.get("link") || ""));
+  check("content-signal header present", /ai-train=yes/.test(r.headers.get("content-signal") || ""));
+  r = await req("GET", "/robots.txt", { raw: true });
+  check("robots.txt Content-Signal + Agentmap", typeof r.data === "string" && /Content-Signal: ai-train=yes/.test(r.data) && /Agentmap: https:\/\/popuploom\.com\/\.well-known\/ard\.json/.test(r.data));
   r = await req("GET", "/migration.html", { raw: true });
   check("migration page noindex + CSP", r.status === 200 && /noindex, nofollow/.test(r.headers.get("x-robots-tag") || "") && /content-security-policy/i.test(Array.from(r.headers.keys()).join(",")));
   r = await req("GET", "/server/index.js");

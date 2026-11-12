@@ -83,4 +83,10 @@
 - Lead-generation popup playbook: https://popuploom.com/guides/popup-builder-for-lead-generation.html
 - Draft recovery for the previous domain: https://popuploom.com/migration.html (kept out of search indexes)
 
+## Agent discovery
+- API catalog (RFC 9727): https://popuploom.com/.well-known/api-catalog
+- Agentic Resource Discovery manifest: https://popuploom.com/.well-known/ard.json
+- OpenAPI 3.1 description of the public embed API: https://popuploom.com/openapi.json
+- Only existing endpoints are described: health, public popup configuration, view counting and lead submission. No MCP server, A2A agent, OAuth authorization server or payment endpoint is published.
+
 This documentation is optional and machine-readable. Crawler access rules live in https://popuploom.com/robots.txt.

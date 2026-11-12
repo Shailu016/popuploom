@@ -1,0 +1,28 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://popuploom.com/api",
+      "service-desc": [
+        {
+          "href": "https://popuploom.com/openapi.json",
+          "type": "application/json",
+          "title": "PopupLoom public embed API (OpenAPI 3.1)"
+        }
+      ],
+      "service-doc": [
+        {
+          "href": "https://popuploom.com/guides/install-popups.html",
+          "type": "text/html",
+          "title": "Install a PopupLoom popup on your site"
+        }
+      ],
+      "status": [
+        {
+          "href": "https://popuploom.com/api/health",
+          "type": "application/json",
+          "title": "Public health endpoint"
+        }
+      ]
+    }
+  ]
+}

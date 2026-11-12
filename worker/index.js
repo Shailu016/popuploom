@@ -49,8 +49,17 @@ function clientScheme(request) {
 // Explicit public allowlist, same as the Express server's static middleware.
 const PUBLIC_FILES = new Set([
   "templates.html", "faq.html", "press.html", "security.html", "guides/install-popups.html", "guides/index.html", "guides/wordpress-popup.html", "guides/shopify-popup.html", "guides/webflow-popup.html", "guides/collect-and-export-leads.html", "guides/popup-not-showing.html", "guides/popup-builder-for-ecommerce.html", "guides/popup-builder-for-quick-commerce.html", "guides/popup-builder-for-lead-generation.html", "ccf2a9f45165c635253d22748df4a573.txt", "robots.txt", "sitemap.xml", "llms.txt", "llms-full.txt", "index.html", "studio.html", "profile.html", "demo.html", "migration.html", "reset-password.html",
-  "leads.html", "privacy.html", "about.html", "contact.html", "terms.html", ".well-known/security.txt", "lead-csv.js", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "verify-email.html", "verify-email.js", "popuploom.js", "popforge.js", "embed/1.1.0/popuploom.js", "embed/1.1.0/popforge.js", "embed/1.1.0/SHA256SUMS", "ui.css", "ads.txt"
+  "leads.html", "privacy.html", "about.html", "contact.html", "terms.html", ".well-known/security.txt", ".well-known/api-catalog", ".well-known/ard.json", ".well-known/ai-catalog.json", "openapi.json", "lead-csv.js", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "verify-email.html", "verify-email.js", "popuploom.js", "popforge.js", "embed/1.1.0/popuploom.js", "embed/1.1.0/popforge.js", "embed/1.1.0/SHA256SUMS", "ui.css", "ads.txt"
 ]);
+
+// Machine-readable discovery documents. Served with their required media
+// types and a permissive CORS header so agents on other origins can read them.
+const AGENT_FILES = {
+  "/.well-known/api-catalog": "application/linkset+json; charset=utf-8",
+  "/.well-known/ard.json": "application/json; charset=utf-8",
+  "/.well-known/ai-catalog.json": "application/json; charset=utf-8",
+  "/openapi.json": "application/json; charset=utf-8"
+};
 
 // [regex, method, handler, needsAuth]
 const WIDGET_ROUTES = [
@@ -324,6 +333,10 @@ async function serveStatic(request, env, pathname, sec, cors, headOnly) {
     if (asset.status === 404) return new Response("Not found", { status: 404, headers: { ...sec, ...cors } });
     const headers = new Headers(asset.headers);
     headers.set("Cache-Control", file.startsWith("/embed/") ? "public, max-age=31536000, immutable" : "no-store");
+    if (AGENT_FILES[file]) {
+      headers.set("Content-Type", AGENT_FILES[file]);
+      headers.set("Access-Control-Allow-Origin", "*");
+    }
     if (["/leads.html", "/studio.html", "/profile.html", "/demo.html", "/migration.html", "/reset-password.html", "/verify-email.html"].includes(file)) headers.set("X-Robots-Tag", ["/migration.html", "/reset-password.html", "/verify-email.html", "/studio.html", "/profile.html", "/leads.html"].includes(file) ? "noindex, nofollow" : "noindex, follow");
     const adConfig = ads.config(env);
     const adNonce = file.endsWith(".html") && adConfig.enabled && ads.isAdPage(file) ? ads.nonce() : "";

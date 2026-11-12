@@ -1,0 +1,22 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "PopupLoom",
+    "url": "https://popuploom.com"
+  },
+  "entries": [
+    {
+      "identifier": "urn:air:popuploom.com:api:embed",
+      "displayName": "PopupLoom embed API",
+      "type": "application/vnd.oai.openapi+json",
+      "url": "https://popuploom.com/openapi.json",
+      "description": "Public, unauthenticated HTTP API used by embedded popups: read a published popup configuration, record a view, and submit a captured lead.",
+      "capabilities": ["readWidgetConfig", "recordView", "submitLead"],
+      "representativeQueries": [
+        "fetch the configuration for a PopupLoom popup",
+        "record a view for an embedded popup",
+        "submit a lead captured by a popup form"
+      ]
+    }
+  ]
+}

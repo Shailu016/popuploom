@@ -2,6 +2,7 @@
 import auth from "./auth.js";
 import hashes from "./csp-hashes.json";
 import ads from "../shared/ads.js";
+import agent from "../shared/agent-discovery.js";
 
 const { ApiError } = auth;
 
@@ -27,7 +28,9 @@ export function originCheck(env, request, pathname) {
 export function securityHeaders(env, request) {
   const headers = {
     "X-Content-Type-Options": "nosniff",
-    "Referrer-Policy": "strict-origin-when-cross-origin"
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    // Content Signals preference, also declared in robots.txt.
+    "Content-Signal": agent.CONTENT_SIGNAL
   };
   // Only send HSTS over https, so local dev (http) never gets it.
   if (new URL(request.url).protocol === "https:") {
@@ -57,6 +60,8 @@ export function htmlHeaders(env, file = "index.html", options = {}) {
     "Content-Security-Policy": policy,
     "X-Frame-Options": "DENY",
     "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+    // RFC 8288 discovery links for agents; every target is a real resource.
+    "Link": agent.LINK,
     "Cache-Control": "no-store"
   };
 }

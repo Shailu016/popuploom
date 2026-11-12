@@ -2,7 +2,7 @@
 
 > PopupLoom is a free website popup builder with 45 templates, a visual editor, hosted widget configuration, optional lead capture, CSV export and signed webhooks. It is built for site owners who can add custom HTML or JavaScript to their own website.
 
-Last reviewed: 2026-11-06. Canonical site: https://popuploom.com/
+Last reviewed: 2026-11-12. Canonical site: https://popuploom.com/
 
 ## Product summary
 - Category: website popup builder / lead-capture widget.
@@ -67,6 +67,12 @@ Last reviewed: 2026-11-06. Canonical site: https://popuploom.com/
 - [Terms of use](https://popuploom.com/terms.html): accounts, acceptable use, lead data and liability.
 - [Privacy and data handling](https://popuploom.com/privacy.html): storage, browser storage, webhooks, retention and advertising status.
 - [Full documentation](https://popuploom.com/llms-full.txt): extended machine-readable product documentation with builder facts, embed format, limits and FAQ.
+
+## Machine-readable discovery
+- API catalog (RFC 9727): https://popuploom.com/.well-known/api-catalog
+- Agentic Resource Discovery manifest: https://popuploom.com/.well-known/ard.json (compatibility alias: /.well-known/ai-catalog.json)
+- OpenAPI 3.1 description of the public embed API: https://popuploom.com/openapi.json
+- These documents describe only endpoints that exist: public popup configuration, view counting and lead submission. PopupLoom does not publish an MCP server, an A2A agent, an OAuth authorization server or a payment endpoint.
 
 ## Crawling and citation
 - Public HTML, the sitemap and this file may be crawled and quoted with attribution to PopupLoom and a link to the canonical page.
