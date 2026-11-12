@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Free Exit-Intent Popup for Any Website | PopupLoom</title>
+<meta name="description" content="What exit intent means, why it is desktop only, how to add a free exit-intent popup with two lines of code, and how to test it without annoying visitors.">
+<link rel="canonical" href="https://popuploom.com/guides/exit-intent-popup.html">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="stylesheet" href="/ui.css"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="PopupLoom">
+<meta property="og:title" content="Free Exit-Intent Popup for Any Website | PopupLoom">
+<meta property="og:description" content="What exit intent means, why it is desktop only, how to add a free exit-intent popup with two lines of code, and how to test it without annoying visitors.">
+<meta property="og:url" content="https://popuploom.com/guides/exit-intent-popup.html">
+<meta property="og:image" content="https://popuploom.com/assets/og-popuploom.png">
+<meta property="og:image:alt" content="PopupLoom: free website popup builder with 45 templates">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Free Exit-Intent Popup for Any Website | PopupLoom">
+<meta name="twitter:description" content="What exit intent means, why it is desktop only, how to add a free exit-intent popup with two lines of code, and how to test it without annoying visitors.">
+<meta name="twitter:image" content="https://popuploom.com/assets/og-popuploom.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://popuploom.com/"},{"@type":"ListItem","position":2,"name":"Guides","item":"https://popuploom.com/guides/index.html"},{"@type":"ListItem","position":3,"name":"Exit-intent popup","item":"https://popuploom.com/guides/exit-intent-popup.html"}]},{"@type":"Article","@id":"https://popuploom.com/guides/exit-intent-popup.html#article","headline":"Free exit-intent popup for any website","description":"What exit intent means, why it is desktop only, how to add a free exit-intent popup with two lines of code, and how to test it without annoying visitors.","datePublished":"2026-11-12","dateModified":"2026-11-12","author":{"@id":"https://popuploom.com/#organization"},"publisher":{"@id":"https://popuploom.com/#organization"},"mainEntityOfPage":"https://popuploom.com/guides/exit-intent-popup.html"},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is an exit-intent popup?","acceptedAnswer":{"@type":"Answer","text":"An exit-intent popup appears when the visitor's cursor leaves the top of the browser viewport, which usually means they are moving toward the address bar, a tab or the back button. It is a last-chance offer or reminder, not a page-load popup."}},{"@type":"Question","name":"Does exit intent work on mobile?","acceptedAnswer":{"@type":"Answer","text":"No. Touch devices have no cursor and no reliable exit event. PopupLoom disables exit intent on mobile by design. Use a timed, scroll-depth or click trigger for phone visitors instead."}},{"@type":"Question","name":"Is an exit-intent popup free?","acceptedAnswer":{"@type":"Answer","text":"With PopupLoom, yes. There is no pageview cap or paid upgrade inside the product. A free account is required to save the popup and get its install code. You still pay for your website host or platform."}},{"@type":"Question","name":"Why is my exit-intent popup not firing?","acceptedAnswer":{"@type":"Answer","text":"Exit intent only fires when the pointer leaves through the top of the viewport. Switching tabs, moving to another monitor or moving the cursor out of the side does not trigger it. It is also disabled on mobile, and the frequency rule may have already recorded a view."}},{"@type":"Question","name":"Can I show it only once per visitor?","acceptedAnswer":{"@type":"Answer","text":"Yes. Set the frequency rule to once per day, once per week or once ever. Frequency is stored in the visitor's browser, so clearing site data resets it."}}]}]}</script>
+</head>
+<body>
+<header class="wrap" style="padding:24px 26px">
+  <nav aria-label="Main"><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/index.html">Guides</a> · <a href="/about.html">About</a> · <a href="/studio.html?tpl=blank">Open the studio</a></nav>
+  <nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/guides/index.html">Guides</a> › <span>Exit intent</span></nav>
+</header>
+<main class="wrap" style="padding:30px 26px 80px;max-width:900px">
+  <article>
+    <h1>Free exit-intent popup for any website</h1>
+    <p class="mut">Product behavior verified on the local PopupLoom build on 12 November 2026. Browser and platform behavior can vary; test on your own site.</p>
+
+    <p><strong>An exit-intent popup appears when a desktop visitor moves the cursor out through the top of the page</strong> — usually toward the address bar, another tab or the back button. It is the last moment before a visit ends, which makes it a good place for a reminder, a first-order offer or a lead magnet. It is not a page-load popup, and it does not work on touch screens.</p>
+
+    <h2>How exit intent actually works</h2>
+    <p>The browser reports that the mouse left the document, with no element receiving it. PopupLoom listens for that event and checks that the pointer crossed the top edge of the viewport. If both are true, the popup fires once, subject to the frequency rule.</p>
+    <ul>
+      <li><strong>Desktop only.</strong> Touch devices have no cursor and no dependable "leaving" event. PopupLoom skips exit intent on mobile by design rather than guessing.</li>
+      <li><strong>Top edge only.</strong> Moving the cursor to the side, to a second monitor or into devtools does not count.</li>
+      <li><strong>Frequency still applies.</strong> Once per day, once per week or once ever can suppress a second appearance.</li>
+      <li><strong>It is a trigger, not a design.</strong> The same popup can use a different trigger on mobile, such as a delay or scroll depth.</li>
+    </ul>
+
+    <h2>Add an exit-intent popup with PopupLoom</h2>
+    <ol>
+      <li>Open the <a href="/studio.html?tpl=blank">PopupLoom studio</a> and pick a template, or start blank. A single offer works better than a menu of options.</li>
+      <li>In the behavior settings, set the trigger to <strong>Exit intent</strong>. Choose a frequency that matches the offer: once per day for a discount, once ever for a welcome gift.</li>
+      <li>Set page targeting. Exclude checkout, legal pages and anything the visitor needs to finish a task. A popup on a payment step is a conversion tax, not a conversion tool.</li>
+      <li>Save the popup and copy the two-line install code from <strong>Publish</strong>.</li>
+      <li>Paste it before <code>&lt;/body&gt;</code> in your site footer, theme code, or a Custom HTML block. Platform steps: <a href="/guides/wordpress-popup.html">WordPress</a>, <a href="/guides/shopify-popup.html">Shopify</a>, <a href="/guides/webflow-popup.html">Webflow</a>, <a href="/guides/squarespace-wix-popup.html">Squarespace and Wix</a>.</li>
+      <li>Publish the site and test the trigger on the live URL.</li>
+    </ol>
+
+    <h2>Test it correctly</h2>
+    <ul>
+      <li>Open a private window on a desktop with a mouse or trackpad.</li>
+      <li>Move the cursor quickly out through the <strong>top</strong> edge of the page. Do not switch tabs; that is a different event.</li>
+      <li>If nothing happens, check the frequency rule, page targeting, device setting and the browser console.</li>
+      <li>Submit one fake response and confirm it lands in the <a href="/guides/collect-and-export-leads.html">lead inbox</a>.</li>
+      <li>Test the mobile trigger separately. Exit intent will not fire there.</li>
+    </ul>
+
+    <h2>Exit-intent best practices</h2>
+    <ul>
+      <li><strong>One offer.</strong> A single discount, checklist or reminder. Multiple choices dilute the moment.</li>
+      <li><strong>Do not fire on the first page load.</strong> Exit intent is strongest after the visitor has read something. Use page targeting or a short delay before the trigger is armed where your setup allows it.</li>
+      <li><strong>Do not block the close button.</strong> PopupLoom renders a close control and supports Escape. Never hide it or make it tiny.</li>
+      <li><strong>Respect frequency.</strong> Once per day is plenty for most stores. Once ever for a welcome offer.</li>
+      <li><strong>Exclude checkout and account flows.</strong> A popup during payment is a policy and usability risk.</li>
+      <li><strong>Have a mobile plan.</strong> Use a scroll or click trigger for phone visitors; do not pretend exit intent covers them.</li>
+    </ul>
+
+    <h2>What an exit-intent popup cannot do</h2>
+    <p>It cannot read cart contents, cart value, customer accounts or order history. It cannot send the follow-up email, apply a discount code automatically or guarantee a sale. It captures the response and stores it; the offer, the code enforcement and the follow-up belong to you and your platform.</p>
+
+    <h2>Exit-intent popup FAQ</h2>
+    <h3>What is an exit-intent popup?</h3>
+    <p>A popup that appears when the cursor leaves the top of the viewport, usually as the visitor moves toward the address bar or back button.</p>
+    <h3>Does it work on mobile?</h3>
+    <p>No. Touch devices have no cursor and no reliable exit event. PopupLoom disables exit intent on mobile by design; use a timed, scroll or click trigger instead.</p>
+    <h3>Is it free?</h3>
+    <p>With PopupLoom, yes. There is no pageview cap or paid upgrade inside the product. A free account is required to save and install a widget.</p>
+    <h3>Why is it not firing?</h3>
+    <p>Check that the pointer exits through the top edge, that you are on desktop, that the frequency rule has not already recorded a view, and that the page is included in targeting.</p>
+    <h3>Can I show it once per visitor?</h3>
+    <p>Yes. Choose once per day, once per week or once ever. Frequency is stored in the visitor's browser.</p>
+
+    <p class="mut">Next: <a href="/guides/email-signup-popup.html">email signup popups</a>, <a href="/guides/popup-not-showing.html">popup not showing</a>, or the <a href="/guides/popup-builder-for-ecommerce.html">ecommerce playbook</a>. See <a href="/about.html">About</a>, <a href="/privacy.html">privacy</a>, <a href="/terms.html">terms</a> or <a href="/contact.html">contact</a>.</p>
+  </article>
+</main>
+<footer class="wrap" style="padding:24px 26px"><a href="/">PopupLoom — free website popup builder</a> · <a href="/guides/index.html">Guides</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></footer>
+</body>
+</html>

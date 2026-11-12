@@ -282,6 +282,14 @@ function hostReq(host, path, method = "GET", extraHeaders = {}) {
   r=await req('GET','/guides/wordpress-popup.html',{raw:true});check('WordPress guide is served',r.status===200);
   r=await req('GET','/guides/shopify-popup.html',{raw:true});check('Shopify guide is served',r.status===200);
   r=await req('GET','/guides/webflow-popup.html',{raw:true});check('Webflow guide is served',r.status===200);
+  const squarespace = await (await fetch(BASE + '/guides/squarespace-wix-popup.html')).text();
+  check('Squarespace and Wix guide is served', squarespace.includes('Squarespace or Wix'));
+  const exitIntent = await (await fetch(BASE + '/guides/exit-intent-popup.html')).text();
+  check('exit-intent guide is served', /exit-intent popup/i.test(exitIntent));
+  const emailSignup = await (await fetch(BASE + '/guides/email-signup-popup.html')).text();
+  check('email signup guide is served', /welcome popup/i.test(emailSignup));
+  const comparison = await (await fetch(BASE + '/guides/free-popup-builders-without-pageview-limits.html')).text();
+  check('free popup builders comparison is served', comparison.includes('12 November 2026'));
   r=await req('GET','/guides/collect-and-export-leads.html',{raw:true});check('lead guide is served',r.status===200);
   r=await req('GET','/guides/popup-not-showing.html',{raw:true});check('troubleshooting guide is served',r.status===200);
   r=await req('GET','/.well-known/security.txt',{raw:true});check('security.txt is served',r.status===200&&String(r.data).includes('Contact:'));

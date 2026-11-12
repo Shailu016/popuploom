@@ -60,6 +60,10 @@ Last reviewed: 2026-11-12. Canonical site: https://popuploom.com/
 - [Guides hub](https://popuploom.com/guides/index.html): installation, platform, lead and troubleshooting guides, plus the three use-case playbooks.
 - [Installation guide](https://popuploom.com/guides/install-popups.html): the hosted widget model, exact snippet, testing and updating.
 - [WordPress guide](https://popuploom.com/guides/wordpress-popup.html), [Shopify guide](https://popuploom.com/guides/shopify-popup.html), [Webflow guide](https://popuploom.com/guides/webflow-popup.html): platform-specific placement and caveats.
+- [Squarespace and Wix guide](https://popuploom.com/guides/squarespace-wix-popup.html): code injection and custom code, plan gates, checkout limits.
+- [Exit-intent popup guide](https://popuploom.com/guides/exit-intent-popup.html): the desktop-only trigger, testing and frequency rules.
+- [Email signup popup guide](https://popuploom.com/guides/email-signup-popup.html): welcome popup timing, fields, consent basics and lead export.
+- [Free popup builders compared](https://popuploom.com/guides/free-popup-builders-without-pageview-limits.html): dated, source-linked free-plan limits, including when not to use PopupLoom.
 - [Collect and export leads](https://popuploom.com/guides/collect-and-export-leads.html): lead inbox, CSV, browser and server webhooks, privacy boundaries.
 - [Popup not showing](https://popuploom.com/guides/popup-not-showing.html): diagnostic sequence for saved widgets.
 - [About PopupLoom](https://popuploom.com/about.html): who operates the product and how templates should be understood.

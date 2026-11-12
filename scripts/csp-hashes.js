@@ -5,7 +5,13 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 
-const htmlFiles = ["index.html", "faq.html", "press.html", "security.html", "studio.html", "profile.html", "demo.html", "templates.html", "guides/install-popups.html", "guides/index.html", "guides/wordpress-popup.html", "guides/shopify-popup.html", "guides/webflow-popup.html", "guides/collect-and-export-leads.html", "guides/popup-not-showing.html", "guides/popup-builder-for-ecommerce.html", "guides/popup-builder-for-quick-commerce.html", "guides/popup-builder-for-lead-generation.html", "migration.html", "reset-password.html", "leads.html", "privacy.html", "about.html", "contact.html", "terms.html"];
+const root = path.join(__dirname, "..");
+// Scan every served HTML file instead of keeping a hand-maintained list.
+// A new guide can no longer ship with an inline JSON-LD block missing its hash.
+const htmlFiles = [
+  ...fs.readdirSync(root).filter(f => f.endsWith(".html")),
+  ...fs.readdirSync(path.join(root, "guides")).filter(f => f.endsWith(".html")).map(f => "guides/" + f)
+].sort();
 const hash = text => "'sha256-" + crypto.createHash("sha256").update(text).digest("base64") + "'";
 
 const out = {};

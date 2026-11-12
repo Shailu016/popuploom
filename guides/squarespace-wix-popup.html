@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Add a Popup to Squarespace or Wix (Free, No App) | PopupLoom</title>
+<meta name="description" content="Add a free popup to Squarespace or Wix without a paid widget app: code injection steps, plan requirements, checkout limits and published-site testing.">
+<link rel="canonical" href="https://popuploom.com/guides/squarespace-wix-popup.html">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="stylesheet" href="/ui.css"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="PopupLoom">
+<meta property="og:title" content="Add a Popup to Squarespace or Wix (Free, No App) | PopupLoom">
+<meta property="og:description" content="Add a free popup to Squarespace or Wix without a paid widget app: code injection steps, plan requirements, checkout limits and published-site testing.">
+<meta property="og:url" content="https://popuploom.com/guides/squarespace-wix-popup.html">
+<meta property="og:image" content="https://popuploom.com/assets/og-popuploom.png">
+<meta property="og:image:alt" content="PopupLoom: free website popup builder with 45 templates">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Add a Popup to Squarespace or Wix (Free, No App) | PopupLoom">
+<meta name="twitter:description" content="Add a free popup to Squarespace or Wix without a paid widget app: code injection steps, plan requirements, checkout limits and published-site testing.">
+<meta name="twitter:image" content="https://popuploom.com/assets/og-popuploom.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://popuploom.com/"},{"@type":"ListItem","position":2,"name":"Guides","item":"https://popuploom.com/guides/index.html"},{"@type":"ListItem","position":3,"name":"Squarespace and Wix popups","item":"https://popuploom.com/guides/squarespace-wix-popup.html"}]},{"@type":"Article","@id":"https://popuploom.com/guides/squarespace-wix-popup.html#article","headline":"Add a popup to Squarespace or Wix without an app","description":"Add a free popup to Squarespace or Wix without a paid widget app: code injection steps, plan requirements, checkout limits and published-site testing.","datePublished":"2026-11-12","dateModified":"2026-11-12","author":{"@id":"https://popuploom.com/#organization"},"publisher":{"@id":"https://popuploom.com/#organization"},"mainEntityOfPage":"https://popuploom.com/guides/squarespace-wix-popup.html"},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Can I add a free popup to Squarespace?","acceptedAnswer":{"@type":"Answer","text":"Yes, if your Squarespace plan includes code injection. Squarespace documents code injection for Core, Plus, Advanced and some legacy plans, but not Basic. Add the PopupLoom snippet in the footer code injection field, save, and test the published site. Checkout pages do not support custom code."}},{"@type":"Question","name":"Can I add a popup to Wix without an app?","acceptedAnswer":{"@type":"Answer","text":"Yes, on sites that can use custom code. In the Wix dashboard, open Settings, Custom Code, add the snippet to all pages and place it in the body end. The site must be published and have a connected domain, and Wix requires a Premium plan to connect a custom domain."}},{"@type":"Question","name":"Why is the Wix popup not showing?","acceptedAnswer":{"@type":"Answer","text":"Wix custom code does not run in the editor; test the published site. Also check that the code is applied to the right pages, placed in the body end, saved, and that the site is published on a connected domain. Wix does not provide support for third-party code."}},{"@type":"Question","name":"Does the popup work on Squarespace checkout pages?","acceptedAnswer":{"@type":"Answer","text":"No. Squarespace's code injection documentation says checkout pages do not support code. A popup installed through code injection covers the rest of the site, not checkout."}},{"@type":"Question","name":"Is this cheaper than a Squarespace or Wix popup app?","acceptedAnswer":{"@type":"Answer","text":"PopupLoom is free with no pageview cap or paid upgrade inside the product. You still pay for the website platform itself. A dedicated app may be worth it if you need platform-specific cart or CMS data that PopupLoom cannot read."}}]}]}</script>
+</head>
+<body>
+<header class="wrap" style="padding:24px 26px">
+  <nav aria-label="Main"><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/index.html">Guides</a> · <a href="/about.html">About</a> · <a href="/studio.html?tpl=blank">Open the studio</a></nav>
+  <nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/guides/index.html">Guides</a> › <span>Squarespace and Wix</span></nav>
+</header>
+<main class="wrap" style="padding:30px 26px 80px;max-width:900px">
+  <article>
+    <h1>Add a popup to Squarespace or Wix without an app</h1>
+    <p class="mut">Checked against Squarespace and Wix official documentation on 12 November 2026. This guide was not tested on a live Squarespace or Wix site; plan names, permissions and editor behavior change, so verify on your own site before a campaign.</p>
+
+    <p><strong>Both platforms can run a free PopupLoom popup, but the gate is the plan, not the popup.</strong> Squarespace puts code injection behind Core and higher. Wix puts custom code behind a published site with a connected domain, and a custom domain generally requires a Premium plan. Once you clear that gate, the install is two lines in a footer field.</p>
+
+    <h2>Quick comparison</h2>
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr><th style="text-align:left;padding:8px;border-bottom:1px solid rgba(127,127,127,.25)">Platform</th><th style="text-align:left;padding:8px;border-bottom:1px solid rgba(127,127,127,.25)">Where the code goes</th><th style="text-align:left;padding:8px;border-bottom:1px solid rgba(127,127,127,.25)">Main limit</th></tr></thead>
+      <tbody>
+        <tr><td style="padding:8px;vertical-align:top"><strong>Squarespace</strong></td><td style="padding:8px;vertical-align:top">Settings → Advanced → Code Injection → Footer</td><td style="padding:8px;vertical-align:top">Code injection requires Core, Plus, Advanced or some legacy plans. Checkout pages do not support code.</td></tr>
+        <tr><td style="padding:8px;vertical-align:top"><strong>Wix</strong></td><td style="padding:8px;vertical-align:top">Dashboard → Settings → Custom Code → Body – end</td><td style="padding:8px;vertical-align:top">Custom code needs a published site and connected domain. Wix does not support third-party code.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Before you start</h2>
+    <ul>
+      <li>Confirm that your current plan includes the code feature. On Squarespace, look for the Code Injection panel; on Wix, look for Custom Code under Development &amp; integrations.</li>
+      <li>Save or duplicate the site first. Custom code can affect layout and behavior, and neither platform's support team will debug third-party code.</li>
+      <li>Decide scope: all pages for a site-wide welcome popup, or one page for a launch.</li>
+      <li>Have the two-line install code ready from PopupLoom's <strong>Publish</strong> screen. The general model is in the <a href="/guides/install-popups.html">installation guide</a>.</li>
+    </ul>
+
+    <h2>Squarespace: add the popup with code injection</h2>
+    <ol>
+      <li>Open the site dashboard and go to <strong>Settings → Advanced → Code Injection</strong>.</li>
+      <li>Put the PopupLoom widget div and script in the <strong>Footer</strong> field. Squarespace injects footer code before the closing body tag, which is where the widget expects to mount.</li>
+      <li>Save the change.</li>
+      <li>Open the published domain in a private window. Code injection is not a preview feature; test the live page.</li>
+      <li>Perform the real trigger and submit one test form response with fake data.</li>
+    </ol>
+    <p>For a single page, use the page's own code injection field instead of the site-wide footer. Do not put the script in a Code Block on the Basic plan: Squarespace documents JavaScript and iframes in code blocks as requiring Core or higher, and a Code Block can be clipped by a parent container.</p>
+
+    <h3>Squarespace limits to plan around</h3>
+    <ul>
+      <li><strong>Checkout is excluded.</strong> Squarespace's documentation says checkout pages do not support code. Do not promise a post-purchase or checkout popup from this install.</li>
+      <li><strong>Code injection is plan-gated.</strong> Core, Plus, Advanced and some legacy plans include it; Basic does not.</li>
+      <li><strong>Support boundary.</strong> Squarespace support will not troubleshoot custom code. Keep the snippet and a rollback note.</li>
+    </ul>
+
+    <h2>Wix: add the popup with custom code</h2>
+    <ol>
+      <li>Publish the site and connect its domain first. Wix's documentation lists those as prerequisites for custom code.</li>
+      <li>In the site dashboard, open <strong>Settings → Custom Code</strong> under Development &amp; integrations.</li>
+      <li>Choose <strong>Add Custom Code</strong>, paste the two PopupLoom lines, and give the snippet a recognisable name.</li>
+      <li>Under <strong>Add Code to Pages</strong>, choose all pages or specific pages. For a site-wide welcome popup, choose all pages and load it once per visit unless you have a reason not to.</li>
+      <li>Under <strong>Place Code in</strong>, choose <strong>Body – end</strong>.</li>
+      <li>Apply, then publish the site again if Wix asks you to.</li>
+      <li>Open the published domain in a private window and test the trigger.</li>
+    </ol>
+
+    <h3>Wix limits to plan around</h3>
+    <ul>
+      <li><strong>No access to Wix APIs.</strong> Wix's documentation says custom code works with the raw DOM and external resources, not Wix data collections, Stores, Bookings or member data. PopupLoom cannot read your Wix catalog or cart.</li>
+      <li><strong>Dynamic DOM.</strong> Wix generates class names and element IDs at runtime. Do not build the popup around Wix selectors; use PopupLoom's URL and device targeting instead.</li>
+      <li><strong>No editor preview.</strong> Custom code runs on the published site, not inside the editor.</li>
+      <li><strong>Third-party support boundary.</strong> Wix says to contact the code provider for issues. That is us for the popup snippet, not for your Wix theme.</li>
+    </ul>
+
+    <h2>Test the popup properly</h2>
+    <ul>
+      <li>Use a private window and a logged-out session.</li>
+      <li>Confirm the widget div and script are in the published page source.</li>
+      <li>Trigger the real behavior: page load, delay, scroll, click or desktop exit intent.</li>
+      <li>Submit one fake lead and confirm it appears in the <a href="/guides/collect-and-export-leads.html">lead inbox</a>.</li>
+      <li>Check mobile separately. Exit intent is desktop only by design.</li>
+      <li>Check the browser console for blocked scripts or a Content Security Policy error.</li>
+    </ul>
+
+    <h2>When a platform-specific app is the better choice</h2>
+    <p>Use a Squarespace or Wix app if you need to branch on platform data: cart value, specific products, member fields, CMS collections, native discount logic, A/B testing or checkout messages. PopupLoom cannot read those. Use PopupLoom when you need a free, lightweight popup for the storefront with URL and device targeting, timed or exit-intent triggers, lead capture and CSV export.</p>
+
+    <h2>Squarespace and Wix popup FAQ</h2>
+    <h3>Can I add a free popup to Squarespace?</h3>
+    <p>Yes, if your plan includes code injection. Add the snippet to the footer code injection field and test the published site. Checkout pages do not support code.</p>
+    <h3>Can I add a popup to Wix without an app?</h3>
+    <p>Yes, on sites that can use custom code. Publish the site, connect the domain, then add the snippet under Settings → Custom Code → Body – end.</p>
+    <h3>Why is the Wix popup not showing?</h3>
+    <p>Test the published site, not the editor. Check that the code is applied to the right pages, placed in the body end, saved, and that the site is published on the connected domain.</p>
+    <h3>Does it work on Squarespace checkout?</h3>
+    <p>No. Squarespace documents that checkout pages do not support code.</p>
+    <h3>Is it cheaper than a popup app?</h3>
+    <p>PopupLoom is free with no pageview cap. You still pay for the website platform. A dedicated app may be worth it for platform-specific cart or CMS data.</p>
+
+    <h2>Official references</h2>
+    <ul>
+      <li><a href="https://support.squarespace.com/hc/en-us/articles/205815908-Customize-parts-of-your-site-with-code-injection">Squarespace Help: Customize parts of your site with code injection</a></li>
+      <li><a href="https://support.squarespace.com/hc/en-us/articles/205815928-Add-custom-code-to-your-site">Squarespace Help: Add custom code to your site</a></li>
+      <li><a href="https://support.wix.com/en/article/wix-editor-embedding-custom-code-on-your-site">Wix Help: Embedding custom code on your site</a></li>
+      <li><a href="https://dev.wix.com/docs/overview/site-features-tools/about-custom-code">Wix Developers: About custom code</a></li>
+    </ul>
+
+    <p class="mut">The PopupLoom install code and product behavior were checked on the local build. Squarespace and Wix plan details must be verified on your own site. See <a href="/about.html">About</a>, <a href="/privacy.html">privacy</a>, <a href="/terms.html">terms</a> or <a href="/contact.html">contact</a>. Related: <a href="/guides/wordpress-popup.html">WordPress without a plugin</a>, <a href="/guides/shopify-popup.html">Shopify without an app</a>, <a href="/guides/email-signup-popup.html">email signup popups</a>.</p>
+  </article>
+</main>
+<footer class="wrap" style="padding:24px 26px"><a href="/">PopupLoom — free website popup builder</a> · <a href="/guides/index.html">Guides</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></footer>
+</body>
+</html>

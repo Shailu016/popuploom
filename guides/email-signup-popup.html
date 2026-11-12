@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Free Email Signup Popup (Welcome Popup) | PopupLoom</title>
+<meta name="description" content="Build a free email signup or welcome popup: timing, fields, frequency, consent basics, lead export and the limits of a popup that does not send email.">
+<link rel="canonical" href="https://popuploom.com/guides/email-signup-popup.html">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="stylesheet" href="/ui.css"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="PopupLoom">
+<meta property="og:title" content="Free Email Signup Popup (Welcome Popup) | PopupLoom">
+<meta property="og:description" content="Build a free email signup or welcome popup: timing, fields, frequency, consent basics, lead export and the limits of a popup that does not send email.">
+<meta property="og:url" content="https://popuploom.com/guides/email-signup-popup.html">
+<meta property="og:image" content="https://popuploom.com/assets/og-popuploom.png">
+<meta property="og:image:alt" content="PopupLoom: free website popup builder with 45 templates">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Free Email Signup Popup (Welcome Popup) | PopupLoom">
+<meta name="twitter:description" content="Build a free email signup or welcome popup: timing, fields, frequency, consent basics, lead export and the limits of a popup that does not send email.">
+<meta name="twitter:image" content="https://popuploom.com/assets/og-popuploom.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://popuploom.com/"},{"@type":"ListItem","position":2,"name":"Guides","item":"https://popuploom.com/guides/index.html"},{"@type":"ListItem","position":3,"name":"Email signup popup","item":"https://popuploom.com/guides/email-signup-popup.html"}]},{"@type":"Article","@id":"https://popuploom.com/guides/email-signup-popup.html#article","headline":"Free email signup popup (welcome popup)","description":"Build a free email signup or welcome popup: timing, fields, frequency, consent basics, lead export and the limits of a popup that does not send email.","datePublished":"2026-11-12","dateModified":"2026-11-12","author":{"@id":"https://popuploom.com/#organization"},"publisher":{"@id":"https://popuploom.com/#organization"},"mainEntityOfPage":"https://popuploom.com/guides/email-signup-popup.html"},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is a welcome popup?","acceptedAnswer":{"@type":"Answer","text":"A welcome popup is an email signup popup shown to new visitors, usually after a short delay, a scroll depth or an exit-intent signal. It offers one reason to subscribe, such as a checklist, discount or early access, and captures an email address."}},{"@type":"Question","name":"Does PopupLoom send the welcome email?","acceptedAnswer":{"@type":"Answer","text":"No. PopupLoom stores the response in the lead inbox and can forward it to a signed webhook. It does not send marketing email, SMS or automated follow-ups. You connect your own email tool or automation."}},{"@type":"Question","name":"Does the form include a consent checkbox?","acceptedAnswer":{"@type":"Answer","text":"No. PopupLoom forms render text, email, phone, number, date and URL fields, but not a separate consent checkbox. The website owner is responsible for the lawful basis, the privacy notice and any consent language their jurisdiction requires."}},{"@type":"Question","name":"When should the popup appear?","acceptedAnswer":{"@type":"Answer","text":"Not immediately on first load. A short delay, a scroll-depth trigger or exit intent usually performs better and interrupts less. Use page targeting to exclude checkout, account and legal pages."}},{"@type":"Question","name":"Is the email signup popup free?","acceptedAnswer":{"@type":"Answer","text":"Yes. PopupLoom has no pageview cap and no paid upgrade inside the product. A free account is required to save the popup and get its install code."}}]}]}</script>
+</head>
+<body>
+<header class="wrap" style="padding:24px 26px">
+  <nav aria-label="Main"><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/index.html">Guides</a> · <a href="/about.html">About</a> · <a href="/studio.html?tpl=blank">Open the studio</a></nav>
+  <nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/guides/index.html">Guides</a> › <span>Email signup</span></nav>
+</header>
+<main class="wrap" style="padding:30px 26px 80px;max-width:900px">
+  <article>
+    <h1>Free email signup popup (welcome popup)</h1>
+    <p class="mut">Product behavior verified on the local PopupLoom build on 12 November 2026. Consent and email-law requirements depend on your jurisdiction and your email provider; this page is not legal advice.</p>
+
+    <p><strong>An email signup popup asks for one thing and offers one reason to give it.</strong> The “welcome popup” pattern — shown to a new visitor after they have had a moment to read — usually works better than a popup that blocks the page immediately. PopupLoom builds the form, stores the response and exports it; your email tool sends the follow-up.</p>
+
+    <h2>What counts as a welcome popup</h2>
+    <p>A welcome popup is not a newsletter archive and not a full-page gate. It is a single, specific invitation: a checklist, a first-order discount, early access, a webinar seat or a waitlist. The visitor should understand the offer and the cost of subscribing in one screen.</p>
+    <ul>
+      <li><strong>One field is usually enough.</strong> Email, optionally a first name. Every extra field lowers completion.</li>
+      <li><strong>One sentence of value.</strong> “Get the 12-point launch checklist” beats “Subscribe to our newsletter”.</li>
+      <li><strong>One privacy link.</strong> The form does not render a consent checkbox, so the surrounding page must explain what happens to the address.</li>
+      <li><strong>One frequency rule.</strong> Once per day or once ever; not on every page view.</li>
+    </ul>
+
+    <h2>Choose the trigger before the design</h2>
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr><th style="text-align:left;padding:8px;border-bottom:1px solid rgba(127,127,127,.25)">Trigger</th><th style="text-align:left;padding:8px;border-bottom:1px solid rgba(127,127,127,.25)">Best for</th><th style="text-align:left;padding:8px;border-bottom:1px solid rgba(127,127,127,.25)">Watch out for</th></tr></thead>
+      <tbody>
+        <tr><td style="padding:8px;vertical-align:top">Timed delay</td><td style="padding:8px;vertical-align:top">A welcome offer on a content page</td><td style="padding:8px;vertical-align:top">Too short feels like an interruption; test 5–15 seconds.</td></tr>
+        <tr><td style="padding:8px;vertical-align:top">Scroll depth</td><td style="padding:8px;vertical-align:top">Long guides and playbooks</td><td style="padding:8px;vertical-align:top">Short pages never reach the threshold.</td></tr>
+        <tr><td style="padding:8px;vertical-align:top">Exit intent</td><td style="padding:8px;vertical-align:top">Ecommerce and lead magnets</td><td style="padding:8px;vertical-align:top">Desktop only. Pair with a mobile trigger.</td></tr>
+        <tr><td style="padding:8px;vertical-align:top">Click</td><td style="padding:8px;vertical-align:top">A “Get the checklist” button</td><td style="padding:8px;vertical-align:top">Needs a visible, honest button label.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Build the popup in PopupLoom</h2>
+    <ol>
+      <li>Open the <a href="/studio.html?tpl=blank">studio</a> and choose an email signup template, or start blank.</li>
+      <li>Add a heading, one short paragraph, the form block and a privacy link. Keep the close control visible.</li>
+      <li>Use an email field. Add a name field only if you will actually personalise with it.</li>
+      <li>Set the trigger and frequency. Set page targeting to exclude checkout, account and legal pages.</li>
+      <li>Save, open <strong>Publish</strong>, and copy the two-line install code.</li>
+      <li>Install it on your site. Platform steps: <a href="/guides/wordpress-popup.html">WordPress</a>, <a href="/guides/shopify-popup.html">Shopify</a>, <a href="/guides/webflow-popup.html">Webflow</a>, <a href="/guides/squarespace-wix-popup.html">Squarespace and Wix</a>.</li>
+      <li>Submit a fake response on the live site and confirm it appears in <strong>Leads</strong>.</li>
+    </ol>
+
+    <h2>Where the email actually goes</h2>
+    <p>PopupLoom stores the response against the saved widget. The signed-in owner can read it in the lead inbox and export CSV. Optional webhooks can forward it:</p>
+    <ul>
+      <li><strong>Browser webhook:</strong> visible to site visitors. Never put a secret or private CRM key in it.</li>
+      <li><strong>Server-side webhook:</strong> HMAC-SHA256 signed, owner-only, with retries and a delivery log. Use this for automation.</li>
+    </ul>
+    <p>PopupLoom does <strong>not</strong> send the welcome email, run a double opt-in, or sync natively with Mailchimp, Klaviyo or HubSpot. Connect your own tool. If your jurisdiction or provider requires confirmed opt-in, send the confirmation from that tool and only add the address to your list after it is confirmed.</p>
+
+    <h2>Consent and privacy basics</h2>
+    <p>The form collects personal data. The website owner is the controller of that data, not PopupLoom. Before publishing:</p>
+    <ul>
+      <li>Link to a privacy notice that explains what you collect, why, how long you keep it and how to unsubscribe or request deletion.</li>
+      <li>Do not pre-tick consent or hide the purpose in fine print.</li>
+      <li>If you need a separate consent checkbox, add it as a choice/link block or collect consent in your email tool; the built-in form fields do not include one.</li>
+      <li>Do not ask for passwords, card numbers, one-time codes or government IDs in a popup form.</li>
+      <li>Honour unsubscribe and deletion requests in your own systems.</li>
+    </ul>
+    <p>Read the PopupLoom <a href="/privacy.html">privacy and data handling page</a> for what the product stores and for how long.</p>
+
+    <h2>Test and measure</h2>
+    <ul>
+      <li>Test on desktop and phone; the popup must be closable without zooming.</li>
+      <li>Check that the form submits, shows a success state and stores exactly one lead per submission.</li>
+      <li>Use the frequency rule to avoid counting the same visitor repeatedly.</li>
+      <li>Compare two offers, not two colours. The offer is the variable that matters.</li>
+      <li>Watch form completion, not only popup views. A high view count with no submissions is a bad popup.</li>
+    </ul>
+
+    <h2>Email signup popup FAQ</h2>
+    <h3>What is a welcome popup?</h3>
+    <p>An email signup popup shown to a new visitor after a delay, scroll or exit signal, offering one specific reason to subscribe.</p>
+    <h3>Does PopupLoom send the welcome email?</h3>
+    <p>No. It stores the response and can forward it to a signed webhook. It does not send marketing email, SMS or automated follow-ups.</p>
+    <h3>Does the form include a consent checkbox?</h3>
+    <p>No. The built-in fields are text, email, phone, number, date and URL. The owner is responsible for the lawful basis, privacy notice and any consent language required.</p>
+    <h3>When should it appear?</h3>
+    <p>Not immediately on first load. A short delay, scroll depth or exit intent usually interrupts less. Exclude checkout, account and legal pages.</p>
+    <h3>Is it free?</h3>
+    <p>Yes. No pageview cap and no paid upgrade inside the product. A free account is required to save and install a popup.</p>
+
+    <p class="mut">Next: <a href="/guides/exit-intent-popup.html">exit-intent popups</a>, <a href="/guides/collect-and-export-leads.html">collect and export leads</a>, or the <a href="/guides/popup-builder-for-lead-generation.html">lead-generation playbook</a>. See <a href="/about.html">About</a>, <a href="/privacy.html">privacy</a>, <a href="/terms.html">terms</a> or <a href="/contact.html">contact</a>.</p>
+  </article>
+</main>
+<footer class="wrap" style="padding:24px 26px"><a href="/">PopupLoom — free website popup builder</a> · <a href="/guides/index.html">Guides</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></footer>
+</body>
+</html>
