@@ -1,6 +1,6 @@
 # PopupLoom SEO page map (scoped)
 
-Updated: **2026-11-10**. Owner: CTO review. This is an architecture map, not a keyword dump. Volumes are unvalidated; Search Console data decides after 4–6 weeks.
+Updated: **2026-11-12**. Owner: CTO review. This is an architecture map, not a keyword dump. Volumes are unvalidated; Search Console data decides after 4–6 weeks.
 
 ## Guardrails
 
@@ -38,20 +38,31 @@ Updated: **2026-11-10**. Owner: CTO review. This is an architecture map, not a k
 
 No merge/delete candidates right now. The homepage owns "free popup builder"; do not create a second page for it.
 
-## Proposed new pages (6 maximum)
+## Shipped new pages (2026-11-12)
 
-| # | URL | Intent | Title (≤60) | Meta (≤155) | H1 |
-|---|---|---|---|---|---|
-| 1 | `/guides/squarespace-popup.html` | Platform install | Add a Popup to Squarespace \| PopupLoom | Install a PopupLoom popup on Squarespace with code injection or a code block, plus plan limits, testing and removal. | Add a PopupLoom popup to Squarespace |
-| 2 | `/guides/wix-popup.html` | Platform install | Add a Popup to Wix \| PopupLoom | Install a PopupLoom popup on Wix where custom code is allowed, with iframe limits, testing and removal. | Add a PopupLoom popup to Wix |
-| 3 | `/guides/carrd-popup.html` | Platform install | Add a Popup to Carrd \| PopupLoom | Add a PopupLoom popup to a Carrd site with an embed element, plus plan requirements, testing and removal. | Add a PopupLoom popup to Carrd |
-| 4 | `/guides/static-html-popup.html` | Platform install | Add a Popup to a Static HTML Site \| PopupLoom | Install a PopupLoom popup on GitHub Pages, Netlify, Ghost or plain HTML with one snippet, then test and update it. | Add a popup to a static HTML site |
-| 5 | `/exit-intent-popup.html` | Feature | Exit Intent Popup Builder \| PopupLoom | Create a desktop exit-intent popup free: choose a trigger, page rules, devices and frequency, then install one snippet. | Exit intent popup builder |
-| 6 | `/email-signup-popup.html` | Feature | Email Signup Popup Builder \| PopupLoom | Build a free email signup popup with a visual editor, 45 templates, lead inbox and CSV export. No credit card. | Email signup popup builder |
+| URL | Intent | Status |
+|---|---|---|
+| `/guides/squarespace-wix-popup.html` | Squarespace + Wix install | **Shipped** — merged into one page to avoid two near-duplicate platform pages |
+| `/guides/exit-intent-popup.html` | Exit-intent feature | **Shipped** |
+| `/guides/email-signup-popup.html` | Email signup / welcome popup | **Shipped** |
+| `/guides/free-popup-builders-without-pageview-limits.html` | Dated, source-linked comparison | **Shipped** — generic URL, no competitor names in the slug |
+
+Also updated, not added:
+
+- `/guides/wordpress-popup.html` — rewritten for “popup in WordPress” and “pop up WordPress”, with a “without a plugin” section and FAQ schema.
+- `/guides/shopify-popup.html` and `/guides/webflow-popup.html` — “without an app” sections, FAQ schema, comparison table.
+
+### Still candidates, not shipped
+
+| URL | Intent | Why it waits |
+|---|---|---|
+| `/guides/carrd-popup.html` | Carrd install | Low volume; verify demand first |
+| `/guides/static-html-popup.html` | Static/Netlify/Ghost install | Broad but overlaps the install guide; needs a distinct angle |
+| `/guides/squarespace-popup.html` and `/guides/wix-popup.html` | Split platform pages | Only if the merged page fails to rank for one platform after 8–12 weeks |
 
 ### Required evidence per page
-- Real instructions tested on the named platform or a correct limitation statement.
-- One screenshot or exact code block from the shipped product.
+- Real instructions or a correct limitation statement, checked against official documentation with a date.
+- One exact code block or product screenshot.
 - Honest limits: iframe restrictions, custom-code plan requirements, no cart access, no email/SMS sending.
 - Links to `/guides/install-popups.html`, `/templates.html`, `/faq.html` and one relevant use-case page.
 

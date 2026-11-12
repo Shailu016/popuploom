@@ -1,5 +1,5 @@
 === PopupLoom - Free Popup Builder Embeds ===
-Contributors: popuploom
+Contributors: shailu3597
 Tags: popup, popup builder, exit intent, lead capture, email signup
 Requires at least: 6.0
 Tested up to: 6.8
