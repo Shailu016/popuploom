@@ -83,6 +83,28 @@ If the zone is upgraded to Pro later, decide whether to switch to Cloudflare's
 converter or keep the origin implementation. Do not enable both blindly; the
 origin version is the source of truth today.
 
+## Scan result (2026-11-13)
+
+The `isitagentready.com` scan now reports **Level 4 — Agent-Integrated**.
+
+Passing:
+
+- `robotsTxt`, `sitemap`, `linkHeaders`
+- `markdownNegotiation`
+- `robotsTxtAiRules`, `contentSignals`
+- `apiCatalog`, `ard`
+
+Still failing, all because the matching service does not exist:
+
+- `dnsAid` — no A2A/MCP index endpoint to bind
+- `webBotAuth` — informational; no signed-agent directory
+- `oauthDiscovery`, `oauthProtectedResource` — no OAuth server
+- `authMd`, `mcpServerCard`, `a2aAgentCard`, `agentSkills`, `webMcp`, `personalAgentProtocol`
+- commerce: `x402`, `mpp`, `ucp`, `acp`, `ap2` — product is free
+
+Do not publish metadata for those without building the service. The level is a
+checklist position, not a security or SEO score.
+
 ## Verification
 
 ```powershell
