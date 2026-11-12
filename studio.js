@@ -79,6 +79,7 @@
       pages: { mode: "all", include: [], exclude: [] },
       devices: { desktop: true, mobile: true },
       sticky: { enabled: false, label: "Hey!" },
+      credit: false,
       theme: { style: "light", accent: "#F99A1F", accentText: "#261303", text: "#171A20", bg: "#FFFFFF", radius: 18, animation: "pop", overlay: true },
       content: {
         badge: "", title: "New popup", body: "Write what matters here.",
@@ -305,6 +306,7 @@
     document.getElementById("stickyEnabled").checked = !!(sm && sm.enabled);
     setVal("stickyLabel", (sm && sm.label) || "Hey!");
     document.getElementById("stickyLabelRow").style.display = (sm && sm.enabled) ? "block" : "none";
+    document.getElementById("creditEnabled").checked = !!state.credit;
     syncToggles();
   }
 
@@ -438,6 +440,7 @@
       enabled: document.getElementById("stickyEnabled").checked,
       label: gval("stickyLabel") || "Hey!"
     };
+    state.credit = document.getElementById("creditEnabled").checked;
     state.name = undefined; // name lives on the wrapper, not config
   }
 

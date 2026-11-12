@@ -240,6 +240,12 @@ test('every catalog template satisfies the saved config schema',()=>{
  const pf=loadApp(async()=>{throw Error('Unexpected request');});const {validateConfig}=require('../server/validation');
  for(const t of pf.templates)assert.equal(validateConfig(pf.cfgFor(t.id)),null,t.id);
 });
+test('brand credit is an optional boolean and cannot be a string',()=>{
+ const {validateConfig}=require('../server/validation');
+ assert.equal(validateConfig({content:{},credit:true}),null);
+ assert.equal(validateConfig({content:{},credit:false}),null);
+ assert.match(validateConfig({content:{},credit:'yes'}),/credit must be a boolean/);
+});
 test('legacy database migration preserves accounts and revokes old Google sessions',()=>{
  const legacy=path.join(temp,'legacy.db');
  const code=`const {DatabaseSync}=require('node:sqlite');const d=new DatabaseSync(process.env.DB_PATH);d.exec("CREATE TABLE users(id INTEGER PRIMARY KEY AUTOINCREMENT,email TEXT UNIQUE NOT NULL,password_hash TEXT NOT NULL,created_at TEXT DEFAULT CURRENT_TIMESTAMP,google_id TEXT,name TEXT,avatar_url TEXT); INSERT INTO users(email,password_hash,google_id) VALUES ('legacy@example.com','legacy-hash','legacy-google')");d.close();const migrated=require('./server/db');const row=migrated.prepare('SELECT * FROM users').get();if(row.email!=='legacy@example.com'||row.token_version!==1)throw Error('Account migration failed');if(!migrated.prepare('PRAGMA table_info(submissions)').all().some(c=>c.name==='request_id'))throw Error('Lead migration failed');migrated.close();`;
@@ -266,6 +272,10 @@ test('targeting, untrusted rendering, storage restrictions and explicit test mod
  const inert=c.cardHTML({cfg:{content:{buttonText:'Demo CTA',buttonUrl:'',links:[{label:'Demo link',url:''}]}}});
  assert.ok(inert.includes('pf-btn-demo')&&!inert.includes('href="#"'));
  assert.ok(inert.includes('pf-link-demo')&&inert.includes('Demo button - set a real destination'));
+ const noCredit=c.cardHTML({cfg:{content:{}}});
+ assert.ok(!noCredit.includes('pf-credit'));
+ const withCredit=c.cardHTML({cfg:{credit:true,content:{}}});
+ assert.ok(withCredit.includes('pf-credit')&&withCredit.includes('utm_source=popuploom-widget')&&withCredit.includes('rel="noopener"'));
  const sample=c.proofHTML({cfg:{theme:{},content:{proof:{enabled:true,demo:true,items:[{name:'Maya',action:'sample action',ago:'2 min ago'}]}}}});
  assert.ok(sample.includes('Sample activity')&&sample.includes('Maya'));
  const emptyProof=c.proofHTML({cfg:{theme:{},content:{proof:{enabled:true,demo:false,items:[]}}}});

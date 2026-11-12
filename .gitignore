@@ -23,6 +23,9 @@ worker/migrations/*_data.sql
 recovered-*.json
 .cf-build/
 
+# WordPress plugin release artifacts are built locally, not committed.
+wordpress-plugin/*.zip
+
 # Owner site-verification drop files are deployed from the working tree
 # (npm run deploy:cf) but are never committed.
 google*.html

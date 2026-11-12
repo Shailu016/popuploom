@@ -9,6 +9,7 @@ function validateConfig(cfg) {
   }
   const options = { placement: ["modal", "fullscreen", "slide:br", "slide:bl", "slide:tr", "slide:tl", "topbar", "bottombar"], frequency: ["always", "once:day", "once:week", "once:ever", "close24h"] };
   for (const [key, allowed] of Object.entries(options)) if (cfg[key] !== undefined && !allowed.includes(cfg[key])) return "Invalid " + key;
+  if (cfg.credit !== undefined && typeof cfg.credit !== "boolean") return "credit must be a boolean";
   if (cfg.trigger?.type !== undefined && !["load", "delay", "scrollPct", "scrollTo", "click", "exitIntent"].includes(cfg.trigger.type)) return "Invalid trigger type";
   if (cfg.pages) {
     if (cfg.pages.mode !== undefined && !["all", "include", "exclude"].includes(cfg.pages.mode)) return "Invalid page mode";

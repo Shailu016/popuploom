@@ -330,6 +330,8 @@
 .pf-stage .pf-holder.pf-corner .pf-card { width: min(400px, 92%); }
 .pf-stage .pf-proof-card .pf-card { width: min(300px, 88%); padding: 14px 14px 14px 16px; }
 .pf-stage .pf-proof-card .pf-ava { width: 34px; height: 34px; font-size: 14px; }
+.pf-credit { display: block; margin: 14px auto 0; font-size: 11px; line-height: 1.4; text-align: center; color: inherit; opacity: .5; text-decoration: none; }
+.pf-credit:hover, .pf-credit:focus-visible { opacity: .85; text-decoration: underline; }
 `;
 
   /**
@@ -705,6 +707,7 @@
       return '<span class="pf-link-demo" role="link" aria-disabled="true" title="Demo link - set a real destination">' + esc(l.label) + "</span>";
     }).join("") + "</div>";
     if (mc.note) h += '<div class="pf-note">' + esc(mc.note) + "</div>";
+    if (c.credit) h += '<a class="pf-credit" href="https://popuploom.com/?utm_source=popuploom-widget&amp;utm_medium=badge&amp;utm_campaign=embed" target="_blank" rel="noopener">Popup by PopupLoom</a>';
     h += "</div>";
     if (split) h += '<div class="pf-media"><img loading="lazy" decoding="async" src="' + escAttr(safeUrl(mc.image, true)) + '" alt=""></div>';
     h += "</div>";
