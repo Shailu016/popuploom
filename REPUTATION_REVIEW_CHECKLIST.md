@@ -97,6 +97,18 @@ Interpretation:
 - Nothing on the site needs changing for this. Do not re-submit the SOCRadar form repeatedly; wait for their reply, then ask for a re-scan quoting the Norton API result.
 7. Public report: `https://gridinsoft.com/online-virus-scanner/url/popuploom-com`.
 
+### Screenshot visibility (support reply 2026-11-11)
+
+Asked Gridinsoft to refresh the public report screenshot. Support confirmed:
+
+- The capture was refreshed and shows the popup builder and the labelled demo preview. Nothing is wrong with the stored image.
+- The public screenshot address currently returns **HTTP 410**, and the image stays hidden on the report.
+- The display rule is: **the public preview is shown only when the score is at least 80**. The report is 53/100.
+- Capturing and displaying are separate steps; a good capture does not make the preview visible.
+- No repeat verification or new screenshot request is needed.
+
+Implication: the screenshot is **not a bug to fix**. It is gated on the trust score. The only way to make it appear is to reach 80/100, which still requires clearing the SOCRadar Phishing warning (the only external warning, 1/26) plus time/popularity signals. Do not open another screenshot ticket.
+
 ## Follow-up cadence
 
 - One initial request.
