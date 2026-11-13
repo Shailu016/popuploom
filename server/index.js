@@ -240,7 +240,7 @@ app.get('/ads.txt', (req, res, next) => {
 });
 const publicFiles = new Set([
   "templates.html", "faq.html", "press.html", "security.html", "guides/install-popups.html", "guides/index.html", "guides/wordpress-popup.html", "guides/shopify-popup.html", "guides/webflow-popup.html", "guides/squarespace-wix-popup.html", "guides/exit-intent-popup.html", "guides/email-signup-popup.html", "guides/free-popup-builders-without-pageview-limits.html", "guides/collect-and-export-leads.html", "guides/popup-not-showing.html", "guides/popup-builder-for-ecommerce.html", "guides/popup-builder-for-quick-commerce.html", "guides/popup-builder-for-lead-generation.html", "ccf2a9f45165c635253d22748df4a573.txt", "robots.txt", "sitemap.xml", "llms.txt", "llms-full.txt", "index.html", "studio.html", "profile.html", "demo.html", "migration.html", "reset-password.html",
-  "leads.html", "privacy.html", "about.html", "contact.html", "terms.html", ".well-known/security.txt", ".well-known/api-catalog", ".well-known/ard.json", ".well-known/ai-catalog.json", "openapi.json", "lead-csv.js", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "verify-email.html", "verify-email.js", "popuploom.js", "popforge.js", "embed/1.1.0/popuploom.js", "embed/1.1.0/popforge.js", "embed/1.1.0/SHA256SUMS", "ui.css", "ads.txt"
+  "leads.html", "privacy.html", "about.html", "contact.html", "terms.html", ".well-known/security.txt", "security.txt", ".well-known/api-catalog", ".well-known/ard.json", ".well-known/ai-catalog.json", "openapi.json", "lead-csv.js", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "verify-email.html", "verify-email.js", "popuploom.js", "popforge.js", "embed/1.1.0/popuploom.js", "embed/1.1.0/popforge.js", "embed/1.1.0/SHA256SUMS", "ui.css", "ads.txt"
 ]);
 // Private/app surfaces stay HTML-only for markdown negotiation.
 const noMarkdown = new Set([
@@ -291,7 +291,7 @@ app.use((req, res, next) => {
     const digest = crypto.createHash("sha256").update(fs.readFileSync(path.join(__dirname, "..", "popuploom.js"))).digest("hex");
     return res.type("text/plain").send(digest + "  popuploom.js\n" + digest + "  popforge.js\n");
   }
-  const sourceFile = (file === "/embed/1.1.0/popuploom.js" || file === "/embed/1.1.0/popforge.js") ? "/popuploom.js" : file;
+  const sourceFile = (file === "/embed/1.1.0/popuploom.js" || file === "/embed/1.1.0/popforge.js") ? "/popuploom.js" : (file === "/security.txt" ? "/.well-known/security.txt" : file);
   const diskPath = path.join(__dirname, "..", sourceFile.slice(1));
   if (!fs.existsSync(diskPath)) return next();
   if (file.endsWith(".html") && !noMarkdown.has(file) && /\btext\/markdown\b/i.test(req.get("Accept") || "")) {

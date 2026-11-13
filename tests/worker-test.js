@@ -302,6 +302,8 @@ function hostReq(host, path, method = "GET", extraHeaders = {}) {
   r=await req('GET','/guides/collect-and-export-leads.html',{raw:true});check('lead guide is served',r.status===200);
   r=await req('GET','/guides/popup-not-showing.html',{raw:true});check('troubleshooting guide is served',r.status===200);
   r=await req('GET','/.well-known/security.txt',{raw:true});check('security.txt is served',r.status===200&&String(r.data).includes('Contact:'));
+  const rootSecurity = await (await fetch(BASE + '/security.txt')).text();
+  check('root security.txt compatibility path is served', rootSecurity.includes('Canonical: https://popuploom.com/.well-known/security.txt'));
   console.log("== rate limit (login 40/10min) ==");
   let got429 = false, count = 0;
   for (let i = 0; i < 45; i++) {
