@@ -18,11 +18,11 @@
     "security:scan": "node scripts/secret-scan.cjs"
   },
   "dependencies": {
-    "bcryptjs": "^2.4.3",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
-    "express": "^4.19.2",
-    "google-auth-library": "^11.3.2",
-    "jose": "^6.2.14",
+    "express": "^5.3.0",
+    "google-auth-library": "^11.3.4",
+    "jose": "^6.2.17",
     "jsonwebtoken": "^9.0.2"
   },
   "engines": {
