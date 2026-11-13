@@ -305,15 +305,17 @@ app.use((req, res, next) => {
     res.type("html").send(ads.inject(html, pathname, adConfig, adNonce));
     return;
   }
-  res.sendFile(diskPath);
+  res.sendFile(diskPath, { dotfiles: "allow" });
 });
 app.use("/assets", express.static(path.join(__dirname, "..", "assets"), {
   dotfiles: "deny", index: false, redirect: false,
   setHeaders: res => res.setHeader("Cache-Control", "no-store")
 }));
 
-// Unknown routes are real 404s, not a soft homepage.
-app.get("*", (req, res, next) => {
+// Unknown routes are real 404s, not a soft homepage. Express 5 no longer
+// accepts a bare "*" path; use terminal middleware and keep the method check.
+app.use((req, res, next) => {
+  if (req.method !== "GET" && req.method !== "HEAD") return next();
   if (req.path.startsWith("/api/")) return next();
   security.htmlHeaders(res);
   res.status(404).type("html").send('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Page not found | PopupLoom</title><meta name="robots" content="noindex"></head><body style="background:#0A0B10;color:#F5F5F7;font-family:system-ui,sans-serif;padding:48px"><h1 style="font-size:28px">Page not found</h1><p style="color:#9DA0AC">That page does not exist. <a href="/" style="color:#FF6A1F">Return to PopupLoom</a>.</p></body></html>');
