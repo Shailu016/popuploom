@@ -1,0 +1,462 @@
+# PopupLoom SEO & organic growth plan
+
+**Created:** 2026-11-14
+**Scope:** organic search and product-led growth for `https://popuploom.com`
+**Status:** plan. Nothing in this document changes ad eligibility, CSP, injection or
+AdSense placements. Those remain governed by `shared/ads.js` and `shared/ad-pages.js`.
+
+---
+
+## 1. Executive summary
+
+PopupLoom is technically clean but commercially invisible in search.
+
+Evidence gathered on 2026-11-14:
+
+- 23 public HTML URLs are in `sitemap.xml`; all return `200` and are indexable.
+- On-page audit found only 11 minor issues, mostly short titles on legal/about pages
+  and missing structured data on six low-priority pages.
+- `robots.txt`, canonicals, `noindex` on private pages, CSP, HSTS and security headers
+  are correct.
+- DuckDuckGo's `site:popuploom.com` returns essentially one page (Privacy). Brand and
+  product queries return no PopupLoom result. Bing's index also looks empty. The site
+  is not yet participating in search.
+- Google Search Console is **DNS-verified** (`google-site-verification` TXT record is
+  live) but the browser session is signed out, so query/index data cannot be read yet.
+- The strongest market wedge is verifiable and rare: **free, no pageview or visitor
+  cap, no trial, no credit card**, with 45 templates and a two-line install.
+  OptinMonster, OptiMonk, Popupsmart, Poptin, Claspo and similar tools meter traffic
+  or brand the free tier.
+
+The plan therefore does three things in order:
+
+1. **Get indexed** (technical + Search Console + Bing/IndexNow).
+2. **Own the “no limits” wedge and the long tail** (comparison, platform, use-case and
+   template pages) before chasing the head term “popup builder”.
+3. **Earn authority** (WordPress plugin, GitHub, directories, a free tool, original
+   data) so the head term becomes reachable in 12–24 months instead of never.
+
+Realistic expectation: long-tail traffic in 4–8 weeks after indexing, meaningful
+non-brand clicks in 3–6 months, and head-term competition in 12–24 months. Anyone who
+promises page-one for “popup builder” in 90 days is guessing.
+
+---
+
+## 2. Baseline audit (2026-11-14)
+
+### 2.1 Page inventory
+
+| Page | Title length | Description length | Words | Schema |
+|---|---:|---:|---:|---|
+| `/` | 43 | 154 | 1294 | Organization, WebSite, SoftwareApplication, FAQ, Offer |
+| `/templates.html` | 40 | 151 | 880 | CollectionPage, ItemList, Breadcrumb |
+| `/faq.html` | 55 | 156 | 1138 | FAQPage, WebPage, Breadcrumb |
+| `/security.html` | 47 | 131 | 1091 | WebPage, Breadcrumb |
+| `/press.html` | 47 | 153 | 914 | AboutPage, Organization |
+| `/guides/index.html` | 62 | **187** | 420 | CollectionPage, ItemList |
+| `/guides/install-popups.html` | 46 | 147 | 825 | TechArticle, HowTo |
+| `/guides/wordpress-popup.html` | 54 | 146 | 1405 | Article, FAQ |
+| `/guides/shopify-popup.html` | 56 | 138 | 1272 | Article, FAQ |
+| `/guides/webflow-popup.html` | 56 | 127 | 970 | Article, FAQ |
+| `/guides/squarespace-wix-popup.html` | 60 | 150 | 1113 | Article, FAQ |
+| `/guides/exit-intent-popup.html` | 50 | 153 | 839 | Article, FAQ |
+| `/guides/email-signup-popup.html` | 51 | 150 | 909 | Article, FAQ |
+| `/guides/free-popup-builders-without-pageview-limits.html` | 62 | 142 | 905 | Article, FAQ |
+| `/guides/collect-and-export-leads.html` | 42 | 140 | 726 | **none** |
+| `/guides/popup-not-showing.html` | 49 | 149 | 876 | **none** |
+| `/guides/popup-builder-for-ecommerce.html` | 51 | 136 | 1846 | TechArticle, FAQ |
+| `/guides/popup-builder-for-quick-commerce.html` | 49 | 135 | 1937 | TechArticle, FAQ |
+| `/guides/popup-builder-for-lead-generation.html` | 46 | 138 | 2067 | TechArticle, FAQ |
+| `/about.html` | **15** | 121 | **272** | **none** |
+| `/contact.html` | **17** | 111 | 149 | **none** |
+| `/terms.html` | **24** | 114 | 436 | **none** |
+| `/privacy.html` | 37 | 125 | 649 | **none** |
+
+### 2.2 What is already good
+
+- Clean canonicals on every sitemap URL.
+- One `H1` per page; zero images missing `alt`.
+- Private surfaces (`studio`, `profile`, `leads`, `migration`, reset/verify) are
+  `noindex`, excluded in `robots.txt`, and blocked in the Worker.
+- Strict CSP with nonces and `strict-dynamic`; no `unsafe-inline`/`unsafe-eval` in
+  `script-src`.
+- Ads appear only on the 20 allowlisted public pages and never on private pages.
+- `sitemap.xml`, `robots.txt`, `llms.txt`, `openapi.json`, security headers and
+  IndexNow key file are all live.
+- 45 templates across 10 categories are a large, under-exploited content asset.
+
+### 2.3 Fix list from the audit
+
+| Priority | Issue | Pages | Action |
+|---|---|---|---|
+| P0 | Short titles | About, Contact, Terms | Rewrite with intent and brand |
+| P0 | Missing structured data | About, Contact, Terms, Privacy, 2 guides | Add `WebPage`/`AboutPage`/`ContactPage`/`Article` + breadcrumbs |
+| P1 | Oversized description | Guides hub (187) | Trim to ≤ 160 |
+| P1 | Thin about page | About (272 words) | Add real founder/mission/editorial process, no invented credentials |
+| P2 | Sitemap has no `lastmod` | All | Add real content dates; do not fake freshness |
+| P2 | Internal linking is shallow | All | Homepage and every guide should link to 3–5 relevant pages |
+| P2 | No individual template pages | 45 templates | Publish only substantive pages, see §4.3 |
+
+---
+
+## 3. Positioning and audience
+
+### 3.1 One-sentence position
+
+> **PopupLoom is the free popup builder with no pageview limits, no trial and no
+> credit card — 45 templates, a two-line install, lead export and signed webhooks on
+> any site that accepts custom HTML.**
+
+### 3.2 Who it is for
+
+1. **Solo site owners and small stores** on WordPress, Shopify, Webflow, Squarespace,
+   Wix or custom HTML who hit a pageview cap on a free popup tool.
+2. **Developers and technical marketers** who prefer a small script over a plugin or
+   an app, and who value signed webhooks and CSV over a locked dashboard.
+3. **Lead-gen sites** (agencies, newsletters, course creators, local services) that
+   need email capture without a monthly platform.
+
+Not the audience: enterprise CRO teams needing A/B testing, audience segmentation,
+cart integration, SMS/email sending or multi-step journeys. Those are honest gaps and
+should be stated on comparison pages rather than hidden.
+
+### 3.3 Why the wedge is credible
+
+| Tool | Free-tier limit | PopupLoom difference |
+|---|---|---|
+| OptinMonster | ~500 impressions/month via plugin | No pageview cap |
+| OptiMonk | ~10,000 pageviews/month | No pageview cap |
+| Popupsmart | ~5,000 pageviews/month | No pageview cap |
+| Poptin | ~1,000 visitors/month, branding | No pageview cap, optional credit |
+| Claspo | ~3,000 pageviews/month | No pageview cap |
+| Popup Maker | Free only inside WordPress | Works on any site via script |
+
+Claims must stay factual and dated. Re-verify competitor limits before publishing and
+link to the competitor's own pricing page as the source.
+
+---
+
+## 4. Keyword and page strategy
+
+No search-volume numbers are invented here. Validate demand in GSC, Google Keyword
+Planner and Bing Webmaster before committing production pages. Priority reflects
+intent and fit, not guessed volume.
+
+### 4.1 Cluster map
+
+| Cluster | Intent | Example queries | Target page | Status |
+|---|---|---|---|---|
+| No-limits wedge | Commercial | free popup builder no pageview limit, unlimited popup builder free | `/guides/free-popup-builders-without-pageview-limits.html` + a dedicated `/free-popup-builder-no-limits.html` | Existing guide; add money page |
+| Free builder | Commercial | free popup builder, free website popup builder | `/` (refine title/H1 around free) | Existing |
+| Platform | Commercial | free WordPress popup, Shopify popup without app, Webflow popup, Squarespace popup, Wix popup | 5 existing platform guides | Existing; expand + interlink |
+| Trigger | Commercial/info | exit intent popup, scroll popup, timed popup, click trigger | `/guides/exit-intent-popup.html` + new trigger pages | Partial |
+| Use case | Commercial | email signup popup, lead magnet popup, discount popup, announcement bar | New use-case pages | Gap |
+| Templates | Transactional/long tail | exit intent popup template, spin to win popup template, Black Friday popup template | New `/templates/...` pages | Gap |
+| Comparisons | Commercial | OptinMonster alternative free, Poptin alternative, Popupsmart alternative | New `/alternatives/...` pages | Gap |
+| Head comparison | Commercial | best free popup builder, popup builder comparison | Existing comparison guide | Existing; strengthen |
+| Informational | Info | how to add a popup to a website, popup not showing, popup SEO, intrusive interstitials | Guides | Partial |
+| Branded | Navigational | popuploom, popuploom login, popuploom review | Home, FAQ, About | Existing |
+
+### 4.2 Money pages to create first
+
+1. `/free-popup-builder-no-limits.html` — the wedge page. Comparison table, install
+   proof, limits of competitors, FAQ, CTA. This is the page to rank for the phrase the
+   product actually wins on.
+2. `/alternatives/optinmonster.html`
+3. `/alternatives/poptin.html`
+4. `/alternatives/popupsmart.html`
+5. `/alternatives/optimonk.html`
+6. `/alternatives/popup-maker.html` (WordPress-only vs any-site angle)
+7. `/best-free-popup-builder.html` — honest shortlist, including competitors, with
+   PopupLoom's fit stated plainly.
+8. `/popup-builder-for-wordpress-without-plugin.html` — targets people who cannot or
+   will not install a plugin.
+
+Each page needs: a clear comparison table with dates and source links, “who it is for”
+and “who it is not for”, screenshots, pricing limits, migration steps, FAQ, and a
+tested CTA. No competitor FUD, no invented review counts.
+
+### 4.3 Template pages: the biggest long-tail asset
+
+45 templates across: discount (7), email (10), gamified (2), seasonal (3), age (2),
+social (3), announce (6), engage (8), video (1), exit (3).
+
+Do **not** publish 45 near-duplicate pages. Google treats mass variable-swapped pages
+as doorway/thin content. Publish in waves of 8–10, each with:
+
+- a real rendered preview image and a live “try this template” link;
+- 600–1,000 words of unique copy: who it suits, when to show it, what to write, which
+  trigger/frequency to use, what to avoid;
+- 2–4 genuine examples or annotated screenshots (own designs, not copied);
+- an FAQ block based on real questions;
+- links to the parent category hub and 3 sibling templates.
+
+Wave 1 (highest commercial intent): exit-intent, cart rescue, first-order discount,
+48-hour drop, spin-to-win, email signup, lead magnet, back-in-stock, webinar, announcement bar.
+
+Category hubs (10 pages) can be thinner but must still explain the category and link
+to every published template in it.
+
+### 4.4 Informational cluster to build trust
+
+- How to add a popup to any website (existing; expand).
+- Popup triggers explained (load, delay, scroll, click, exit intent).
+- Popup frequency capping: what “once per day” actually means.
+- Why your popup is not showing (existing; add decision tree).
+- Popup accessibility: focus, Escape, reduced motion, screen readers.
+- Do popups hurt SEO? Google’s intrusive-interstitial guidance, explained honestly.
+- Popup conversion benchmarks: only publish with real, sourced data.
+- Popup copywriting: 20 tested patterns (own examples).
+- How to test a popup without annoying visitors.
+- Popup privacy: what a builder should never store on the customer’s site.
+
+The “do popups hurt SEO” page is a trust differentiator: most popup vendors avoid the
+topic. State plainly that intrusive mobile interstitials can be penalized, and that
+exit-intent and delayed popups are the safer pattern.
+
+---
+
+## 5. Technical SEO backlog
+
+### P0 — this week
+
+1. **Search Console access.** Sign in to the DNS-verified `sc-domain:popuploom.com`
+   property. Submit `https://popuploom.com/sitemap.xml`. Inspect and request indexing
+   for all 23 URLs (spread over 2–3 days).
+2. **Bing Webmaster Tools.** Verify (DNS or import from GSC). Submit the sitemap.
+   IndexNow is already live and was re-run on 2026-11-14 (23 URLs, HTTP 200).
+3. **Rewrite short titles/descriptions** for About, Contact, Terms; trim the guides hub
+   description.
+4. **Add structured data** to the six pages missing it.
+5. **Check the Page indexing report** for “Discovered/Crawled — currently not indexed”
+   and “Duplicate without user-selected canonical”. Fix causes before adding pages.
+
+### P1 — next 30 days
+
+6. Add real `lastmod` values to `sitemap.xml`; automate from git commit dates per page.
+7. Add a visible “Last updated” line and author/reviewer to every guide.
+8. Internal-link modules: “Related guides”, “Next step”, and contextual links from
+   every guide to the money pages.
+9. Add all five platform guides and the template hub to the homepage/footer.
+10. Add `WebSite` + `SearchAction` only if a real site search exists; otherwise keep
+    the current `WebSite` node without a fake search action.
+11. Compress and dimension every OG/preview image; keep CLS at 0.
+12. Confirm ad slots reserve height and never push content (protect CWV).
+
+### P2 — 60–90 days
+
+13. Add an `Atom`/`RSS` feed for guides and link it in `<head>`.
+14. Add a 404 page that helps (“Popular guides”, search, home) while staying hardened.
+15. Add `hreflang` only if translations are real; do not machine-translate for SEO.
+16. Split the sitemap into an index if the page count passes ~200.
+17. Add automated checks: broken internal links, missing titles/descriptions, duplicate
+    titles, canonical mismatches, and sitemap/HTML drift in CI.
+
+### Guardrails
+
+- Never add `noindex` pages to the sitemap.
+- Never let `/guides/` and `/guides/index.html` both become indexable duplicates;
+  keep one canonical.
+- Never add new pages to the AdSense allowlist automatically. Ads stay on the current
+  20-page list until each new page is reviewed for content quality and policy.
+- No `FAQPage` rich-result dependency: Google restricts FAQ rich results. Keep the
+  schema for semantics, not as a traffic promise.
+
+---
+
+## 6. Authority and off-page plan
+
+### 6.1 Owned properties (highest ROI, lowest risk)
+
+| Asset | Action | Status |
+|---|---|---|
+| WordPress.org plugin | “PopupLoom – Free Popup Builder Embeds” 1.0.1 | Awaiting review — do not resubmit |
+| GitHub `popuploom-embed` | MIT wrapper repo, README links to site | Published |
+| GitHub main repo | README with install + docs links | Exists |
+| npm package (optional) | Publish the embed wrapper if it is genuinely useful | Not started |
+| Product Hunt | Launch after 20+ template pages exist | Owner action |
+| AlternativeTo, SaaSHub, Slant, Peerlist | Claim/list with accurate copy | Owner account |
+| G2 / Capterra | Only if eligible; do not invent reviews | Owner account |
+| Indie Hackers / Show HN / relevant subreddits | Share the “no pageview limits” story, not spam | Owner voice |
+
+### 6.2 Link-earning assets
+
+1. **Free popup ROI calculator** (`/tools/popup-roi-calculator.html`) — client-side,
+   no signup, embeddable. Targets “popup ROI calculator” and earns links from marketing
+   blogs.
+2. **Popup copy swipe file** (`/tools/popup-copy-swipe-file.html`) — 50 original
+   headline/CTA patterns, filterable, no email gate. High link potential.
+3. **Exit-intent snippet generator** — produces a copy-paste vanilla-JS snippet.
+   Developer-friendly and naturally linked from Stack Overflow/Dev.to answers.
+4. **Original data study** — survey 100–300 site owners about popup conversion and
+   pageview-cap frustration. Publish methodology, sample size and limitations. This is
+   the only ethical way to earn “popup benchmarks” links. Do not fabricate numbers.
+5. **Annual “state of popup limits” report** — re-verify every competitor’s free-tier
+   cap with dates and source links. Naturally cited when limits change.
+
+### 6.3 Link targets to pursue manually
+
+- “Best free popup builder” listicles (pitch a factual update, not a paid placement).
+- WordPress/Shopify/Webflow/Squarespace tutorial sites.
+- Marketing tool comparison sites (Capterra, G2, GetApp, Software Advice).
+- “Awesome” lists for Webflow, Shopify, indie marketing and no-code.
+- Newsletter and community roundups (Indie Hackers, Marketing Examples, etc.).
+- HARO/Featured/Qwoted expert commentary on popups, CRO and intrusive interstitials.
+
+Measure referring domains and non-brand clicks, not “mentions”.
+
+---
+
+## 7. Measurement
+
+### 7.1 Tools
+
+- **Google Search Console** — queries, pages, indexing, CWV, manual actions.
+- **Bing Webmaster Tools** — Bing index and keyword data.
+- **Cloudflare Web Analytics** — traffic and referrers; GA4 is not used and should not
+  be added.
+- **D1 product metrics** — accounts created, widgets saved, widgets with a first view,
+  widgets with a first lead. These are the real north-star numbers.
+- **UTM links** for every outbound campaign; keep them consistent.
+
+### 7.2 Weekly scorecard
+
+| Metric | Source | Why |
+|---|---|---|
+| Indexed pages | GSC Pages | Is the site participating at all? |
+| Impressions / clicks / CTR | GSC Performance | Demand and title/meta fit |
+| Average position for target queries | GSC | Are money pages moving? |
+| Non-brand clicks | GSC filter | Real acquisition, not brand recall |
+| Referring domains | GSC Links / Bing | Authority trend |
+| Signups | D1 | Traffic quality |
+| Widgets saved | D1 | Activation |
+| Widgets with first view | D1 | Installation |
+| Widgets with first lead | D1 | Value delivered |
+| CWV “Good” URLs | GSC | Technical health |
+
+### 7.3 Targets (not promises)
+
+- **30 days:** all 23 URLs inspected; sitemap success; 0 P0 audit issues; 10+ pages
+  indexed; 5 money/template pages shipped.
+- **90 days:** 45–60 indexable pages; 10–20 long-tail queries in the top 20; 5–10
+  referring domains; first non-brand signups attributable to search.
+- **6 months:** 100+ quality pages; 50+ referring domains; consistent non-brand clicks;
+  comparison pages ranking for competitor-alternative terms.
+- **12–24 months:** competitive for “free popup builder” variants; head term
+  “popup builder” only if authority and links justify it.
+
+---
+
+## 8. 90-day execution plan
+
+### Week 0 (now)
+
+- [ ] Owner signs in to Search Console; I pull the data and record the baseline.
+- [ ] Submit sitemap; inspect all 23 URLs; request indexing in batches.
+- [ ] Verify Bing Webmaster; re-run IndexNow after each deploy.
+- [ ] Fix the 11 audit issues (titles, descriptions, schema, About copy).
+- [ ] Add real `lastmod` and related-link modules.
+
+### Weeks 1–2
+
+- [ ] Publish the no-limits money page.
+- [ ] Publish 3 alternative pages (OptinMonster, Poptin, Popupsmart).
+- [ ] Add homepage/footer links to all platform and money pages.
+- [ ] Set up the weekly scorecard.
+
+### Weeks 3–4
+
+- [ ] Publish 2 more alternatives + “best free popup builder”.
+- [ ] Publish WordPress-without-plugin page.
+- [ ] Expand the 5 platform guides with fresh screenshots and FAQs.
+- [ ] Publish template hub + first 8 template pages.
+
+### Weeks 5–6
+
+- [ ] Publish next 8 template pages.
+- [ ] Publish 4 informational guides (triggers, frequency, accessibility, testing).
+- [ ] Ship the ROI calculator.
+- [ ] Internal-link audit and fixes.
+
+### Weeks 7–8
+
+- [ ] Publish 4 comparison pages (OptiMonk, Claspo, Wisepops, Popup Maker).
+- [ ] Publish “do popups hurt SEO?” and “popup privacy” guides.
+- [ ] Start the owner survey for the original data study.
+- [ ] Pitch 20 listicles and directories with factual updates.
+
+### Weeks 9–10
+
+- [ ] Publish the copy swipe file and exit-intent snippet generator.
+- [ ] Publish 4 more template pages.
+- [ ] Refresh underperforming titles/descriptions using GSC CTR data.
+- [ ] Build 10–20 quality backlinks from directories and communities.
+
+### Weeks 11–12
+
+- [ ] Publish the data study with methodology and limitations.
+- [ ] Product Hunt prep (only if the page inventory and onboarding are ready).
+- [ ] Quarterly content audit: prune, merge or improve thin pages.
+- [ ] Re-run the full audit and update this plan with real GSC numbers.
+
+---
+
+## 9. Search Console checklist (once signed in)
+
+Do this in order and save screenshots/CSV exports as the baseline.
+
+1. **Property:** confirm `sc-domain:popuploom.com` (DNS TXT is present). Check whether
+   a URL-prefix property also exists; avoid split data.
+2. **Sitemaps:** submit `https://popuploom.com/sitemap.xml`. Confirm “Success” and the
+   discovered URL count (should be 23 today).
+3. **Page indexing:** record counts and reasons for every “Not indexed” bucket.
+   Prioritise “Crawled — currently not indexed” and “Discovered — currently not
+   indexed”.
+4. **URL Inspection:** for each of the 23 URLs, run “Test live URL”, confirm
+   “Indexable”, then “Request indexing”. Do 8–10 per day.
+5. **Performance:** export last 3 months (or since launch). Split branded vs
+   non-branded. Flag queries at positions 8–20 and pages with impressions but CTR
+   below 2%.
+6. **Core Web Vitals:** mobile report. Fix any URL that is not “Good”.
+7. **Manual actions / Security issues:** confirm both are empty.
+8. **Links:** export top linking sites and top linked pages. Compare with the plan.
+9. **Crawl stats:** check response codes, file types and host status.
+10. **Robots.txt:** fetch and confirm the sitemap line and private disallows.
+
+If the property has no data, that is itself the finding: the site has not been
+discovered, and indexing requests + links are the priority.
+
+---
+
+## 10. Risks and non-negotiables
+
+- **AdSense:** no changes to eligibility, CSP, nonce handling or injection. New pages
+  are not added to the allowlist automatically. Ads never go on private/app/legal/
+  contact/terms/demo pages.
+- **Thin content:** no 45-page template farm. Publish only pages with unique previews,
+  copy and examples. Quality gates beat volume.
+- **Claims:** no fabricated certifications, review counts, customer logos, conversion
+  lifts or “#1” claims. Competitor limits must be dated and source-linked.
+- **Privacy:** no new tracking beyond Cloudflare Analytics; no GA4; no PII in URLs or
+  client storage.
+- **Security:** keep CSP hashes updated when adding inline JSON-LD; run
+  `npm test`, `npm run test:cf`, `npm run test:cf:integration`, `npm audit` and
+  `npm run security:scan` after any HTML/JS change.
+- **Owner-only actions:** Search Console/Bing sign-in, directory accounts, Product
+  Hunt, Cloudflare MFA, WordPress.org review follow-up. I can prepare everything and
+  verify the result, but I cannot create accounts or accept terms on the owner’s behalf.
+
+---
+
+## 11. What I can do next without owner access
+
+1. Fix the 11 on-page audit issues.
+2. Add `lastmod` and internal-link modules.
+3. Draft the no-limits money page and three alternative pages.
+4. Draft the template hub and first 8 template pages.
+5. Build the ROI calculator and copy swipe file.
+6. Add automated SEO checks to CI.
+7. Re-run the audit and IndexNow after each deploy.
+
+The only thing blocking the Search Console half of this plan is a signed-in Google
+session in the app browser.
