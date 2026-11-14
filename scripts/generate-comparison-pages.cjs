@@ -193,6 +193,9 @@ const PAGES = [
       <li><a href="/alternatives/optinmonster.html">OptinMonster alternative</a> — strong campaign suite, 500-impression free trial.</li>
       <li><a href="/alternatives/poptin.html">Poptin alternative</a> — 1,000-visitor free plan, built-in forms.</li>
       <li><a href="/alternatives/popupsmart.html">Popupsmart alternative</a> — 5K-pageview free plan, Shopify app and AI builder.</li>
+      <li><a href="/alternatives/optimonk.html">OptiMonk alternative</a> — 10K-pageview free plan, AI agent and all features.</li>
+      <li><a href="/alternatives/popup-maker.html">Popup Maker alternative</a> — free WordPress plugin, any-site comparison.</li>
+      <li><a href="/best-free-popup-builder.html">Best free popup builder</a> — the full shortlist and how to choose.</li>
       <li><a href="/guides/free-popup-builders-without-pageview-limits.html">Free popup builder comparison guide</a> — the longer buying guide.</li>
     </ul>
 
@@ -433,6 +436,232 @@ const PAGES = [
       <li>Confirm the response in the lead inbox, then remove the old campaign.</li>
     </ol>
     <p>Platform steps: <a href="/guides/wordpress-popup.html">WordPress</a>, <a href="/guides/shopify-popup.html">Shopify</a>, <a href="/guides/webflow-popup.html">Webflow</a> and <a href="/guides/squarespace-wix-popup.html">Squarespace and Wix</a>.</p>
+
+    <h2>Common questions</h2>
+    __FAQ__
+    `
+  },
+  {
+    path: "/alternatives/optimonk.html",
+    title: "OptiMonk Alternative: Free, No Pageview Limits | PopupLoom",
+    description: "Compare OptiMonk's 10,000-pageview free plan with PopupLoom's free, no-pageview-limit popup builder. Checked 14 November 2026.",
+    crumbs: [{ name: "Home", path: "/" }, { name: "Alternatives", path: "/free-popup-builder-no-limits.html" }, { name: "OptiMonk", path: "/alternatives/optimonk.html" }],
+    faq: [
+      ["Is PopupLoom a free OptiMonk alternative?", "Yes. PopupLoom is free and does not meter pageviews. OptiMonk's free plan was listed at 10,000 pageviews per month and one domain when checked on 14 November 2026."],
+      ["What is OptiMonk's free plan?", `OptiMonk's pricing page on ${CHECKED} listed a free-forever plan with 10,000 pageviews per month, one domain, 1,000 AI credits and no credit card. At the pageview limit, campaigns pause until the counter resets or the account upgrades.`],
+      ["Does PopupLoom have an AI popup agent?", "No. PopupLoom is a visual editor with 45 templates. It does not generate campaigns with an AI agent."],
+      ["Does PopupLoom have A/B testing or geotargeting?", "No. It has page, device and frequency targeting plus six triggers, but not A/B testing, geotargeting or audience segmentation."],
+      ["Can I migrate my OptiMonk leads?", "Export them from OptiMonk and keep the CSV. PopupLoom has no automatic importer; it collects new responses after installation."],
+      ["Is PopupLoom affiliated with OptiMonk?", "No. OptiMonk is a trademark of its owner. PopupLoom is not affiliated with or endorsed by OptiMonk."]
+    ],
+    body: `
+    <h1>A free OptiMonk alternative with no pageview limits</h1>
+    <p class="mut">OptiMonk terms checked on ${CHECKED}. Verify current pricing on its site before buying.</p>
+    <p>OptiMonk is an ecommerce-focused popup platform with an AI agent, all features available on every plan and a genuinely useful free tier. It is a strong choice for a store that wants popups, A/B testing and analytics in one place. The free plan is still metered: 10,000 pageviews per month when we checked.</p>
+    <p><strong>PopupLoom is free and does not meter pageviews.</strong> It is deliberately narrower: 45 templates, six triggers, page/device/frequency targeting, a lead inbox, CSV export and an optional signed webhook. It does not use an AI agent or include A/B testing.</p>
+
+    <h2>OptiMonk at a glance</h2>
+    ${table(
+      ["", "OptiMonk", "PopupLoom"],
+      [
+        ["Free offer", "Free forever: <strong>10,000 pageviews/month</strong>, 1 domain, 1,000 AI credits", "Free, no trial timer"],
+        ["Meter", "Site pageviews per month", "No pageview, visitor or impression cap"],
+        ["At the cap", "Campaigns pause until the counter resets or you upgrade", "No upgrade; hosting/API rate limits only"],
+        ["Paid entry", "Essential: 20,000 pageviews/month (from $19/month billed yearly)", "No paid plan inside the product"],
+        ["Scope", "AI agent, all features on every plan, ecommerce integrations, A/B testing, analytics", "Focused popup builder: 45 templates, 6 triggers, page/device/frequency targeting, lead inbox, CSV, signed webhook"],
+        ["Install", "Script or platform integration", "Two-line script on any site with custom HTML/JavaScript"]
+      ]
+    )}
+    <p class="mut">Source: <a href="https://www.optimonk.com/pricing/" target="_blank" rel="noopener">OptiMonk pricing</a>, checked ${CHECKED}.</p>
+
+    <h2>Where OptiMonk is stronger</h2>
+    <ul>
+      <li><strong>AI agent and all features on the free plan.</strong> Campaign creation, A/B testing and analytics are not gated by plan.</li>
+      <li><strong>Ecommerce focus.</strong> Integrations and targeting built for stores.</li>
+      <li><strong>Analytics and testing.</strong> A stronger experimentation workflow than PopupLoom.</li>
+      <li><strong>More room before the cap.</strong> 10,000 pageviews per month is a generous free allowance for a small store.</li>
+      <li><strong>No branding on any plan</strong> and a mature support operation.</li>
+    </ul>
+
+    <h2>Where PopupLoom fits</h2>
+    <ul>
+      <li><strong>No pageview meter.</strong> Your popup does not pause because a monthly allowance ran out.</li>
+      <li><strong>Any site with custom HTML.</strong> WordPress, Shopify, Webflow, Squarespace, Wix or a static site.</li>
+      <li><strong>Free with no card.</strong> No trial timer and no paid upgrade inside the product.</li>
+      <li><strong>Portable leads.</strong> Lead inbox, CSV export and a signed server webhook.</li>
+      <li><strong>45 templates</strong> with honest setup notes for each category.</li>
+    </ul>
+
+    <h2>Who should switch</h2>
+    <ul>
+      <li>Your pageviews are near or above 10,000 per month.</li>
+      <li>You do not need an AI agent, A/B testing or ecommerce targeting.</li>
+      <li>You want a simple script and a focused popup tool.</li>
+      <li>You already use a separate email/CRM tool.</li>
+    </ul>
+
+    <h2>Who should stay</h2>
+    <ul>
+      <li>You want the AI agent and all features on the free plan.</li>
+      <li>You rely on A/B testing, analytics or store integrations.</li>
+      <li>You need a mature support organization.</li>
+    </ul>
+
+    <h2>Switch in about ten minutes</h2>
+    <ol>
+      <li>Export your OptiMonk leads and keep the CSV.</li>
+      <li>Build the popup in the <a href="/studio.html?tpl=blank">PopupLoom studio</a> and test it as a guest.</li>
+      <li>Save it, open <strong>Publish</strong>, and copy the two-line install code.</li>
+      <li>Add the code, pause the OptiMonk campaign, and test one fake submission.</li>
+      <li>Confirm the response in the lead inbox, then remove the old campaign.</li>
+    </ol>
+    <p>Platform steps: <a href="/guides/wordpress-popup.html">WordPress</a>, <a href="/guides/shopify-popup.html">Shopify</a>, <a href="/guides/webflow-popup.html">Webflow</a> and <a href="/guides/squarespace-wix-popup.html">Squarespace and Wix</a>.</p>
+
+    <h2>Common questions</h2>
+    __FAQ__
+    `
+  },
+  {
+    path: "/alternatives/popup-maker.html",
+    title: "Popup Maker Alternative for Any Website | PopupLoom",
+    description: "Popup Maker is a free WordPress plugin with unlimited impressions. Compare it with PopupLoom's free, any-site popup builder. Checked 14 November 2026.",
+    crumbs: [{ name: "Home", path: "/" }, { name: "Alternatives", path: "/free-popup-builder-no-limits.html" }, { name: "Popup Maker", path: "/alternatives/popup-maker.html" }],
+    faq: [
+      ["Is PopupLoom a Popup Maker alternative?", "Yes, if you need a popup on a site that is not WordPress or you prefer a hosted script. If you are on WordPress and only need a native plugin, Popup Maker is a strong free option and may be the better fit."],
+      ["Is Popup Maker free?", `Popup Maker's pricing page on ${CHECKED} lists a free WordPress.org plugin with unlimited popups and unlimited pageviews/impressions. Advanced targeting, exit-intent triggers, analytics, WooCommerce features and support are part of the paid Pro plans.`],
+      ["Does PopupLoom work on WordPress?", "Yes, through theme code or a code-snippet plugin. It is not a WordPress plugin, so it does not appear in the WordPress admin. See the WordPress guide for the exact placement."],
+      ["Does PopupLoom have unlimited pageviews?", "Yes. It does not meter pageviews, visitors or popup impressions. A free account is required to save and install."],
+      ["Can I migrate my Popup Maker leads?", "Export them from your WordPress database or the plugin's export if available, and keep the CSV. PopupLoom has no automatic importer."],
+      ["Is PopupLoom affiliated with Popup Maker?", "No. Popup Maker is a trademark of Code Atlantic LLC. PopupLoom is not affiliated with or endorsed by Popup Maker."]
+    ],
+    body: `
+    <h1>A Popup Maker alternative for any website</h1>
+    <p class="mut">Popup Maker terms checked on ${CHECKED}. Verify current pricing on its site before buying.</p>
+    <p>Popup Maker is a strong free WordPress plugin: unlimited popups and unlimited impressions, with no hosted account required. If your site is WordPress and you are comfortable in the plugin ecosystem, it may be the better free option. This page is for the cases where it is not: a Shopify, Webflow, Squarespace, Wix or custom site, or a WordPress site where you want a hosted script instead of another plugin.</p>
+    <p><strong>PopupLoom is free and does not meter pageviews.</strong> It installs as a two-line script on any site that allows custom HTML or JavaScript. The trade-off is that it is not a WordPress plugin: there is no WP admin screen, and the popup is managed in the PopupLoom studio.</p>
+
+    <h2>Popup Maker at a glance</h2>
+    ${table(
+      ["", "Popup Maker", "PopupLoom"],
+      [
+        ["Free offer", "Free WordPress plugin with unlimited popups and unlimited pageviews/impressions", "Free, no trial timer"],
+        ["Platform", "WordPress only", "Any site that allows custom HTML or JavaScript"],
+        ["Meter", "No pageview/impression cap in the core plugin", "No pageview, visitor or impression cap"],
+        ["Advanced features", "Targeting, exit intent, analytics, WooCommerce and support are paid Pro features", "Focused feature set; no paid tier"],
+        ["Install", "WordPress plugin", "Two-line script, no plugin"],
+        ["Hosted config", "Configuration lives in WordPress", "Configuration lives in PopupLoom; edits go live without re-pasting"]
+      ]
+    )}
+    <p class="mut">Source: <a href="https://wppopupmaker.com/pricing/" target="_blank" rel="noopener">Popup Maker pricing</a>, checked ${CHECKED}.</p>
+
+    <h2>Where Popup Maker is stronger</h2>
+    <ul>
+      <li><strong>Native WordPress integration.</strong> Popups live in the WordPress admin and can use WordPress conditions and hooks.</li>
+      <li><strong>Unlimited popups and impressions on the free plugin.</strong> A genuinely free core, not a trial.</li>
+      <li><strong>WooCommerce path.</strong> Paid Pro/Pro+ plans add cart and revenue features for stores.</li>
+      <li><strong>No external account.</strong> The plugin runs inside your WordPress site.</li>
+      <li><strong>Mature plugin ecosystem</strong> with documentation and support plans.</li>
+    </ul>
+
+    <h2>Where PopupLoom fits</h2>
+    <ul>
+      <li><strong>Not WordPress.</strong> Shopify, Webflow, Squarespace, Wix, static sites and custom apps.</li>
+      <li><strong>No plugin.</strong> Two lines before the closing body tag; nothing to update in a plugin dashboard.</li>
+      <li><strong>Hosted configuration.</strong> Change the popup in the studio and the installed widget updates.</li>
+      <li><strong>Portable leads.</strong> Lead inbox, CSV export and a signed server webhook.</li>
+      <li><strong>45 templates</strong> across email, discounts, exit intent, announcements, engagement, trust, age gates, gamified, seasonal and video.</li>
+    </ul>
+
+    <h2>Who should switch</h2>
+    <ul>
+      <li>Your site is not WordPress.</li>
+      <li>You want to avoid another WordPress plugin and its update surface.</li>
+      <li>You want a hosted config you can change without touching the site.</li>
+      <li>You need the lead inbox, CSV and signed webhook in one free tool.</li>
+    </ul>
+
+    <h2>Who should stay</h2>
+    <ul>
+      <li>Your site is WordPress and you want popups managed inside WP.</li>
+      <li>You need Popup Maker's WordPress conditions or WooCommerce Pro features.</li>
+      <li>You want a plugin with a large WordPress.org install base and support plans.</li>
+    </ul>
+
+    <h2>Switch in about ten minutes</h2>
+    <ol>
+      <li>Export or back up your Popup Maker leads and settings.</li>
+      <li>Build the popup in the <a href="/studio.html?tpl=blank">PopupLoom studio</a> and test it as a guest.</li>
+      <li>Save it, open <strong>Publish</strong>, and copy the two-line install code.</li>
+      <li>Add the code to the site, pause the Popup Maker popup, and test one fake submission.</li>
+      <li>Confirm the response in the lead inbox, then remove the old popup.</li>
+    </ol>
+    <p>WordPress placement without a popup plugin: see <a href="/guides/wordpress-popup-without-plugin.html">how to add a popup to WordPress without a plugin</a>. Other platforms: <a href="/guides/shopify-popup.html">Shopify</a>, <a href="/guides/webflow-popup.html">Webflow</a>, <a href="/guides/squarespace-wix-popup.html">Squarespace and Wix</a>.</p>
+
+    <h2>Common questions</h2>
+    __FAQ__
+    `
+  },
+  {
+    path: "/best-free-popup-builder.html",
+    title: "Best Free Popup Builders in 2026: Honest Comparison",
+    description: "An honest comparison of free popup builders: PopupLoom, Popup Maker, OptiMonk, Poptin, Popupsmart and OptinMonster, with dated limits and fit.",
+    crumbs: [{ name: "Home", path: "/" }, { name: "Best free popup builder", path: "/best-free-popup-builder.html" }],
+    faq: [
+      ["What is the best free popup builder?", "There is no single answer. Popup Maker is the strongest free WordPress-only option, OptiMonk has the most generous feature-complete free tier for small stores, and PopupLoom is the fit when you want no pageview cap and a script on any site. Choose by platform, meter and features, not by a generic ranking."],
+      ["Which free popup builder has no pageview limit?", "PopupLoom does not meter pageviews, visitors or impressions. Popup Maker's free WordPress plugin also advertises unlimited pageviews and impressions. OptiMonk, Poptin and Popupsmart publish monthly free-tier meters; OptinMonster's free offer is a 500-impression trial."],
+      ["Is PopupLoom really free?", "Yes. There is no credit card, trial timer or paid upgrade inside the product. A free account is required to save a popup and get its install code."],
+      ["Do these free plans include email sending?", "PopupLoom does not send email. Poptin and Popupsmart include email features with their own quotas. OptiMonk and OptinMonster focus on popups; email delivery is a separate tool."],
+      ["Are the limits on this page current?", `They were checked on ${CHECKED}. Free tiers change, so open each vendor's pricing page before you commit.`]
+    ],
+    body: `
+    <h1>Best free popup builders in 2026: an honest comparison</h1>
+    <p class="mut">Vendor limits checked on ${CHECKED}. Prices and limits change; verify on each linked pricing page.</p>
+    <p>“Best” depends on your platform, your traffic and the features you actually use. A WordPress-only plugin with unlimited impressions is not the same product as a script that works on Shopify, Webflow and a custom site. This page compares the free tiers we could verify and says which one fits which job.</p>
+
+    <h2>The short answer</h2>
+    <ul>
+      <li><strong>WordPress only, free, unlimited impressions:</strong> <a href="/alternatives/popup-maker.html">Popup Maker</a>.</li>
+      <li><strong>Any site, no pageview cap, simple script:</strong> <a href="/free-popup-builder-no-limits.html">PopupLoom</a>.</li>
+      <li><strong>Small store, AI agent and all features on free:</strong> <a href="/alternatives/optimonk.html">OptiMonk</a> (10K pageviews/month).</li>
+      <li><strong>Popups plus email in one dashboard:</strong> <a href="/alternatives/poptin.html">Poptin</a> (1,000 visitors/month).</li>
+      <li><strong>Shopify app and AI builder:</strong> <a href="/alternatives/popupsmart.html">Popupsmart</a> (5K pageviews/month).</li>
+      <li><strong>Advanced paid campaign suite:</strong> <a href="/alternatives/optinmonster.html">OptinMonster</a> (500-impression free trial).</li>
+    </ul>
+
+    <h2>Free-tier comparison</h2>
+    ${table(
+      ["Tool", "Free offer", "Platform", "Best for"],
+      [
+        ["<strong>PopupLoom</strong>", "Free; no pageview, visitor or impression cap", "Any site with custom HTML/JavaScript", "A simple popup, lead capture and no traffic meter"],
+        ["<strong>Popup Maker</strong>", "Free WordPress plugin; unlimited popups and pageviews/impressions", "WordPress only", "WordPress sites that want a native plugin"],
+        ["<strong>OptiMonk</strong>", "Free forever: 10,000 pageviews/month, 1 domain, 1,000 AI credits", "Script or platform integration", "Small ecommerce stores that want AI and all features"],
+        ["<strong>Poptin</strong>", "Free forever: 1,000 unique visitors/month, 1 domain", "Script or platform integration", "Popups and email in one dashboard"],
+        ["<strong>Popupsmart</strong>", "Free: 5K pageviews/month, 1 website, 1 live popup, 100 email quota", "Script, Shopify app or platform integration", "Shopify stores that want an app and AI builder"],
+        ["<strong>OptinMonster</strong>", "Free trial: 500 campaign impressions, auto-upgrades to paid Plus", "WordPress plugin or script", "Teams that need advanced campaigns and will pay"]
+      ]
+    )}
+    <p class="mut">Sources: <a href="https://wppopupmaker.com/pricing/" target="_blank" rel="noopener">Popup Maker</a> · <a href="https://www.optimonk.com/pricing/" target="_blank" rel="noopener">OptiMonk</a> · <a href="https://www.poptin.com/pricing/" target="_blank" rel="noopener">Poptin</a> · <a href="https://popupsmart.com/pricing/" target="_blank" rel="noopener">Popupsmart</a> · <a href="https://optinmonster.com/pricing/" target="_blank" rel="noopener">OptinMonster</a>. All checked ${CHECKED}. Trademarks belong to their respective owners; PopupLoom is not affiliated with or endorsed by them.</p>
+
+    <h2>How to choose in five questions</h2>
+    <ol>
+      <li><strong>What platform are you on?</strong> WordPress-only tools are not a fit for Shopify, Webflow, Squarespace, Wix or a custom app.</li>
+      <li><strong>What does the free tier meter?</strong> Pageviews, unique visitors, campaign impressions, live popups or contacts are different units.</li>
+      <li><strong>What happens at the cap?</strong> Stop, pause, auto-upgrade or overage charge.</li>
+      <li><strong>Which features are non-negotiable?</strong> A/B testing, geotargeting, cart data, email sending, SMS or a native app SDK.</li>
+      <li><strong>Who owns the lead?</strong> Check the export and webhook story before you collect a single address.</li>
+    </ol>
+
+    <h2>Why we did not rank them 1–6</h2>
+    <p>A single ranking hides the trade-offs. Popup Maker is the best free option for many WordPress sites, but it cannot run on Shopify. OptiMonk has the most complete free feature set for a small store, but it still pauses at 10,000 pageviews. PopupLoom has no pageview cap, but it does not send email or run A/B tests. The right choice is the one that fits your platform and your must-have list.</p>
+
+    <h2>What to verify before you commit</h2>
+    <ul>
+      <li>The free tier is permanent, not a trial.</li>
+      <li>The meter matches your traffic pattern.</li>
+      <li>Your platform can install the code.</li>
+      <li>You can export leads and cancel without losing data.</li>
+      <li>The pricing page is current and the limit is stated in the vendor's own words.</li>
+    </ul>
 
     <h2>Common questions</h2>
     __FAQ__

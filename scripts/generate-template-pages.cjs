@@ -384,6 +384,15 @@ const CATEGORIES = {
 
 const ORDER = ["email", "discount", "exit", "announce", "engage", "social", "age", "gamified", "seasonal", "video"];
 
+// Individual template pages published in the first wave. The category cards
+// link to these guides in addition to opening the studio.
+const TEMPLATE_GUIDES = {
+  fullscreenExit: "/templates/exit-intent-popup.html",
+  drop48: "/templates/discount-popup.html",
+  leadShelf: "/templates/email-signup-popup.html",
+  wheelWin: "/templates/spin-to-win-popup.html"
+};
+
 // Extra depth per category: what to measure and the mistakes that make the
 // template backfire. Kept separate so the category copy above stays readable.
 const EXTRA = {
@@ -465,7 +474,7 @@ function renderPage(categoryKey, templates) {
   const list = items.map((t, index) => `<article class="card" id="${t.id}" style="margin:18px 0;padding:20px">
   <h2 style="margin:0 0 6px">${t.name}</h2>
   <p style="margin:0 0 12px">${t.description}</p>
-  <p style="margin:0"><a class="btn primary small" href="/studio.html?tpl=${t.id}">Use this template</a> <a class="btn ghost small" href="/templates.html">Compare all 45</a></p>
+  <p style="margin:0"><a class="btn primary small" href="/studio.html?tpl=${t.id}">Use this template</a> <a class="btn ghost small" href="/templates.html">Compare all 45</a>${TEMPLATE_GUIDES[t.id] ? ` <a class="btn ghost small" href="${TEMPLATE_GUIDES[t.id]}">Read the full guide</a>` : ""}</p>
 </article>`).join("\n");
   const jsonLd = {
     "@context": "https://schema.org",

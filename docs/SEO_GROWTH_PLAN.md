@@ -182,6 +182,27 @@ Do not start with 45 template pages. Start with:
 - Ads remain off on all new pages; no eligibility or injection change.
 - Post-deploy audit: **37 URLs, 0 issues**; IndexNow resubmitted all 37.
 
+### 2.8 Third implementation batch (2026-11-14)
+
+- Added `/alternatives/optimonk.html` and `/alternatives/popup-maker.html` with
+  verified limits: OptiMonk free 10,000 pageviews/month on one domain; Popup Maker
+  free WordPress plugin with unlimited popups and impressions.
+- Added `/best-free-popup-builder.html`, an honest six-tool shortlist that names
+  Popup Maker as the WordPress-only free option and PopupLoom as the any-site
+  no-cap option.
+- Added `/guides/wordpress-popup-without-plugin.html`: child-theme `wp_footer`
+  placement, the exact snippet, cache/CSP notes, WordPress.com and multisite limits.
+- Added the first four individual template pages:
+  `/templates/exit-intent-popup.html`, `/templates/discount-popup.html`,
+  `/templates/email-signup-popup.html`, `/templates/spin-to-win-popup.html`.
+  Each has unique copy examples, setup steps, measurement guidance and mistakes.
+- Category pages now link to the four full template guides.
+- Added `scripts/seo-scorecard.cjs` and `npm run seo:scorecard`; it records site
+  health and optional GSC CSV totals in `docs/SEO_SCORECARD.md` and
+  `docs/seo-scorecard-history.json`.
+- Sitemap now has 45 URLs. Ads remain off on all new pages.
+
+
 
 
 
@@ -458,10 +479,10 @@ Measure referring domains and non-brand clicks, not “mentions”.
 
 ### Weeks 3–4
 
-- [ ] Publish 2 more alternatives + “best free popup builder”.
-- [ ] Publish WordPress-without-plugin page.
+- [x] Publish 2 more alternatives (OptiMonk, Popup Maker) and “best free popup builder”.
+- [x] Publish WordPress-without-plugin page.
 - [ ] Expand the 5 platform guides with fresh screenshots and FAQs.
-- [ ] Publish template hub + first 8 template pages.
+- [~] Publish template hub + first 4 individual template pages; next wave is 4 more.
 
 ### Weeks 5–6
 

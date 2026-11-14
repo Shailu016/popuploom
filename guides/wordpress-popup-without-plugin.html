@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Add a Popup to WordPress Without a Plugin | PopupLoom</title>
+<meta name="description" content="Add a popup to WordPress without a popup plugin: build it in PopupLoom, then place the two-line snippet in a child theme or code snippet. Cache and CSP notes.">
+<link rel="canonical" href="https://popuploom.com/guides/wordpress-popup-without-plugin.html">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="stylesheet" href="/ui.css"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="PopupLoom">
+<meta property="og:title" content="Add a Popup to WordPress Without a Plugin | PopupLoom">
+<meta property="og:description" content="Add a popup to WordPress without a popup plugin: build it in PopupLoom, then place the two-line snippet in a child theme or code snippet. Cache and CSP notes.">
+<meta property="og:url" content="https://popuploom.com/guides/wordpress-popup-without-plugin.html">
+<meta property="og:image" content="https://popuploom.com/assets/og-popuploom.png">
+<meta property="og:image:alt" content="PopupLoom: free website popup builder with 45 templates">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Add a Popup to WordPress Without a Plugin | PopupLoom">
+<meta name="twitter:description" content="Add a popup to WordPress without a popup plugin: build it in PopupLoom, then place the two-line snippet in a child theme or code snippet. Cache and CSP notes.">
+<meta name="twitter:image" content="https://popuploom.com/assets/og-popuploom.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://popuploom.com/"},{"@type":"ListItem","position":2,"name":"Guides","item":"https://popuploom.com/guides/index.html"},{"@type":"ListItem","position":3,"name":"WordPress without a plugin","item":"https://popuploom.com/guides/wordpress-popup-without-plugin.html"}]},{"@type":"Article","@id":"https://popuploom.com/guides/wordpress-popup-without-plugin.html#article","headline":"How to add a popup to WordPress without a plugin","description":"Add a popup to WordPress without a popup plugin: build it in PopupLoom, then place the two-line snippet in a child theme or code snippet. Cache and CSP notes.","datePublished":"2026-11-14","dateModified":"2026-11-14","author":{"@id":"https://popuploom.com/#organization"},"publisher":{"@id":"https://popuploom.com/#organization"},"mainEntityOfPage":"https://popuploom.com/guides/wordpress-popup-without-plugin.html"},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Can I add a popup to WordPress without any plugin?","acceptedAnswer":{"@type":"Answer","text":"Yes, on a self-hosted WordPress site that allows theme code. Build the popup in PopupLoom, copy the two-line install code, and print it from a child theme's functions.php on the wp_footer hook, or paste it into the child theme footer before the closing body tag."}},{"@type":"Question","name":"Will a theme update remove the popup code?","acceptedAnswer":{"@type":"Answer","text":"A parent theme update overwrites direct edits. Use a child theme, or a code-snippet plugin, and keep a backup. The PopupLoom configuration lives in your account, so the snippet itself rarely changes."}},{"@type":"Question","name":"Does this work on WordPress.com?","acceptedAnswer":{"@type":"Answer","text":"Only on a WordPress.com plan that allows custom JavaScript. Lower plans and some multisite setups strip script tags. On a self-hosted WordPress site you control the theme and can add the snippet."}},{"@type":"Question","name":"Why is my WordPress popup not showing?","acceptedAnswer":{"@type":"Answer","text":"Check the widget id, page caching and CDN cache, script optimization or defer settings, the site's Content Security Policy, the trigger and frequency rule, and the browser console. The troubleshooting guide has a step-by-step diagnosis."}},{"@type":"Question","name":"Should I use a popup plugin instead?","acceptedAnswer":{"@type":"Answer","text":"Use a popup plugin if you want popups managed inside WordPress, WordPress-specific conditions or a WooCommerce integration. Use the theme-code method if you want fewer plugins, a hosted configuration and the same popup on other platforms."}}]}]}</script>
+</head>
+<body>
+<header class="wrap" style="padding:24px 26px">
+  <nav aria-label="Main"><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/index.html">Guides</a> · <a href="/free-popup-builder-no-limits.html">No pageview limits</a> · <a href="/about.html">About</a> · <a href="/studio.html?tpl=blank">Open the studio</a></nav>
+  <nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/guides/index.html">Guides</a> › <span>WordPress without a plugin</span></nav>
+</header>
+<main class="wrap" style="padding:30px 26px 80px;max-width:920px">
+  <article>
+    <h1>How to add a popup to WordPress without a plugin</h1>
+    <p class="mut">Written for self-hosted WordPress. Theme code can break a site; back up first and use a child theme. Behavior checked on the local PopupLoom build on 14 November 2026.</p>
+
+    <p><strong>You can add a PopupLoom popup to WordPress without installing a popup plugin.</strong> Build and save the popup in the PopupLoom studio, copy the two-line install code, and print it from your child theme’s <code>functions.php</code> on the <code>wp_footer</code> hook. The popup then loads on the public site while the configuration stays in your PopupLoom account.</p>
+    <p>This method is for people who are comfortable editing theme code or using a code-snippet tool. If you want popups managed inside the WordPress admin, a native popup plugin is a better fit. If you want the plugin path, read the <a href="/guides/wordpress-popup.html">WordPress popup guide</a> instead.</p>
+
+    <h2>What you need</h2>
+    <ul>
+      <li>A self-hosted WordPress site where you can edit theme files or add a code snippet.</li>
+      <li>A saved PopupLoom widget and its install code. A guest draft has no install code.</li>
+      <li>A child theme, or a code-snippet plugin you already trust. Never edit the parent theme directly.</li>
+      <li>A way to clear the page cache and CDN cache after the change.</li>
+    </ul>
+
+    <h2>Step 1: build and save the popup</h2>
+    <ol>
+      <li>Open the <a href="/studio.html?tpl=blank">PopupLoom studio</a> and choose a template or start blank.</li>
+      <li>Set the content, trigger, page targeting, devices and frequency.</li>
+      <li>Save the popup, open <strong>Publish</strong>, and copy the install code. It looks like this:</li>
+    </ol>
+    <pre class="card" style="padding:16px;overflow-x:auto"><code>&lt;div data-popuploom="wan_your_widget_id"&gt;&lt;/div&gt;
+&lt;script src="https://popuploom.com/embed/1.1.0/popuploom.js"&gt;&lt;/script&gt;</code></pre>
+    <p>Keep the widget id exact. The script loads the saved configuration for that id; the config changes in the studio do not require a new snippet.</p>
+
+    <h2>Step 2: print the snippet in a child theme</h2>
+    <p>Add this to the child theme’s <code>functions.php</code>. Replace the example id with your real widget id.</p>
+    <pre class="card" style="padding:16px;overflow-x:auto"><code>add_action( 'wp_footer', function () {
+    ?&gt;
+    &lt;div data-popuploom="wan_your_widget_id"&gt;&lt;/div&gt;
+    &lt;script src="https://popuploom.com/embed/1.1.0/popuploom.js"&gt;&lt;/script&gt;
+    &lt;?php
+} );</code></pre>
+    <p><code>wp_footer</code> runs before the closing body tag on the public site. It does not run in the WordPress admin, which is what you want. If your theme does not call <code>wp_footer()</code>, the hook will not run; add the snippet to the child theme’s <code>footer.php</code> before <code>&lt;/body&gt;</code> instead.</p>
+
+    <h2>Alternative: child theme footer file</h2>
+    <ol>
+      <li>Create or open the child theme’s <code>footer.php</code>.</li>
+      <li>Paste the two-line snippet immediately before <code>&lt;/body&gt;</code>.</li>
+      <li>Save, clear the cache, and load a public page in a private window.</li>
+    </ol>
+    <p>Do not paste the snippet into the block editor’s Custom HTML block unless you know the site allows <code>&lt;script&gt;</code> for your user. WordPress can strip script tags for non-administrators, on multisite, or on restricted WordPress.com plans.</p>
+
+    <h2>Alternative: a code-snippet tool</h2>
+    <p>If you do not want to edit theme files, a code-snippet plugin can add the same code to the footer. That is still a plugin, but it is not a popup plugin. Use one you already trust, restrict it to administrators, and keep it updated. The placement rules are the same: public footer, real widget id, after the page is cached.</p>
+
+    <h2>WordPress.com and multisite limits</h2>
+    <ul>
+      <li><strong>WordPress.com:</strong> custom JavaScript requires a plan that allows it. Lower plans may strip the script; check your plan before buying.</li>
+      <li><strong>Multisite:</strong> only a super administrator may have <code>unfiltered_html</code>. A site administrator may be unable to save a script tag in the editor.</li>
+      <li><strong>Managed hosts:</strong> some disable theme editing or enforce a Content Security Policy. Use a staging site and check with the host.</li>
+    </ul>
+
+    <h2>Caching, optimization and CSP</h2>
+    <ul>
+      <li><strong>Clear the page cache and CDN cache.</strong> A cached page can keep serving the old footer after the code is added.</li>
+      <li><strong>Exclude the script from combine/defer.</strong> If a performance plugin combines or delays scripts, the popup may load late or not at all. Exclude <code>popuploom.com/embed/1.1.0/popuploom.js</code>.</li>
+      <li><strong>Allow the script in your CSP.</strong> If the site sends a Content Security Policy, allow <code>https://popuploom.com</code> in <code>script-src</code>. Do not add a hash; the file is updated independently of your HTML.</li>
+      <li><strong>Do not add SRI unless you pin the version.</strong> The immutable <code>/embed/1.1.0/</code> path is stable, but the configuration is fetched separately. If you add an integrity attribute, you own the update process.</li>
+      <li><strong>Check the console.</strong> A blocked script, a CSP violation or a 404 on the widget config is visible there.</li>
+    </ul>
+
+    <h2>Test it properly</h2>
+    <ol>
+      <li>Open a public page in a private window, not the logged-in admin preview.</li>
+      <li>Trigger the popup with the rule you configured: load, delay, scroll, click or desktop exit intent.</li>
+      <li>Submit one fake response and confirm it appears in the PopupLoom lead inbox.</li>
+      <li>Test on a phone. Exit intent is desktop-only by design.</li>
+      <li>Clear the cache again and repeat on the live URL.</li>
+    </ol>
+    <p>If nothing shows, use the <a href="/guides/popup-not-showing.html">popup troubleshooting guide</a>. It covers the snippet, saved id, trigger, page/device rules, frequency, selectors, CSP, cache and iframe limits.</p>
+
+    <h2>Without a plugin vs a popup plugin</h2>
+    <ul>
+      <li><strong>Choose the theme-code method</strong> if you want fewer plugins, a hosted configuration, the same popup on other platforms, and you are comfortable with child themes.</li>
+      <li><strong>Choose a popup plugin</strong> if you want popups managed inside WordPress, WordPress-specific conditions, WooCommerce cart data or a support contract.</li>
+      <li><strong>Do not run both</strong> on the same page during a migration. Pause one before enabling the other.</li>
+    </ul>
+
+    <h2>Common questions</h2>
+    <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Can I add a popup to WordPress without any plugin?</strong></summary><p style="margin:10px 0 0">Yes, on a self-hosted WordPress site that allows theme code. Build the popup in PopupLoom, copy the two-line install code, and print it from a child theme’s <code>functions.php</code> on the <code>wp_footer</code> hook, or paste it into the child theme footer before the closing body tag.</p></details>
+    <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Will a theme update remove the popup code?</strong></summary><p style="margin:10px 0 0">A parent theme update overwrites direct edits. Use a child theme, or a code-snippet plugin, and keep a backup. The PopupLoom configuration lives in your account, so the snippet itself rarely changes.</p></details>
+    <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Does this work on WordPress.com?</strong></summary><p style="margin:10px 0 0">Only on a WordPress.com plan that allows custom JavaScript. Lower plans and some multisite setups strip script tags. On a self-hosted WordPress site you control the theme and can add the snippet.</p></details>
+    <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Why is my WordPress popup not showing?</strong></summary><p style="margin:10px 0 0">Check the widget id, page caching and CDN cache, script optimization or defer settings, the site’s Content Security Policy, the trigger and frequency rule, and the browser console. The troubleshooting guide has a step-by-step diagnosis.</p></details>
+    <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Should I use a popup plugin instead?</strong></summary><p style="margin:10px 0 0">Use a popup plugin if you want popups managed inside WordPress, WordPress-specific conditions or a WooCommerce integration. Use the theme-code method if you want fewer plugins, a hosted configuration and the same popup on other platforms.</p></details>
+
+    <p style="margin-top:26px"><a class="btn primary" href="/studio.html?tpl=blank">Build a popup</a> <a class="btn ghost" href="/guides/wordpress-popup.html">Read the WordPress plugin guide</a></p>
+  </article>
+</main>
+<footer class="wrap" style="padding:24px 0;font-size:13px">
+  <div><a href="/">PopupLoom — free website popup builder</a> · <a href="/templates.html">Templates</a> · <a href="/guides/index.html">Guides</a> · <a href="/free-popup-builder-no-limits.html">No pageview limits</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></div>
+  <div style="margin-top:8px"><a href="/guides/wordpress-popup.html">WordPress plugin guide</a> · <a href="/guides/shopify-popup.html">Shopify</a> · <a href="/guides/webflow-popup.html">Webflow</a> · <a href="/guides/squarespace-wix-popup.html">Squarespace and Wix</a> · <a href="/alternatives/popup-maker.html">Popup Maker alternative</a></div>
+</footer>
+</body>
+</html>
