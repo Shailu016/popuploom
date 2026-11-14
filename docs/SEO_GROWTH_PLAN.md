@@ -157,6 +157,9 @@ Do not start with 45 template pages. Start with:
   unchanged.
 - `sitemap.xml`, `llms.txt`, Express and Worker public allowlists, CSP hash
   generation and the Cloudflare build all include the new pages.
+- Production SEO audit after deploy: **33 URLs, 0 issues** (was 23 URLs, 11 issues).
+- IndexNow re-submitted all 33 URLs (HTTP 200). The sitemap URL is unchanged, so
+  Search Console will re-read it; the 10 new pages do not need a new sitemap entry.
 - Ads are deliberately **not** enabled on the new pages; the allowlist is unchanged.
 
 
