@@ -9,6 +9,7 @@ const path = require("path");
 const root = path.join(__dirname, "..");
 
 const CHECKED = "14 November 2026";
+const VERIFIED = `<p class="mut" style="display:inline-block;margin:0 0 10px;padding:4px 10px;border:1px solid rgba(255,255,255,.18);border-radius:999px;font-size:12px">Pricing and limits verified ${CHECKED}</p>`;
 const ORG = "https://popuploom.com/#organization";
 
 const FOOTER = `<footer class="wrap" style="padding:24px 0;font-size:13px">
@@ -131,6 +132,7 @@ const PAGES = [
     <p>PopupLoom has no pageview, visitor or impression meter for the popup itself. Hosting and API rate limits exist to stop abuse, not to bill you for traffic. The trade-off is scope: PopupLoom is a focused popup and lead-capture tool, not a full campaign suite.</p>
 
     <h2>Free-tier comparison</h2>
+    ${VERIFIED}
     ${table(
       ["Tool", "Free offer", "What the meter counts", "At the cap", "Install"],
       [
@@ -206,8 +208,8 @@ const PAGES = [
   },
   {
     path: "/alternatives/optinmonster.html",
-    title: "OptinMonster Alternative: Free, No Pageview Limits | PopupLoom",
-    description: "Compare OptinMonster's 500-impression free trial with PopupLoom's free, no-pageview-limit popup builder. Checked 14 November 2026.",
+    title: "PopupLoom vs OptinMonster: Free Alternative, No Pageview Limits",
+    description: "PopupLoom vs OptinMonster: compare the 500-impression free trial with a free builder that has no pageview cap. Checked 14 November 2026.",
     crumbs: [{ name: "Home", path: "/" }, { name: "Alternatives", path: "/free-popup-builder-no-limits.html" }, { name: "OptinMonster", path: "/alternatives/optinmonster.html" }],
     faq: [
       ["Is PopupLoom a free OptinMonster alternative?", "Yes. PopupLoom is free and does not meter pageviews, visitors or popup impressions. It does not include OptinMonster's advanced campaign suite, A/B testing, geotargeting or managed support."],
@@ -218,12 +220,13 @@ const PAGES = [
       ["Is PopupLoom affiliated with OptinMonster?", "No. OptinMonster is a trademark of Retyp, LLC. PopupLoom is not affiliated with or endorsed by OptinMonster."]
     ],
     body: `
-    <h1>A free OptinMonster alternative with no pageview limits</h1>
+    <h1>PopupLoom vs OptinMonster: a free alternative with no pageview limits</h1>
     <p class="mut">OptinMonster terms checked on ${CHECKED}. Verify current pricing on its site before buying.</p>
     <p>OptinMonster is a mature campaign suite with a large template library, advanced targeting, A/B testing and integrations. It is a good product for teams that need those features and can pay for them. This page is for the narrower case: you want a well-designed popup, lead capture and no traffic meter, and you do not need the full suite.</p>
     <p><strong>PopupLoom is free and does not meter pageviews, visitors or popup impressions.</strong> A free account is required to save and install. It is a two-line script, not a WordPress plugin, and it works on any site that allows custom HTML or JavaScript.</p>
 
     <h2>OptinMonster at a glance</h2>
+    ${VERIFIED}
     ${table(
       ["", "OptinMonster", "PopupLoom"],
       [
@@ -286,8 +289,8 @@ const PAGES = [
   },
   {
     path: "/alternatives/poptin.html",
-    title: "Free Poptin Alternative Without Visitor Limits | PopupLoom",
-    description: "Compare Poptin's 1,000-visitor free plan with PopupLoom's free, no-visitor-limit popup builder. Checked 14 November 2026.",
+    title: "PopupLoom vs Poptin: Free Alternative Without Visitor Limits",
+    description: "PopupLoom vs Poptin: compare the 1,000-visitor free plan with a free builder that has no visitor cap. Checked 14 November 2026.",
     crumbs: [{ name: "Home", path: "/" }, { name: "Alternatives", path: "/free-popup-builder-no-limits.html" }, { name: "Poptin", path: "/alternatives/poptin.html" }],
     faq: [
       ["Is PopupLoom a free Poptin alternative?", "Yes. PopupLoom is free and does not meter unique visitors or pageviews. Poptin's free plan was listed at 1,000 unique visitors per month, one domain, when checked on 14 November 2026."],
@@ -298,12 +301,13 @@ const PAGES = [
       ["Is PopupLoom affiliated with Poptin?", "No. Poptin is a trademark of its owner. PopupLoom is not affiliated with or endorsed by Poptin."]
     ],
     body: `
-    <h1>A free Poptin alternative with no visitor limits</h1>
+    <h1>PopupLoom vs Poptin: a free alternative without visitor limits</h1>
     <p class="mut">Poptin terms checked on ${CHECKED}. Verify current pricing on its site before buying.</p>
     <p>Poptin combines popups, forms and email tooling in one dashboard. Its free plan is one of the more generous entry points, but it is still metered: 1,000 unique visitors per month on one domain when we checked. If your traffic grows, the cap becomes the decision point.</p>
     <p><strong>PopupLoom is free and does not meter unique visitors or pageviews.</strong> It is a focused popup builder: 45 templates, six triggers, page/device/frequency targeting, a lead inbox, CSV export and an optional signed webhook. It does not send email or SMS.</p>
 
     <h2>Poptin at a glance</h2>
+    ${VERIFIED}
     ${table(
       ["", "Poptin", "PopupLoom"],
       [
@@ -365,8 +369,8 @@ const PAGES = [
   },
   {
     path: "/alternatives/popupsmart.html",
-    title: "Free Popupsmart Alternative Without Pageview Limits | PopupLoom",
-    description: "Compare Popupsmart's 5K-pageview free plan with PopupLoom's free, no-pageview-limit popup builder. Checked 14 November 2026.",
+    title: "PopupLoom vs Popupsmart: Free Alternative, No Pageview Caps",
+    description: "PopupLoom vs Popupsmart: compare the 5K-pageview free plan with a free builder that has no pageview cap. Checked 14 November 2026.",
     crumbs: [{ name: "Home", path: "/" }, { name: "Alternatives", path: "/free-popup-builder-no-limits.html" }, { name: "Popupsmart", path: "/alternatives/popupsmart.html" }],
     faq: [
       ["Is PopupLoom a free Popupsmart alternative?", "Yes. PopupLoom is free and does not meter pageviews. Popupsmart's free plan was listed at 5K pageviews per month, one website and one live popup when checked on 14 November 2026."],
@@ -377,12 +381,13 @@ const PAGES = [
       ["Is PopupLoom affiliated with Popupsmart?", "No. Popupsmart is a trademark of its owner. PopupLoom is not affiliated with or endorsed by Popupsmart."]
     ],
     body: `
-    <h1>A free Popupsmart alternative with no pageview limits</h1>
+    <h1>PopupLoom vs Popupsmart: a free alternative without pageview limits</h1>
     <p class="mut">Popupsmart terms checked on ${CHECKED}. Verify current pricing on its site before buying.</p>
     <p>Popupsmart is built for marketers who want an AI-assisted builder, a large template library, Shopify integration and campaign targeting. Its free plan is useful for a single site, but it is metered by pageviews and limited to one live popup when we checked.</p>
     <p><strong>PopupLoom is free and does not meter pageviews.</strong> It is a smaller, focused tool: 45 templates, six triggers, page/device/frequency targeting, lead inbox, CSV and optional signed webhook. It does not include AI campaign generation, A/B testing or geotargeting.</p>
 
     <h2>Popupsmart at a glance</h2>
+    ${VERIFIED}
     ${table(
       ["", "Popupsmart", "PopupLoom"],
       [
@@ -444,8 +449,8 @@ const PAGES = [
   },
   {
     path: "/alternatives/optimonk.html",
-    title: "OptiMonk Alternative: Free, No Pageview Limits | PopupLoom",
-    description: "Compare OptiMonk's 10,000-pageview free plan with PopupLoom's free, no-pageview-limit popup builder. Checked 14 November 2026.",
+    title: "PopupLoom vs OptiMonk: Free Alternative, No Pageview Caps",
+    description: "PopupLoom vs OptiMonk: compare the 10,000-pageview free plan with a free builder that has no pageview cap. Checked 14 November 2026.",
     crumbs: [{ name: "Home", path: "/" }, { name: "Alternatives", path: "/free-popup-builder-no-limits.html" }, { name: "OptiMonk", path: "/alternatives/optimonk.html" }],
     faq: [
       ["Is PopupLoom a free OptiMonk alternative?", "Yes. PopupLoom is free and does not meter pageviews. OptiMonk's free plan was listed at 10,000 pageviews per month and one domain when checked on 14 November 2026."],
@@ -456,12 +461,13 @@ const PAGES = [
       ["Is PopupLoom affiliated with OptiMonk?", "No. OptiMonk is a trademark of its owner. PopupLoom is not affiliated with or endorsed by OptiMonk."]
     ],
     body: `
-    <h1>A free OptiMonk alternative with no pageview limits</h1>
+    <h1>PopupLoom vs OptiMonk: a free alternative without pageview limits</h1>
     <p class="mut">OptiMonk terms checked on ${CHECKED}. Verify current pricing on its site before buying.</p>
     <p>OptiMonk is an ecommerce-focused popup platform with an AI agent, all features available on every plan and a genuinely useful free tier. It is a strong choice for a store that wants popups, A/B testing and analytics in one place. The free plan is still metered: 10,000 pageviews per month when we checked.</p>
     <p><strong>PopupLoom is free and does not meter pageviews.</strong> It is deliberately narrower: 45 templates, six triggers, page/device/frequency targeting, a lead inbox, CSV export and an optional signed webhook. It does not use an AI agent or include A/B testing.</p>
 
     <h2>OptiMonk at a glance</h2>
+    ${VERIFIED}
     ${table(
       ["", "OptiMonk", "PopupLoom"],
       [
@@ -524,8 +530,8 @@ const PAGES = [
   },
   {
     path: "/alternatives/popup-maker.html",
-    title: "Popup Maker Alternative for Any Website | PopupLoom",
-    description: "Popup Maker is a free WordPress plugin with unlimited impressions. Compare it with PopupLoom's free, any-site popup builder. Checked 14 November 2026.",
+    title: "PopupLoom vs Popup Maker: Free Alternative for Any Website",
+    description: "PopupLoom vs Popup Maker: compare the free WordPress plugin with a free, any-site popup builder. Checked 14 November 2026.",
     crumbs: [{ name: "Home", path: "/" }, { name: "Alternatives", path: "/free-popup-builder-no-limits.html" }, { name: "Popup Maker", path: "/alternatives/popup-maker.html" }],
     faq: [
       ["Is PopupLoom a Popup Maker alternative?", "Yes, if you need a popup on a site that is not WordPress or you prefer a hosted script. If you are on WordPress and only need a native plugin, Popup Maker is a strong free option and may be the better fit."],
@@ -536,12 +542,13 @@ const PAGES = [
       ["Is PopupLoom affiliated with Popup Maker?", "No. Popup Maker is a trademark of Code Atlantic LLC. PopupLoom is not affiliated with or endorsed by Popup Maker."]
     ],
     body: `
-    <h1>A Popup Maker alternative for any website</h1>
+    <h1>PopupLoom vs Popup Maker: a free alternative for any website</h1>
     <p class="mut">Popup Maker terms checked on ${CHECKED}. Verify current pricing on its site before buying.</p>
     <p>Popup Maker is a strong free WordPress plugin: unlimited popups and unlimited impressions, with no hosted account required. If your site is WordPress and you are comfortable in the plugin ecosystem, it may be the better free option. This page is for the cases where it is not: a Shopify, Webflow, Squarespace, Wix or custom site, or a WordPress site where you want a hosted script instead of another plugin.</p>
     <p><strong>PopupLoom is free and does not meter pageviews.</strong> It installs as a two-line script on any site that allows custom HTML or JavaScript. The trade-off is that it is not a WordPress plugin: there is no WP admin screen, and the popup is managed in the PopupLoom studio.</p>
 
     <h2>Popup Maker at a glance</h2>
+    ${VERIFIED}
     ${table(
       ["", "Popup Maker", "PopupLoom"],
       [
@@ -630,6 +637,7 @@ const PAGES = [
     </ul>
 
     <h2>Free-tier comparison</h2>
+    ${VERIFIED}
     ${table(
       ["Tool", "Free offer", "Platform", "Best for"],
       [

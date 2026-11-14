@@ -479,11 +479,11 @@ test('identity, metadata and crawler files agree on the apex origin',async()=>{
   '/templates/seasonal.html':['Seasonal Popup Templates: Black Friday and Holidays | PopupLoom','https://popuploom.com/templates/seasonal.html'],
   '/templates/video.html':['Free Video Popup Template | PopupLoom','https://popuploom.com/templates/video.html'],
   '/free-popup-builder-no-limits.html':['Free Popup Builder, No Pageview Limits: Honest Comparison','https://popuploom.com/free-popup-builder-no-limits.html'],
-  '/alternatives/optinmonster.html':['OptinMonster Alternative: Free, No Pageview Limits | PopupLoom','https://popuploom.com/alternatives/optinmonster.html'],
-  '/alternatives/poptin.html':['Free Poptin Alternative Without Visitor Limits | PopupLoom','https://popuploom.com/alternatives/poptin.html'],
-  '/alternatives/popupsmart.html':['Free Popupsmart Alternative Without Pageview Limits | PopupLoom','https://popuploom.com/alternatives/popupsmart.html'],
-  '/alternatives/optimonk.html':['OptiMonk Alternative: Free, No Pageview Limits | PopupLoom','https://popuploom.com/alternatives/optimonk.html'],
-  '/alternatives/popup-maker.html':['Popup Maker Alternative for Any Website | PopupLoom','https://popuploom.com/alternatives/popup-maker.html'],
+  '/alternatives/optinmonster.html':['PopupLoom vs OptinMonster: Free Alternative, No Pageview Limits','https://popuploom.com/alternatives/optinmonster.html'],
+  '/alternatives/poptin.html':['PopupLoom vs Poptin: Free Alternative Without Visitor Limits','https://popuploom.com/alternatives/poptin.html'],
+  '/alternatives/popupsmart.html':['PopupLoom vs Popupsmart: Free Alternative, No Pageview Caps','https://popuploom.com/alternatives/popupsmart.html'],
+  '/alternatives/optimonk.html':['PopupLoom vs OptiMonk: Free Alternative, No Pageview Caps','https://popuploom.com/alternatives/optimonk.html'],
+  '/alternatives/popup-maker.html':['PopupLoom vs Popup Maker: Free Alternative for Any Website','https://popuploom.com/alternatives/popup-maker.html'],
   '/best-free-popup-builder.html':['Best Free Popup Builders in 2026: Honest Comparison','https://popuploom.com/best-free-popup-builder.html'],
   '/guides/wordpress-popup-without-plugin.html':['Add a Popup to WordPress Without a Plugin | PopupLoom','https://popuploom.com/guides/wordpress-popup-without-plugin.html'],
   '/templates/exit-intent-popup.html':["Free Exit-Intent Popup Template: Don't Leave Empty | PopupLoom",'https://popuploom.com/templates/exit-intent-popup.html'],
@@ -523,6 +523,7 @@ test('identity, metadata and crawler files agree on the apex origin',async()=>{
  const money=(await api('/free-popup-builder-no-limits.html')).data;
  assert.ok(money.includes('500 campaign impressions')&&money.includes('1,000 unique visitors')&&money.includes('5K pageviews'),'comparison keeps the dated verified limits');
  assert.ok(money.toLowerCase().includes('no pageview, visitor or impression cap'),'money page states the wedge');
+ assert.ok(money.includes('Pricing and limits verified 14 November 2026'),'money page shows the visible verification badge');
  const best=(await api('/best-free-popup-builder.html')).data;
  assert.ok(best.includes('Popup Maker')&&best.includes('10,000 pageviews')&&best.includes('unlimited popups'),'best-free page keeps the verified shortlist');
  const wpGuide=(await api('/guides/wordpress-popup-without-plugin.html')).data;
