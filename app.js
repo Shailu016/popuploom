@@ -46,8 +46,27 @@
     login: async function (email, password) {
       const res = await fetch(API + "/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Login failed");
+      if (!res.ok) {
+        const err = new Error(data.error || "Login failed");
+        err.code = data.code;
+        throw err;
+      }
       this.setToken(data.token);
+      return data;
+    },
+    resendVerification: async function (email) {
+      const res = await fetch(API + "/api/auth/resend-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email })
+      });
+      let data = {};
+      try { data = await res.json(); } catch (e) {}
+      if (!res.ok) {
+        const err = new Error(data.error || "Could not send the verification email.");
+        err.code = data.code;
+        throw err;
+      }
       return data;
     },
     logout: async function () {
@@ -106,6 +125,37 @@
   /* Storage: API when authed, localStorage (guest) otherwise            */
   /* ------------------------------------------------------------------ */
   const GUEST_KEY = "pf.widgets";
+  const MIGRATE_LOCK = "pf.migrating";
+  let migrationRun = null;
+
+  function guestViews(id) {
+    try { return Math.max(0, Number(localStorage.getItem("pfview." + id)) || 0); } catch (e) { return 0; }
+  }
+
+  // Cross-tab lock so two tabs that sign in at the same time cannot both
+  // replay the same guest drafts into the account and create duplicates.
+  function acquireMigrationLock() {
+    var token = uid();
+    try {
+      var raw = localStorage.getItem(MIGRATE_LOCK);
+      if (raw) {
+        var held = JSON.parse(raw);
+        if (held && Number(held.until) > Date.now()) return null;
+      }
+      localStorage.setItem(MIGRATE_LOCK, JSON.stringify({ token: token, until: Date.now() + 60000 }));
+      return token;
+    } catch (e) {
+      return "unlocked"; // Blocked storage: still migrate in this tab.
+    }
+  }
+  function releaseMigrationLock(token) {
+    if (!token || token === "unlocked") return;
+    try {
+      var raw = localStorage.getItem(MIGRATE_LOCK);
+      var held = raw ? JSON.parse(raw) : null;
+      if (held && held.token === token) localStorage.removeItem(MIGRATE_LOCK);
+    } catch (e) {}
+  }
 
   const Store = {
     isAuthed: function () { return Auth.isAuthed(); },
@@ -117,7 +167,12 @@
         const rows = await res.json();
         return rows.map(function (r) { return { id: r.id, name: r.name, cfg: r.cfg, template: r.template, viewCount: r.viewCount || 0, submissionCount: r.submissionCount || 0, submissions: [], createdAt: r.createdAt, updatedAt: r.updatedAt }; });
       }
-      try { return JSON.parse(localStorage.getItem(GUEST_KEY) || "[]"); } catch (e) { return []; }
+      try {
+        var list = JSON.parse(localStorage.getItem(GUEST_KEY) || "[]");
+        return (Array.isArray(list) ? list : []).map(function (w) {
+          return Object.assign({}, w, { viewCount: guestViews(w.id) });
+        });
+      } catch (e) { return []; }
     },
 
     get: async function (id) {
@@ -173,8 +228,8 @@
     },
 
     views: function (id) {
-      // sync read from cached list; for authed, view_count is on the widget
-      return 0;
+      // Guest counters live in this browser; cloud counts arrive on the row.
+      return Auth.isAuthed() ? 0 : guestViews(id);
     },
 
     bumpView: async function (id) {
@@ -202,43 +257,59 @@
     },
 
     putSubmission: async function (id, s) {
-      if (Auth.isAuthed()) {
-        try {
-          await fetch(API + "/api/widgets/" + encodeURIComponent(id) + "/submit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ data: s.data || s }) });
-        } catch (e) {}
-        return;
+      if (!Auth.isAuthed()) {
+        // Guest submissions are not persisted: the runtime never stores lead
+        // data on the customer's origin, and this legacy path must not either.
+        return false;
       }
       try {
-        var arr = JSON.parse(localStorage.getItem("pfsubs." + id) || "[]");
-        arr.unshift(s);
-        localStorage.setItem("pfsubs." + id, JSON.stringify(arr.slice(0, 300)));
-      } catch (e) {}
+        await fetch(API + "/api/widgets/" + encodeURIComponent(id) + "/submit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ data: s.data || s }) });
+        return true;
+      } catch (e) { return false; }
     },
 
     // After sign-in, move guest drafts from this browser into the account so
     // nobody loses work they did before joining. Returns how many moved.
-    migrateGuestDrafts: async function () {
-      if (!Auth.isAuthed()) return 0;
-      var drafts = [];
-      try { drafts = JSON.parse(localStorage.getItem(GUEST_KEY) || "[]"); } catch (e) { drafts = []; }
-      if (!Array.isArray(drafts) || !drafts.length) return 0;
-      var moved = 0;
-      var remaining = [];
-      for (var i = 0; i < drafts.length; i++) {
-        var w = drafts[i];
-        if (!w || !w.cfg) { remaining.push(w); continue; }
+    migrateGuestDrafts: function () {
+      if (!Auth.isAuthed()) return Promise.resolve(0);
+      if (migrationRun) return migrationRun;
+      var self = this;
+      migrationRun = (async function () {
+        var lock = acquireMigrationLock();
+        if (!lock) return 0;
         try {
-          await this.save(w);
-          moved++;
-        } catch (e) {
-          remaining.push(w);
+          var drafts = [];
+          try { drafts = JSON.parse(localStorage.getItem(GUEST_KEY) || "[]"); } catch (e) { drafts = []; }
+          if (!Array.isArray(drafts) || !drafts.length) return 0;
+          var moved = 0;
+          var remaining = [];
+          for (var i = 0; i < drafts.length; i++) {
+            var w = drafts[i];
+            if (!w || !w.cfg) { remaining.push(w); continue; }
+            try {
+              await self.save(w);
+              moved++;
+            } catch (e) {
+              remaining.push(w);
+            }
+          }
+          try {
+            if (remaining.length) localStorage.setItem(GUEST_KEY, JSON.stringify(remaining));
+            else localStorage.removeItem(GUEST_KEY);
+          } catch (e) {}
+          return moved;
+        } finally {
+          releaseMigrationLock(lock);
         }
-      }
-      try {
-        if (remaining.length) localStorage.setItem(GUEST_KEY, JSON.stringify(remaining));
-        else localStorage.removeItem(GUEST_KEY);
-      } catch (e) {}
-      return moved;
+      })();
+      migrationRun = migrationRun.then(function (n) {
+        migrationRun = null;
+        return n;
+      }, function (e) {
+        migrationRun = null;
+        throw e;
+      });
+      return migrationRun;
     }
   };
 
@@ -584,12 +655,40 @@
     var mode = "login";
     var errEl = document.getElementById("authErr");
     var submitEl = document.getElementById("authSubmit");
+    var resendEl = document.getElementById("authResend");
+    if (!resendEl && errEl && errEl.parentNode) {
+      resendEl = document.createElement("button");
+      resendEl.type = "button";
+      resendEl.id = "authResend";
+      resendEl.textContent = "Email me a new verification link";
+      resendEl.style.cssText = "display:none;border:0;background:none;padding:0 0 12px;color:var(--acc);font-size:12.5px;cursor:pointer;font-family:inherit;text-align:left";
+      errEl.parentNode.insertBefore(resendEl, errEl.nextSibling);
+    }
 
-    function showErr(msg) {
+    function showErr(msg, allowResend) {
       if (!errEl) return;
       errEl.textContent = msg || "";
       errEl.style.display = msg ? "block" : "none";
+      if (resendEl) resendEl.style.display = msg && allowResend ? "block" : "none";
     }
+    if (resendEl) resendEl.onclick = async function () {
+      var emailEl = document.getElementById("authEmail");
+      var email = (emailEl && emailEl.value || "").trim();
+      if (!email) { showErr("Enter your email address first.", true); return; }
+      var label = resendEl.textContent;
+      resendEl.disabled = true;
+      resendEl.textContent = "Sending…";
+      try {
+        var data = await Auth.resendVerification(email);
+        showErr(data.message || "If that address still needs verification, a new link is on its way.", true);
+        if (typeof window.toast === "function") window.toast("Verification email requested", true);
+      } catch (e) {
+        showErr(e.message || "Could not send the verification email. Try again later.", true);
+      } finally {
+        resendEl.textContent = label;
+        resendEl.disabled = false;
+      }
+    };
     function setMode(next) {
       mode = next === "register" ? "register" : "login";
       var isLogin = mode === "login";
@@ -677,13 +776,13 @@
           // Signup no longer returns a session when email verification is on.
           setMode("login");
           if (emailEl) emailEl.value = email;
-          showErr(data.message || "Check your email to verify your account, then sign in.");
+          showErr(data.message || "Check your email to verify your account, then sign in.", true);
           if (typeof window.toast === "function") window.toast("Check your email to verify your account", true);
           return;
         }
         finish(data, mode === "register");
       } catch (e) {
-        showErr(e.message || "Something went wrong");
+        showErr(e.message || "Something went wrong", e.code === "EMAIL_NOT_VERIFIED");
       } finally {
         if (submitEl) {
           submitEl.disabled = false;

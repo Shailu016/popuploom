@@ -14,7 +14,7 @@ try {
 
 const express = require("express");
 const security = require("./security");
-const { register, login, findOrCreateGoogleUser, getUserById, updateProfile, authMiddleware, verifyEmail, verificationRequired } = require("./auth");
+const { register, login, findOrCreateGoogleUser, getUserById, updateProfile, authMiddleware, verifyEmail, resendVerification, verificationRequired } = require("./auth");
 const { verifyCredential, isConfigured, CLIENT_ID } = require("./google");
 const widgetsRouter = require("./routes/widgets");
 const ads = require("../shared/ads");
@@ -64,6 +64,7 @@ app.use("/api/auth/google", rateLimit("google", 30, 10 * 60 * 1000));
 app.use("/api/auth/forgot-password", rateLimit("forgot-password", 20, 15 * 60 * 1000));
 app.use("/api/auth/reset-password", rateLimit("reset-password", 30, 15 * 60 * 1000));
 app.use("/api/auth/verify-email", rateLimit("verify-email", 30, 15 * 60 * 1000));
+app.use("/api/auth/resend-verification", rateLimit("resend-verification", 20, 15 * 60 * 1000));
 app.use("/api", (req, res, next) => { res.setHeader("Cache-Control", "no-store"); next(); });
 app.use("/api", rateLimit("api", 1200, 60000));
 // Reject oversized/compressed JSON after cheap origin and rate checks.
@@ -116,6 +117,33 @@ app.post("/api/auth/verify-email", (req, res) => {
     res.json(result);
   } catch (e) {
     res.status(e.status || 400).json({ error: e.message, code: e.code || verifyShared.INVALID_VERIFY_CODE });
+  }
+});
+
+// Same answer for unknown, verified and unverified addresses. Only an
+// unverified address receives mail.
+app.post("/api/auth/resend-verification", async (req, res) => {
+  try {
+    const emailAddress = req.body && req.body.email;
+    const limited = rateLimit.checkEmailLimit("resend-verification-email", 5, 15 * 60 * 1000, emailAddress);
+    if (limited.limited) return res.status(429).json({ error: "Too many requests. Try again later.", code: "RATE_LIMITED" });
+    let config = null;
+    if (verificationRequired()) {
+      config = email.readConfig(process.env, process.env.PUBLIC_ORIGIN || ("http://localhost:" + (process.env.PORT || 3000)));
+      if (!config.configured) return res.status(503).json({ error: email.setupMessage(config), code: verifyShared.NOT_CONFIGURED_CODE });
+    }
+    try {
+      if (config && config.configured) {
+        const result = resendVerification(emailAddress);
+        if (result) await email.sendVerificationEmail(config, { to: result.to, token: result.token });
+      }
+    } catch (e) {
+      console.error("[popuploom] verification resend failed:", e && e.message);
+    }
+    noStore(res);
+    res.json({ ok: true, message: verifyShared.GENERIC_RESEND_MESSAGE });
+  } catch (e) {
+    res.status(400).json({ error: "Could not send the verification email." });
   }
 });
 
@@ -280,6 +308,7 @@ app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
   }
   const adConfig = ads.config(process.env);
+  ads.warnIfDisabled(adConfig);
   const adNonce = file.endsWith(".html") && adConfig.enabled && ads.isAdPage(pathname) ? ads.nonce() : "";
   if (file.endsWith(".html")) {
     security.htmlHeaders(res, file.slice(1), { adsEnabled: !!adNonce, adsNonce: adNonce });

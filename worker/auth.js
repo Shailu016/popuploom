@@ -109,6 +109,16 @@ async function updateProfile(env, userId, patch) {
   return getUserById(env, userId);
 }
 
+async function issueVerificationToken(env, userId, email) {
+  const token = randomVerifyToken();
+  const now = Math.floor(Date.now() / 1000);
+  await env.DB.prepare("DELETE FROM email_verification_tokens WHERE expires_at <= ?").bind(now).run();
+  await env.DB.prepare("UPDATE email_verification_tokens SET used_at = ? WHERE user_id = ? AND used_at IS NULL").bind(now, userId).run();
+  await env.DB.prepare("INSERT INTO email_verification_tokens (token_hash, user_id, email, created_at, expires_at) VALUES (?, ?, ?, ?, ?)")
+    .bind(await sha256Hex(token), userId, email, now, now + verifyShared.VERIFY_TOKEN_TTL_SECONDS).run();
+  return token;
+}
+
 async function register(env, email, password, name) {
   secretKey(env);
   email = String(email || "").trim().toLowerCase();
@@ -134,12 +144,7 @@ async function register(env, email, password, name) {
   const user = { id: info.meta.last_row_id, email, name: name || null, avatarUrl: null };
   if (!verified) {
     // Verification is on: no session until the emailed link is opened.
-    const token = randomVerifyToken();
-    const now = Math.floor(Date.now() / 1000);
-    await env.DB.prepare("DELETE FROM email_verification_tokens WHERE expires_at <= ?").bind(now).run();
-    await env.DB.prepare("UPDATE email_verification_tokens SET used_at = ? WHERE user_id = ? AND used_at IS NULL").bind(now, user.id).run();
-    await env.DB.prepare("INSERT INTO email_verification_tokens (token_hash, user_id, email, created_at, expires_at) VALUES (?, ?, ?, ?, ?)")
-      .bind(await sha256Hex(token), user.id, email, now, now + verifyShared.VERIFY_TOKEN_TTL_SECONDS).run();
+    const token = await issueVerificationToken(env, user.id, email);
     return { ok: true, verificationRequired: true, existing: false, to: email, token };
   }
   return { user, token: await signToken(env, user) };
@@ -200,6 +205,19 @@ async function verifyEmail(env, rawToken) {
   return { user, token: await signToken(env, user), message: verifyShared.VERIFY_SUCCESS_MESSAGE };
 }
 
+// Re-issue a verification link for an address that is registered but not yet
+// verified. Returns null for unknown or already-verified addresses so the route
+// can answer exactly the same way in every case.
+async function resendVerification(env, rawEmail) {
+  const email = verifyShared.normalizeEmail(rawEmail);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) return null;
+  await ensureVerificationSchema(env);
+  const row = await env.DB.prepare("SELECT id, email, email_verified FROM users WHERE email = ?").bind(email).first();
+  if (!row || Number(row.email_verified) !== 0) return null;
+  const token = await issueVerificationToken(env, row.id, row.email || email);
+  return { to: row.email || email, token };
+}
+
 // Failing logins still perform one PBKDF2 verification. Without this, a missing
 // or Google-only account returned before the key derivation and its faster
 // response disclosed which emails are registered. Generated once per isolate.
@@ -222,9 +240,12 @@ async function login(env, email, password) {
   const valid = await verifyPassword(passwordString, stored);
   if (!canMatch || !valid) throw new ApiError(401, "Invalid email or password");
   if (verificationRequired(env) && Number(row.email_verified) === 0) {
-    // Same response as a wrong password on purpose: a distinct 403 would let
-    // an attacker learn that a freshly registered address was new.
-    throw new ApiError(401, "Invalid email or password");
+    // Keep the exact 401 wording and timing so a wrong password and an
+    // unverified address stay indistinguishable, but attach a machine-readable
+    // code so the signed-in user can request a fresh verification link.
+    const error = new ApiError(401, "Invalid email or password");
+    error.code = verifyShared.NOT_VERIFIED_CODE;
+    throw error;
   }
   if (/^\$2[aby]\$/.test(row.password_hash)) {
     const upgraded = await hashPassword(password);
@@ -268,10 +289,17 @@ async function findOrCreateGoogleUser(env, profile) {
       if (!email.endsWith("@gmail.com") && !(typeof profile.hostedDomain === "string" && profile.hostedDomain.trim())) {
         throw new ApiError(401, "Sign in with your existing email and password. Google cannot verify current ownership of this email for account linking.");
       }
-      // Verified email ownership replaces unverified credentials and revokes prior sessions.
-      const unusableHash = await hashPassword(crypto.randomUUID());
-      await env.DB.prepare("UPDATE users SET google_id = ?, password_hash = ?, token_version = token_version + 1, email_verified = 1, name = COALESCE(name, ?), avatar_url = COALESCE(avatar_url, ?) WHERE id = ?")
-        .bind(sub, unusableHash, name, avatar, row.id).run();
+      // Linking revokes prior sessions. A verified password account keeps its
+      // credential; an unverified one loses it, because a stranger may have
+      // pre-registered the address before the real owner arrived via Google.
+      if (Number(row.email_verified) === 1) {
+        await env.DB.prepare("UPDATE users SET google_id = ?, token_version = token_version + 1, email_verified = 1, name = COALESCE(name, ?), avatar_url = COALESCE(avatar_url, ?) WHERE id = ?")
+          .bind(sub, name, avatar, row.id).run();
+      } else {
+        const unusableHash = await hashPassword(crypto.randomUUID());
+        await env.DB.prepare("UPDATE users SET google_id = ?, password_hash = ?, token_version = token_version + 1, email_verified = 1, name = COALESCE(name, ?), avatar_url = COALESCE(avatar_url, ?) WHERE id = ?")
+          .bind(sub, unusableHash, name, avatar, row.id).run();
+      }
       row = await env.DB.prepare("SELECT * FROM users WHERE id = ?").bind(row.id).first();
     } else {
       const randomHash = await hashPassword(crypto.randomUUID());
@@ -357,6 +385,7 @@ module.exports = {
   hashPassword,
   sha256Hex,
   verifyEmail,
+  resendVerification,
   verificationRequired
 };
 

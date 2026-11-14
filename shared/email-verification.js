@@ -6,6 +6,9 @@ const VERIFY_TOKEN_TTL_SECONDS = VERIFY_TOKEN_TTL_MINUTES * 60;
 const VERIFY_TOKEN_RE = /^[A-Za-z0-9_-]{43}$/;
 
 const GENERIC_REGISTER_MESSAGE = "If that email is available, a verification link is on its way. Check your inbox and spam folder, then sign in.";
+// Resend deliberately says "needs verification" rather than "account exists":
+// the response is identical for unknown, verified and unverified addresses.
+const GENERIC_RESEND_MESSAGE = "If that address still needs verification, a new link is on its way. Check your inbox and spam folder.";
 const VERIFY_SUCCESS_MESSAGE = "Email verified. You are signed in.";
 const INVALID_VERIFY_MESSAGE = "This verification link is invalid or has expired. Sign in or reset your password to request a new one.";
 const NOT_VERIFIED_MESSAGE = "Verify your email before signing in. Check your inbox and spam folder.";
@@ -39,5 +42,6 @@ module.exports = {
   NOT_VERIFIED_CODE,
   normalizeEmail,
   isVerifyTokenFormat,
-  buildVerifyUrl
+  buildVerifyUrl,
+  GENERIC_RESEND_MESSAGE
 };

@@ -12,13 +12,15 @@ import hostPolicy from "../shared/host-policy.js";
 import markdown from "../shared/markdown.js";
 import { verificationFile } from "../shared/verification.js";
 
-const { ApiError, register, login, findOrCreateGoogleUser, verifyCredential, getUserById, updateProfile, authMiddleware, revokeToken, verifyEmail, verificationRequired } = auth;
+const { ApiError, register, login, findOrCreateGoogleUser, verifyCredential, getUserById, updateProfile, authMiddleware, revokeToken, verifyEmail, resendVerification, verificationRequired } = auth;
 const { json, rateLimit } = http;
 
 const registerLimit = rateLimit("register", 40, 10 * 60 * 1000);
 const registerEmailLimit = http.emailRateLimit("register-email", 5, 15 * 60 * 1000);
 const accountLimit = rateLimit("account-action",10,60000);
 const loginLimit = rateLimit("login", 40, 10 * 60 * 1000);
+const resendLimit = rateLimit("resend-verification", 20, 15 * 60 * 1000);
+const resendEmailLimit = http.emailRateLimit("resend-verification-email", 5, 15 * 60 * 1000);
 const googleLimit = rateLimit("google", 30, 10 * 60 * 1000);
 const forgotLimit = rateLimit("forgot-password", 20, 15 * 60 * 1000);
 const forgotEmailLimit = http.emailRateLimit("forgot-password-email", 5, 15 * 60 * 1000);
@@ -162,6 +164,30 @@ async function verifyEmailRoute(c) {
   }
 }
 
+// Always answers with the same body. Only an unverified address receives mail,
+// and the response never reveals whether the address exists or is verified.
+async function resendVerificationRoute(c) {
+  const emailAddress = c.body && c.body.email;
+  await resendEmailLimit(c.request, c.env, emailAddress);
+  let config = null;
+  if (verificationRequired(c.env)) {
+    config = email.readConfig(c.env, "https://popuploom.com");
+    if (!config.configured) {
+      return json({ error: email.setupMessage(config), code: verifyShared.NOT_CONFIGURED_CODE }, 503);
+    }
+  }
+  try {
+    if (config && config.configured) {
+      const result = await resendVerification(c.env, emailAddress);
+      if (result) await email.sendVerificationEmail(config, { to: result.to, token: result.token });
+    }
+  } catch (e) {
+    // Best effort: provider failures must not change the answer.
+    console.error("[popuploom] verification resend failed:", e && e.message);
+  }
+  return json({ ok: true, message: verifyShared.GENERIC_RESEND_MESSAGE });
+}
+
 async function loginRoute(c) {
   try {
     const { email, password } = c.body || {};
@@ -267,6 +293,8 @@ async function handleApi(request, env, ctx, pathname, method, cors) {
     matched = { handler: resetRoute, limit: resetLimit };
   } else if (pathname === "/api/auth/verify-email" && method === "POST") {
     matched = { handler: verifyEmailRoute, limit: verifyLimit };
+  } else if (pathname === "/api/auth/resend-verification" && method === "POST") {
+    matched = { handler: resendVerificationRoute, limit: resendLimit };
   } else if (pathname === "/api/auth/logout" && method === "POST") {
     matched = { handler: logoutRoute, needsAuth: true };
   } else if (pathname === "/api/auth/config" && method === "GET") {
@@ -357,6 +385,7 @@ async function serveStatic(request, env, pathname, sec, cors, headOnly) {
     }
     if (["/leads.html", "/studio.html", "/profile.html", "/demo.html", "/migration.html", "/reset-password.html", "/verify-email.html"].includes(file)) headers.set("X-Robots-Tag", ["/migration.html", "/reset-password.html", "/verify-email.html", "/studio.html", "/profile.html", "/leads.html"].includes(file) ? "noindex, nofollow" : "noindex, follow");
     const adConfig = ads.config(env);
+    ads.warnIfDisabled(adConfig);
     const adNonce = file.endsWith(".html") && adConfig.enabled && ads.isAdPage(file) ? ads.nonce() : "";
     if (file.endsWith(".html")) for (const [key, value] of Object.entries(htmlHeaders(env, file.slice(1), { adsEnabled: !!adNonce, adsNonce: adNonce }))) headers.set(key, value);
     if (adNonce) {

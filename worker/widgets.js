@@ -31,11 +31,33 @@ function webhookJson(row) {
   };
 }
 
+async function trimDeliveries(env, widgetId) {
+  await env.DB.prepare("DELETE FROM webhook_deliveries WHERE widget_id = ? AND rowid NOT IN (SELECT rowid FROM webhook_deliveries WHERE widget_id = ? ORDER BY rowid DESC LIMIT 100)").bind(widgetId, widgetId).run();
+}
+
+// Insert the in-flight row before the first attempt so a platform kill leaves a
+// visible `pending` record rather than no record. Stale pending rows are swept
+// on the next delivery for the same widget.
+async function logDeliveryStart(env, widgetId, event, submissionId) {
+  try {
+    await env.DB.prepare("DELETE FROM webhook_deliveries WHERE widget_id = ? AND status = 'pending' AND created_at < datetime('now','-1 day')").bind(widgetId).run();
+    await env.DB.prepare("INSERT OR IGNORE INTO webhook_deliveries (id, widget_id, submission_id, event, test, status, attempts, completed_at) VALUES (?, ?, ?, ?, ?, 'pending', 0, NULL)")
+      .bind(event.id, widgetId, submissionId || null, event.event, event.test ? 1 : 0).run();
+    await trimDeliveries(env, widgetId);
+  } catch (e) {
+    console.error("[popuploom] could not start webhook delivery log:", e.message);
+  }
+}
+
 async function logDelivery(env, widgetId, event, submissionId, result) {
   try {
-    await env.DB.prepare("INSERT INTO webhook_deliveries (id, widget_id, submission_id, event, test, status, attempts, response_status, error, completed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))")
-      .bind(event.id, widgetId, submissionId || null, event.event, event.test ? 1 : 0, result.ok ? "success" : "failed", result.attempts || 0, result.status || null, result.error ? String(result.error).slice(0, 500) : null).run();
-    await env.DB.prepare("DELETE FROM webhook_deliveries WHERE widget_id = ? AND rowid NOT IN (SELECT rowid FROM webhook_deliveries WHERE widget_id = ? ORDER BY rowid DESC LIMIT 100)").bind(widgetId, widgetId).run();
+    const updated = await env.DB.prepare("UPDATE webhook_deliveries SET status = ?, attempts = ?, response_status = ?, error = ?, completed_at = datetime('now') WHERE id = ?")
+      .bind(result.ok ? "success" : "failed", result.attempts || 0, result.status || null, result.error ? String(result.error).slice(0, 500) : null, event.id).run();
+    if (!updated.meta.changes) {
+      await env.DB.prepare("INSERT INTO webhook_deliveries (id, widget_id, submission_id, event, test, status, attempts, response_status, error, completed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))")
+        .bind(event.id, widgetId, submissionId || null, event.event, event.test ? 1 : 0, result.ok ? "success" : "failed", result.attempts || 0, result.status || null, result.error ? String(result.error).slice(0, 500) : null).run();
+    }
+    await trimDeliveries(env, widgetId);
   } catch (e) {
     console.error("[popuploom] could not record webhook delivery:", e.message);
   }
@@ -48,6 +70,7 @@ async function deliverLead(c, widgetId, submissionId, data) {
   const endpoint = await c.env.DB.prepare("SELECT url, secret FROM webhook_endpoints WHERE widget_id = ? AND enabled = 1").bind(widgetId).first();
   if (!widget || !endpoint) return;
   const event = webhook.payload(widget, { id: submissionId, createdAt: new Date().toISOString(), data: data }, { id: webhook.randomId() });
+  await logDeliveryStart(c.env, widgetId, event, submissionId);
   const result = await webhook.deliver(endpoint, event, webhookOptions(c.env));
   await logDelivery(c.env, widgetId, event, submissionId, result);
 }
@@ -72,8 +95,8 @@ async function listWidgets(c) {
 // This is what a signed-in user's install snippet fetches on their site, so
 // edits in the studio go live without re-pasting. Only presentational data
 // leaves the server: no owner id, no counters, no leads.
-// Cached for 30s via the Cache API (Cloudflare does not edge-cache workers.dev
-// responses by default) with the same header the Express server advertised.
+// Reads always hit D1 and are sent no-store: a stale cached config could
+// outlive a delete and keep serving a removed popup.
 async function getWidgetConfig(c) {
   const r = await c.env.DB.prepare("SELECT id, name, template, config, updated_at FROM widgets WHERE id = ?").bind(c.params.id).first();
   if (!r) return json({ error: "Widget not found" }, 404);
@@ -195,6 +218,7 @@ async function testWebhook(c) {
   const endpoint = await c.env.DB.prepare("SELECT url, secret FROM webhook_endpoints WHERE widget_id = ?").bind(w.id).first();
   if (!endpoint) return json({ error: "Configure a webhook first" }, 400);
   const event = webhook.payload(w, { id: null, createdAt: new Date().toISOString(), data: { email: "test@example.com", message: "PopupLoom test delivery" } }, { id: webhook.randomId(), test: true });
+  await logDeliveryStart(c.env, w.id, event, null);
   const result = await webhook.deliver(endpoint, event, webhookOptions(c.env));
   await logDelivery(c.env, w.id, event, null, result);
   return json({ ok: result.ok, status: result.status, attempts: result.attempts, error: result.error });

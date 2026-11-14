@@ -130,6 +130,8 @@
     fill();
     refresh();
     renderPublish();
+    // Everything above is initial paint, not a user edit.
+    ready = true;
   }
 
   /* tabs */
@@ -461,8 +463,17 @@
   var previewInst = null;
   var saving = false;
   var refreshT = 0;
+  var dirty = false;
+  var ready = false;
+  var editVersion = 0;
+  function markDirty() {
+    if (!ready) return;
+    dirty = true;
+    editVersion++;
+  }
   function refresh() {
     gather();
+    markDirty();
     clearTimeout(refreshT);
     refreshT = setTimeout(function () {
       // re-render preview
@@ -524,6 +535,7 @@
   document.getElementById("panel-rail").addEventListener("change", refresh);
   document.getElementById("nameInput").addEventListener("input", function () {
     document.getElementById("pubName").textContent = innerName();
+    markDirty();
   });
 
   /* trigger-type dependent fields */
@@ -592,6 +604,7 @@
   /* ---------------- save / test / delete ---------------- */
   async function saveWidget() {
     if (saving) return;
+    var version = editVersion;
     saving = true;
     try {
       gather();
@@ -602,7 +615,10 @@
       w.name = innerName();
       document.getElementById("pubName").textContent = w.name;
       renderPublish();
-      if (PF.auth.isAuthed()) toast('Saved "' + w.name + '". Install code ready.', true);
+      // Only claim "saved" for the snapshot that was actually sent. Edits made
+      // while the request was in flight keep the dirty flag set.
+      if (version === editVersion) dirty = false;
+      if (PF.auth.isAuthed()) toast(version === editVersion ? 'Saved "' + w.name + '". Install code ready.' : 'Saved. Newer edits are still unsaved.', true);
       else toast('Draft saved in this browser. Sign in to get the install code.', true);
       var btn = document.getElementById("btnSave");
       if (btn) {
@@ -629,6 +645,7 @@
       await PF.store.remove(widgetId);
       widgetId = null;
       state.id = PF.uid();
+      dirty = false;
       renderPublish();
       toast("Deleted", true);
     } catch (e) { toast("Delete failed: " + e.message, false); }
@@ -653,4 +670,12 @@
 
   /* fill once + first paint */
   init().catch(function (e) { toast("Could not load the studio: " + e.message, false); });
+
+  // A reload or tab close with unsaved edits should ask first. Browsers show
+  // their own wording; the important part is that the transition is not silent.
+  addEventListener("beforeunload", function (e) {
+    if (!dirty || saving) return;
+    e.preventDefault();
+    e.returnValue = "";
+  });
 })();

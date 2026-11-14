@@ -97,6 +97,18 @@
     };
   }
 
+  // Fail-closed stays fail-closed, but an operator must be able to see *why*
+  // ads stopped. One line per distinct reason per isolate/process.
+  var lastWarnedReason = "";
+  function warnIfDisabled(cfg) {
+    if (!cfg || cfg.enabled || !cfg.reason || cfg.reason === "disabled") return;
+    if (cfg.reason === lastWarnedReason) return;
+    lastWarnedReason = cfg.reason;
+    try {
+      console.warn("[popuploom] AdSense disabled: " + cfg.reason + ". Check the ADSENSE_* environment variables.");
+    } catch (e) {}
+  }
+
   function nonce() {
     var bytes = new Uint8Array(16);
     crypto.getRandomValues(bytes);
@@ -166,6 +178,7 @@
 
   return {
     config: config,
+    warnIfDisabled: warnIfDisabled,
     nonce: nonce,
     inject: inject,
     markup: markup,

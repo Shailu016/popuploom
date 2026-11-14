@@ -49,6 +49,16 @@ function updateProfile(userId, patch) {
   return getUserById(userId);
 }
 
+function issueVerificationToken(userId, email) {
+  const token = crypto.randomBytes(verifyShared.VERIFY_TOKEN_BYTES).toString("base64url");
+  const now = Math.floor(Date.now() / 1000);
+  db.prepare("DELETE FROM email_verification_tokens WHERE expires_at <= ?").run(now);
+  db.prepare("UPDATE email_verification_tokens SET used_at = ? WHERE user_id = ? AND used_at IS NULL").run(now, userId);
+  db.prepare("INSERT INTO email_verification_tokens (token_hash, user_id, email, created_at, expires_at) VALUES (?, ?, ?, ?, ?)")
+    .run(hashToken(token), userId, email, now, now + verifyShared.VERIFY_TOKEN_TTL_SECONDS);
+  return token;
+}
+
 function register(email, password, name) {
   email = String(email || "").trim().toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) throw new Error("Enter a valid email address");
@@ -71,12 +81,7 @@ function register(email, password, name) {
   const user = { id: info.lastInsertRowid, email, name: name || null, avatarUrl: null };
   if (!verifying) return { user, token: signToken(user) };
 
-  const token = crypto.randomBytes(verifyShared.VERIFY_TOKEN_BYTES).toString("base64url");
-  const now = Math.floor(Date.now() / 1000);
-  db.prepare("DELETE FROM email_verification_tokens WHERE expires_at <= ?").run(now);
-  db.prepare("UPDATE email_verification_tokens SET used_at = ? WHERE user_id = ? AND used_at IS NULL").run(now, user.id);
-  db.prepare("INSERT INTO email_verification_tokens (token_hash, user_id, email, created_at, expires_at) VALUES (?, ?, ?, ?, ?)")
-    .run(hashToken(token), user.id, email, now, now + verifyShared.VERIFY_TOKEN_TTL_SECONDS);
+  const token = issueVerificationToken(user.id, email);
   return { ok: true, verificationRequired: true, existing: false, to: email, token };
 }
 
@@ -120,6 +125,18 @@ function verifyEmail(rawToken) {
   return { user, token: signToken(user), message: verifyShared.VERIFY_SUCCESS_MESSAGE };
 }
 
+// Re-issue a verification link for a registered but unverified address.
+// Returns null for unknown or already-verified addresses; the route answers
+// identically in every case.
+function resendVerification(rawEmail) {
+  const email = verifyShared.normalizeEmail(rawEmail);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) return null;
+  const row = db.prepare("SELECT id, email, email_verified FROM users WHERE email = ?").get(email);
+  if (!row || Number(row.email_verified) !== 0) return null;
+  const token = issueVerificationToken(row.id, row.email || email);
+  return { to: row.email || email, token };
+}
+
 // Failing logins still perform one bcrypt comparison. Without this, a missing
 // or Google-only account returned before the hash work and its faster response
 // disclosed which emails are registered. Generated once per process.
@@ -140,9 +157,11 @@ function login(email, password) {
   const valid = bcrypt.compareSync(passwordString, canMatch ? row.password_hash : dummyPasswordHash());
   if (!canMatch || !valid) throw new Error("Invalid email or password");
   if (verificationRequired() && Number(row.email_verified) === 0) {
-    // Same response as a wrong password: a distinct status would leak whether
-    // the address was newly registered.
-    throw new Error("Invalid email or password");
+    // Same wording and 401 status as a wrong password so the two stay
+    // indistinguishable; the code lets the client offer a resend action.
+    const error = new Error("Invalid email or password");
+    error.code = verifyShared.NOT_VERIFIED_CODE;
+    throw error;
   }
   // Rehash older cost-10 bcrypt hashes after a successful login. The update is
   // conditional so a concurrent password change is never overwritten.
@@ -187,10 +206,17 @@ function findOrCreateGoogleUser(profile) {
       if (!email.endsWith("@gmail.com") && !(typeof profile.hostedDomain === "string" && profile.hostedDomain.trim())) {
         throw new Error("Sign in with your existing email and password. Google cannot verify current ownership of this email for account linking.");
       }
-      // Verified email ownership replaces unverified credentials and revokes prior sessions.
-      const unusableHash = bcrypt.hashSync(crypto.randomBytes(32).toString("hex"), BCRYPT_ROUNDS);
-      db.prepare("UPDATE users SET google_id = ?, password_hash = ?, token_version = token_version + 1, email_verified = 1, name = COALESCE(name, ?), avatar_url = COALESCE(avatar_url, ?) WHERE id = ?")
-        .run(sub, unusableHash, name, avatar, row.id);
+      // Linking revokes prior sessions. A verified password account keeps its
+      // credential; an unverified one loses it, because a stranger may have
+      // pre-registered the address before the real owner arrived via Google.
+      if (Number(row.email_verified) === 1) {
+        db.prepare("UPDATE users SET google_id = ?, token_version = token_version + 1, email_verified = 1, name = COALESCE(name, ?), avatar_url = COALESCE(avatar_url, ?) WHERE id = ?")
+          .run(sub, name, avatar, row.id);
+      } else {
+        const unusableHash = bcrypt.hashSync(crypto.randomBytes(32).toString("hex"), BCRYPT_ROUNDS);
+        db.prepare("UPDATE users SET google_id = ?, password_hash = ?, token_version = token_version + 1, email_verified = 1, name = COALESCE(name, ?), avatar_url = COALESCE(avatar_url, ?) WHERE id = ?")
+          .run(sub, unusableHash, name, avatar, row.id);
+      }
       row = db.prepare("SELECT * FROM users WHERE id = ?").get(row.id);
     } else {
       const randomHash = bcrypt.hashSync(crypto.randomBytes(32).toString("hex"), BCRYPT_ROUNDS);
@@ -224,7 +250,7 @@ function authMiddleware(req, res, next) {
   }
 }
 
-module.exports = { register, login, findOrCreateGoogleUser, getUserById, updateProfile, authMiddleware, signToken, verifyEmail, verificationRequired };
+module.exports = { register, login, findOrCreateGoogleUser, getUserById, updateProfile, authMiddleware, signToken, verifyEmail, resendVerification, verificationRequired };
 
 async function manageAccount(id, body) {
   const row = db.prepare("SELECT * FROM users WHERE id = ?").get(id);

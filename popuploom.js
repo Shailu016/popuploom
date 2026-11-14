@@ -588,7 +588,7 @@
         this.notify("open");
       }
     },
-    close: function () {
+    close: function (opts) {
       var self = this, H = this.holderEl;
       if (!H) return;
       clearInterval(this._cdInt);
@@ -599,7 +599,11 @@
         self.notify("close");
       };
       if (this.preview) { done(); return; }
-      try { localStorage.setItem(this.key("closed"), String(Date.now())); } catch (e) {}
+      // Programmatic teardown (destroy) must not look like the visitor closed
+      // the popup: writing a `closed` stamp would suppress it for close24h.
+      if (!(opts && opts.persist === false)) {
+        try { localStorage.setItem(this.key("closed"), String(Date.now())); } catch (e) {}
+      }
       var card = H.querySelector(".pf-overlay, .pf-card");
       (card || H).classList.add("pf-anim-out");
       setTimeout(done, 170);
@@ -612,7 +616,7 @@
         dispatchEvent(new CustomEvent("popforge:" + evName, { detail: { id: this.cfg.id, name: this.cfg.name } }));
       } catch (e) {}
     },
-    destroy: function () { this.unbind(); if (this.stickyEl) this.stickyEl.remove(); this.close(); }
+    destroy: function () { this.unbind(); if (this.stickyEl) this.stickyEl.remove(); this.close({ persist: false }); }
   };
 
   /* ------------------------------------------------------------------ */
@@ -798,7 +802,13 @@
         if (!self.preview) self.notify("submit");
         prizeView(pendingPrize);
       } catch (e) {
-        submissionError(self);
+        var terminal = !!(e && e.terminal);
+        submissionError(self, terminal ? "This popup is no longer available. Please contact the site owner." : null, terminal);
+        if (terminal) {
+          hub.textContent = "Unavailable";
+          hub.disabled = true;
+          return;
+        }
         hub.textContent = "Retry";
         hub.disabled = false;
       }
@@ -852,11 +862,19 @@
     }, self.apiBase);
     if (!response || !response.ok) throw new Error("Submission failed");
     var result = await response.json();
+    if (result && result.stored === false && result.reason === "unknown_widget") {
+      // The widget was deleted after this page loaded. Retrying can never
+      // succeed, so mark the error terminal instead of looping the visitor.
+      var gone = new Error("This popup is no longer available.");
+      gone.terminal = true;
+      throw gone;
+    }
     if (!result || result.ok !== true || result.stored === false) throw new Error("Submission was not stored");
     self._pendingLead = null;
   }
-  function submissionError(self) {
+  function submissionError(self, message, terminal) {
     var body = self.holderEl && self.holderEl.querySelector(".pf-body");
+    if (terminal) self._unavailable = true;
     if (!body) return;
     var error = body.querySelector(".pf-submit-error");
     if (!error) {
@@ -865,10 +883,14 @@
       error.setAttribute("role", "alert");
       body.appendChild(error);
     }
-    error.textContent = "We couldn't save your response. Please try again.";
+    error.textContent = message || "We couldn't save your response. Please try again.";
   }
   async function submitLike(self, data, form) {
     if (self._submitting) return false;
+    if (self._unavailable) {
+      submissionError(self, "This popup is no longer available. Please contact the site owner.", true);
+      return false;
+    }
     self._submitting = true;
     var controls = Array.from(self.holderEl.querySelectorAll("button, input"));
     var disabled = controls.map(function (el) { return el.disabled; });
@@ -892,11 +914,17 @@
       self.notify("submit");
       return true;
     } catch (e) {
-      submissionError(self);
+      var terminal = !!(e && e.terminal);
+      submissionError(self, terminal ? "This popup is no longer available. Please contact the site owner." : null, terminal);
       return false;
     } finally {
       self._submitting = false;
-      controls.forEach(function (el, i) { el.disabled = disabled[i]; });
+      controls.forEach(function (el, i) {
+        // A terminal failure must not re-enable the submit path, but the close
+        // button always stays usable.
+        if (self._unavailable && !el.classList.contains("pf-close")) el.disabled = true;
+        else el.disabled = disabled[i];
+      });
     }
   }
   function safeUrl(value, image) {

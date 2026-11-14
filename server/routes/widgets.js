@@ -39,11 +39,33 @@ function webhookJson(row) {
   };
 }
 
+function trimDeliveries(widgetId) {
+  db.prepare("DELETE FROM webhook_deliveries WHERE widget_id = ? AND rowid NOT IN (SELECT rowid FROM webhook_deliveries WHERE widget_id = ? ORDER BY rowid DESC LIMIT 100)").run(widgetId, widgetId);
+}
+
+// A delivery is visible while it is still in flight, so a crash leaves a
+// `pending` row instead of no row at all. Stale pending rows are swept on the
+// next delivery for the same widget.
+function logDeliveryStart(widgetId, event, submissionId) {
+  try {
+    db.prepare("DELETE FROM webhook_deliveries WHERE widget_id = ? AND status = 'pending' AND created_at < datetime('now','-1 day')").run(widgetId);
+    db.prepare("INSERT OR IGNORE INTO webhook_deliveries (id, widget_id, submission_id, event, test, status, attempts, completed_at) VALUES (?, ?, ?, ?, ?, 'pending', 0, NULL)")
+      .run(event.id, widgetId, submissionId || null, event.event, event.test ? 1 : 0);
+    trimDeliveries(widgetId);
+  } catch (e) {
+    console.error("[popuploom] could not start webhook delivery log:", e.message);
+  }
+}
+
 function logDelivery(widgetId, event, submissionId, result) {
   try {
-    db.prepare("INSERT INTO webhook_deliveries (id, widget_id, submission_id, event, test, status, attempts, response_status, error, completed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))")
-      .run(event.id, widgetId, submissionId || null, event.event, event.test ? 1 : 0, result.ok ? "success" : "failed", result.attempts || 0, result.status || null, result.error ? String(result.error).slice(0, 500) : null);
-    db.prepare("DELETE FROM webhook_deliveries WHERE widget_id = ? AND rowid NOT IN (SELECT rowid FROM webhook_deliveries WHERE widget_id = ? ORDER BY rowid DESC LIMIT 100)").run(widgetId, widgetId);
+    const updated = db.prepare("UPDATE webhook_deliveries SET status = ?, attempts = ?, response_status = ?, error = ?, completed_at = datetime('now') WHERE id = ?")
+      .run(result.ok ? "success" : "failed", result.attempts || 0, result.status || null, result.error ? String(result.error).slice(0, 500) : null, event.id);
+    if (!updated.changes) {
+      db.prepare("INSERT INTO webhook_deliveries (id, widget_id, submission_id, event, test, status, attempts, response_status, error, completed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))")
+        .run(event.id, widgetId, submissionId || null, event.event, event.test ? 1 : 0, result.ok ? "success" : "failed", result.attempts || 0, result.status || null, result.error ? String(result.error).slice(0, 500) : null);
+    }
+    trimDeliveries(widgetId);
   } catch (e) {
     console.error("[popuploom] could not record webhook delivery:", e.message);
   }
@@ -61,6 +83,7 @@ function dispatchLead(widgetId, submissionId, data) {
   }
   if (!widget || !endpoint) return;
   const event = webhook.payload(widget, { id: submissionId, createdAt: new Date().toISOString(), data: data }, { id: webhook.randomId() });
+  logDeliveryStart(widgetId, event, submissionId);
   webhook.deliver(endpoint, event, webhookOptions()).then(function (result) {
     logDelivery(widgetId, event, submissionId, result);
   }, function () {});
@@ -199,6 +222,7 @@ router.post("/:id/webhook/test", authMiddleware, rateLimit("webhook-test", 10, 6
   const endpoint = db.prepare("SELECT url, secret FROM webhook_endpoints WHERE widget_id = ?").get(w.id);
   if (!endpoint) return res.status(400).json({ error: "Configure a webhook first" });
   const event = webhook.payload(w, { id: null, createdAt: new Date().toISOString(), data: { email: "test@example.com", message: "PopupLoom test delivery" } }, { id: webhook.randomId(), test: true });
+  logDeliveryStart(w.id, event, null);
   const result = await webhook.deliver(endpoint, event, webhookOptions());
   logDelivery(w.id, event, null, result);
   res.json({ ok: result.ok, status: result.status, attempts: result.attempts, error: result.error });
@@ -237,7 +261,10 @@ router.get("/:id/webhook/deliveries", authMiddleware, (req, res) => {
 router.post("/:id/view", rateLimit("view", 600, 60000), (req, res) => {
   const widget = db.prepare("SELECT id FROM widgets WHERE id = ?").get(req.params.id);
   if (!widget) return res.status(204).end();
-  const visitor = req.headers["x-visitor-id"] || req.ip || (req.socket && req.socket.remoteAddress) || "local";
+  // The client-supplied x-visitor-id header is deliberately ignored: it is
+  // attacker-controlled and rotating it would mint a fresh bucket per request.
+  // req.ip is resolved by Express's configured proxy policy.
+  const visitor = req.ip || (req.socket && req.socket.remoteAddress) || "local";
   const isFirst = rateLimit.dedupeView(req.params.id, visitor);
   if (isFirst) {
     db.prepare("UPDATE widgets SET view_count = view_count + 1, updated_at = updated_at WHERE id = ?").run(req.params.id);
