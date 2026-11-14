@@ -180,6 +180,7 @@ Do not start with 45 template pages. Start with:
 - Regenerated the sitemap, CSP hashes, Express/Worker allowlists and the Cloudflare
   build list.
 - Ads remain off on all new pages; no eligibility or injection change.
+- Post-deploy audit: **37 URLs, 0 issues**; IndexNow resubmitted all 37.
 
 
 
@@ -450,9 +451,9 @@ Measure referring domains and non-brand clicks, not “mentions”.
 
 ### Weeks 1–2
 
-- [ ] Publish the no-limits money page.
-- [ ] Publish 3 alternative pages (OptinMonster, Poptin, Popupsmart).
-- [ ] Add homepage/footer links to all platform and money pages.
+- [x] Publish the no-limits money page.
+- [x] Publish 3 alternative pages (OptinMonster, Poptin, Popupsmart).
+- [x] Add homepage/footer links to all platform and money pages.
 - [ ] Set up the weekly scorecard.
 
 ### Weeks 3–4
