@@ -7,11 +7,17 @@ const crypto = require("crypto");
 
 const root = path.join(__dirname, "..");
 // Scan every served HTML file instead of keeping a hand-maintained list.
-// A new guide can no longer ship with an inline JSON-LD block missing its hash.
-const htmlFiles = [
-  ...fs.readdirSync(root).filter(f => f.endsWith(".html")),
-  ...fs.readdirSync(path.join(root, "guides")).filter(f => f.endsWith(".html")).map(f => "guides/" + f)
-].sort();
+// A new guide or template category page can no longer ship with an inline
+// JSON-LD block missing its hash.
+const htmlFiles = [];
+for (const dir of ["", "guides", "templates"]) {
+  const full = path.join(root, dir);
+  if (!fs.existsSync(full)) continue;
+  for (const file of fs.readdirSync(full)) {
+    if (file.endsWith(".html")) htmlFiles.push(dir ? dir + "/" + file : file);
+  }
+}
+htmlFiles.sort();
 const hash = text => "'sha256-" + crypto.createHash("sha256").update(text).digest("base64") + "'";
 
 const out = {};

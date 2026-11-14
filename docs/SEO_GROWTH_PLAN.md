@@ -101,10 +101,10 @@ promises page-one for “popup builder” in 90 days is guessing.
 
 | Priority | Issue | Pages | Action |
 |---|---|---|---|
-| P0 | Homepage does not mention the wedge | `/` | Title/description/H1 currently say “free” but not “no pageview limits”; add the wedge now while traffic is negligible |
-| P0 | Short titles | About, Contact, Terms | Rewrite with intent and brand |
-| P0 | Missing structured data | About, Contact, Terms, Privacy, 2 guides | Add `WebPage`/`AboutPage`/`ContactPage`/`Article` + breadcrumbs |
-| P0 | Template gallery sends every click to `/studio.html?tpl=...` (39 noindex URLs) | Templates | Add public template/category pages and link cards to them; keep studio as “use this template” |
+| P0 | Homepage does not mention the wedge | `/` | **Done 2026-11-14** — title, description, H1 and hero stat now say “no pageview limits”. |
+| P0 | Short titles | About, Contact, Terms | **Done 2026-11-14** — all three rewritten with intent. |
+| P0 | Missing structured data | About, Contact, Terms, Privacy, 2 guides | **Done 2026-11-14** — `AboutPage`, `ContactPage`, `WebPage`, `Article` + breadcrumbs. |
+| P0 | Template gallery sent every click to `/studio.html?tpl=...` (39 noindex URLs) | Templates | **Done 2026-11-14** — 10 public category pages; 45 cards now point at anchors; studio path kept as the CTA. |
 | P1 | Oversized description | Guides hub (187) | Trim to ≤ 160 |
 | P1 | Thin about page | About (272 words) | Add real founder/mission/editorial process, no invented credentials |
 | P1 | 0 external links | Whole site | Link-earning assets + directories + plugin listings, see §6 |
@@ -141,6 +141,24 @@ Do not start with 45 template pages. Start with:
 2. The four discovered URLs (requested 2026-11-14).
 3. The “no pageview limits” money page and 3 alternative pages.
 4. Then the template hub and first 8 template pages.
+
+### 2.6 Implementation log (2026-11-14)
+
+- Homepage title, description, OG/Twitter copy and H1 now lead with
+  “no pageview limits”; the fourth hero stat is “0 pageview caps”.
+- About, Contact and Terms titles/descriptions rewritten; About, Contact, Terms,
+  Privacy and the two schema-less guides now carry `AboutPage` / `ContactPage` /
+  `WebPage` / `Article` plus `BreadcrumbList`.
+- Ten public category pages added under `/templates/`:
+  `email-signup`, `discount`, `exit-intent`, `announcements`, `engagement`,
+  `social-proof`, `age-gates`, `gamified`, `seasonal`, `video`.
+- All 45 gallery cards now link to their category page anchor; each category page
+  keeps a `Use this template` link to `/studio.html?tpl=<id>`, so the studio flow is
+  unchanged.
+- `sitemap.xml`, `llms.txt`, Express and Worker public allowlists, CSP hash
+  generation and the Cloudflare build all include the new pages.
+- Ads are deliberately **not** enabled on the new pages; the allowlist is unchanged.
+
 
 
 ---
@@ -402,10 +420,10 @@ Measure referring domains and non-brand clicks, not “mentions”.
 - [x] Sitemap submitted and read successfully: 23 discovered pages.
 - [x] Requested indexing for the 4 discovered-but-not-crawled URLs.
 - [ ] Verify Bing Webmaster; re-run IndexNow after each deploy.
-- [ ] Fix the 11 audit issues (titles, descriptions, schema, About copy).
-- [ ] Add real `lastmod` and related-link modules.
-- [ ] Add public template pages and repoint the gallery cards away from
-  `/studio.html?tpl=...`.
+- [x] Fixed the 11 audit issues (titles, descriptions, schema, About copy).
+- [~] Added real `lastmod` for the new template pages; older URLs still need dates.
+- [x] Added 10 public template category pages and repointed all 45 gallery cards
+  away from `/studio.html?tpl=...`.
 
 ### Weeks 1–2
 

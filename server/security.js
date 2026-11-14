@@ -22,7 +22,10 @@ const htmlFiles = new Set([
   "guides/webflow-popup.html", "guides/collect-and-export-leads.html", "guides/popup-not-showing.html",
   "guides/popup-builder-for-ecommerce.html", "guides/popup-builder-for-quick-commerce.html",
   "guides/popup-builder-for-lead-generation.html", "migration.html", "reset-password.html", "leads.html",
-  "privacy.html", "about.html", "contact.html", "terms.html"
+  "privacy.html", "about.html", "contact.html", "terms.html",
+  "templates/email-signup.html", "templates/discount.html", "templates/exit-intent.html",
+  "templates/announcements.html", "templates/engagement.html", "templates/social-proof.html",
+  "templates/age-gates.html", "templates/gamified.html", "templates/seasonal.html", "templates/video.html"
 ]);
 const policyCache = new Map();
 const hash = text => "'sha256-" + crypto.createHash("sha256").update(text).digest("base64") + "'";

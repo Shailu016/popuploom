@@ -12,7 +12,7 @@ const env={JWT_SECRET:require('crypto').randomBytes(32).toString('hex'),RESEND_A
   assert.ok(guide.includes('data-pl-ad="1"') && guide.includes('adsbygoogle.js') && guide.includes('Advertisement'));
   assert.ok(nonce && policy.includes("'nonce-" + nonce + "'") && policy.includes("'strict-dynamic'"));
   assert.ok(!policy.includes("'unsafe-eval'"));
-  for (const path of ['/studio.html', '/profile.html', '/leads.html', '/reset-password.html', '/migration.html']) {
+  for (const path of ['/studio.html', '/profile.html', '/leads.html', '/reset-password.html', '/migration.html', '/templates/email-signup.html']) {
     const res = await worker.fetch(new Request('https://popuploom.com' + path), adEnv, { waitUntil() {} });
     const body = await res.text();
     assert.ok(!body.includes('adsbygoogle.js') && !body.includes('data-pl-ad'), path + ' must stay ad-free');
