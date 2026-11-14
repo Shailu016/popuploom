@@ -23,7 +23,13 @@ IndexNow is already implemented and has been run after each deploy (45 URLs,
 HTTP 200). That covers Bing and its partners even before the Webmaster account is
 verified; the account adds reporting and manual submission.
 
-**Owner action:** sign in and verify. Do not create a second Google identity.
+**Status 2026-11-14:** `popuploom.com` is active in Bing Webmaster. The sitemap
+reports Success with 45 URLs discovered, URL Submission accepted all 45 URLs, and
+the IndexNow report lists them with source “Self”. The only Site Scan error bucket
+is “Blocked by robots.txt”, which is expected for the private app surfaces.
+
+**Owner action:** keep the account signed in for weekly reports. Do not create a
+second Google identity.
 
 ---
 

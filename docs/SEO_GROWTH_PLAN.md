@@ -202,6 +202,22 @@ Do not start with 45 template pages. Start with:
   `docs/seo-scorecard-history.json`.
 - Sitemap now has 45 URLs. Ads remain off on all new pages.
 
+### 2.9 Bing and Search Console status (2026-11-14)
+
+- **Bing Webmaster:** `popuploom.com` is active in the account. The sitemap was
+  resubmitted and now reports **Success, 45 URLs discovered**. URL Submission
+  accepted all 45 URLs, and IndexNow shows the same URLs with source “Self”.
+- **Bing Site Scan:** the only error bucket is “Blocked by robots.txt” (48 pages),
+  which is expected because `/studio.html` and the other private surfaces are
+  intentionally disallowed.
+- **Google Search Console:** indexing was requested for the money page, best-free
+  page, WordPress-without-plugin guide, four individual template pages, OptiMonk
+  and Popup Maker. One later request returned a temporary submission error after
+  the daily volume, so the rest rely on the sitemap and IndexNow.
+- GSC still shows 23 discovered pages from its 13 November read; the sitemap is
+  unchanged, so the next scheduled read should pick up 45.
+
+
 
 
 
