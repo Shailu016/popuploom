@@ -13,16 +13,28 @@ PopupLoom is technically clean but commercially invisible in search.
 
 Evidence gathered on 2026-11-14:
 
+- **Search Console (property `sc-domain:popuploom.com`, DNS-verified):**
+  - **13 pages indexed, 48 not indexed** (39 `noindex` studio-template URLs,
+    3 robots-blocked, 2 redirects, 4 discovered but not crawled).
+  - **4 clicks, 35 impressions, 11.4% CTR, average position 24.4** for 1–11 Nov.
+    This is not a ranking problem yet; it is an absence-of-participation problem.
+  - Sitemap submitted and read successfully: **23 discovered pages**.
+  - **0 external links** reported; 63 internal links. Authority is the binding
+    constraint.
+  - Manual actions: **none**. Security issues: **none**. Breadcrumbs: 6 valid, 0 invalid.
+  - The four discovered-but-not-crawled URLs were requested for indexing on
+    2026-11-14: `/guides/index.html`, `/guides/popup-not-showing.html`,
+    `/guides/webflow-popup.html`, `/terms.html`.
 - 23 public HTML URLs are in `sitemap.xml`; all return `200` and are indexable.
 - On-page audit found only 11 minor issues, mostly short titles on legal/about pages
   and missing structured data on six low-priority pages.
 - `robots.txt`, canonicals, `noindex` on private pages, CSP, HSTS and security headers
   are correct.
 - DuckDuckGo's `site:popuploom.com` returns essentially one page (Privacy). Brand and
-  product queries return no PopupLoom result. Bing's index also looks empty. The site
-  is not yet participating in search.
-- Google Search Console is **DNS-verified** (`google-site-verification` TXT record is
-  live) but the browser session is signed out, so query/index data cannot be read yet.
+  product queries return no PopupLoom result. Bing's index also looks empty.
+- The 39 “noindex” URLs are all `/studio.html?tpl=...` links from the template gallery.
+  They are intentionally private, but they show that the gallery sends every template
+  click into a non-indexable URL instead of a public template page.
 - The strongest market wedge is verifiable and rare: **free, no pageview or visitor
   cap, no trial, no credit card**, with 45 templates and a two-line install.
   OptinMonster, OptiMonk, Popupsmart, Poptin, Claspo and similar tools meter traffic
@@ -89,13 +101,47 @@ promises page-one for “popup builder” in 90 days is guessing.
 
 | Priority | Issue | Pages | Action |
 |---|---|---|---|
+| P0 | Homepage does not mention the wedge | `/` | Title/description/H1 currently say “free” but not “no pageview limits”; add the wedge now while traffic is negligible |
 | P0 | Short titles | About, Contact, Terms | Rewrite with intent and brand |
 | P0 | Missing structured data | About, Contact, Terms, Privacy, 2 guides | Add `WebPage`/`AboutPage`/`ContactPage`/`Article` + breadcrumbs |
+| P0 | Template gallery sends every click to `/studio.html?tpl=...` (39 noindex URLs) | Templates | Add public template/category pages and link cards to them; keep studio as “use this template” |
 | P1 | Oversized description | Guides hub (187) | Trim to ≤ 160 |
 | P1 | Thin about page | About (272 words) | Add real founder/mission/editorial process, no invented credentials |
+| P1 | 0 external links | Whole site | Link-earning assets + directories + plugin listings, see §6 |
 | P2 | Sitemap has no `lastmod` | All | Add real content dates; do not fake freshness |
 | P2 | Internal linking is shallow | All | Homepage and every guide should link to 3–5 relevant pages |
 | P2 | No individual template pages | 45 templates | Publish only substantive pages, see §4.3 |
+
+### 2.4 What the Search Console data actually says
+
+- **The site is not ranking; it is barely being served.** 35 impressions in 11 days is
+  noise, not a trend. The 11.4% CTR is computed on that tiny sample and should not be
+  treated as a real CTR.
+- **The pages that already receive impressions are the right first refreshes:**
+  homepage (15), templates (11), ecommerce guide (14), about (9), press (9),
+  WordPress guide (8), contact (7), collect-and-export (7), privacy (6),
+  quick-commerce guide (6).
+- **The queries are mostly low-intent or accidental:** “pop up in wordpress”,
+  “welcome popup”, “pop up sign up form”, plus one unrelated SEC-filing query that
+  should be ignored. There is no meaningful non-brand demand captured yet.
+- **Average position 24.4** means the few queries the site appears for are on page 3.
+  Small relevance and internal-link improvements can move these before new content is
+  needed.
+- **Zero external links** is the clearest strategic finding. Content alone will not
+  make the site competitive; the plan must include distribution and link earning.
+- **The 39 noindex URLs are not a penalty.** They are the template gallery's
+  `/studio.html?tpl=...` links. They are correctly noindexed, but they represent a
+  missed public-page opportunity and add crawl noise.
+
+### 2.5 Priority correction from the data
+
+Do not start with 45 template pages. Start with:
+
+1. The pages that already have impressions (refresh + internal links).
+2. The four discovered URLs (requested 2026-11-14).
+3. The “no pageview limits” money page and 3 alternative pages.
+4. Then the template hub and first 8 template pages.
+
 
 ---
 
@@ -351,11 +397,15 @@ Measure referring domains and non-brand clicks, not “mentions”.
 
 ### Week 0 (now)
 
-- [ ] Owner signs in to Search Console; I pull the data and record the baseline.
-- [ ] Submit sitemap; inspect all 23 URLs; request indexing in batches.
+- [x] Owner signed in to Search Console; baseline recorded (13 indexed / 48 not,
+  4 clicks / 35 impressions, 0 external links, no manual actions).
+- [x] Sitemap submitted and read successfully: 23 discovered pages.
+- [x] Requested indexing for the 4 discovered-but-not-crawled URLs.
 - [ ] Verify Bing Webmaster; re-run IndexNow after each deploy.
 - [ ] Fix the 11 audit issues (titles, descriptions, schema, About copy).
 - [ ] Add real `lastmod` and related-link modules.
+- [ ] Add public template pages and repoint the gallery cards away from
+  `/studio.html?tpl=...`.
 
 ### Weeks 1–2
 
@@ -405,15 +455,13 @@ Measure referring domains and non-brand clicks, not “mentions”.
 
 Do this in order and save screenshots/CSV exports as the baseline.
 
-1. **Property:** confirm `sc-domain:popuploom.com` (DNS TXT is present). Check whether
-   a URL-prefix property also exists; avoid split data.
-2. **Sitemaps:** submit `https://popuploom.com/sitemap.xml`. Confirm “Success” and the
-   discovered URL count (should be 23 today).
-3. **Page indexing:** record counts and reasons for every “Not indexed” bucket.
-   Prioritise “Crawled — currently not indexed” and “Discovered — currently not
-   indexed”.
-4. **URL Inspection:** for each of the 23 URLs, run “Test live URL”, confirm
-   “Indexable”, then “Request indexing”. Do 8–10 per day.
+1. **Property:** confirmed `sc-domain:popuploom.com` (DNS TXT is present).
+2. **Sitemaps:** `https://popuploom.com/sitemap.xml` is submitted, last read
+   2026-11-13, status **Success**, 23 discovered URLs.
+3. **Page indexing:** 13 indexed / 48 not indexed. Breakdown recorded:
+   39 `noindex` (`studio.html?tpl=...`), 3 robots-blocked, 2 redirects, 4 discovered.
+4. **URL Inspection:** the four discovered URLs were inspected and requested for
+   indexing on 2026-11-14.
 5. **Performance:** export last 3 months (or since launch). Split branded vs
    non-branded. Flag queries at positions 8–20 and pages with impressions but CTR
    below 2%.
@@ -448,15 +496,18 @@ discovered, and indexing requests + links are the priority.
 
 ---
 
-## 11. What I can do next without owner access
+## 11. What I can do next
 
-1. Fix the 11 on-page audit issues.
+1. Fix the 11 on-page audit issues and add the wedge to the homepage title,
+   description and H1.
 2. Add `lastmod` and internal-link modules.
-3. Draft the no-limits money page and three alternative pages.
-4. Draft the template hub and first 8 template pages.
-5. Build the ROI calculator and copy swipe file.
-6. Add automated SEO checks to CI.
-7. Re-run the audit and IndexNow after each deploy.
+3. Add public template/category pages and repoint the gallery cards.
+4. Draft the no-limits money page and three alternative pages.
+5. Draft the template hub and first 8 template pages.
+6. Build the ROI calculator and copy swipe file.
+7. Add automated SEO checks to CI.
+8. Re-run the audit and IndexNow after each deploy, and monitor GSC weekly.
 
-The only thing blocking the Search Console half of this plan is a signed-in Google
-session in the app browser.
+The Search Console baseline is now recorded. The remaining owner-only pieces are the
+Bing Webmaster account, directory/Product Hunt accounts, and any off-site outreach that
+requires a human identity.
