@@ -102,7 +102,7 @@ Only launch when these are true:
 - [ ] The homepage and money page load cleanly on mobile.
 - [ ] A new user can save a popup and copy the install code without help.
 - [ ] The lead inbox and CSV export work.
-- [ ] The 45 template pages and 10 category pages are live.
+- [ ] The 10 template category pages and the first individual template guides are live.
 - [ ] Ads are absent from the app and onboarding flow.
 - [ ] The press kit facts are current (no stale numbers).
 - [ ] A support inbox is monitored on launch day.
