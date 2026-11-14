@@ -476,7 +476,7 @@ test('identity, metadata and crawler files agree on the apex origin',async()=>{
   '/templates/social-proof.html':['Free Trust and Social-Proof Popup Templates | PopupLoom','https://popuploom.com/templates/social-proof.html'],
   '/templates/age-gates.html':['Free Age Gate Popup Templates | PopupLoom','https://popuploom.com/templates/age-gates.html'],
   '/templates/gamified.html':['Free Spin-to-Win and Giveaway Popup Templates | PopupLoom','https://popuploom.com/templates/gamified.html'],
-  '/templates/seasonal.html':['Free Seasonal Popup Templates: Black Friday and Holidays | PopupLoom','https://popuploom.com/templates/seasonal.html'],
+  '/templates/seasonal.html':['Seasonal Popup Templates: Black Friday and Holidays | PopupLoom','https://popuploom.com/templates/seasonal.html'],
   '/templates/video.html':['Free Video Popup Template | PopupLoom','https://popuploom.com/templates/video.html'],
   '/privacy.html':['Privacy and data handling | PopupLoom','https://popuploom.com/privacy.html']
  };

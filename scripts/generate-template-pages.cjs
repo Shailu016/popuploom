@@ -313,7 +313,7 @@ const CATEGORIES = {
   seasonal: {
     slug: "seasonal",
     label: "Seasonal",
-    title: "Free Seasonal Popup Templates: Black Friday and Holidays | PopupLoom",
+    title: "Seasonal Popup Templates: Black Friday and Holidays | PopupLoom",
     h1: "Free seasonal popup templates",
     description: "3 free Black Friday, Cyber Monday and winter holiday popup templates. Customize the dates and offers for your campaign.",
     intro: [
