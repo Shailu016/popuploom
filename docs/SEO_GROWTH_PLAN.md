@@ -414,6 +414,9 @@ exit-intent and delayed popups are the safer pattern.
 
 Measure referring domains and non-brand clicks, not “mentions”.
 
+The owner-only execution checklist (Bing Webmaster, directories, Product Hunt,
+outreach template, UTM convention) is in `docs/SEO_OUTREACH.md`.
+
 ---
 
 ## 7. Measurement
