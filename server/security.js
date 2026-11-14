@@ -25,7 +25,8 @@ const htmlFiles = new Set([
   "privacy.html", "about.html", "contact.html", "terms.html",
   "templates/email-signup.html", "templates/discount.html", "templates/exit-intent.html",
   "templates/announcements.html", "templates/engagement.html", "templates/social-proof.html",
-  "templates/age-gates.html", "templates/gamified.html", "templates/seasonal.html", "templates/video.html"
+  "templates/age-gates.html", "templates/gamified.html", "templates/seasonal.html", "templates/video.html",
+  "free-popup-builder-no-limits.html", "alternatives/optinmonster.html", "alternatives/poptin.html", "alternatives/popupsmart.html"
 ]);
 const policyCache = new Map();
 const hash = text => "'sha256-" + crypto.createHash("sha256").update(text).digest("base64") + "'";

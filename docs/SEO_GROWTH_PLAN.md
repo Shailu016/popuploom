@@ -162,6 +162,26 @@ Do not start with 45 template pages. Start with:
   Search Console will re-read it; the 10 new pages do not need a new sitemap entry.
 - Ads are deliberately **not** enabled on the new pages; the allowlist is unchanged.
 
+### 2.7 Second implementation batch (2026-11-14)
+
+- Added `/free-popup-builder-no-limits.html`, a 1,200+ word money page with a
+  dated free-tier comparison, an explanation of pageview vs visitor vs impression
+  meters, honest “when PopupLoom is wrong” guidance, migration steps and FAQ.
+- Added `/alternatives/optinmonster.html`, `/alternatives/poptin.html` and
+  `/alternatives/popupsmart.html`, each with a dated, source-linked limit table,
+  what the competitor does better, who should switch/stay, migration steps and a
+  trademark disclaimer.
+- Verified limits on the vendors’ own pricing pages on 2026-11-14:
+  OptinMonster free trial 500 campaign impressions with auto-upgrade; Poptin free
+  1,000 unique visitors/month on one domain; Popupsmart free 5K pageviews/month,
+  one website and one live popup.
+- Linked the new pages from the homepage nav/footer, the template category
+  footers, the comparison guide and `llms.txt`.
+- Regenerated the sitemap, CSP hashes, Express/Worker allowlists and the Cloudflare
+  build list.
+- Ads remain off on all new pages; no eligibility or injection change.
+
+
 
 
 ---

@@ -281,6 +281,10 @@ function hostReq(host, path, method = "GET", extraHeaders = {}) {
   check('template category page is served with CSP',r.status===200&&String(r.headers.get('content-type')).includes('text/html')&&/content-security-policy/i.test([...r.headers.keys()].join(','))&&!/noindex/i.test(r.headers.get('x-robots-tag')||''));
   const templatePage=await(await fetch(BASE+'/templates/email-signup.html')).text();
   check('template category page lists templates and keeps the studio path',templatePage.includes('Last Exit Note')&&templatePage.includes('/studio.html?tpl=exitOnly'));
+  r=await req('GET','/free-popup-builder-no-limits.html',{raw:true});
+  check('no-limits money page is served with CSP',r.status===200&&String(r.headers.get('content-type')).includes('text/html')&&/content-security-policy/i.test([...r.headers.keys()].join(',')));
+  r=await req('GET','/alternatives/optinmonster.html',{raw:true});
+  check('alternative page is served',r.status===200&&String(r.headers.get('content-type')).includes('text/html'));
   r=await req('GET','/guides/index.html',{raw:true});check('guides hub is served',r.status===200);
   r=await req('GET','/guides/',{raw:true});check('guides directory URL serves the hub',r.status===200&&String(r.headers.get('content-type')).includes('text/html'));
   r=await req('GET','/guides/wordpress-popup.html',{raw:true});check('WordPress guide is served',r.status===200);
@@ -293,7 +297,7 @@ function hostReq(host, path, method = "GET", extraHeaders = {}) {
   const emailSignup = await (await fetch(BASE + '/guides/email-signup-popup.html')).text();
   check('email signup guide is served', /welcome popup/i.test(emailSignup));
   const comparison = await (await fetch(BASE + '/guides/free-popup-builders-without-pageview-limits.html')).text();
-  check('free popup builders comparison is served', comparison.includes('12 November 2026'));
+  check('free popup builders comparison is served', comparison.includes('14 November 2026'));
   // Content negotiation: markdown for agents, HTML by default, HTML for private pages.
   const mdRes = await fetch(BASE + '/guides/wordpress-popup.html', { headers: { Accept: 'text/markdown' } });
   const mdText = await mdRes.text();

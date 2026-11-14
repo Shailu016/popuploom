@@ -10,7 +10,7 @@ const root = path.join(__dirname, "..");
 // A new guide or template category page can no longer ship with an inline
 // JSON-LD block missing its hash.
 const htmlFiles = [];
-for (const dir of ["", "guides", "templates"]) {
+for (const dir of ["", "guides", "templates", "alternatives"]) {
   const full = path.join(root, dir);
   if (!fs.existsSync(full)) continue;
   for (const file of fs.readdirSync(full)) {
