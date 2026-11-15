@@ -7,7 +7,12 @@ const verifyShared = require("../shared/email-verification");
 const GOOGLE_ISSUER = "https://accounts.google.com";
 const GOOGLE_CERTS = new URL("https://www.googleapis.com/oauth2/v3/certs");
 const JWT_EXPIRES = "30d";
-const PBKDF2_ITERATIONS = 600000;
+// Cloudflare's production edge enforces a hard 100,000-iteration limit for
+// PBKDF2 and throws NotSupportedError above it. Node and `wrangler dev` do not
+// enforce this policy limit, so local tests cannot catch an over-limit value.
+// Keep this at the platform maximum; tests/cf-unit.test.cjs guards it.
+const MAX_PBKDF2_ITERATIONS = 100000;
+const PBKDF2_ITERATIONS = MAX_PBKDF2_ITERATIONS;
 
 class ApiError extends Error {
   constructor(status, message, code, headers) {
@@ -55,7 +60,9 @@ async function verifyPassword(password, stored) {
   const parts = stored.split("$");
   if (parts.length !== 4 || parts[0] !== "pbkdf2") return false; // legacy hashes are not verifiable here
   const iterations = Number(parts[1]);
-  if (!Number.isSafeInteger(iterations) || iterations < 10000 || iterations > 1000000) return false;
+  // Hashes above the platform cap cannot be derived on Workers. Fail closed
+  // instead of throwing a runtime error; such hashes need an offline migration.
+  if (!Number.isSafeInteger(iterations) || iterations < 10000 || iterations > MAX_PBKDF2_ITERATIONS) return false;
   const salt = b64Buf(parts[2]), expected = b64Buf(parts[3]);
   if (salt.length < 8 || expected.length !== 32) return false;
   const actual = new Uint8Array(await deriveKey(password, salt, iterations));
@@ -383,6 +390,9 @@ module.exports = {
   signToken,
   revokeToken,
   hashPassword,
+  verifyPassword,
+  PBKDF2_ITERATIONS,
+  MAX_PBKDF2_ITERATIONS,
   sha256Hex,
   verifyEmail,
   resendVerification,
@@ -391,19 +401,19 @@ module.exports = {
 
 async function manageAccount(env, id, body) {
   const row = await env.DB.prepare("SELECT * FROM users WHERE id = ?").bind(id).first();
-  if (!row) throw new Error("Account not found");
+  if (!row) throw new ApiError(400, "Account not found");
   if (row.google_id) {
     const profile = await verifyCredential(env, body.credential);
-    if (profile.sub !== row.google_id) throw new Error("Verify with the Google account linked to this account");
+    if (profile.sub !== row.google_id) throw new ApiError(400, "Verify with the Google account linked to this account");
   } else {
-    if (typeof body.currentPassword !== 'string' || new TextEncoder().encode(body.currentPassword).length>72 || !(await verifyPassword(body.currentPassword,row.password_hash))) throw new Error("Current password is incorrect");
+    if (typeof body.currentPassword !== 'string' || new TextEncoder().encode(body.currentPassword).length>72 || !(await verifyPassword(body.currentPassword,row.password_hash))) throw new ApiError(400, "Current password is incorrect");
   }
   if (body.action === 'password') {
-    if(row.google_id) throw new Error("This account uses Google sign-in. Manage its password with Google.");
-    if(typeof body.newPassword!=='string'||body.newPassword.length<12||new TextEncoder().encode(body.newPassword).length>72)throw new Error("New password must be 12 characters or more and at most 72 UTF-8 bytes");
+    if(row.google_id) throw new ApiError(400, "This account uses Google sign-in. Manage its password with Google.");
+    if(typeof body.newPassword!=='string'||body.newPassword.length<12||new TextEncoder().encode(body.newPassword).length>72)throw new ApiError(400, "New password must be 12 characters or more and at most 72 UTF-8 bytes");
     await env.DB.prepare("UPDATE users SET password_hash = ?, token_version = token_version + 1 WHERE id = ?").bind(await hashPassword(body.newPassword),id).run();
   } else if(body.action === 'delete') {
-    if(body.confirmation!==row.email)throw new Error("Type your account email to confirm deletion");
+    if(body.confirmation!==row.email)throw new ApiError(400, "Type your account email to confirm deletion");
     // Explicitly remove dependent rows before the user row. This preserves the
     // privacy promise even if a restored database has cascades disabled.
     const owned = "SELECT id FROM widgets WHERE user_id = ?";
@@ -414,7 +424,7 @@ async function manageAccount(env, id, body) {
     await env.DB.prepare("DELETE FROM password_reset_tokens WHERE user_id = ?").bind(id).run();
     await env.DB.prepare("DELETE FROM email_verification_tokens WHERE user_id = ?").bind(id).run();
     await env.DB.prepare("DELETE FROM users WHERE id = ?").bind(id).run();
-  } else throw new Error("Invalid account action");
+  } else throw new ApiError(400, "Invalid account action");
   return {ok:true};
 }
 module.exports.manageAccount = manageAccount;

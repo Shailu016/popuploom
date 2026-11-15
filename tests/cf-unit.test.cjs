@@ -31,6 +31,36 @@ test('login fails generically for unknown and Google-only accounts',async()=>{
   await assert.rejects(auth.login(env,'google@example.com','some-password-123'),e=>e.status===401&&e.message==='Invalid email or password');
  }finally{db.close();}
 });
+test('password hashing stays within the Cloudflare 100,000-iteration PBKDF2 cap',async()=>{
+ assert.ok(auth.PBKDF2_ITERATIONS<=100000,'Cloudflare rejects PBKDF2 above 100,000 iterations');
+ assert.equal(auth.PBKDF2_ITERATIONS,auth.MAX_PBKDF2_ITERATIONS);
+ // Emulate the production policy that Node and wrangler dev do not enforce.
+ const subtle=globalThis.crypto.subtle,realDerive=subtle.deriveBits.bind(subtle);
+ subtle.deriveBits=async(algorithm,key,length)=>{
+  if(algorithm&&algorithm.name==='PBKDF2'&&algorithm.iterations>100000){
+   const error=new Error('Pbkdf2 failed: iteration counts above 100000 are not supported (requested '+algorithm.iterations+').');
+   error.name='NotSupportedError';
+   throw error;
+  }
+  return realDerive(algorithm,key,length);
+ };
+ const {db,env}=setup();
+ try{
+  const registered=await auth.register(env,'cap@example.com','cap-password-123','Cap');
+  assert.ok(registered.token,'registration works under the platform cap');
+  const loggedIn=await auth.login(env,'cap@example.com','cap-password-123');
+  assert.ok(loggedIn.token,'login works under the platform cap');
+  await assert.rejects(auth.login(env,'missing-cap@example.com','cap-password-123'),e=>e.status===401&&e.message==='Invalid email or password');
+ }finally{subtle.deriveBits=realDerive;db.close();}
+});
+test('stored hashes above the platform cap fail closed without a runtime error',async()=>{
+ const {db,env}=setup();
+ try{
+  const salt=Buffer.alloc(16,1).toString('base64'),hash=Buffer.alloc(32,2).toString('base64');
+  db.prepare('INSERT INTO users(email,password_hash) VALUES (?,?)').run('above-cap@example.com','pbkdf2$600000$'+salt+'$'+hash);
+  await assert.rejects(auth.login(env,'above-cap@example.com','any-password-123'),e=>e.status===401&&e.message==='Invalid email or password');
+ }finally{db.close();}
+});
 test('registration derives key before branching to protect against enumeration timing attacks',async()=>{
  const {db,env}=setup();
  try{

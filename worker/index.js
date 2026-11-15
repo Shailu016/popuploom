@@ -155,7 +155,9 @@ async function registerRoute(c) {
     }
     return json(result, 201);
   } catch (e) {
-    return json({ error: e.message }, e instanceof ApiError ? e.status : 400);
+    if (e instanceof ApiError) return json({ error: e.message, code: e.code }, e.status);
+    console.error("[popuploom] registration failed:", e && e.message);
+    return json({ error: "Could not create your account. Please try again." }, 500);
   }
 }
 
@@ -164,7 +166,9 @@ async function verifyEmailRoute(c) {
     const token = c.body && c.body.token;
     return json(await verifyEmail(c.env, token));
   } catch (e) {
-    return json({ error: e.message, code: e.code }, e instanceof ApiError ? e.status : 400);
+    if (e instanceof ApiError) return json({ error: e.message, code: e.code }, e.status);
+    console.error("[popuploom] email verification failed:", e && e.message);
+    return json({ error: "Could not verify this link. Please try again." }, 500);
   }
 }
 
@@ -198,7 +202,9 @@ async function loginRoute(c) {
     const result = await login(c.env, email, password);
     return json(result);
   } catch (e) {
-    return json({ error: e.message }, e instanceof ApiError ? e.status : 401);
+    if (e instanceof ApiError) return json({ error: e.message, code: e.code }, e.status);
+    console.error("[popuploom] login failed:", e && e.message);
+    return json({ error: "Sign-in is temporarily unavailable. Please try again." }, 500);
   }
 }
 
@@ -248,10 +254,14 @@ async function googleRoute(c) {
     const result = await findOrCreateGoogleUser(c.env, profile);
     return json(result);
   } catch (e) {
+    if (!(e instanceof ApiError)) {
+      console.error("[popuploom] Google sign-in failed:", e && e.message);
+      return json({ error: "Google sign-in is temporarily unavailable. Please try again.", code: "AUTH_FAILED" }, 500);
+    }
     const status = e.code === "GOOGLE_NOT_CONFIGURED" ? 503
       : e.code === "EMAIL_UNVERIFIED" ? 403
       : e.code === "BAD_REQUEST" ? 400
-      : (e instanceof ApiError ? e.status : 401);
+      : e.status;
     return json({ error: e.message, code: e.code || "AUTH_FAILED" }, status);
   }
 }
@@ -267,13 +277,19 @@ async function profileRoute(c) {
     const user = await updateProfile(c.env, c.user.id, c.body || {});
     return json({ user });
   } catch (e) {
-    return json({ error: e.message }, e instanceof ApiError ? e.status : 400);
+    if (e instanceof ApiError) return json({ error: e.message, code: e.code }, e.status);
+    console.error("[popuploom] profile update failed:", e && e.message);
+    return json({ error: "Could not save your profile. Please try again." }, 500);
   }
 }
 
 async function accountRoute(c) {
   try { return json(await auth.manageAccount(c.env,c.user.id,c.body||{})); }
-  catch(e){return json({error:e.message},400);}
+  catch(e){
+    if (e instanceof ApiError) return json({ error: e.message, code: e.code }, e.status);
+    console.error("[popuploom] account update failed:", e && e.message);
+    return json({ error: "Could not update your account. Please try again." }, 500);
+  }
 }
 function healthRoute() {
   return json({ ok: true, version: "2.0" });

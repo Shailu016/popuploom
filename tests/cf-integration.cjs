@@ -88,6 +88,47 @@ let cancelled=false;const stream=new ReadableStream({pull(c){c.enqueue(new Uint8
  }finally{globalThis.fetch=realFetch;}
  console.log('PASS Worker reset provider failures stay generic and store only a hash');
 }
+{
+  console.log('== PBKDF2 platform cap ==');
+  const subtle = globalThis.crypto.subtle;
+  const realDerive = subtle.deriveBits.bind(subtle);
+  // Cloudflare's production edge rejects PBKDF2 above 100,000 iterations.
+  // Node and wrangler dev do not, so emulate the policy limit here.
+  subtle.deriveBits = async (algorithm, key, length) => {
+    if (algorithm && algorithm.name === 'PBKDF2' && algorithm.iterations > 100000) {
+      const error = new Error('Pbkdf2 failed: iteration counts above 100000 are not supported (requested ' + algorithm.iterations + ').');
+      error.name = 'NotSupportedError';
+      throw error;
+    }
+    return realDerive(algorithm, key, length);
+  };
+  try {
+    const created = await worker.fetch(new Request('https://popuploom.com/api/auth/register', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'cap-' + Date.now() + '@example.com', password: 'cap-password-123' })
+    }), env, { waitUntil() {} });
+    assert.equal(created.status, 201, 'registration hashes within the production cap');
+    const unknown = await worker.fetch(new Request('https://popuploom.com/api/auth/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'missing-' + Date.now() + '@example.com', password: 'cap-password-123' })
+    }), env, { waitUntil() {} });
+    assert.equal(unknown.status, 401);
+    assert.equal((await unknown.json()).error, 'Invalid email or password');
+
+    subtle.deriveBits = async () => { throw new Error('Pbkdf2 failed: internal detail'); };
+    const failed = await worker.fetch(new Request('https://popuploom.com/api/auth/register', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'fail-' + Date.now() + '@example.com', password: 'cap-password-123' })
+    }), env, { waitUntil() {} });
+    assert.equal(failed.status, 500);
+    const failedBody = await failed.json();
+    assert.equal(failedBody.error, 'Could not create your account. Please try again.');
+    assert.ok(!JSON.stringify(failedBody).includes('Pbkdf2'), 'internal runtime details are not exposed');
+  } finally {
+    subtle.deriveBits = realDerive;
+  }
+  console.log('PASS password hashing respects the edge cap and internal errors stay generic');
+}
 
 {
   console.log('== lead webhooks ==');

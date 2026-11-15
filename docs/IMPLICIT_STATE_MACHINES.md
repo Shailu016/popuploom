@@ -21,6 +21,11 @@ is why several of the findings below are "two runtimes disagree" rather than
 Legend: **P1** = user-visible or security-relevant divergence; **P2** = silent
 degradation or operational blind spot; **P3** = cosmetic/robustness.
 
+**Related incident:** [PBKDF2 work factor above the Cloudflare Workers
+limit](INCIDENT_2026-11-15_PBKDF2_EDGE_LIMIT.md) — a runtime policy limit that
+Node and `wrangler dev` did not reproduce, so every local test passed while
+production password auth failed.
+
 ---
 
 ## 1. Master index
