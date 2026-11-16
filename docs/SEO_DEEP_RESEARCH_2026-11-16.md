@@ -1,5 +1,10 @@
 # PopupLoom SEO deep research: why we are not #1 and how to get there
 
+> **Historical internal record — not public copy.** Competitor names are retained as
+> research evidence and are out of scope for the no-names rule in `AGENTS.md`, which
+> governs public pages. Do not reuse this text on the site without rewriting it
+> vendor-neutral.
+
 **Research date:** 16 November 2026
 **Scope:** organic search for `https://popuploom.com`
 **Status:** research complete; two foundation fixes deployed and verified

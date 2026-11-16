@@ -1,5 +1,9 @@
 # PopupLoom outreach and webmaster checklist
 
+> **Historical internal record — not public copy.** Names of other products appear
+> when describing directory or outreach context. They are out of scope for the
+> no-names rule in `AGENTS.md`, which governs public pages and shipped copy.
+
 **Created:** 2026-11-14
 **Purpose:** the owner-only half of the SEO plan: Bing Webmaster, directories,
 communities and link outreach. Nothing here requires a paid link or a fake claim.

@@ -1,5 +1,11 @@
 # PopupLoom SEO & organic growth plan
 
+> **Historical internal record — not public copy.** This document names competitors
+> on purpose, to preserve the evidence behind past decisions (dates, prices, limits).
+> The no-competitor-names rule in `AGENTS.md` applies to public pages and shipped
+> copy, not to this file. Do not paste sections of it into site content without
+> rewriting them vendor-neutral.
+
 **Created:** 2026-11-14
 **Scope:** organic search and product-led growth for `https://popuploom.com`
 **Status:** plan. Nothing in this document changes ad eligibility, CSP, injection or
