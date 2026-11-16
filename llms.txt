@@ -69,6 +69,7 @@ Last reviewed: 2026-11-12. Canonical site: https://popuploom.com/
 - [Guides hub](https://popuploom.com/guides/): installation, platform, lead and troubleshooting guides, plus the three use-case playbooks.
 - [Installation guide](https://popuploom.com/guides/install-popups.html): the hosted widget model, exact snippet, testing and updating.
 - [WordPress guide](https://popuploom.com/guides/wordpress-popup.html), [Shopify guide](https://popuploom.com/guides/shopify-popup.html), [Webflow guide](https://popuploom.com/guides/webflow-popup.html): platform-specific placement and caveats.
+- Framework guides: [Next.js](https://popuploom.com/guides/nextjs-popup.html) (App Router and Pages), [React](https://popuploom.com/guides/react-popup.html), [Astro](https://popuploom.com/guides/astro-popup.html), [Google Tag Manager](https://popuploom.com/guides/google-tag-manager-popup.html), [static HTML](https://popuploom.com/guides/static-html-popup.html) and [BigCommerce](https://popuploom.com/guides/bigcommerce-popup.html). Each names the exact placement path and the limits that matter.
 - [Squarespace and Wix guide](https://popuploom.com/guides/squarespace-wix-popup.html): code injection and custom code, plan gates, checkout limits.
 - [Exit-intent popup guide](https://popuploom.com/guides/exit-intent-popup.html): the desktop-only trigger, testing and frequency rules.
 - [Email signup popup guide](https://popuploom.com/guides/email-signup-popup.html): welcome popup timing, fields, consent basics and lead export.

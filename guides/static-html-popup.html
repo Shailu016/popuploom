@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Add a Popup to a Static HTML Site | PopupLoom</title>
+<meta name="description" content="Paste the PopupLoom snippet before the closing body tag on a static site, with local testing, caching, CSP and versioned-script notes.">
+<link rel="canonical" href="https://popuploom.com/guides/static-html-popup.html">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="PopupLoom">
+<meta property="og:title" content="Add a Popup to a Static HTML Site | PopupLoom">
+<meta property="og:description" content="Paste the PopupLoom snippet before the closing body tag on a static site, with testing and CSP notes.">
+<meta property="og:url" content="https://popuploom.com/guides/static-html-popup.html">
+<meta property="og:image" content="https://popuploom.com/assets/og-popuploom.png">
+<meta property="og:image:alt" content="PopupLoom: free website popup builder with 45 templates">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Add a Popup to a Static HTML Site | PopupLoom">
+<meta name="twitter:description" content="Placement, local testing and caching notes for a plain HTML site.">
+<meta name="twitter:image" content="https://popuploom.com/assets/og-popuploom.png">
+<link rel="stylesheet" href="/ui.css"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://popuploom.com/"},{"@type":"ListItem","position":2,"name":"Guides","item":"https://popuploom.com/guides/"},{"@type":"ListItem","position":3,"name":"Static HTML popup","item":"https://popuploom.com/guides/static-html-popup.html"}]},{"@type":"Article","@id":"https://popuploom.com/guides/static-html-popup.html#article","headline":"Add a Popup to a Static HTML Site","description":"Placement, local testing, caching and CSP guidance for the PopupLoom widget on a plain HTML site.","datePublished":"2026-11-17","dateModified":"2026-11-17","author":{"@type":"Person","name":"Shailu","url":"https://popuploom.com/about.html"},"publisher":{"@id":"https://popuploom.com/#organization"},"mainEntityOfPage":"https://popuploom.com/guides/static-html-popup.html"},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Do I need to add the snippet to every page?","acceptedAnswer":{"@type":"Answer","text":"If every page has its own HTML file, yes, or add it to the shared footer include your build uses. One copy per page is enough. Two copies load the widget twice."}},{"@type":"Question","name":"Why does the popup not appear when I open the file directly?","acceptedAnswer":{"@type":"Answer","text":"Opening an HTML file from disk uses the file:// protocol, which blocks the configuration request and can behave differently for scripts. Serve the folder over http with any local server and test again."}},{"@type":"Question","name":"Can I self-host the script file?","acceptedAnswer":{"@type":"Answer","text":"You can host a copy of the versioned file, but the widget still needs to fetch its configuration from PopupLoom. Self-hosting changes where the code is served from, not how the saved popup is loaded, and it means you own updates."}},{"@type":"Question","name":"How do I update a popup after installing the snippet?","acceptedAnswer":{"@type":"Answer","text":"Edit and save it in the studio. The page loads the saved configuration at runtime, so you do not need to change the HTML again. Only a change to the snippet itself requires editing the page."}}]}]}</script>
+<style>
+.pl-meta{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-size:13px;color:var(--muted-2);margin:14px 0 22px}
+.pl-note{padding:18px 20px;margin:22px 0;border-left:3px solid rgba(255,106,31,.7);background:rgba(255,106,31,.05);border-radius:0 12px 12px 0}
+.pl-note p:last-child{margin-bottom:0}
+.pl-code{padding:16px;border:1px solid var(--line);border-radius:12px;background:#0b0d12;overflow:auto;font-size:13px;line-height:1.65}
+.pl-code code{font-family:var(--font-mono);color:#dbe3f4}
+.pl-table{width:100%;border-collapse:collapse;font-size:14px}
+.pl-table th,.pl-table td{padding:10px;border-bottom:1px solid rgba(255,255,255,.1);vertical-align:top;text-align:left}
+.pl-table th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-2)}
+.pl-wrap{overflow-x:auto}
+.pl-small{font-size:12.5px;color:var(--muted-2)}
+</style>
+</head>
+<body>
+<header class="wrap" style="padding:24px 26px">
+  <nav aria-label="Main"><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/">Guides</a> · <a href="/free-popup-builder-no-limits.html">No pageview limits</a> · <a href="/about.html">About</a></nav>
+  <nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/guides/">Guides</a> › <span>Static HTML</span></nav>
+</header>
+<main class="wrap" style="padding:30px 26px 80px;max-width:900px">
+  <article>
+    <h1>Add a popup to a static HTML site</h1>
+    <div class="pl-meta">
+      <span>By <a href="/about.html">Shailu</a>, founder of PopupLoom</span>
+      <span>Published 17 November 2026</span>
+      <span>Last updated 17 November 2026</span>
+      <span>Checked 17 November 2026</span>
+    </div>
+
+    <p class="mut">If you can edit the HTML, you can install the widget. This guide covers a plain static site: hand-written pages, a static host, or a generator that lets you edit a shared footer. It was not tested on a live deployment.</p>
+
+    <h2>Where the two lines go</h2>
+    <p>Paste them immediately before the closing <code>&lt;/body&gt;</code> tag, after all your content and your own scripts:</p>
+    <pre class="pl-code"><code>&lt;div data-popuploom="YOUR_WIDGET_ID"&gt;&lt;/div&gt;
+&lt;script src="https://popuploom.com/embed/1.1.0/popuploom.js"&gt;&lt;/script&gt;</code></pre>
+    <p>Order matters a little: the div must exist before the script runs. Placing both at the end of the body guarantees that, and keeps the popup from delaying the content above it.</p>
+
+    <h2>Every page, or a shared footer</h2>
+    <div class="pl-wrap">
+      <table class="pl-table card">
+        <thead><tr><th>Setup</th><th>What to do</th><th>Risk</th></tr></thead>
+        <tbody>
+          <tr><td>Hand-written pages</td><td>Add the two lines to each file that should show the popup.</td><td>Easy to miss a page or paste twice.</td></tr>
+          <tr><td>Shared footer partial</td><td>Add them once to the include used by every page.</td><td>A page that uses a different layout will not get it.</td></tr>
+          <tr><td>Static site generator</td><td>Put them in the base layout or footer component.</td><td>Generator-specific templating; check the built HTML.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>One copy per page is the rule. Two copies load the widget twice, and the second can initialise the same widget again.</p>
+
+    <div class="pl-note">
+      <p><strong>Do not test from the file system.</strong> Opening the page with <code>file://</code> blocks the configuration request in most browsers. Serve the folder over http, for example with <code>python -m http.server</code>, and test at <code>http://localhost:8000</code>. A popup that “does not work” locally is often just the protocol.</p>
+    </div>
+
+    <h2>Caching and updates</h2>
+    <p>The script URL is versioned and immutable: <code>/embed/1.1.0/popuploom.js</code>. Browsers and CDNs can cache it for a long time, which is why the version is in the path. Your popup's content and targeting are fetched as configuration at runtime, so editing the popup in the studio does not require touching the HTML.</p>
+    <p>If you change the snippet itself, update the HTML and redeploy. If the site sits behind a cache, purge the page, not the script.</p>
+
+    <h2>CSP</h2>
+    <p>If the site sends a Content Security Policy, allow <code>https://popuploom.com</code> in <code>script-src</code> and <code>connect-src</code>. A blocked script shows as a console error; a blocked config request shows as an invisible popup.</p>
+
+    <h2>Test checklist</h2>
+    <ul>
+      <li>Serve over http, open the page in a private window.</li>
+      <li>Confirm the popup appears once, not twice.</li>
+      <li>Submit a test response and check the lead inbox.</li>
+      <li>Reload: the frequency rule behaves as configured.</li>
+      <li>Check the page on a phone width and with caching enabled on the host.</li>
+    </ul>
+
+    <h2>Removal</h2>
+    <p>Delete the two lines and redeploy. The saved popup remains in the studio.</p>
+
+    <h2>Common questions</h2>
+    <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Do I need to add the snippet to every page?</strong></summary><p style="margin:10px 0 0">If every page has its own HTML file, yes, or add it to the shared footer include your build uses. One copy per page is enough. Two copies load the widget twice.</p></details>
+    <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Why does the popup not appear when I open the file directly?</strong></summary><p style="margin:10px 0 0">Opening an HTML file from disk uses the file:// protocol, which blocks the configuration request and can behave differently for scripts. Serve the folder over http with any local server and test again.</p></details>
+    <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Can I self-host the script file?</strong></summary><p style="margin:10px 0 0">You can host a copy of the versioned file, but the widget still needs to fetch its configuration from PopupLoom. Self-hosting changes where the code is served from, not how the saved popup is loaded, and it means you own updates.</p></details>
+    <details class="card" style="margin:10px 0;padding:16px"><summary><strong>How do I update a popup after installing the snippet?</strong></summary><p style="margin:10px 0 0">Edit and save it in the studio. The page loads the saved configuration at runtime, so you do not need to change the HTML again. Only a change to the snippet itself requires editing the page.</p></details>
+
+    <h2>Official references</h2>
+    <ul class="pl-small">
+      <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script" target="_blank" rel="noopener">MDN: script element</a> — placement, async and defer.</li>
+      <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP" target="_blank" rel="noopener">MDN: Content Security Policy</a> — script-src and connect-src.</li>
+    </ul>
+
+    <p class="pl-small">Written by <a href="/about.html">Shailu</a>, founder of PopupLoom. Checked on 17 November 2026; not tested on a live deployment. No ranking, traffic or conversion claim is made. Related: <a href="/guides/install-popups.html">the general install guide</a>, <a href="/guides/google-tag-manager-popup.html">Tag Manager</a> and <a href="/guides/popup-not-showing.html">popup not showing</a>.</p>
+  </article>
+</main>
+<footer class="wrap" style="padding:24px 0;font-size:13px">
+  <div><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/">Guides</a> · <a href="/free-popup-builder-no-limits.html">No pageview limits</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></div>
+</footer>
+</body>
+</html>

@@ -351,6 +351,38 @@ the product and the owner's rules were executed; the rest was rejected.
   `70bbd703-bda5-4e23-997c-557b673a2245`; IndexNow accepted all 50 URLs. Audit: 50
   pages, 0 issues, 50/50 structured data.
 
+### 2.13 Six verified platform guides (2026-11-17)
+
+Added framework and platform installation guides, each naming the exact placement
+path rather than saying “add the code to your site”:
+
+| Page | Words | Placement covered |
+|---|---:|---|
+| `/guides/nextjs-popup.html` | 819 | `app/layout.tsx` with `next/script`; `_app.tsx` or a plain tag in `_document.tsx` |
+| `/guides/react-popup.html` | 730 | `index.html` or a component with a duplicate-load guard |
+| `/guides/astro-popup.html` | 712 | layout with `is:inline`, view-transition caveat |
+| `/guides/google-tag-manager-popup.html` | 712 | Custom HTML tag, triggers, consent, duplicate-load check |
+| `/guides/static-html-popup.html` | 684 | before `</body>`, `file://` caveat, caching |
+| `/guides/bigcommerce-popup.html` | 719 | Script Manager footer, Stencil alternative, checkout boundary |
+
+Every page states what was verified and what was not: documentation checked on
+17 November 2026, not tested on a live deployment. External references were fetched
+and returned 200. The pages carry `Article` + `FAQPage` + `BreadcrumbList`, not
+`HowTo`, because Google no longer shows HowTo rich results for most sites and a
+mismatched HowTo block would fail the structured-data mirror test.
+
+**Operational catch:** the first deploy uploaded only three assets. The Express and
+Worker allowlists had the new guides, but `scripts/build-cf.cjs` keeps an explicit
+copy list, so the six HTML files never reached `.cf-build/public`. They returned 200
+from the Worker shell only after being added to that list. Any future page added to
+an allowlist must also be added to the build list — the allowlist decides what may
+be served, not what exists.
+
+Verification: 55/55 regression, 20/20 Worker unit, 140/140 integration; all six live
+with 200, public cache, one H1, valid JSON-LD hash, no ads and no unsafe CSP
+directives. Deployed `11e20337-44a8-42a2-8357-c925c1f0342d`; IndexNow accepted all
+**56 URLs**. Audit: 56 pages, 0 issues, 56/56 structured data, 1,088 average words.
+
 
 
 
