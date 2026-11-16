@@ -12,10 +12,16 @@ const env={JWT_SECRET:require('crypto').randomBytes(32).toString('hex'),RESEND_A
   assert.ok(guide.includes('data-pl-ad="1"') && guide.includes('adsbygoogle.js') && guide.includes('Advertisement'));
   assert.ok(nonce && policy.includes("'nonce-" + nonce + "'") && policy.includes("'strict-dynamic'"));
   assert.ok(!policy.includes("'unsafe-eval'"));
-  for (const path of ['/studio.html', '/profile.html', '/leads.html', '/reset-password.html', '/migration.html', '/templates/email-signup.html', '/free-popup-builder-no-limits.html', '/best-free-popup-builder.html', '/alternatives/optinmonster.html', '/alternatives/optimonk.html', '/templates/exit-intent-popup.html', '/tools/popup-roi-calculator.html', '/tools/popup-copy-swipe-file.html']) {
+  for (const path of ['/studio.html', '/profile.html', '/leads.html', '/reset-password.html', '/migration.html', '/templates/email-signup.html', '/free-popup-builder-no-limits.html', '/best-free-popup-builder.html', '/templates/exit-intent-popup.html', '/tools/popup-roi-calculator.html', '/tools/popup-copy-swipe-file.html']) {
     const res = await worker.fetch(new Request('https://popuploom.com' + path), adEnv, { waitUntil() {} });
     const body = await res.text();
     assert.ok(!body.includes('adsbygoogle.js') && !body.includes('data-pl-ad'), path + ' must stay ad-free');
+  }
+  // Retired named-comparison URLs must 301 rather than 404 or serve a page.
+  for (const old of ['/alternatives/optinmonster.html', '/alternatives/poptin.html', '/alternatives/popupsmart.html', '/alternatives/optimonk.html', '/alternatives/popup-maker.html']) {
+    const res = await worker.fetch(new Request('https://popuploom.com' + old, { redirect: 'manual' }), adEnv, { waitUntil() {} });
+    assert.equal(res.status, 301, old + ' must redirect');
+    assert.equal(res.headers.get('location'), '/free-popup-builder-no-limits.html', old + ' target');
   }
   for (const path of ['/', '/templates.html', '/faq.html', '/guides/']) {
     const res = await worker.fetch(new Request('https://popuploom.com' + path), adEnv, { waitUntil() {} });

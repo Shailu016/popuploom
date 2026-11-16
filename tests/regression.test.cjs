@@ -42,7 +42,7 @@ test('private files stay private including encoded separators and extensions',as
   const r=await api(url);assert.ok(r.status===404||r.headers.get('content-type').includes('text/html'),url);
   assert.ok(!String(r.data).includes('SQLite format 3')&&!String(r.data).includes('JWT_SECRET=')&&!String(r.data).includes('const JWT_SECRET'),url);
  }
- for(const url of ['/','/templates.html','/templates/email-signup.html','/templates/discount.html','/templates/exit-intent.html','/templates/announcements.html','/templates/engagement.html','/templates/social-proof.html','/templates/age-gates.html','/templates/gamified.html','/templates/seasonal.html','/templates/video.html','/templates/exit-intent-popup.html','/templates/discount-popup.html','/templates/email-signup-popup.html','/templates/spin-to-win-popup.html','/free-popup-builder-no-limits.html','/best-free-popup-builder.html','/alternatives/optinmonster.html','/alternatives/poptin.html','/alternatives/popupsmart.html','/alternatives/optimonk.html','/alternatives/popup-maker.html','/guides/wordpress-popup-without-plugin.html','/faq.html','/press.html','/security.html','/guides/','/guides/index.html','/guides/install-popups.html','/guides/wordpress-popup.html','/guides/shopify-popup.html','/guides/webflow-popup.html','/guides/squarespace-wix-popup.html','/guides/exit-intent-popup.html','/guides/email-signup-popup.html','/guides/free-popup-builders-without-pageview-limits.html','/guides/collect-and-export-leads.html','/guides/popup-not-showing.html','/guides/popup-builder-for-ecommerce.html','/guides/popup-builder-for-quick-commerce.html','/guides/popup-builder-for-lead-generation.html','/tools/popup-roi-calculator.html','/tools/popup-copy-swipe-file.html','/tools/roi-calculator.js','/tools/copy-swipe.js','/tools/popup-copy-swipe-file.txt','/migration.html','/studio.html','/profile.html','/demo.html','/reset-password.html','/verify-email.html','/verify-email.js','/about.html','/contact.html','/terms.html','/.well-known/security.txt','/security.txt','/app.js','/lead-csv.js','/studio.js','/reset-password.js','/popuploom.js','/popforge.js','/embed/1.1.0/popuploom.js','/embed/1.1.0/popforge.js','/embed/1.1.0/SHA256SUMS','/ui.css','/robots.txt','/sitemap.xml','/llms.txt','/llms-full.txt','/ccf2a9f45165c635253d22748df4a573.txt','/assets/winter-gift.jpg','/assets/favicon.svg','/assets/og-popuploom.png'])assert.equal((await api(url)).status,200,url);
+ for(const url of ['/','/templates.html','/templates/email-signup.html','/templates/discount.html','/templates/exit-intent.html','/templates/announcements.html','/templates/engagement.html','/templates/social-proof.html','/templates/age-gates.html','/templates/gamified.html','/templates/seasonal.html','/templates/video.html','/templates/exit-intent-popup.html','/templates/discount-popup.html','/templates/email-signup-popup.html','/templates/spin-to-win-popup.html','/free-popup-builder-no-limits.html','/best-free-popup-builder.html','/guides/wordpress-popup-without-plugin.html','/faq.html','/press.html','/security.html','/guides/','/guides/index.html','/guides/install-popups.html','/guides/wordpress-popup.html','/guides/shopify-popup.html','/guides/webflow-popup.html','/guides/squarespace-wix-popup.html','/guides/exit-intent-popup.html','/guides/email-signup-popup.html','/guides/free-popup-builders-without-pageview-limits.html','/guides/collect-and-export-leads.html','/guides/popup-not-showing.html','/guides/popup-builder-for-ecommerce.html','/guides/popup-builder-for-quick-commerce.html','/guides/popup-builder-for-lead-generation.html','/tools/popup-roi-calculator.html','/tools/popup-copy-swipe-file.html','/tools/roi-calculator.js','/tools/copy-swipe.js','/tools/popup-copy-swipe-file.txt','/migration.html','/studio.html','/profile.html','/demo.html','/reset-password.html','/verify-email.html','/verify-email.js','/about.html','/contact.html','/terms.html','/.well-known/security.txt','/security.txt','/app.js','/lead-csv.js','/studio.js','/reset-password.js','/popuploom.js','/popforge.js','/embed/1.1.0/popuploom.js','/embed/1.1.0/popforge.js','/embed/1.1.0/SHA256SUMS','/ui.css','/robots.txt','/sitemap.xml','/llms.txt','/llms-full.txt','/ccf2a9f45165c635253d22748df4a573.txt','/assets/winter-gift.jpg','/assets/favicon.svg','/assets/og-popuploom.png'])assert.equal((await api(url)).status,200,url);
 });
 test('public pages are crawl-cacheable and the guides hub has one canonical URL',async()=>{
  for(const url of ['/','/privacy.html','/sitemap.xml','/robots.txt','/tools/popup-roi-calculator.html','/tools/popup-copy-swipe-file.html']){
@@ -54,6 +54,12 @@ test('public pages are crawl-cacheable and the guides hub has one canonical URL'
  const alias=await fetch(base+'/guides/index.html',{redirect:'manual'});
  assert.equal(alias.status,301);
  assert.equal(alias.headers.get('location'),'/guides/');
+ // Named comparison pages were retired; every old URL must 301 in one hop.
+ for(const old of ['/alternatives/optinmonster.html','/alternatives/poptin.html','/alternatives/popupsmart.html','/alternatives/optimonk.html','/alternatives/popup-maker.html']){
+  const r=await fetch(base+old,{redirect:'manual'});
+  assert.equal(r.status,301,old);
+  assert.equal(r.headers.get('location'),'/free-popup-builder-no-limits.html',old);
+ }
  const hub=await api('/guides/');
  assert.match(String(hub.data),/<link rel="canonical" href="https:\/\/popuploom\.com\/guides\/">/);
  assert.equal(hub.headers.get('vary'),'Accept');
@@ -496,13 +502,8 @@ test('identity, metadata and crawler files agree on the apex origin',async()=>{
   '/templates/gamified.html':['Free Spin-to-Win and Giveaway Popup Templates | PopupLoom','https://popuploom.com/templates/gamified.html'],
   '/templates/seasonal.html':['Seasonal Popup Templates: Black Friday and Holidays | PopupLoom','https://popuploom.com/templates/seasonal.html'],
   '/templates/video.html':['Free Video Popup Template | PopupLoom','https://popuploom.com/templates/video.html'],
-  '/free-popup-builder-no-limits.html':['Free Popup Builder, No Pageview Limits: Honest Comparison','https://popuploom.com/free-popup-builder-no-limits.html'],
-  '/alternatives/optinmonster.html':['OptinMonster Alternative: Free Popup Builder, No Limits','https://popuploom.com/alternatives/optinmonster.html'],
-  '/alternatives/poptin.html':['PopupLoom vs Poptin: Free Alternative Without Visitor Limits','https://popuploom.com/alternatives/poptin.html'],
-  '/alternatives/popupsmart.html':['PopupLoom vs Popupsmart: Free Alternative, No Pageview Caps','https://popuploom.com/alternatives/popupsmart.html'],
-  '/alternatives/optimonk.html':['PopupLoom vs OptiMonk: Free Alternative, No Pageview Caps','https://popuploom.com/alternatives/optimonk.html'],
-  '/alternatives/popup-maker.html':['PopupLoom vs Popup Maker: Free Alternative for Any Website','https://popuploom.com/alternatives/popup-maker.html'],
-  '/best-free-popup-builder.html':['Best Free Popup Builders in 2026: Honest Comparison','https://popuploom.com/best-free-popup-builder.html'],
+  '/free-popup-builder-no-limits.html':['Free Popup Builder, No Pageview Limits: What It Means','https://popuploom.com/free-popup-builder-no-limits.html'],
+  '/best-free-popup-builder.html':['How to Choose a Free Popup Builder in 2026: 9 Checks','https://popuploom.com/best-free-popup-builder.html'],
   '/guides/wordpress-popup-without-plugin.html':['Add a Popup to WordPress Without a Plugin | PopupLoom','https://popuploom.com/guides/wordpress-popup-without-plugin.html'],
   '/tools/popup-roi-calculator.html':['Popup ROI Calculator: Signups, Value, Break-Even | PopupLoom','https://popuploom.com/tools/popup-roi-calculator.html'],
   '/tools/popup-copy-swipe-file.html':['Popup Copy Swipe File: 24 Reusable Patterns | PopupLoom','https://popuploom.com/tools/popup-copy-swipe-file.html'],
@@ -536,16 +537,22 @@ test('identity, metadata and crawler files agree on the apex origin',async()=>{
  assert.ok(!sitemap.includes('studio.html')&&!sitemap.includes('migration.html'));
  for(const u of ['/faq.html','/press.html','/security.html','/guides/popup-builder-for-ecommerce.html','/guides/popup-builder-for-quick-commerce.html','/guides/popup-builder-for-lead-generation.html','/guides/squarespace-wix-popup.html','/guides/exit-intent-popup.html','/guides/email-signup-popup.html','/guides/free-popup-builders-without-pageview-limits.html'])assert.ok(sitemap.includes('https://popuploom.com'+u),u);
  for(const u of ['/templates/email-signup.html','/templates/discount.html','/templates/exit-intent.html','/templates/announcements.html','/templates/engagement.html','/templates/social-proof.html','/templates/age-gates.html','/templates/gamified.html','/templates/seasonal.html','/templates/video.html'])assert.ok(sitemap.includes('https://popuploom.com'+u),u);
- for(const u of ['/free-popup-builder-no-limits.html','/best-free-popup-builder.html','/alternatives/optinmonster.html','/alternatives/poptin.html','/alternatives/popupsmart.html','/alternatives/optimonk.html','/alternatives/popup-maker.html','/guides/wordpress-popup-without-plugin.html','/templates/exit-intent-popup.html','/templates/discount-popup.html','/templates/email-signup-popup.html','/templates/spin-to-win-popup.html','/tools/popup-roi-calculator.html','/tools/popup-copy-swipe-file.html'])assert.ok(sitemap.includes('https://popuploom.com'+u),u);
+ for(const u of ['/free-popup-builder-no-limits.html','/best-free-popup-builder.html','/guides/wordpress-popup-without-plugin.html','/templates/exit-intent-popup.html','/templates/discount-popup.html','/templates/email-signup-popup.html','/templates/spin-to-win-popup.html','/tools/popup-roi-calculator.html','/tools/popup-copy-swipe-file.html'])assert.ok(sitemap.includes('https://popuploom.com'+u),u);
  const gallery=(await api('/templates.html')).data;
  assert.ok(gallery.includes('/templates/email-signup.html#exitOnly'),'gallery card points at a public template page');
  assert.ok(!gallery.includes('href="/studio.html?tpl=exitOnly"'),'gallery no longer links cards to the noindex studio URL');
  const money=(await api('/free-popup-builder-no-limits.html')).data;
- assert.ok(money.includes('500 campaign impressions')&&money.includes('1,000 unique visitors')&&money.includes('5K pageviews'),'comparison keeps the dated verified limits');
- assert.ok(money.toLowerCase().includes('no pageview, visitor or impression cap'),'money page states the wedge');
- assert.ok(money.includes('Pricing and limits verified 16 November 2026'),'money page shows the visible verification badge');
+ assert.ok(money.includes('no pageview, unique-visitor or impression allowance'),'money page states the no-meter claim');
+ assert.ok(money.includes('Product facts checked 16 November 2026'),'money page shows the visible check date');
+ assert.ok(money.includes('no live-campaign cap'),'money page covers the campaign and domain caps');
  const best=(await api('/best-free-popup-builder.html')).data;
- assert.ok(best.includes('Popup Maker')&&best.includes('10,000 pageviews')&&best.includes('unlimited popups'),'best-free page keeps the verified shortlist');
+ assert.ok(best.includes('nine checks')&&best.includes('Metered unit'),'checklist page keeps its nine checks');
+ // The comparison cluster is deliberately vendor-neutral. Guard the whole set.
+ const named=['OptinMonster','OptiMonk','Poptin','Popupsmart','Popup Maker'];
+ for(const p of ['/','/guides/','/free-popup-builder-no-limits.html','/best-free-popup-builder.html','/guides/free-popup-builders-without-pageview-limits.html','/tools/popup-roi-calculator.html','/templates.html','/guides/wordpress-popup-without-plugin.html']){
+  const html=String((await api(p)).data);
+  for(const n of named) assert.ok(!html.includes(n),p+' must not name '+n);
+ }
  const wpGuide=(await api('/guides/wordpress-popup-without-plugin.html')).data;
  assert.ok(wpGuide.includes('wp_footer')&&wpGuide.includes('data-popuploom'),'WordPress guide shows the real install path');
  assert.ok(robots.includes('User-agent: GPTBot')&&robots.includes('User-agent: OAI-SearchBot')&&robots.includes('User-agent: PerplexityBot'),'AI crawlers explicitly allowed');
@@ -758,7 +765,7 @@ test('advertising allowlist covers public content and excludes private surfaces'
  const {isAdPage,AD_PAGES}=require('../shared/ad-pages');
  assert.ok(AD_PAGES.size>=15);
  for(const p of ['/','/index.html','/templates.html','/faq.html','/press.html','/security.html','/about.html','/guides/index.html','/guides/install-popups.html','/guides/wordpress-popup.html','/guides/shopify-popup.html','/guides/webflow-popup.html','/guides/squarespace-wix-popup.html','/guides/exit-intent-popup.html','/guides/email-signup-popup.html','/guides/free-popup-builders-without-pageview-limits.html','/guides/collect-and-export-leads.html','/guides/popup-not-showing.html','/guides/popup-builder-for-ecommerce.html','/guides/popup-builder-for-quick-commerce.html','/guides/popup-builder-for-lead-generation.html'])assert.ok(isAdPage(p),p);
- for(const p of ['/studio.html','/profile.html','/leads.html','/reset-password.html','/migration.html','/popuploom.js','/popforge.js','/api/widgets/x/submit','/demo.html','/contact.html','/terms.html','/privacy.html','/templates/email-signup.html','/templates/discount.html','/templates/exit-intent.html','/free-popup-builder-no-limits.html','/best-free-popup-builder.html','/alternatives/optinmonster.html','/alternatives/poptin.html','/alternatives/popupsmart.html','/alternatives/optimonk.html','/alternatives/popup-maker.html','/guides/wordpress-popup-without-plugin.html','/templates/exit-intent-popup.html','/templates/discount-popup.html','/templates/email-signup-popup.html','/templates/spin-to-win-popup.html','/tools/popup-roi-calculator.html','/tools/popup-copy-swipe-file.html'])assert.ok(!isAdPage(p),p);
+ for(const p of ['/studio.html','/profile.html','/leads.html','/reset-password.html','/migration.html','/popuploom.js','/popforge.js','/api/widgets/x/submit','/demo.html','/contact.html','/terms.html','/privacy.html','/templates/email-signup.html','/templates/discount.html','/templates/exit-intent.html','/free-popup-builder-no-limits.html','/best-free-popup-builder.html','/guides/wordpress-popup-without-plugin.html','/templates/exit-intent-popup.html','/templates/discount-popup.html','/templates/email-signup-popup.html','/templates/spin-to-win-popup.html','/tools/popup-roi-calculator.html','/tools/popup-copy-swipe-file.html'])assert.ok(!isAdPage(p),p);
  const runtime=require('node:fs').readFileSync(require('node:path').join(root,'popuploom.js'),'utf8');
  assert.ok(!/adsbygoogle|googlesyndication|doubleclick|fundingchoicesmessages/i.test(runtime),'customer runtime has no ad code');
  const adsTxt=await api('/ads.txt');assert.equal(adsTxt.status,404,'ads.txt is absent until a real publisher id is configured');

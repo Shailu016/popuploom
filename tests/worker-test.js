@@ -283,10 +283,10 @@ function hostReq(host, path, method = "GET", extraHeaders = {}) {
   check('template category page lists templates and keeps the studio path',templatePage.includes('Last Exit Note')&&templatePage.includes('/studio.html?tpl=exitOnly'));
   r=await req('GET','/free-popup-builder-no-limits.html',{raw:true});
   check('no-limits money page is served with CSP',r.status===200&&String(r.headers.get('content-type')).includes('text/html')&&/content-security-policy/i.test([...r.headers.keys()].join(',')));
-  r=await req('GET','/alternatives/optinmonster.html',{raw:true});
-  check('alternative page is served',r.status===200&&String(r.headers.get('content-type')).includes('text/html'));
+  const retired=await fetch(BASE+'/alternatives/optinmonster.html',{redirect:'manual'});
+  check('retired comparison page redirects',retired.status===301&&retired.headers.get('location')==='/free-popup-builder-no-limits.html');
   r=await req('GET','/best-free-popup-builder.html',{raw:true});
-  check('best-free shortlist page is served',r.status===200&&String(r.headers.get('content-type')).includes('text/html'));
+  check('free-builder checklist page is served',r.status===200&&String(r.headers.get('content-type')).includes('text/html'));
   r=await req('GET','/guides/wordpress-popup-without-plugin.html',{raw:true});
   check('WordPress-without-plugin guide is served',r.status===200&&String(r.headers.get('content-type')).includes('text/html'));
   r=await hostReq('popuploom.com','/guides/index.html');check('guides index redirects to the canonical URL',r.status===308&&r.headers.location==='https://popuploom.com/guides/');

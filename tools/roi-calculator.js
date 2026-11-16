@@ -8,11 +8,11 @@
   if (!form) return;
 
   var PRESETS = {
-    "optinmonster-basic": { amount: 2500, unit: "impressions" },
-    "optinmonster-trial": { amount: 500, unit: "impressions" },
-    "poptin-free": { amount: 1000, unit: "visitors" },
-    "popupsmart-free": { amount: 5000, unit: "pageviews" },
-    "optimonk-free": { amount: 10000, unit: "pageviews" }
+    "impressions-2500": { amount: 2500, unit: "impressions" },
+    "impressions-500-trial": { amount: 500, unit: "impressions" },
+    "visitors-1000": { amount: 1000, unit: "visitors" },
+    "pageviews-5000": { amount: 5000, unit: "pageviews" },
+    "pageviews-10000": { amount: 10000, unit: "pageviews" }
   };
 
   function el(id) {
@@ -156,7 +156,7 @@
         " against a " + count(cap) + " " + unitLabel + " allowance (" + percent(used) + ")." +
         (days === null ? "" : " At a steady pace, the allowance is reached in about " +
           (days < 1 ? "less than 1" : Math.round(days)) + " days.") +
-        (preset === "optinmonster-trial"
+        (preset === "impressions-500-trial"
           ? " This preset is a one-time trial credit, not a monthly allowance."
           : "");
     }
@@ -181,7 +181,7 @@
       for (var i = 0; i < defaults.length; i += 1) {
         defaults[i].value = defaults[i].getAttribute("data-default");
       }
-      el("cap-preset").value = "optinmonster-basic";
+      el("cap-preset").value = "impressions-2500";
       updateCapFields();
       recalculate();
       el("monthly-visitors").focus();

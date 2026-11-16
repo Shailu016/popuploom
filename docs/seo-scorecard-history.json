@@ -53,5 +53,38 @@
     "thinPages": 0,
     "schemaCoverage": 47,
     "gsc": null
+  },
+  {
+    "date": "2026-11-16",
+    "origin": "https://popuploom.com",
+    "sitemap": 42,
+    "issues": 2,
+    "totalWords": 46636,
+    "averageWords": 1110,
+    "thinPages": 0,
+    "schemaCoverage": 42,
+    "gsc": null
+  },
+  {
+    "date": "2026-11-16",
+    "origin": "https://popuploom.com",
+    "sitemap": 42,
+    "issues": 2,
+    "totalWords": 46636,
+    "averageWords": 1110,
+    "thinPages": 0,
+    "schemaCoverage": 42,
+    "gsc": null
+  },
+  {
+    "date": "2026-11-16",
+    "origin": "https://popuploom.com",
+    "sitemap": 42,
+    "issues": 0,
+    "totalWords": 46633,
+    "averageWords": 1110,
+    "thinPages": 0,
+    "schemaCoverage": 42,
+    "gsc": null
   }
 ]

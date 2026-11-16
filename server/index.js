@@ -271,8 +271,7 @@ const publicFiles = new Set([
   "templates.html", "faq.html", "press.html", "security.html", "guides/install-popups.html", "guides/index.html", "guides/wordpress-popup.html", "guides/shopify-popup.html", "guides/webflow-popup.html", "guides/squarespace-wix-popup.html", "guides/exit-intent-popup.html", "guides/email-signup-popup.html", "guides/free-popup-builders-without-pageview-limits.html", "guides/collect-and-export-leads.html", "guides/popup-not-showing.html", "guides/popup-builder-for-ecommerce.html", "guides/popup-builder-for-quick-commerce.html", "guides/popup-builder-for-lead-generation.html", "ccf2a9f45165c635253d22748df4a573.txt", "robots.txt", "sitemap.xml", "llms.txt", "llms-full.txt", "index.html", "studio.html", "profile.html", "demo.html", "migration.html", "reset-password.html",
   "leads.html", "privacy.html", "about.html", "contact.html", "terms.html", ".well-known/security.txt", "security.txt", ".well-known/api-catalog", ".well-known/ard.json", ".well-known/ai-catalog.json", "openapi.json", "lead-csv.js", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "verify-email.html", "verify-email.js", "popuploom.js", "popforge.js", "embed/1.1.0/popuploom.js", "embed/1.1.0/popforge.js", "embed/1.1.0/SHA256SUMS", "ui.css", "ads.txt",
   "templates/email-signup.html", "templates/discount.html", "templates/exit-intent.html", "templates/announcements.html", "templates/engagement.html", "templates/social-proof.html", "templates/age-gates.html", "templates/gamified.html", "templates/seasonal.html", "templates/video.html",
-  "free-popup-builder-no-limits.html", "alternatives/optinmonster.html", "alternatives/poptin.html", "alternatives/popupsmart.html",
-  "alternatives/optimonk.html", "alternatives/popup-maker.html", "best-free-popup-builder.html", "guides/wordpress-popup-without-plugin.html",
+  "free-popup-builder-no-limits.html", "best-free-popup-builder.html", "guides/wordpress-popup-without-plugin.html",
   "templates/exit-intent-popup.html", "templates/discount-popup.html", "templates/email-signup-popup.html", "templates/spin-to-win-popup.html",
   "tools/popup-roi-calculator.html", "tools/popup-copy-swipe-file.html", "tools/roi-calculator.js", "tools/copy-swipe.js", "tools/popup-copy-swipe-file.txt"
 ]);
@@ -280,6 +279,15 @@ const publicFiles = new Set([
 const noMarkdown = new Set([
   "/studio.html", "/profile.html", "/leads.html", "/reset-password.html",
   "/verify-email.html", "/migration.html"
+]);
+// Named competitor pages were retired on 2026-11-16. Each old URL 301s to the
+// surviving explanation of free-tier limits so no indexed link dead-ends.
+const retiredPages = new Map([
+  ["/alternatives/optinmonster.html", "/free-popup-builder-no-limits.html"],
+  ["/alternatives/poptin.html", "/free-popup-builder-no-limits.html"],
+  ["/alternatives/popupsmart.html", "/free-popup-builder-no-limits.html"],
+  ["/alternatives/optimonk.html", "/free-popup-builder-no-limits.html"],
+  ["/alternatives/popup-maker.html", "/free-popup-builder-no-limits.html"]
 ]);
 app.use((req, res, next) => {
   if (req.method !== "GET" && req.method !== "HEAD") return next();
@@ -289,6 +297,9 @@ app.use((req, res, next) => {
   // Keep one canonical URL for the guides hub. The pretty URL is what every
   // navigation link uses and what the sitemap advertises.
   if (pathname === "/guides/index.html") return res.redirect(301, "/guides/");
+  // Retired named-comparison pages: send indexed URLs to the surviving page on
+  // the same topic in one hop instead of letting them fall through to a 404.
+  if (retiredPages.has(pathname)) return res.redirect(301, retiredPages.get(pathname));
   if (pathname === "/") pathname = "/index.html";
   // Directory URLs ending in a slash resolve to their allowlisted index page,
   // so /guides/ is a real page instead of a soft 404.
