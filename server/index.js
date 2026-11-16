@@ -23,6 +23,7 @@ const verifyShared = require("../shared/email-verification");
 const db = require("./db");
 const hostPolicy = require("../shared/host-policy");
 const markdown = require("../shared/markdown");
+const cachePolicy = require("../shared/cache-policy");
 const verification = require("../shared/verification");
 const passwordReset = require("./password-reset");
 const sharedReset = require("../shared/password-reset");
@@ -284,6 +285,9 @@ app.use((req, res, next) => {
   let pathname;
   try { pathname = decodeURIComponent(req.path); }
   catch (e) { return res.status(400).end(); }
+  // Keep one canonical URL for the guides hub. The pretty URL is what every
+  // navigation link uses and what the sitemap advertises.
+  if (pathname === "/guides/index.html") return res.redirect(301, "/guides/");
   if (pathname === "/") pathname = "/index.html";
   // Directory URLs ending in a slash resolve to their allowlisted index page,
   // so /guides/ is a real page instead of a soft 404.
@@ -299,8 +303,8 @@ app.use((req, res, next) => {
     try { dropStat = fs.statSync(path.join(__dirname, "..", pathname.slice(1))); } catch (e) {}
     if (!dropStat || !dropStat.isFile()) return next();
   }
+  const verificationDrop = !publicFiles.has(pathname.slice(1)) && verification.verificationFile(pathname.slice(1));
   const file = pathname === "/popforge.js" ? "/popuploom.js" : pathname;
-  res.setHeader("Cache-Control", file.startsWith("/embed/") ? "public, max-age=31536000, immutable" : "no-store");
   const agentTypes = {
     "/.well-known/api-catalog": "application/linkset+json; charset=utf-8",
     "/.well-known/ard.json": "application/json; charset=utf-8",
@@ -316,7 +320,10 @@ app.use((req, res, next) => {
   const adNonce = file.endsWith(".html") && adConfig.enabled && ads.isAdPage(pathname) ? ads.nonce() : "";
   if (file.endsWith(".html")) {
     security.htmlHeaders(res, file.slice(1), { adsEnabled: !!adNonce, adsNonce: adNonce });
+    if (verificationDrop) res.setHeader("Cache-Control", "no-store");
     if (file === "/migration.html" || file === "/reset-password.html" || file === "/verify-email.html" || file === "/studio.html" || file === "/profile.html" || file === "/leads.html") res.setHeader("X-Robots-Tag", "noindex, nofollow");
+  } else {
+    res.setHeader("Cache-Control", verificationDrop ? "no-store" : cachePolicy.cacheControlFor(file));
   }
   // The immutable embed path is materialised by the Cloudflare build. The
   // Express runtime serves the same bytes from the canonical source file.
@@ -330,6 +337,9 @@ app.use((req, res, next) => {
   if (file.endsWith(".html") && !noMarkdown.has(file) && /\btext\/markdown\b/i.test(req.get("Accept") || "")) {
     const html = fs.readFileSync(diskPath, "utf8");
     res.setHeader("Vary", "Accept");
+    // A content-negotiated representation is generated per request; do not let
+    // a shared cache serve markdown to a browser that asked for HTML.
+    res.setHeader("Cache-Control", "no-store");
     res.type("text/markdown").send(markdown.fromHtml(html, { url: "https://popuploom.com" + file }));
     return;
   }
@@ -338,7 +348,8 @@ app.use((req, res, next) => {
     res.type("html").send(ads.inject(html, pathname, adConfig, adNonce));
     return;
   }
-  res.sendFile(diskPath, { dotfiles: "allow" });
+  // Express sendFile defaults to its own Cache-Control; keep the policy above.
+  res.sendFile(diskPath, { dotfiles: "allow", cacheControl: false });
 });
 app.use("/assets", express.static(path.join(__dirname, "..", "assets"), {
   dotfiles: "deny", index: false, redirect: false,

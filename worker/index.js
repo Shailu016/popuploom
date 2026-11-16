@@ -10,6 +10,7 @@ import verifyShared from "../shared/email-verification.js";
 import { originCheck, securityHeaders, htmlHeaders } from "./security.js";
 import hostPolicy from "../shared/host-policy.js";
 import markdown from "../shared/markdown.js";
+import cachePolicy from "../shared/cache-policy.js";
 import { verificationFile } from "../shared/verification.js";
 
 const { ApiError, register, login, findOrCreateGoogleUser, verifyCredential, getUserById, updateProfile, authMiddleware, revokeToken, verifyEmail, resendVerification, verificationRequired } = auth;
@@ -381,6 +382,14 @@ async function serveIndex(env, request, sec, cors, headOnly) {
 
 async function serveStatic(request, env, pathname, sec, cors, headOnly) {
   let file = pathname === "/" ? "/index.html" : pathname;
+  // The guides hub is linked everywhere as /guides/. Keep one canonical URL so
+  // the pretty URL and the underlying index.html never compete in the index.
+  if (file === "/guides/index.html") {
+    return new Response(null, {
+      status: 301,
+      headers: { ...sec, ...cors, Location: "/guides/", "Cache-Control": "public, max-age=3600" }
+    });
+  }
   // Directory URLs ending in a slash resolve to their allowlisted index page,
   // so /guides/ is a real page instead of a soft 404.
   if (file.endsWith("/") && PUBLIC_FILES.has((file + "index.html").slice(1))) file += "index.html";
@@ -388,7 +397,7 @@ async function serveStatic(request, env, pathname, sec, cors, headOnly) {
     const asset = await env.ASSETS.fetch(new Request(new URL(file, request.url)));
     if (asset.status === 404) return new Response("Not found", { status: 404, headers: { ...sec, ...cors } });
     const headers = new Headers(asset.headers);
-    headers.set("Cache-Control", file.startsWith("/embed/") ? "public, max-age=31536000, immutable" : "no-store");
+    headers.set("Cache-Control", cachePolicy.cacheControlFor(file));
     if (AGENT_FILES[file]) {
       headers.set("Content-Type", AGENT_FILES[file]);
     }

@@ -20,7 +20,8 @@ const LEGACY_PAGES = new Map([
   ["/index.html", "/"],
   ["/templates.html", "/templates.html"],
   ["/guides/install-popups.html", "/guides/install-popups.html"],
-  ["/guides/index.html", "/guides/index.html"],
+  ["/guides/index.html", "/guides/"],
+  ["/guides/", "/guides/"],
   ["/guides/wordpress-popup.html", "/guides/wordpress-popup.html"],
   ["/guides/shopify-popup.html", "/guides/shopify-popup.html"],
   ["/guides/webflow-popup.html", "/guides/webflow-popup.html"],
@@ -61,6 +62,15 @@ function isMoveEnabled(cutoverEnabled) {
 function canonicalTarget(url, moveLegacy) {
   const host = url.hostname.toLowerCase();
   const pathname = url.pathname;
+
+  // The guides hub is linked as /guides/ everywhere. Normalize the underlying
+  // index.html in one hop on the canonical hosts and the legacy host.
+  if (pathname === "/guides/index.html") {
+    if (APEX_HOSTS.has(host) || WWW_HOSTS.has(host) || (moveLegacy && LEGACY_HOSTS.has(host))) {
+      return NEW_ORIGIN + "/guides/" + url.search;
+    }
+    return null;
+  }
 
   // Same-origin /index.html normalization is safe on every host (including
   // localhost) and keeps one canonical URL per deployment.

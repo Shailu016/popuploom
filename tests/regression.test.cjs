@@ -44,6 +44,20 @@ test('private files stay private including encoded separators and extensions',as
  }
  for(const url of ['/','/templates.html','/templates/email-signup.html','/templates/discount.html','/templates/exit-intent.html','/templates/announcements.html','/templates/engagement.html','/templates/social-proof.html','/templates/age-gates.html','/templates/gamified.html','/templates/seasonal.html','/templates/video.html','/templates/exit-intent-popup.html','/templates/discount-popup.html','/templates/email-signup-popup.html','/templates/spin-to-win-popup.html','/free-popup-builder-no-limits.html','/best-free-popup-builder.html','/alternatives/optinmonster.html','/alternatives/poptin.html','/alternatives/popupsmart.html','/alternatives/optimonk.html','/alternatives/popup-maker.html','/guides/wordpress-popup-without-plugin.html','/faq.html','/press.html','/security.html','/guides/','/guides/index.html','/guides/install-popups.html','/guides/wordpress-popup.html','/guides/shopify-popup.html','/guides/webflow-popup.html','/guides/squarespace-wix-popup.html','/guides/exit-intent-popup.html','/guides/email-signup-popup.html','/guides/free-popup-builders-without-pageview-limits.html','/guides/collect-and-export-leads.html','/guides/popup-not-showing.html','/guides/popup-builder-for-ecommerce.html','/guides/popup-builder-for-quick-commerce.html','/guides/popup-builder-for-lead-generation.html','/migration.html','/studio.html','/profile.html','/demo.html','/reset-password.html','/verify-email.html','/verify-email.js','/about.html','/contact.html','/terms.html','/.well-known/security.txt','/security.txt','/app.js','/lead-csv.js','/studio.js','/reset-password.js','/popuploom.js','/popforge.js','/embed/1.1.0/popuploom.js','/embed/1.1.0/popforge.js','/embed/1.1.0/SHA256SUMS','/ui.css','/robots.txt','/sitemap.xml','/llms.txt','/llms-full.txt','/ccf2a9f45165c635253d22748df4a573.txt','/assets/winter-gift.jpg','/assets/favicon.svg','/assets/og-popuploom.png'])assert.equal((await api(url)).status,200,url);
 });
+test('public pages are crawl-cacheable and the guides hub has one canonical URL',async()=>{
+ for(const url of ['/','/privacy.html','/sitemap.xml','/robots.txt']){
+  const r=await api(url);
+  assert.equal(r.headers.get('cache-control'),'public, max-age=0, must-revalidate',url);
+ }
+ const studio=await api('/studio.html');
+ assert.equal(studio.headers.get('cache-control'),'no-store');
+ const alias=await fetch(base+'/guides/index.html',{redirect:'manual'});
+ assert.equal(alias.status,301);
+ assert.equal(alias.headers.get('location'),'/guides/');
+ const hub=await api('/guides/');
+ assert.match(String(hub.data),/<link rel="canonical" href="https:\/\/popuploom\.com\/guides\/">/);
+ assert.equal(hub.headers.get('vary'),'Accept');
+});
 test('publisher verification is public without enabling ads and ads.txt requires a valid ID',async()=>{
  const home=await api('/');
  assert.match(home.data,/<meta name="google-adsense-account" content="ca-pub-8947829712444522">/);
@@ -351,6 +365,10 @@ test('host policy only moves known pages and never crosses hosts for API or runt
  assert.equal(pageRedirect(old+'/index.html','GET'),apex+'/');
  assert.equal(pageRedirect(old+'/templates.html?ref=1','GET'),apex+'/templates.html?ref=1');
  assert.equal(pageRedirect(old+'/guides/install-popups.html','GET'),apex+'/guides/install-popups.html');
+ assert.equal(pageRedirect(apex+'/guides/index.html','GET'),apex+'/guides/');
+ assert.equal(pageRedirect('https://www.popuploom.com/guides/index.html','GET'),apex+'/guides/');
+ assert.equal(pageRedirect(old+'/guides/index.html','GET'),apex+'/guides/');
+ assert.equal(pageRedirect(old+'/guides/','GET'),apex+'/guides/');
  assert.equal(pageRedirect(old+'/studio.html?id=wan_123','GET'),apex+'/studio.html?id=wan_123');
  assert.equal(pageRedirect(old+'/migration.html','GET'),null);
  assert.equal(pageRedirect(old+'/reset-password.html','GET'),null);

@@ -46,7 +46,7 @@ function hostReq(host, path, method = "GET", extraHeaders = {}) {
 (async () => {
   console.log("== static/security ==");
   let r = await req("GET", "/", { raw: true });
-  check("GET / 200 + CSP + no-store", r.status === 200 && /content-security-policy/i.test(Array.from(r.headers.keys()).join(",")) && r.headers.get("cache-control") === "no-store", r.status);
+  check("GET / 200 + CSP + crawl-cacheable", r.status === 200 && /content-security-policy/i.test(Array.from(r.headers.keys()).join(",")) && /public, max-age=0, must-revalidate/.test(r.headers.get("cache-control") || ""), r.status);
   r = await req("GET", "/studio.html", { raw: true });
   check("studio.html CSP present", r.status === 200 && /content-security-policy/i.test(Array.from(r.headers.keys()).join(",")));
   r = await req("GET", "/popforge.js", { raw: true });
@@ -289,7 +289,7 @@ function hostReq(host, path, method = "GET", extraHeaders = {}) {
   check('best-free shortlist page is served',r.status===200&&String(r.headers.get('content-type')).includes('text/html'));
   r=await req('GET','/guides/wordpress-popup-without-plugin.html',{raw:true});
   check('WordPress-without-plugin guide is served',r.status===200&&String(r.headers.get('content-type')).includes('text/html'));
-  r=await req('GET','/guides/index.html',{raw:true});check('guides hub is served',r.status===200);
+  r=await hostReq('popuploom.com','/guides/index.html');check('guides index redirects to the canonical URL',r.status===308&&r.headers.location==='https://popuploom.com/guides/');
   r=await req('GET','/guides/',{raw:true});check('guides directory URL serves the hub',r.status===200&&String(r.headers.get('content-type')).includes('text/html'));
   r=await req('GET','/guides/wordpress-popup.html',{raw:true});check('WordPress guide is served',r.status===200);
   r=await req('GET','/guides/shopify-popup.html',{raw:true});check('Shopify guide is served',r.status===200);

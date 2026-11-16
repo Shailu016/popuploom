@@ -4,6 +4,7 @@ const crypto = require("crypto");
 const cors = require("cors");
 const ads = require("../shared/ads");
 const agent = require("../shared/agent-discovery");
+const cachePolicy = require("../shared/cache-policy");
 const origins = String(process.env.APP_ORIGINS || "").split(",").filter(Boolean).map(value => {
   const url = new URL(value.trim());
   if (!["https:", "http:"].includes(url.protocol)) throw new Error("APP_ORIGINS must contain HTTP(S) origins");
@@ -75,6 +76,7 @@ function htmlHeaders(res, file = "index.html", options = {}) {
   res.setHeader("X-Frame-Options", "DENY");
   res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
   res.setHeader("Link", agent.LINK);
-  res.setHeader("Cache-Control", "no-store");
+  res.setHeader("Vary", "Accept");
+  res.setHeader("Cache-Control", cachePolicy.cacheControlFor(file, { adsNonce: options.adsNonce }));
 }
 module.exports = { browserOrigin, headers, htmlHeaders };

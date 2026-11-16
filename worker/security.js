@@ -3,6 +3,7 @@ import auth from "./auth.js";
 import hashes from "./csp-hashes.json";
 import ads from "../shared/ads.js";
 import agent from "../shared/agent-discovery.js";
+import cachePolicy from "../shared/cache-policy.js";
 
 const { ApiError } = auth;
 
@@ -62,6 +63,8 @@ export function htmlHeaders(env, file = "index.html", options = {}) {
     "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
     // RFC 8288 discovery links for agents; every target is a real resource.
     "Link": agent.LINK,
-    "Cache-Control": "no-store"
+    // The runtime can return HTML or a markdown rendering of the same URL.
+    "Vary": "Accept",
+    "Cache-Control": cachePolicy.cacheControlFor(file, { adsNonce: options.adsNonce })
   };
 }

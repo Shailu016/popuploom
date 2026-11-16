@@ -63,7 +63,7 @@ Last reviewed: 2026-11-12. Canonical site: https://popuploom.com/
 - [Best free popup builder](https://popuploom.com/best-free-popup-builder.html): the honest shortlist across PopupLoom, Popup Maker, OptiMonk, Poptin, Popupsmart and OptinMonster.
 - [WordPress without a plugin](https://popuploom.com/guides/wordpress-popup-without-plugin.html): child-theme/wp_footer placement, cache, CSP and multisite limits.
 - Template guides: [exit intent](https://popuploom.com/templates/exit-intent-popup.html), [discount](https://popuploom.com/templates/discount-popup.html), [email signup](https://popuploom.com/templates/email-signup-popup.html) and [spin to win](https://popuploom.com/templates/spin-to-win-popup.html).
-- [Guides hub](https://popuploom.com/guides/index.html): installation, platform, lead and troubleshooting guides, plus the three use-case playbooks.
+- [Guides hub](https://popuploom.com/guides/): installation, platform, lead and troubleshooting guides, plus the three use-case playbooks.
 - [Installation guide](https://popuploom.com/guides/install-popups.html): the hosted widget model, exact snippet, testing and updating.
 - [WordPress guide](https://popuploom.com/guides/wordpress-popup.html), [Shopify guide](https://popuploom.com/guides/shopify-popup.html), [Webflow guide](https://popuploom.com/guides/webflow-popup.html): platform-specific placement and caveats.
 - [Squarespace and Wix guide](https://popuploom.com/guides/squarespace-wix-popup.html): code injection and custom code, plan gates, checkout limits.

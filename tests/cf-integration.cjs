@@ -17,14 +17,34 @@ const env={JWT_SECRET:require('crypto').randomBytes(32).toString('hex'),RESEND_A
     const body = await res.text();
     assert.ok(!body.includes('adsbygoogle.js') && !body.includes('data-pl-ad'), path + ' must stay ad-free');
   }
-  for (const path of ['/', '/templates.html', '/faq.html', '/guides/index.html']) {
+  for (const path of ['/', '/templates.html', '/faq.html', '/guides/']) {
     const res = await worker.fetch(new Request('https://popuploom.com' + path), adEnv, { waitUntil() {} });
     const body = await res.text();
     assert.ok(body.includes('adsbygoogle.js') && body.includes('data-pl-ad'), path + ' must carry the ad unit');
+    if (path === '/') assert.equal(res.headers.get('cache-control'), 'private, max-age=0, must-revalidate');
   }
   const disabled = await worker.fetch(new Request('https://popuploom.com/guides/install-popups.html'), env, { waitUntil() {} });
   assert.ok(!(await disabled.text()).includes('adsbygoogle.js'), 'disabled advertising must load no ad resource');
   console.log('PASS advertising boundary and nonce CSP');
+}
+{
+  console.log('== crawl caching and one guides canonical ==');
+  const home = await worker.fetch(new Request('https://popuploom.com/'), env, { waitUntil() {} });
+  assert.equal(home.headers.get('cache-control'), 'public, max-age=0, must-revalidate');
+  assert.equal(home.headers.get('vary'), 'Accept');
+  const privacy = await worker.fetch(new Request('https://popuploom.com/privacy.html'), env, { waitUntil() {} });
+  assert.equal(privacy.headers.get('cache-control'), 'public, max-age=0, must-revalidate');
+  const studio = await worker.fetch(new Request('https://popuploom.com/studio.html'), env, { waitUntil() {} });
+  assert.equal(studio.headers.get('cache-control'), 'no-store');
+  const sitemap = await worker.fetch(new Request('https://popuploom.com/sitemap.xml'), env, { waitUntil() {} });
+  assert.equal(sitemap.headers.get('cache-control'), 'public, max-age=0, must-revalidate');
+  const alias = await worker.fetch(new Request('https://popuploom.com/guides/index.html'), env, { waitUntil() {} });
+  assert.equal(alias.status, 308);
+  assert.equal(alias.headers.get('Location'), 'https://popuploom.com/guides/');
+  const hub = await worker.fetch(new Request('https://popuploom.com/guides/'), env, { waitUntil() {} });
+  assert.equal(hub.status, 200);
+  assert.match(await hub.text(), /<link rel="canonical" href="https:\/\/popuploom\.com\/guides\/">/);
+  console.log('PASS public pages are crawl-cacheable, private pages are no-store, guides have one canonical URL');
 }
 
 for(const flag of [undefined,'false','true']){
