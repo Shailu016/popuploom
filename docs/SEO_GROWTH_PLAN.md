@@ -232,11 +232,11 @@ Do not start with 45 template pages. Start with:
     credits and one domain on free, $228–$2,148 annual tiers, and an explanation
     of the two meters. The pricing page carries its own “Last updated September
     2026” note.
-  - `/alternatives/popup-maker.html` — 2,711 words; WordPress-only free plugin
+  - `/alternatives/popup-maker.html` — 2,724 words; WordPress-only free plugin
     1.25.0, 600,000+ installs, 4.9/5 from 4,516 reviews, Pro at $99/year with a
     40% first-year discount. The page states plainly that the free plugin wins on
     WordPress and covers the plugin maintenance cost.
-  - `/best-free-popup-builder.html` — 2,812 words; honest six-tool shortlist with
+  - `/best-free-popup-builder.html` — 2,823 words; honest six-tool shortlist with
     named trade-offs, a dated comparison table and a “what free means” section.
 - Every vendor fact was read from the vendor’s own pricing or product page on
   16 November 2026. No vendor account was created and no campaign was run, and
@@ -248,6 +248,12 @@ Do not start with 45 template pages. Start with:
 - Deployed Worker version `ca192922-4bc4-4da5-8bc4-183e2b399937`; live checks
   confirm 200, public revalidate cache, one H1, valid JSON-LD hash in CSP, no
   `unsafe-inline`/`unsafe-eval`, no ad nonce and no ad code on all five.
+- Follow-up fixes before close-out: the Popup Maker page had cited a screenshot
+  that turned out to be a text callout rather than the publish panel, so it was
+  swapped for the real guest publish-panel screenshot and the Article `image`
+  array updated to match; the best-free table gained a visible “scroll sideways”
+  hint plus a labelled, focusable scroll region. Both re-tested and redeployed as
+  `3c1a9131-bacb-4900-b9c0-e6d0aaa81203`.
 - IndexNow accepted all 47 URLs (HTTP 200). Scorecard: 47 pages, 0 issues,
   1,344 average words, 0 thin pages, 47/47 structured data.
 
