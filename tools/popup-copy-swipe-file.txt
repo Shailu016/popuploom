@@ -1,0 +1,212 @@
+PopupLoom popup copy swipe file
+24 reusable patterns across 8 popup jobs
+Last updated: 16 November 2026
+Canonical page: https://popuploom.com/tools/popup-copy-swipe-file.html
+
+These are structural patterns, not tested conversion claims. Replace every
+[PLACEHOLDER] with a true fact. PopupLoom has not run an A/B test on every
+pattern and does not claim a conversion rate for any of them. Check the
+consumer-protection, advertising, privacy and consent rules that apply to
+your business before publishing. This file is not legal advice.
+
+================================================================================
+WELCOME AND FIRST ORDER
+================================================================================
+
+1. First-order welcome with a real code
+
+Headline: Your first order, [PERCENT]% off
+Body: Use [CODE] at checkout. One use per customer. Valid until [DATE].
+Button: Shop with [CODE]
+Fine print: [PERCENT]% off one order. Excludes [EXCLUSIONS]. Cannot be combined with other offers. See [TERMS LINK].
+
+2. New-arrival early access
+
+Headline: First look: [COLLECTION]
+Body: New pieces go live [DATE]. Get the early-access link before the public launch.
+Button: Send me the early link
+Fine print: By subscribing you agree to [PRIVACY NOTICE]. You can unsubscribe at any time.
+
+3. Newsletter welcome without a discount
+
+Headline: One useful email, [CADENCE]
+Body: [WHAT THEY GET] — written by [WHO], not a daily sales blast. Read the latest issue before you decide.
+Button: Get the next issue
+Fine print: [CADENCE]. Unsubscribe in one click. [PRIVACY NOTICE].
+
+================================================================================
+EMAIL AND LEAD MAGNETS
+================================================================================
+
+4. Checklist lead magnet
+
+Headline: The [N]-point [TOPIC] checklist
+Body: A printable checklist for [SPECIFIC TASK]. No account needed — enter your email and we will send the link.
+Button: Send the checklist
+Fine print: One email with the download and [CADENCE] follow-ups. Unsubscribe at any time. [PRIVACY NOTICE].
+
+5. Template pack
+
+Headline: [N] [FORMAT] templates for [AUDIENCE]
+Body: Copy the structure, replace the placeholders and publish. The pack includes [FORMAT 1], [FORMAT 2] and [FORMAT 3].
+Button: Get the template pack
+Fine print: Delivered by email as [FILE TYPE]. [LICENCE TERMS].
+
+6. Webinar registration
+
+Headline: Live on [DATE]: [TOPIC]
+Body: [SPEAKER] walks through [SPECIFIC OUTCOME] in [DURATION]. Bring one question for the Q&A.
+Button: Save my seat
+Fine print: [DATE] at [TIME] [TIMEZONE]. Replay sent to registrants. [PRIVACY NOTICE].
+
+================================================================================
+EXIT INTENT
+================================================================================
+
+7. Cart-page reminder (written by the owner)
+
+Headline: Still deciding on [PRODUCT]?
+Body: Your [PRODUCT] is waiting in the cart. [SHIPPING / RETURNS / STOCK FACT].
+Button: Return to cart
+Fine print: [OFFER OR NO OFFER]. [TERMS LINK].
+
+8. Content-page exit offer
+
+Headline: Before you go: [RESOURCE]
+Body: [ONE-SENTENCE VALUE]. It is free and takes [TIME] to read.
+Button: Get [RESOURCE]
+Fine print: [PRIVACY NOTICE]. No purchase required.
+
+9. Exit feedback
+
+Headline: Did this page answer your question?
+Body: One click helps us fix the gaps. No email required.
+Button: Yes, it answered it
+Secondary: Not quite — tell us what is missing
+Fine print: Answers are anonymous unless you add an email.
+
+================================================================================
+ANNOUNCEMENTS AND OPERATIONS
+================================================================================
+
+10. Shipping cutoff
+
+Headline: Order by [DATE/TIME] for [DELIVERY WINDOW]
+Body: Orders placed after the cutoff ship on [NEXT SHIP DATE]. [REGION] delivery only.
+Button: Shop in-stock items
+Fine print: Delivery estimates are not guarantees. [CARRIER / REGION DETAILS].
+
+11. New hours or service area
+
+Headline: We are open [NEW HOURS]
+Body: Starting [DATE], [LOCATION/SERVICE] runs [HOURS]. [WHAT CHANGES FOR CUSTOMERS].
+Button: See the full schedule
+Fine print: Holiday hours may differ. [CONTACT LINK].
+
+12. Maintenance notice
+
+Headline: [SERVICE] is down for maintenance
+Body: We are fixing [SPECIFIC ISSUE]. Expected back by [TIME] [TIMEZONE]. Orders already placed are unaffected.
+Button: Read the status update
+Fine print: Updates posted at [STATUS LINK]. No need to email us unless [CONDITION].
+
+================================================================================
+WAITLISTS AND RESTOCKS
+================================================================================
+
+13. Back-in-stock alert
+
+Headline: [PRODUCT] is out of stock
+Body: Leave your email and we will send one message when it is back. No daily reminders.
+Button: Notify me
+Fine print: One restock email. No purchase obligation. [PRIVACY NOTICE].
+
+14. New-city waitlist
+
+Headline: [CITY], we are coming
+Body: Join the launch list for [SERVICE] in [CITY]. We will email the date and the first available slots.
+Button: Join the [CITY] list
+Fine print: Launch date is an estimate. [PRIVACY NOTICE].
+
+15. Product launch waitlist
+
+Headline: [PRODUCT] launches [DATE]
+Body: Get the launch link and [EARLY ACCESS DETAIL] before the public announcement.
+Button: Put me on the list
+Fine print: One launch email. [PRIVACY NOTICE]. No payment is taken now.
+
+================================================================================
+REVIEWS AND COMMUNITY
+================================================================================
+
+16. Review request
+
+Headline: How was [PRODUCT]?
+Body: A two-minute review helps the next customer choose. We read every response.
+Button: Leave a review
+Fine print: Reviews are published with your display name. [REVIEW POLICY LINK].
+
+17. Case-study invitation
+
+Headline: Would you share how you use [PRODUCT]?
+Body: We are looking for [ROLE] to feature in a short case study. We will ask before publishing anything.
+Button: Tell us about your setup
+Fine print: Participation is optional. [PRIVACY NOTICE]. No payment is implied.
+
+18. Community invitation
+
+Headline: Join [COMMUNITY] for [AUDIENCE]
+Body: [WHAT HAPPENS THERE] — [CADENCE] and [RULES]. Read the pinned post before you introduce yourself.
+Button: Open the community
+Fine print: [PLATFORM] account required. [COMMUNITY RULES LINK].
+
+================================================================================
+SEASONAL AND EVENTS
+================================================================================
+
+19. Black Friday or Cyber Monday
+
+Headline: [SALE NAME]: [OFFER] until [DATE]
+Body: Use [CODE] at checkout. [WHAT IS INCLUDED]. [WHAT IS EXCLUDED].
+Button: Shop the sale
+Fine print: Ends [DATE] at [TIME] [TIMEZONE]. While stocks last. Cannot be combined with other offers. [TERMS LINK].
+
+20. Holiday shipping deadline
+
+Headline: Last order date for [HOLIDAY] delivery
+Body: Order by [DATE/TIME] with [SHIPPING METHOD]. After that, choose [ALTERNATIVE].
+Button: See shipping options
+Fine print: Delivery estimates depend on the carrier. [REGION] only. [TERMS LINK].
+
+21. Local event or market
+
+Headline: Meet us at [EVENT] on [DATE]
+Body: [LOCATION], [TIME]. [WHAT VISITORS CAN DO]. [TICKET / FREE ENTRY DETAIL].
+Button: Get the event details
+Fine print: [WEATHER / CANCELLATION POLICY]. [ORGANISER LINK].
+
+================================================================================
+FEEDBACK AND RESPONSIBLE EXITS
+================================================================================
+
+22. One-question feedback
+
+Headline: What stopped you from [ACTION]?
+Body: Pick the closest answer. It takes one click and helps us improve this page.
+Options: [PRICE] / [CHOICE] / [TRUST] / [SOMETHING ELSE]
+Fine print: No email required. Answers are anonymous unless you add one.
+
+23. Beta invitation
+
+Headline: Try [FEATURE] before it is public
+Body: We are testing [WHAT IT DOES] with a small group. Expect rough edges and a feedback form.
+Button: Request beta access
+Fine print: Access is limited and not guaranteed. [PRIVACY NOTICE]. [SUPPORT LINK].
+
+24. Responsible exit
+
+Headline: Not interested? That is fine.
+Body: Close this window and keep reading. If you want [RESOURCE], the link is below.
+Button: Close
+Secondary: Send me [RESOURCE]
+Fine print: No email is required to close. [PRIVACY NOTICE].

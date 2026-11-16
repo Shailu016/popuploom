@@ -50,5 +50,7 @@
   "templates/spin-to-win-popup.html": "'sha256-fe+wf9rwOy5ONjcdF98/u3YQTwlhBA7XCabtpswTQJ4='",
   "templates/video.html": "'sha256-35V9OuFfoUIuTq0uNSo47F/VdhQ/SOD4PBVm2xKfZNo='",
   "terms.html": "'sha256-W4lPASAOo83fDPWwoYxX9tuPXGKHffJEOnqDybfbraY='",
+  "tools/popup-copy-swipe-file.html": "'sha256-ylooB3bHS8316gr3pFIKXsqhhOxhpah+rXIVDtVxKSY='",
+  "tools/popup-roi-calculator.html": "'sha256-MCZZbIXUHQha2J1Sw6XaOUDGGqDh9mDKiQNS6FIce/0='",
   "verify-email.html": ""
 }

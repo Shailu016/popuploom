@@ -86,6 +86,9 @@
 - Free exit-intent popup guide: https://popuploom.com/guides/exit-intent-popup.html
 - Free email signup and welcome popup guide: https://popuploom.com/guides/email-signup-popup.html
 - Free popup builders compared (dated, source-linked): https://popuploom.com/guides/free-popup-builders-without-pageview-limits.html
+- Popup ROI calculator: https://popuploom.com/tools/popup-roi-calculator.html
+- Popup copy swipe file (24 patterns, not tested conversion claims): https://popuploom.com/tools/popup-copy-swipe-file.html
+- Plain-text copy swipe file download: https://popuploom.com/tools/popup-copy-swipe-file.txt
 
 ## Agent discovery
 - API catalog (RFC 9727): https://popuploom.com/.well-known/api-catalog

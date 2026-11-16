@@ -12,7 +12,7 @@ const env={JWT_SECRET:require('crypto').randomBytes(32).toString('hex'),RESEND_A
   assert.ok(guide.includes('data-pl-ad="1"') && guide.includes('adsbygoogle.js') && guide.includes('Advertisement'));
   assert.ok(nonce && policy.includes("'nonce-" + nonce + "'") && policy.includes("'strict-dynamic'"));
   assert.ok(!policy.includes("'unsafe-eval'"));
-  for (const path of ['/studio.html', '/profile.html', '/leads.html', '/reset-password.html', '/migration.html', '/templates/email-signup.html', '/free-popup-builder-no-limits.html', '/best-free-popup-builder.html', '/alternatives/optinmonster.html', '/alternatives/optimonk.html', '/templates/exit-intent-popup.html']) {
+  for (const path of ['/studio.html', '/profile.html', '/leads.html', '/reset-password.html', '/migration.html', '/templates/email-signup.html', '/free-popup-builder-no-limits.html', '/best-free-popup-builder.html', '/alternatives/optinmonster.html', '/alternatives/optimonk.html', '/templates/exit-intent-popup.html', '/tools/popup-roi-calculator.html', '/tools/popup-copy-swipe-file.html']) {
     const res = await worker.fetch(new Request('https://popuploom.com' + path), adEnv, { waitUntil() {} });
     const body = await res.text();
     assert.ok(!body.includes('adsbygoogle.js') && !body.includes('data-pl-ad'), path + ' must stay ad-free');
@@ -34,6 +34,15 @@ const env={JWT_SECRET:require('crypto').randomBytes(32).toString('hex'),RESEND_A
   assert.equal(home.headers.get('vary'), 'Accept');
   const privacy = await worker.fetch(new Request('https://popuploom.com/privacy.html'), env, { waitUntil() {} });
   assert.equal(privacy.headers.get('cache-control'), 'public, max-age=0, must-revalidate');
+  for (const toolPath of ['/tools/popup-roi-calculator.html', '/tools/popup-copy-swipe-file.html']) {
+    const tool = await worker.fetch(new Request('https://popuploom.com' + toolPath), env, { waitUntil() {} });
+    assert.equal(tool.status, 200, toolPath);
+    assert.equal(tool.headers.get('cache-control'), 'public, max-age=0, must-revalidate', toolPath);
+    const toolHtml = await tool.text();
+    const jsonLd = (toolHtml.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/) || [])[1] || '';
+    const digest = "'sha256-" + require('crypto').createHash('sha256').update(jsonLd).digest('base64') + "'";
+    assert.ok((tool.headers.get('content-security-policy') || '').includes(digest), toolPath + ' JSON-LD hash is allowed by CSP');
+  }
   const studio = await worker.fetch(new Request('https://popuploom.com/studio.html'), env, { waitUntil() {} });
   assert.equal(studio.headers.get('cache-control'), 'no-store');
   const sitemap = await worker.fetch(new Request('https://popuploom.com/sitemap.xml'), env, { waitUntil() {} });

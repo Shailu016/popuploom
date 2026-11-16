@@ -7,6 +7,9 @@ for(const f of ['ccf2a9f45165c635253d22748df4a573.txt','robots.txt','sitemap.xml
 // Copy the whole directory so a new category cannot be forgotten in the build list.
 if(fs.existsSync('templates'))fs.cpSync('templates',path.join(out,'templates'),{recursive:true});
 if(fs.existsSync('alternatives'))fs.cpSync('alternatives',path.join(out,'alternatives'),{recursive:true});
+// Tool pages and their external scripts/downloads live together. The runtime
+// allowlist still decides which individual files are served.
+if(fs.existsSync('tools'))fs.cpSync('tools',path.join(out,'tools'),{recursive:true});
 // RFC 9116 puts the canonical file at /.well-known/security.txt; the legacy
 // /security.txt path is served with the same bytes for scanners that only look
 // at the root. The Canonical field keeps the well-known URL authoritative.
