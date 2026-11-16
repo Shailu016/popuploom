@@ -273,7 +273,10 @@ const publicFiles = new Set([
   "templates/email-signup.html", "templates/discount.html", "templates/exit-intent.html", "templates/announcements.html", "templates/engagement.html", "templates/social-proof.html", "templates/age-gates.html", "templates/gamified.html", "templates/seasonal.html", "templates/video.html",
   "free-popup-builder-no-limits.html", "best-free-popup-builder.html", "guides/wordpress-popup-without-plugin.html",
   "templates/exit-intent-popup.html", "templates/discount-popup.html", "templates/email-signup-popup.html", "templates/spin-to-win-popup.html",
-  "tools/popup-roi-calculator.html", "tools/popup-copy-swipe-file.html", "tools/roi-calculator.js", "tools/copy-swipe.js", "tools/popup-copy-swipe-file.txt"
+  "templates/cart-rescue-popup.html", "templates/announcement-bar.html", "templates/back-in-stock-popup.html", "templates/black-friday-popup.html",
+  "templates/age-verification-popup.html", "templates/free-shipping-bar.html",
+  "tools/popup-roi-calculator.html", "tools/popup-copy-swipe-file.html", "tools/exit-intent-code-generator.html", "tools/popup-copy-generator.html",
+  "tools/roi-calculator.js", "tools/copy-swipe.js", "tools/exit-intent-generator.js", "tools/popup-copy-generator.js", "tools/popup-copy-swipe-file.txt"
 ]);
 // Private/app surfaces stay HTML-only for markdown negotiation.
 const noMarkdown = new Set([

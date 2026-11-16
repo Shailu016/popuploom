@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Free Cart Rescue Popup Template (Exit Intent) | PopupLoom</title>
+<meta name="description" content="A free cart-rescue popup template for desktop exit intent and a mobile scroll trigger, with cart-page URL rules, copy placeholders and setup steps.">
+<link rel="canonical" href="https://popuploom.com/templates/cart-rescue-popup.html">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="PopupLoom">
+<meta property="og:title" content="Free Cart Rescue Popup Template (Exit Intent) | PopupLoom">
+<meta property="og:description" content="A free cart-rescue popup template for desktop exit intent and a mobile scroll trigger, with cart-page URL rules and copy placeholders.">
+<meta property="og:url" content="https://popuploom.com/templates/cart-rescue-popup.html">
+<meta property="og:image" content="https://popuploom.com/assets/og-popuploom.png">
+<meta property="og:image:alt" content="PopupLoom: free website popup builder with 45 templates">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Free Cart Rescue Popup Template (Exit Intent) | PopupLoom">
+<meta name="twitter:description" content="A free cart-rescue popup template for desktop exit intent and a mobile scroll trigger.">
+<meta name="twitter:image" content="https://popuploom.com/assets/og-popuploom.png">
+<link rel="stylesheet" href="/ui.css"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://popuploom.com/"},{"@type":"ListItem","position":2,"name":"Templates","item":"https://popuploom.com/templates.html"},{"@type":"ListItem","position":3,"name":"Cart rescue popup","item":"https://popuploom.com/templates/cart-rescue-popup.html"}]},{"@type":"Article","@id":"https://popuploom.com/templates/cart-rescue-popup.html#article","headline":"Free Cart Rescue Popup Template","description":"A cart-page popup layout for desktop exit intent and a mobile scroll trigger, with configuration and copy guidance.","datePublished":"2026-11-16","dateModified":"2026-11-16","author":{"@type":"Person","name":"Shailu","url":"https://popuploom.com/about.html"},"publisher":{"@id":"https://popuploom.com/#organization"},"mainEntityOfPage":"https://popuploom.com/templates/cart-rescue-popup.html"},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Should a cart rescue popup show on checkout?","acceptedAnswer":{"@type":"Answer","text":"No. Exclude checkout pages from the URL rule. A visitor who is entering payment details has already decided; an overlay at that step adds friction and can break the flow."}},{"@type":"Question","name":"Does exit intent work on mobile for cart rescue?","acceptedAnswer":{"@type":"Answer","text":"Exit intent is desktop only. For phones, create a second popup with a scroll-depth or timer trigger, and make the dismiss button large enough to tap without hitting the offer."}},{"@type":"Question","name":"Can PopupLoom read my cart total or products?","acceptedAnswer":{"@type":"Answer","text":"No. PopupLoom does not inspect native cart totals, customer state or inventory. It targets by URL path and can read a CSS selector on the page, so dynamic cart contents need your own logic or a different tool."}},{"@type":"Question","name":"How often should the popup appear?","acceptedAnswer":{"@type":"Answer","text":"Once per visitor per cart session is a reasonable starting point. Showing it on every visit teaches people to dismiss it without reading, and a cart that is still open days later is better served by email than by another overlay."}}]}]}</script>
+<style>
+.tpl-meta{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-size:13px;color:var(--muted-2);margin:14px 0 22px}
+.tpl-table{width:100%;border-collapse:collapse;font-size:14px}
+.tpl-table th,.tpl-table td{padding:10px;border-bottom:1px solid rgba(255,255,255,.1);vertical-align:top;text-align:left}
+.tpl-table th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-2)}
+.tpl-wrap{overflow-x:auto}
+.tpl-note{padding:18px 20px;margin:22px 0;border-left:3px solid rgba(255,106,31,.7);background:rgba(255,106,31,.05);border-radius:0 12px 12px 0}
+.tpl-note p:last-child{margin-bottom:0}
+.tpl-small{font-size:12.5px;color:var(--muted-2)}
+.tpl-copy{padding:18px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.02);font-size:14px;line-height:1.8}
+</style>
+</head>
+<body>
+<header class="wrap" style="padding:24px 26px">
+  <nav aria-label="Main"><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/">Guides</a> · <a href="/free-popup-builder-no-limits.html">No pageview limits</a> · <a href="/about.html">About</a> · <a href="/studio.html?tpl=blank">Open the studio</a></nav>
+  <nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/templates.html">Templates</a> › <a href="/templates/exit-intent.html">Exit intent</a> › <span>Cart rescue</span></nav>
+</header>
+<main class="wrap" style="padding:30px 26px 80px;max-width:900px">
+  <article>
+    <h1>Free cart rescue popup template</h1>
+    <div class="tpl-meta">
+      <span>By <a href="/about.html">Shailu</a>, founder of PopupLoom</span>
+      <span>Published 16 November 2026</span>
+      <span>Last updated 16 November 2026</span>
+      <span>Template checked 16 November 2026</span>
+    </div>
+
+    <p><strong>A cart rescue popup appears when a shopper is about to leave the cart page.</strong> It offers a reason to finish the order — a discount, a shipping reminder or a support link — without interrupting people who are still browsing. The layout is a small card with one offer, one action and an obvious close button.</p>
+    <p>This page covers the trigger configuration, the URL rules that keep it off checkout, the copy to adapt and the things that go wrong. It is one of the <a href="/templates/exit-intent.html">exit-intent templates</a>, and it uses the same desktop-only exit trigger as the rest of that category.</p>
+
+    <h2>What this template is for</h2>
+    <p>The cart page is the highest-intent moment in a store. The visitor has chosen something and stopped. The popup's job is not to argue; it is to remove one specific reason to leave. That is why the layout keeps one field, one button and one line of small print.</p>
+    <ul>
+      <li><strong>One offer.</strong> A discount, free shipping or a saved-cart reminder. Two offers read as a sale, not a rescue.</li>
+      <li><strong>One action.</strong> The button returns the visitor to the cart or reveals a code; it does not open a second form.</li>
+      <li><strong>One dismissal.</strong> A visible close button, a backdrop click and Escape all work.</li>
+      <li><strong>No cart totals.</strong> PopupLoom cannot read the cart value, so the copy must not promise “10% off your $84 order”.</li>
+    </ul>
+
+    <h2>Use it when</h2>
+    <ul>
+      <li>The visitor is on the cart page and has not started checkout.</li>
+      <li>You have a real reason to offer: a first-order code, a shipping threshold or a way to save the cart.</li>
+      <li>You can afford the discount on the margin. A rescue that loses money is not a rescue.</li>
+      <li>You have a separate mobile plan, because the desktop trigger will not fire on phones.</li>
+    </ul>
+    <p>Do not use it on checkout, on the order confirmation page or immediately after an add-to-cart. Those pages have their own jobs, and an overlay there is an interruption rather than a save.</p>
+
+    <h2>Recommended configuration</h2>
+    <div class="tpl-wrap">
+      <table class="tpl-table card">
+        <thead><tr><th>Setting</th><th>Recommended value</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>Trigger</td><td>Exit intent (desktop)</td><td>Fires when the pointer leaves through the top edge, not on page load.</td></tr>
+          <tr><td>Mobile companion</td><td>Scroll depth 60–70% or 15-second delay</td><td>Touch devices have no exit event; a scroll trigger is the closest honest substitute.</td></tr>
+          <tr><td>URL rule</td><td>Include <code>/cart*</code>; exclude <code>/checkout*</code>, <code>/order*</code></td><td>Keeps the overlay off payment and confirmation steps.</td></tr>
+          <tr><td>Device</td><td>Desktop for this popup; separate mobile popup</td><td>One configuration cannot cover both trigger types.</td></tr>
+          <tr><td>Frequency</td><td>Once per visitor per session</td><td>Repeated overlays train dismissal.</td></tr>
+          <tr><td>Fields</td><td>Email only, or none for a click-to-reveal code</td><td>Every extra field lowers completion.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Copy you can adapt</h2>
+    <div class="tpl-copy">
+      <p><strong>Badge:</strong> BEFORE YOU GO</p>
+      <p><strong>Headline:</strong> Your cart is still here</p>
+      <p><strong>Subheadline:</strong> Finish the order, or take [X]% off if that is the sticking point.</p>
+      <p><strong>Button:</strong> Back to my cart</p>
+      <p><strong>Small print:</strong> One use per customer. Code expires [DATE].</p>
+    </div>
+    <p>Replace every bracket. If the code is not real, remove the discount sentence rather than inventing a number. The <a href="/tools/popup-copy-generator.html">copy generator</a> produces twelve more cart-recovery variants if you want to compare structures.</p>
+
+    <h2>Set it up</h2>
+    <ol>
+      <li>Open the <a href="/studio.html?tpl=cartRescue">Cart Rescue template</a> in the studio.</li>
+      <li>Replace the headline, subheadline and small print. Set the button to return to the cart or reveal the code.</li>
+      <li>Set the trigger to <strong>Exit intent</strong>. Do not add a timer to the same popup; pick one.</li>
+      <li>Add the URL rule: include <code>/cart*</code>, exclude <code>/checkout*</code> and <code>/order*</code>.</li>
+      <li>Save, publish and paste the two-line snippet. The <a href="/guides/install-popups.html">installation guide</a> covers placement and caching.</li>
+      <li>Create a second popup for mobile with a scroll or delay trigger.</li>
+      <li>Test on a desktop: load the cart, wait past the grace period, move the pointer up. Then test that checkout is clean.</li>
+    </ol>
+
+    <h2>What to measure</h2>
+    <ul>
+      <li><strong>Cart completions before and after</strong> over a comparable period, not a single day.</li>
+      <li><strong>Discount cost</strong> against the margin on the orders it saves. A rescue that converts at a loss is not working.</li>
+      <li><strong>Dismissal rate.</strong> A popup that is closed instantly is usually mistimed or repeating.</li>
+      <li><strong>Checkout leakage.</strong> If completions fall after launch, check that the popup is not appearing on checkout.</li>
+    </ul>
+    <p>PopupLoom has no built-in analytics for popups. Use your store's reporting for orders and your own event tracking for impressions if you need them.</p>
+
+    <h2>Common mistakes</h2>
+    <ul>
+      <li>Showing the popup on checkout because the URL rule was left as “all pages”.</li>
+      <li>Promising a cart-specific value the popup cannot read.</li>
+      <li>Using a countdown that resets on reload, which teaches visitors to distrust every timer.</li>
+      <li>Forgetting the mobile companion, then concluding that “exit intent does not work” from phone traffic.</li>
+      <li>Making the close button small or low-contrast on a page where the visitor is already trying to leave.</li>
+    </ul>
+
+    <h2>Related pages</h2>
+    <ul>
+      <li><a href="/templates/exit-intent.html">All exit-intent templates</a></li>
+      <li><a href="/templates/discount-popup.html">Discount popup template (48-hour code)</a></li>
+      <li><a href="/templates/free-shipping-bar.html">Free shipping bar template</a></li>
+      <li><a href="/guides/popup-builder-for-ecommerce.html">Popup builder for ecommerce</a></li>
+      <li><a href="/guides/exit-intent-popup.html">How exit intent works and how to test it</a></li>
+      <li><a href="/guides/shopify-popup.html">Shopify popup guide</a></li>
+    </ul>
+
+    <h2>Common questions</h2>
+    <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Should a cart rescue popup show on checkout?</strong></summary><p style="margin:10px 0 0">No. Exclude checkout pages from the URL rule. A visitor who is entering payment details has already decided; an overlay at that step adds friction and can break the flow.</p></details>
+    <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Does exit intent work on mobile for cart rescue?</strong></summary><p style="margin:10px 0 0">Exit intent is desktop only. For phones, create a second popup with a scroll-depth or timer trigger, and make the dismiss button large enough to tap without hitting the offer.</p></details>
+    <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Can PopupLoom read my cart total or products?</strong></summary><p style="margin:10px 0 0">No. PopupLoom does not inspect native cart totals, customer state or inventory. It targets by URL path and can read a CSS selector on the page, so dynamic cart contents need your own logic or a different tool.</p></details>
+    <details class="card" style="margin:10px 0;padding:16px"><summary><strong>How often should the popup appear?</strong></summary><p style="margin:10px 0 0">Once per visitor per cart session is a reasonable starting point. Showing it on every visit teaches people to dismiss it without reading, and a cart that is still open days later is better served by email than by another overlay.</p></details>
+
+    <p class="tpl-small">Written by <a href="/about.html">Shailu</a>, founder of PopupLoom. Template behaviour checked on 16 November 2026. No conversion, revenue or ranking claim is made. PopupLoom does not read cart totals or customer state.</p>
+  </article>
+</main>
+<footer class="wrap" style="padding:24px 0;font-size:13px">
+  <div><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/">Guides</a> · <a href="/free-popup-builder-no-limits.html">No pageview limits</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></div>
+</footer>
+</body>
+</html>

@@ -299,6 +299,58 @@ Do not start with 45 template pages. Start with:
 - Trade-off accepted: the “<brand> alternative” queries are no longer targeted. The
   pages that remain do not go stale when a competitor changes its pricing.
 
+### 2.12 Programmatic tranche: two tools and six template pages (2026-11-16)
+
+An external “engineering-as-SEO” plan was reviewed on 2026-11-16. The parts that fit
+the product and the owner's rules were executed; the rest was rejected.
+
+**Adopted**
+
+- `/tools/exit-intent-code-generator.html` — writes a zero-dependency desktop
+  exit-intent snippet from sensitivity, delay and cooldown, with a live preview and
+  copy button. The snippet builds the overlay with `textContent`, checks for a fine
+  pointer, and stores only a cooldown timestamp. 1,272 words.
+- `/tools/popup-copy-generator.html` — deterministic 12-set matrix across industry,
+  goal and tone, with badge, headline, subheadline, button and disclaimer
+  placeholders. No conversion claim. 951 words.
+- Six template guides, each with unique copy, a configuration table, setup steps,
+  measurement notes and matching FAQ schema: cart rescue, announcement bar,
+  back in stock, Black Friday, age confirmation and free shipping bar. 874–1,031
+  words. This brings the template detail set to ten.
+- Internal links added from the homepage tools section, the guides hub, the tools
+  index block on `/templates.html`, five template category hubs, and the two older
+  tools. Sitemap is now **50 URLs**.
+
+**Rejected, with reasons**
+
+- The 12 named competitor pages: they contradict the no-names rule in `AGENTS.md`.
+- Stripping display ads from SaaS and guide pages: the 20-page allowlist is locked.
+- Generating all 45 template pages from one dataset at once: variable-swapped pages
+  are the doorway pattern the earlier plan warned against. Waves of six to ten with
+  unique copy are the chosen method.
+- A second `.mjs` build/schema pipeline: the repo already has `build-cf.cjs`,
+  `csp-hashes.js` and `sitemap-lastmod.cjs`; a parallel pipeline would create two
+  sources of truth.
+
+**Plan facts corrected before use**
+
+- `/embed.js` returns 404; the install path is `/embed/1.1.0/popuploom.js`.
+- The catalogue has 10 category pages, not 9.
+- The plan's guide URLs (`/guides/popup-for-shopify.html`,
+  `/guides/free-website-popup-builder-comparison.html`) do not exist; the real paths
+  are `/guides/shopify-popup.html` and
+  `/guides/free-popup-builders-without-pageview-limits.html`.
+- The plan's default conversion figures (3.2% and 2.5%) are invented benchmarks and
+  were not used.
+
+**Verification**
+
+- 55/55 regression, 20/20 Worker unit, 140/140 integration. Browser-tested both
+  tools (output updates, preview opens and closes with Escape, copy works, 12 cards,
+  no horizontal overflow at 390px). Deployed
+  `70bbd703-bda5-4e23-997c-557b673a2245`; IndexNow accepted all 50 URLs. Audit: 50
+  pages, 0 issues, 50/50 structured data.
+
 
 
 
