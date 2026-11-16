@@ -497,7 +497,7 @@ test('identity, metadata and crawler files agree on the apex origin',async()=>{
   '/templates/seasonal.html':['Seasonal Popup Templates: Black Friday and Holidays | PopupLoom','https://popuploom.com/templates/seasonal.html'],
   '/templates/video.html':['Free Video Popup Template | PopupLoom','https://popuploom.com/templates/video.html'],
   '/free-popup-builder-no-limits.html':['Free Popup Builder, No Pageview Limits: Honest Comparison','https://popuploom.com/free-popup-builder-no-limits.html'],
-  '/alternatives/optinmonster.html':['PopupLoom vs OptinMonster: Free Alternative, No Pageview Limits','https://popuploom.com/alternatives/optinmonster.html'],
+  '/alternatives/optinmonster.html':['OptinMonster Alternative: Free Popup Builder, No Limits','https://popuploom.com/alternatives/optinmonster.html'],
   '/alternatives/poptin.html':['PopupLoom vs Poptin: Free Alternative Without Visitor Limits','https://popuploom.com/alternatives/poptin.html'],
   '/alternatives/popupsmart.html':['PopupLoom vs Popupsmart: Free Alternative, No Pageview Caps','https://popuploom.com/alternatives/popupsmart.html'],
   '/alternatives/optimonk.html':['PopupLoom vs OptiMonk: Free Alternative, No Pageview Caps','https://popuploom.com/alternatives/optimonk.html'],
@@ -541,7 +541,7 @@ test('identity, metadata and crawler files agree on the apex origin',async()=>{
  const money=(await api('/free-popup-builder-no-limits.html')).data;
  assert.ok(money.includes('500 campaign impressions')&&money.includes('1,000 unique visitors')&&money.includes('5K pageviews'),'comparison keeps the dated verified limits');
  assert.ok(money.toLowerCase().includes('no pageview, visitor or impression cap'),'money page states the wedge');
- assert.ok(money.includes('Pricing and limits verified 14 November 2026'),'money page shows the visible verification badge');
+ assert.ok(money.includes('Pricing and limits verified 16 November 2026'),'money page shows the visible verification badge');
  const best=(await api('/best-free-popup-builder.html')).data;
  assert.ok(best.includes('Popup Maker')&&best.includes('10,000 pageviews')&&best.includes('unlimited popups'),'best-free page keeps the verified shortlist');
  const wpGuide=(await api('/guides/wordpress-popup-without-plugin.html')).data;
