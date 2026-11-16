@@ -217,6 +217,40 @@ Do not start with 45 template pages. Start with:
 - GSC still shows 23 discovered pages from its 13 November read; the sitemap is
   unchanged, so the next scheduled read should pick up 45.
 
+### 2.10 Commercial-page rebuilds (2026-11-16)
+
+- Rebuilt five commercial pages to first-hand, dated reviews, each with a visible
+  “verified 16 November 2026” badge, an author box, source list, real PopupLoom
+  screenshots and 11–23 internal links:
+  - `/alternatives/poptin.html` — 3,498 words in `<main>`; 1,000-visitor free plan,
+    $240/$564/$1,140 annual tiers, email and coupon bundle, visitor-vs-pageview unit.
+  - `/alternatives/popupsmart.html` — 3,500 words; 5K pageviews, one live popup,
+    100 email quota, $390–$1,590 annual tiers. The page prints two different
+    money-back windows (7/15 days at the top, 15 days/one month at the footer);
+    both are quoted and the reader is told to confirm in writing.
+  - `/alternatives/optimonk.html` — 2,875 words; 10,000 pageviews, 1,000 AI
+    credits and one domain on free, $228–$2,148 annual tiers, and an explanation
+    of the two meters. The pricing page carries its own “Last updated September
+    2026” note.
+  - `/alternatives/popup-maker.html` — 2,711 words; WordPress-only free plugin
+    1.25.0, 600,000+ installs, 4.9/5 from 4,516 reviews, Pro at $99/year with a
+    40% first-year discount. The page states plainly that the free plugin wins on
+    WordPress and covers the plugin maintenance cost.
+  - `/best-free-popup-builder.html` — 2,812 words; honest six-tool shortlist with
+    named trade-offs, a dated comparison table and a “what free means” section.
+- Every vendor fact was read from the vendor’s own pricing or product page on
+  16 November 2026. No vendor account was created and no campaign was run, and
+  each page says so.
+- Ads remain off on all five pages; the 20-page allowlist is unchanged.
+- Regenerated `worker/csp-hashes.json` (JSON-LD changed on five pages), refreshed
+  the sitemap (47 URLs, all five rebuilt pages dated 2026-11-16) and re-ran the
+  suites: 55/55 regression, 20/20 Cloudflare unit, 140/140 Cloudflare integration.
+- Deployed Worker version `ca192922-4bc4-4da5-8bc4-183e2b399937`; live checks
+  confirm 200, public revalidate cache, one H1, valid JSON-LD hash in CSP, no
+  `unsafe-inline`/`unsafe-eval`, no ad nonce and no ad code on all five.
+- IndexNow accepted all 47 URLs (HTTP 200). Scorecard: 47 pages, 0 issues,
+  1,344 average words, 0 thin pages, 47/47 structured data.
+
 
 
 

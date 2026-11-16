@@ -6,7 +6,7 @@ Last run: 2026-11-16 · https://popuploom.com
 |---|---:|
 | Sitemap pages | 47 |
 | Audit issues | 0 |
-| Average words per page | 1091 |
+| Average words per page | 1344 |
 | Pages under 400 words | 0 |
 | Pages with structured data | 47/47 |
 | GSC clicks / impressions (from CSV) | n/a |
@@ -19,6 +19,7 @@ Last run: 2026-11-16 · https://popuploom.com
 | 2026-11-16 | 45 | 0 | 873 | 0 | 45/45 | n/a |
 | 2026-11-16 | 45 | 0 | 983 | 0 | 45/45 | n/a |
 | 2026-11-16 | 47 | 0 | 1091 | 0 | 47/47 | n/a |
+| 2026-11-16 | 47 | 0 | 1344 | 0 | 47/47 | n/a |
 
 ## How to record GSC data
 
