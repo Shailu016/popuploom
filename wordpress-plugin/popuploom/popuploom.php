@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name:       PopupLoom - Free Popup Builder Embeds
+ * Plugin Name:       PopupLoom Popup Builder Embeds
  * Plugin URI:        https://popuploom.com/guides/wordpress-popup.html
  * Description:       Adds a PopupLoom popup to your site with one saved widget ID. No account connection, no tracking, no per-view fee.
- * Version:           1.0.1
+ * Version:           1.0.2
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            PopupLoom

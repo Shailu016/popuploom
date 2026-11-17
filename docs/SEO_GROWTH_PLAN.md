@@ -768,7 +768,7 @@ exit-intent and delayed popups are the safer pattern.
 
 | Asset | Action | Status |
 |---|---|---|
-| WordPress.org plugin | “PopupLoom – Free Popup Builder Embeds” 1.0.1 | Awaiting review — do not resubmit |
+| WordPress.org plugin | "PopupLoom Popup Builder Embeds" 1.0.2 | Pre-review reply 2026-11-17: "Free" dropped from the name, Contributors set to the owning account, brand ownership asserted in the reply. Resubmitted, awaiting the reviewer. |
 | GitHub `popuploom-embed` | MIT wrapper repo, README links to site | Published |
 | GitHub main repo | README with install + docs links | Exists |
 | npm package (optional) | Publish the embed wrapper if it is genuinely useful | Not started |

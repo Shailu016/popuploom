@@ -44,7 +44,7 @@ Mark each as done only after the listing is live and links to
 
 | Target | URL | Account needed | Notes |
 |---|---|---|---|
-| WordPress.org plugin | https://wordpress.org/plugins/ | Existing | “PopupLoom – Free Popup Builder Embeds” 1.0.1 is awaiting review. Do not resubmit. |
+| WordPress.org plugin | https://wordpress.org/plugins/ | Existing | "PopupLoom Popup Builder Embeds" 1.0.2 is back in review after the pre-review reply. Do not resubmit again while the thread is open. |
 | GitHub embed repo | https://github.com/Shailu016/popuploom-embed | Existing | README links to the site; keep the MIT license and tests. |
 | GitHub main repo | https://github.com/Shailu016/popuploom | Existing | Product README, install docs and security notes. |
 | Product Hunt | https://www.producthunt.com/ | Owner | Launch only after the 45-page inventory and onboarding are stable. Use the press kit facts. |

@@ -1,10 +1,10 @@
-=== PopupLoom - Free Popup Builder Embeds ===
-Contributors: shailu3597
+=== PopupLoom Popup Builder Embeds ===
+Contributors: shailu016
 Tags: popup, popup builder, exit intent, lead capture, email signup
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -66,6 +66,10 @@ The embedded runtime requests the saved popup configuration and records views an
 1. Settings > PopupLoom with the widget ID field.
 
 == Changelog ==
+
+= 1.0.2 =
+* Display name is now "PopupLoom Popup Builder Embeds"; the redundant "Free" is dropped from the name and the header.
+* Contributors lists shailu016, the account that owns the submission.
 
 = 1.0.1 =
 * Match the text domain to the approved plugin slug.
