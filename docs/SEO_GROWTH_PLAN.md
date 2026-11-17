@@ -452,6 +452,28 @@ and the JSON-LD CSP hash. 57 sitemap URLs, 56/56 regression, 20/20 worker unit,
 **Lesson:** a hub is a URL, not a folder. If the directory form 404s while four
 children are live, the children have no parent, and their breadcrumbs are lying.
 
+### 2.16 robots.txt kept plain (2026-11-17)
+
+Lighthouse flagged `robots.txt` as invalid on every audit. `Content-Signal:` and
+`Agentmap:` sat above the first `User-agent` group, which a strict parser treats as
+rules outside a group. Both directives are non-standard additions.
+
+**Chosen fix:** remove both from the file and rely on the channels that already
+carry them. `Content-Signal` is sent as a response header on every page by both the
+Express server and the Worker, and the ARD manifest stays discoverable through the
+`Link` header and its well-known path. `robots.txt` now opens with `User-agent` and
+contains only standard directives; a comment says where the two signals moved so
+they are not re-added.
+
+**Verified live:** `robots.txt` is 200 `text/plain`, no `Content-Signal:` or
+`Agentmap:` line, 12 `Disallow` rules intact, and the `Content-Signal` header is
+still present on the response and on the homepage. A `Mediapartners-Google` request
+still returns 200 with the AdSense verification meta tag, and `ads.txt` still returns
+the exact record. Lighthouse now reports SEO 100 with no failures.
+
+**Lesson:** a duplicate channel that trips validators is worse than a single channel
+that does not. Keep the signal on the header, keep the file plain.
+
 
 
 
