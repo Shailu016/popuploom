@@ -77,6 +77,15 @@ function canonicalTarget(url, moveLegacy) {
 
   // Same-origin /index.html normalization is safe on every host (including
   // localhost) and keeps one canonical URL per deployment.
+  // A hub is also typed without its trailing slash. Normalize both forms in one
+  // hop so /tools and /tools/index.html never 404 or duplicate /tools/.
+  if (pathname === "/guides" || pathname === "/tools") {
+    if (APEX_HOSTS.has(host) || WWW_HOSTS.has(host) || (moveLegacy && LEGACY_HOSTS.has(host))) {
+      return NEW_ORIGIN + pathname + "/" + url.search;
+    }
+    return null;
+  }
+
   if (pathname === "/index.html") {
     if (APEX_HOSTS.has(host) || WWW_HOSTS.has(host) || (moveLegacy && LEGACY_HOSTS.has(host))) {
       return NEW_ORIGIN + "/" + url.search;

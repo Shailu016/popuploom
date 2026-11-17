@@ -302,6 +302,8 @@ app.use((req, res, next) => {
   if (pathname === "/guides/index.html" || pathname === "/tools/index.html") {
     return res.redirect(301, pathname.replace("/index.html", "/"));
   }
+  // A hub typed without its trailing slash goes to the directory URL, not a 404.
+  if (pathname === "/guides" || pathname === "/tools") return res.redirect(301, pathname + "/");
   // Retired named-comparison pages: send indexed URLs to the surviving page on
   // the same topic in one hop instead of letting them fall through to a 404.
   if (retiredPages.has(pathname)) return res.redirect(301, retiredPages.get(pathname));

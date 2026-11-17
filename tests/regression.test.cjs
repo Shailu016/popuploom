@@ -58,6 +58,10 @@ test('public pages are crawl-cacheable and the guides hub has one canonical URL'
  const toolsAlias=await fetch(base+'/tools/index.html',{redirect:'manual'});
  assert.equal(toolsAlias.status,301);
  assert.equal(toolsAlias.headers.get('location'),'/tools/');
+ // The slash-less hub is a typed URL; it must not 404 beside a live child.
+ const toolsBare=await fetch(base+'/tools',{redirect:'manual'});
+ assert.equal(toolsBare.status,301);
+ assert.equal(toolsBare.headers.get('location'),'/tools/');
  // Named comparison pages were retired; every old URL must 301 in one hop.
  for(const old of ['/alternatives/optinmonster.html','/alternatives/poptin.html','/alternatives/popupsmart.html','/alternatives/optimonk.html','/alternatives/popup-maker.html']){
   const r=await fetch(base+old,{redirect:'manual'});

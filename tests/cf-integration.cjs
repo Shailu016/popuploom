@@ -76,6 +76,9 @@ const env={JWT_SECRET:require('crypto').randomBytes(32).toString('hex'),RESEND_A
   const toolsAlias = await worker.fetch(new Request('https://popuploom.com/tools/index.html'), env, { waitUntil() {} });
   assert.equal(toolsAlias.status, 308);
   assert.equal(toolsAlias.headers.get('Location'), 'https://popuploom.com/tools/');
+  const toolsBare = await worker.fetch(new Request('https://popuploom.com/tools'), env, { waitUntil() {} });
+  assert.equal(toolsBare.status, 308);
+  assert.equal(toolsBare.headers.get('Location'), 'https://popuploom.com/tools/');
   const toolsHub = await worker.fetch(new Request('https://popuploom.com/tools/'), env, { waitUntil() {} });
   assert.equal(toolsHub.status, 200);
   const toolsHtml = await toolsHub.text();

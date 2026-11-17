@@ -420,6 +420,14 @@ async function serveStatic(request, env, pathname, sec, cors, headOnly) {
       headers: { ...sec, ...cors, Location: DIRECTORY_HUBS.get(file), "Cache-Control": "public, max-age=3600" }
     });
   }
+  // The slash-less form of a hub is a typed URL, not a page. Send it to the
+  // canonical directory address instead of answering 404 next to a live child.
+  if (DIRECTORY_HUBS.has(file + "/index.html")) {
+    return new Response(null, {
+      status: 301,
+      headers: { ...sec, ...cors, Location: file + "/" + new URL(request.url).search, "Cache-Control": "public, max-age=3600" }
+    });
+  }
   // Directory URLs ending in a slash resolve to their allowlisted index page,
   // so /guides/ is a real page instead of a soft 404.
   if (file.endsWith("/") && PUBLIC_FILES.has((file + "index.html").slice(1))) file += "index.html";
