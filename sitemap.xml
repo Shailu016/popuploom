@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://popuploom.com/</loc><lastmod>2026-11-16</lastmod></url>
+  <url><loc>https://popuploom.com/</loc><lastmod>2026-11-17</lastmod></url>
   <url><loc>https://popuploom.com/templates.html</loc><lastmod>2026-11-16</lastmod></url>
   <url><loc>https://popuploom.com/faq.html</loc><lastmod>2026-11-06</lastmod></url>
   <url><loc>https://popuploom.com/security.html</loc><lastmod>2026-11-06</lastmod></url>
   <url><loc>https://popuploom.com/press.html</loc><lastmod>2026-11-06</lastmod></url>
-  <url><loc>https://popuploom.com/guides/</loc><lastmod>2026-11-16</lastmod></url>
+  <url><loc>https://popuploom.com/guides/</loc><lastmod>2026-11-17</lastmod></url>
   <url><loc>https://popuploom.com/guides/install-popups.html</loc><lastmod>2026-11-05</lastmod></url>
   <url><loc>https://popuploom.com/guides/wordpress-popup.html</loc><lastmod>2026-11-16</lastmod></url>
   <url><loc>https://popuploom.com/guides/shopify-popup.html</loc><lastmod>2026-11-16</lastmod></url>
@@ -57,4 +57,10 @@
   <url><loc>https://popuploom.com/guides/google-tag-manager-popup.html</loc><lastmod>2026-11-17</lastmod></url>
   <url><loc>https://popuploom.com/guides/static-html-popup.html</loc><lastmod>2026-11-17</lastmod></url>
   <url><loc>https://popuploom.com/guides/bigcommerce-popup.html</loc><lastmod>2026-11-17</lastmod></url>
+  <url><loc>https://popuploom.com/templates/video-popup.html</loc><lastmod>2026-11-17</lastmod></url>
+  <url><loc>https://popuploom.com/templates/feedback-popup.html</loc><lastmod>2026-11-17</lastmod></url>
+  <url><loc>https://popuploom.com/templates/referral-popup.html</loc><lastmod>2026-11-17</lastmod></url>
+  <url><loc>https://popuploom.com/templates/trust-badge-popup.html</loc><lastmod>2026-11-17</lastmod></url>
+  <url><loc>https://popuploom.com/templates/giveaway-popup.html</loc><lastmod>2026-11-17</lastmod></url>
+  <url><loc>https://popuploom.com/templates/shipping-notice-popup.html</loc><lastmod>2026-11-17</lastmod></url>
 </urlset>

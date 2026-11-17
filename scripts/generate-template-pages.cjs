@@ -60,6 +60,7 @@ const CATEGORIES = {
       ["Do I need a consent checkbox?", "PopupLoom forms do not render a separate consent checkbox. The owner is responsible for the consent language and lawful basis required in their jurisdiction."]
     ],
     guides: [
+      ["/templates/back-in-stock-popup.html", "Back-in-stock popup template"],
       ["/guides/email-signup-popup.html", "Email signup popup guide"],
       ["/guides/collect-and-export-leads.html", "Collect and export leads"],
       ["/guides/install-popups.html", "Install a popup on your site"]
@@ -130,6 +131,7 @@ const CATEGORIES = {
       ["Is this free?", "Yes. There is no pageview cap; a free account is required to save a popup and get its install code."]
     ],
     guides: [
+      ["/templates/cart-rescue-popup.html", "Cart rescue popup template"],
       ["/guides/exit-intent-popup.html", "Exit-intent popup guide"],
       ["/guides/popup-not-showing.html", "Popup not showing?"],
       ["/guides/install-popups.html", "Install a popup on your site"]
@@ -165,6 +167,9 @@ const CATEGORIES = {
       ["Are the templates free?", "Yes. No pageview cap; a free account is required to save and install."]
     ],
     guides: [
+      ["/templates/announcement-bar.html", "Announcement bar template"],
+      ["/templates/free-shipping-bar.html", "Free shipping bar template"],
+      ["/templates/shipping-notice-popup.html", "Shipping notice popup template"],
       ["/guides/install-popups.html", "Install a popup on your site"],
       ["/guides/wordpress-popup.html", "WordPress popup guide"],
       ["/faq.html", "PopupLoom FAQ"]
@@ -200,6 +205,8 @@ const CATEGORIES = {
       ["Are the templates free?", "Yes, with no pageview cap. A free account is required to save and install."]
     ],
     guides: [
+      ["/templates/feedback-popup.html", "Feedback popup template"],
+      ["/templates/referral-popup.html", "Referral popup template"],
       ["/guides/collect-and-export-leads.html", "Collect and export leads"],
       ["/guides/email-signup-popup.html", "Email signup popup guide"],
       ["/guides/install-popups.html", "Install a popup on your site"]
@@ -235,6 +242,7 @@ const CATEGORIES = {
       ["Are the templates free?", "Yes, with no pageview cap."]
     ],
     guides: [
+      ["/templates/trust-badge-popup.html", "Trust badge popup template"],
       ["/security.html", "Security and responsible disclosure"],
       ["/guides/popup-builder-for-ecommerce.html", "Popup builder for ecommerce"],
       ["/guides/install-popups.html", "Install a popup on your site"]
@@ -270,6 +278,7 @@ const CATEGORIES = {
       ["Are the templates free?", "Yes, with no pageview cap."]
     ],
     guides: [
+      ["/templates/age-verification-popup.html", "Age confirmation popup template"],
       ["/faq.html", "PopupLoom FAQ"],
       ["/guides/install-popups.html", "Install a popup on your site"],
       ["/terms.html", "Terms of use"]
@@ -279,7 +288,7 @@ const CATEGORIES = {
     slug: "gamified",
     label: "Gamified",
     title: "Free Spin-to-Win and Giveaway Popup Templates | PopupLoom",
-    h1: "Free gamified popup templates",
+    h1: "Free spin-to-win and giveaway popup templates",
     description: "2 free gamified popup templates for spin-to-win wheels and giveaways. Set real prizes, terms and eligibility.",
     intro: [
       "Spin-to-win and giveaway popups are good at earning attention and bad at fixing a weak offer. These two templates provide the layout; the prize, eligibility, odds, deadline and fulfillment are the owner's responsibility.",
@@ -305,6 +314,7 @@ const CATEGORIES = {
       ["Are the templates free?", "Yes, with no pageview cap."]
     ],
     guides: [
+      ["/templates/giveaway-popup.html", "Giveaway popup template"],
       ["/guides/email-signup-popup.html", "Email signup popup guide"],
       ["/guides/collect-and-export-leads.html", "Collect and export leads"],
       ["/faq.html", "PopupLoom FAQ"]
@@ -314,7 +324,7 @@ const CATEGORIES = {
     slug: "seasonal",
     label: "Seasonal",
     title: "Seasonal Popup Templates: Black Friday and Holidays | PopupLoom",
-    h1: "Free seasonal popup templates",
+    h1: "Free Black Friday and seasonal popup templates",
     description: "3 free Black Friday, Cyber Monday and winter holiday popup templates. Customize the dates and offers for your campaign.",
     intro: [
       "Seasonal campaigns have a short window and a clear reason to act. These three templates cover Black Friday, Cyber Monday and a winter holiday offer. Change the dates, code and terms before publishing.",
@@ -340,6 +350,7 @@ const CATEGORIES = {
       ["Are the templates free?", "Yes, with no pageview cap."]
     ],
     guides: [
+      ["/templates/black-friday-popup.html", "Black Friday popup template"],
       ["/guides/popup-builder-for-ecommerce.html", "Popup builder for ecommerce"],
       ["/guides/shopify-popup.html", "Shopify popup guide"],
       ["/guides/wordpress-popup.html", "WordPress popup guide"]
@@ -375,6 +386,7 @@ const CATEGORIES = {
       ["Are the templates free?", "Yes, with no pageview cap."]
     ],
     guides: [
+      ["/templates/video-popup.html", "Video popup template"],
       ["/guides/install-popups.html", "Install a popup on your site"],
       ["/guides/webflow-popup.html", "Webflow popup guide"],
       ["/faq.html", "PopupLoom FAQ"]
@@ -390,7 +402,19 @@ const TEMPLATE_GUIDES = {
   fullscreenExit: "/templates/exit-intent-popup.html",
   drop48: "/templates/discount-popup.html",
   leadShelf: "/templates/email-signup-popup.html",
-  wheelWin: "/templates/spin-to-win-popup.html"
+  wheelWin: "/templates/spin-to-win-popup.html",
+  cartRescue: "/templates/cart-rescue-popup.html",
+  barnews: "/templates/announcement-bar.html",
+  backStock: "/templates/back-in-stock-popup.html",
+  bfdrop: "/templates/black-friday-popup.html",
+  age21: "/templates/age-verification-popup.html",
+  freeship: "/templates/free-shipping-bar.html",
+  player: "/templates/video-popup.html",
+  tapMeter: "/templates/feedback-popup.html",
+  referFriend: "/templates/referral-popup.html",
+  secureCheckout: "/templates/trust-badge-popup.html",
+  giveaway: "/templates/giveaway-popup.html",
+  shippingDelay: "/templates/shipping-notice-popup.html"
 };
 
 // Extra depth per category: what to measure and the mistakes that make the
@@ -438,6 +462,46 @@ const EXTRA = {
   }
 };
 for (const key of Object.keys(EXTRA)) Object.assign(CATEGORIES[key], EXTRA[key]);
+
+// Long-form sections that were added to the published category pages after the
+// first generation. Kept here so re-running the script cannot delete them.
+const SECTIONS = {
+  age: {
+    h2: "What an age gate can and cannot do",
+    paras: [
+      "An age gate records a self-declaration. It is not identity verification: anyone can click the button, and clearing cookies or opening a private window resets the choice. Say \u201cage confirmation\u201d, not \u201cage verified\u201d, unless you actually checked a document.",
+      "Rules for alcohol, vaping, gambling and adult content differ by country and sometimes by state, and a popup is not a compliance certificate. Record what you collect and why, keep the wording plain, and make the exit path obvious rather than trapping the visitor in a loop. For a regulated category, have a professional review the flow before launch."
+    ]
+  },
+  gamified: {
+    h2: "Fairness, rules and prize obligations",
+    paras: [
+      "The template randomises what the wheel displays. It does not enforce odds, eligibility or a real draw, and it cannot verify that a winner exists. If you promise a prize, publish the rules: who may enter, start and end dates, how the result is determined, what the prize is worth and how it will be delivered.",
+      "Collect marketing consent separately from the entry, so a giveaway is not used to opt people into email they did not ask for. Prize fulfilment, tax and any registration requirement are the site owner's responsibility, and the rules differ by country. Treat the template as a layout for the mechanic, not as legal cover, and have a professional check the promotion before it goes live."
+    ]
+  },
+  seasonal: {
+    h2: "Timing a seasonal campaign",
+    paras: [
+      "Publish one to two weeks before the event and retire the popup within a few days of it ending. A Black Friday countdown left up in December reads as neglect, and an expired code is worse than no popup. Date-stamp the creative so a cached copy cannot promise something that has already passed.",
+      "Run one seasonal offer per visitor rather than stacking a Black Friday, a holiday and a shipping banner on the same page. Set the frequency to once per campaign instead of once per day, and exclude checkout. After the event, replace the popup with a non-seasonal offer rather than switching it off and leaving the page bare."
+    ]
+  },
+  social: {
+    h2: "What you can and cannot claim",
+    paras: [
+      "Use only reviews, counts, ratings and logos you can evidence. Keep a dated screenshot of the source, because a number quoted from a dashboard changes and a badge can expire. Get permission before using a customer's name, photo or company logo; otherwise anonymise the quote.",
+      "A testimonial is one person's experience, not a typical result, so do not present it as an average or a guarantee. Do not imply a rating you have not received, a certification you do not hold or a customer you do not serve. When a claim stops being true, remove it the same day rather than leaving it until the next redesign."
+    ]
+  },
+  video: {
+    h2: "Video setup that avoids the usual problems",
+    paras: [
+      "Browsers block autoplay with sound, so a popup that starts unmuted will either stay paused or be muted by the browser. Start muted, or require a click before playback. Load the player only when the popup opens, so the page is not paying for an embed nobody watches.",
+      "Use the provider's privacy-enhanced embed and check what cookies it sets; a video player is a third-party script with its own consent implications. Add captions and a short text fallback, because the embed can be blocked by consent tools or corporate networks. Keep the clip to 60\u201390 seconds for a launch or demo; if the story needs longer, link to a page instead of forcing it into a modal."
+    ]
+  }
+};
 const NAV = ORDER.map((key) => ({ key, ...CATEGORIES[key] }));
 
 function esc(value) {
@@ -503,7 +567,8 @@ function renderPage(categoryKey, templates) {
             name: t.name,
             url: url + "#" + t.id
           }))
-        }
+        },
+        author: { "@type": "Person", name: "Shailu", url: "https://popuploom.com/about.html" }
       }
     ]
   };
@@ -544,6 +609,7 @@ function renderPage(categoryKey, templates) {
 </header>
 <main class="wrap" style="padding:30px 26px 80px;max-width:900px">
   <h1>${esc(c.h1)}</h1>
+  <p class="mut" style="font-size:13px;margin:6px 0 18px">By <a href="/about.html">Shailu</a>, founder of PopupLoom · Last updated 16 November 2026</p>
   <p class="mut">Free to edit and install. No pageview cap, no trial and no credit card.</p>
   ${c.intro.map((p) => `<p>${esc(p)}</p>`).join("\n  ")}
   ${navHTML()}
@@ -572,6 +638,7 @@ ${mistakes}
   <p class="mut">Each card opens the template in the studio. Replace the sample copy, set a real offer or message, then save and copy the install code.</p>
 ${list}
 
+${SECTIONS[categoryKey] ? `<h2>${esc(SECTIONS[categoryKey].h2)}</h2>\n${SECTIONS[categoryKey].paras.map((p) => `<p>${esc(p)}</p>`).join("\n")}\n` : ""}
   <h2>Related guides</h2>
   <ul>
 ${guides}

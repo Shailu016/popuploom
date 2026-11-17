@@ -59,6 +59,8 @@ const PUBLIC_FILES = new Set([
   "templates/exit-intent-popup.html", "templates/discount-popup.html", "templates/email-signup-popup.html", "templates/spin-to-win-popup.html",
   "templates/cart-rescue-popup.html", "templates/announcement-bar.html", "templates/back-in-stock-popup.html", "templates/black-friday-popup.html",
   "templates/age-verification-popup.html", "templates/free-shipping-bar.html",
+  "templates/video-popup.html", "templates/feedback-popup.html", "templates/referral-popup.html",
+  "templates/trust-badge-popup.html", "templates/giveaway-popup.html", "templates/shipping-notice-popup.html",
   "tools/index.html", "tools/popup-roi-calculator.html", "tools/popup-copy-swipe-file.html", "tools/exit-intent-code-generator.html", "tools/popup-copy-generator.html",
   "tools/roi-calculator.js", "tools/copy-swipe.js", "tools/exit-intent-generator.js", "tools/popup-copy-generator.js", "tools/popup-copy-swipe-file.txt"
 ]);
