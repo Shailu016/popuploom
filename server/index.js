@@ -275,7 +275,7 @@ const publicFiles = new Set([
   "templates/exit-intent-popup.html", "templates/discount-popup.html", "templates/email-signup-popup.html", "templates/spin-to-win-popup.html",
   "templates/cart-rescue-popup.html", "templates/announcement-bar.html", "templates/back-in-stock-popup.html", "templates/black-friday-popup.html",
   "templates/age-verification-popup.html", "templates/free-shipping-bar.html",
-  "tools/popup-roi-calculator.html", "tools/popup-copy-swipe-file.html", "tools/exit-intent-code-generator.html", "tools/popup-copy-generator.html",
+  "tools/index.html", "tools/popup-roi-calculator.html", "tools/popup-copy-swipe-file.html", "tools/exit-intent-code-generator.html", "tools/popup-copy-generator.html",
   "tools/roi-calculator.js", "tools/copy-swipe.js", "tools/exit-intent-generator.js", "tools/popup-copy-generator.js", "tools/popup-copy-swipe-file.txt"
 ]);
 // Private/app surfaces stay HTML-only for markdown negotiation.
@@ -297,9 +297,11 @@ app.use((req, res, next) => {
   let pathname;
   try { pathname = decodeURIComponent(req.path); }
   catch (e) { return res.status(400).end(); }
-  // Keep one canonical URL for the guides hub. The pretty URL is what every
-  // navigation link uses and what the sitemap advertises.
-  if (pathname === "/guides/index.html") return res.redirect(301, "/guides/");
+  // Keep one canonical URL per hub. The pretty URL is what every navigation
+  // link uses and what the sitemap advertises.
+  if (pathname === "/guides/index.html" || pathname === "/tools/index.html") {
+    return res.redirect(301, pathname.replace("/index.html", "/"));
+  }
   // Retired named-comparison pages: send indexed URLs to the surviving page on
   // the same topic in one hop instead of letting them fall through to a 404.
   if (retiredPages.has(pathname)) return res.redirect(301, retiredPages.get(pathname));

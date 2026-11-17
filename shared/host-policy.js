@@ -22,6 +22,8 @@ const LEGACY_PAGES = new Map([
   ["/guides/install-popups.html", "/guides/install-popups.html"],
   ["/guides/index.html", "/guides/"],
   ["/guides/", "/guides/"],
+  ["/tools/index.html", "/tools/"],
+  ["/tools/", "/tools/"],
   ["/guides/wordpress-popup.html", "/guides/wordpress-popup.html"],
   ["/guides/shopify-popup.html", "/guides/shopify-popup.html"],
   ["/guides/webflow-popup.html", "/guides/webflow-popup.html"],
@@ -63,11 +65,12 @@ function canonicalTarget(url, moveLegacy) {
   const host = url.hostname.toLowerCase();
   const pathname = url.pathname;
 
-  // The guides hub is linked as /guides/ everywhere. Normalize the underlying
-  // index.html in one hop on the canonical hosts and the legacy host.
-  if (pathname === "/guides/index.html") {
+  // The guides and tools hubs are linked by their directory URLs everywhere.
+  // Normalize the underlying index.html in one hop on the canonical hosts and
+  // the legacy host.
+  if (pathname === "/guides/index.html" || pathname === "/tools/index.html") {
     if (APEX_HOSTS.has(host) || WWW_HOSTS.has(host) || (moveLegacy && LEGACY_HOSTS.has(host))) {
-      return NEW_ORIGIN + "/guides/" + url.search;
+      return NEW_ORIGIN + pathname.replace("/index.html", "/") + url.search;
     }
     return null;
   }

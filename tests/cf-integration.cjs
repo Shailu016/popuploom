@@ -71,6 +71,22 @@ const env={JWT_SECRET:require('crypto').randomBytes(32).toString('hex'),RESEND_A
   console.log('PASS public pages are crawl-cacheable, private pages are no-store, guides have one canonical URL');
 }
 
+{
+  console.log('== tools hub has one canonical URL ==');
+  const toolsAlias = await worker.fetch(new Request('https://popuploom.com/tools/index.html'), env, { waitUntil() {} });
+  assert.equal(toolsAlias.status, 308);
+  assert.equal(toolsAlias.headers.get('Location'), 'https://popuploom.com/tools/');
+  const toolsHub = await worker.fetch(new Request('https://popuploom.com/tools/'), env, { waitUntil() {} });
+  assert.equal(toolsHub.status, 200);
+  const toolsHtml = await toolsHub.text();
+  assert.match(toolsHtml, /<link rel="canonical" href="https:\/\/popuploom\.com\/tools\/">/);
+  assert.equal(toolsHub.headers.get('cache-control'), 'public, max-age=0, must-revalidate');
+  const toolsJsonLd = (toolsHtml.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/) || [])[1] || '';
+  const toolsDigest = "'sha256-" + require('crypto').createHash('sha256').update(toolsJsonLd).digest('base64') + "'";
+  assert.ok((toolsHub.headers.get('content-security-policy') || '').includes(toolsDigest), 'tools hub JSON-LD hash is allowed by CSP');
+  console.log('PASS tools hub serves one canonical URL with an allowed CSP hash');
+}
+
 for(const flag of [undefined,'false','true']){
  const enabled=flag==='true';
  for(const path of ['/','/studio.html?tpl=cafeClub','/index.html?ref=1']){

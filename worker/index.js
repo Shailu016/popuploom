@@ -59,7 +59,7 @@ const PUBLIC_FILES = new Set([
   "templates/exit-intent-popup.html", "templates/discount-popup.html", "templates/email-signup-popup.html", "templates/spin-to-win-popup.html",
   "templates/cart-rescue-popup.html", "templates/announcement-bar.html", "templates/back-in-stock-popup.html", "templates/black-friday-popup.html",
   "templates/age-verification-popup.html", "templates/free-shipping-bar.html",
-  "tools/popup-roi-calculator.html", "tools/popup-copy-swipe-file.html", "tools/exit-intent-code-generator.html", "tools/popup-copy-generator.html",
+  "tools/index.html", "tools/popup-roi-calculator.html", "tools/popup-copy-swipe-file.html", "tools/exit-intent-code-generator.html", "tools/popup-copy-generator.html",
   "tools/roi-calculator.js", "tools/copy-swipe.js", "tools/exit-intent-generator.js", "tools/popup-copy-generator.js", "tools/popup-copy-swipe-file.txt"
 ]);
 
@@ -71,6 +71,13 @@ const RETIRED_PAGES = new Map([
   ["/alternatives/popupsmart.html", "/free-popup-builder-no-limits.html"],
   ["/alternatives/optimonk.html", "/free-popup-builder-no-limits.html"],
   ["/alternatives/popup-maker.html", "/free-popup-builder-no-limits.html"]
+]);
+
+// Hub pages are addressed by their directory URL. The underlying index.html is
+// a build detail, not a second address, so it redirects to the slash form.
+const DIRECTORY_HUBS = new Map([
+  ["/guides/index.html", "/guides/"],
+  ["/tools/index.html", "/tools/"]
 ]);
 
 // Machine-readable discovery documents. Served with their required media
@@ -404,12 +411,13 @@ async function serveStatic(request, env, pathname, sec, cors, headOnly) {
       headers: { ...sec, ...cors, Location: retired, "Cache-Control": "public, max-age=3600" }
     });
   }
-  // The guides hub is linked everywhere as /guides/. Keep one canonical URL so
-  // the pretty URL and the underlying index.html never compete in the index.
-  if (file === "/guides/index.html") {
+  // A directory URL is the public address for its hub page. Keep one canonical
+  // form per hub so /guides/index.html and /tools/index.html never compete with
+  // the slash form in the index.
+  if (DIRECTORY_HUBS.has(file)) {
     return new Response(null, {
       status: 301,
-      headers: { ...sec, ...cors, Location: "/guides/", "Cache-Control": "public, max-age=3600" }
+      headers: { ...sec, ...cors, Location: DIRECTORY_HUBS.get(file), "Cache-Control": "public, max-age=3600" }
     });
   }
   // Directory URLs ending in a slash resolve to their allowlisted index page,

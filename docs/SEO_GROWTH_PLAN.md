@@ -413,6 +413,45 @@ bindings are the reliable source for a value that must not depend on the deploy
 shell. A file that a third-party crawler fetches should not depend on a redirect
 either.
 
+### 2.15 Tools hub and the proxy blueprint that was rejected (2026-11-17)
+
+An external blueprint proposed a second Cloudflare Worker on `popuploom.com/tools*`
+reverse-proxying a separate Pages origin, rewriting canonicals with `HTMLRewriter`.
+It was rejected. `/tools/*` is already served by the `popforge` Worker, four tool
+URLs are already indexed in `sitemap.xml`, and a second Worker on that route would
+detach the subtree from `PUBLIC_FILES`, the CSP hash set, `hostPolicy` redirects and
+404 handling. The sample code also proxied every path instead of the declared slug
+list, appended a duplicate canonical on every page (the `head` handler runs before
+the `link[rel=canonical]` handler), forwarded cookies to the origin and cached HTML
+with `cacheEverything`. The real gap it pointed at was smaller: no page existed at
+`/tools/`.
+
+**Shipped:** `tools/index.html`, a 1,489-word hub at `https://popuploom.com/tools/`.
+It carries a decision table (which tool for which question), a section per tool with
+inputs, outputs and a stated limit, an explicit "what these tools will not tell you"
+block, a six-question FAQ, and `BreadcrumbList` + `CollectionPage`/`ItemList` +
+`FAQPage` JSON-LD. Ad-free, as every new page ships until reviewed.
+
+**Also fixed:** the four tool pages had a breadcrumb whose "Tools" link pointed at a
+tool, not a hub — on the copy generator it pointed at the page itself. Visible
+breadcrumbs and structured `BreadcrumbList` now point at `/tools/`.
+
+**Wiring:** `PUBLIC_FILES` in `worker/index.js` and `server/index.js`, the CSP page
+set in `server/security.js`, a `DIRECTORY_HUBS` map in the Worker and an equivalent
+redirect in `server/index.js` (`/tools/index.html` → 308 `/tools/`), `hostPolicy`
+alias entries, `sitemap.xml`, `llms.txt`, `llms-full.txt`, the homepage tools
+section and the guides hub. `scripts/csp-hashes.js` picks the new page up
+automatically; `scripts/build-cf.cjs` already copies the whole `tools/` directory.
+
+**Tests:** regression asserts the hub returns 200 with one canonical, four list
+items, a FAQ block, and that every tool links back to `/tools/` in both the visible
+and structured breadcrumb. Worker integration asserts the 308 alias, the canonical
+and the JSON-LD CSP hash. 57 sitemap URLs, 56/56 regression, 20/20 worker unit,
+140/140 integration.
+
+**Lesson:** a hub is a URL, not a folder. If the directory form 404s while four
+children are live, the children have no parent, and their breadcrumbs are lying.
+
 
 
 

@@ -57,9 +57,10 @@
   "templates/spin-to-win-popup.html": "'sha256-lwAMIdvoQS0u6INZm+ZV9QL3ixgSxkr4Qh2ufhtjmbo='",
   "templates/video.html": "'sha256-amGpUUHdaBtN2FS569O8yq/IZQ2Lh/U/qpvteJDQ8sY='",
   "terms.html": "'sha256-W4lPASAOo83fDPWwoYxX9tuPXGKHffJEOnqDybfbraY='",
-  "tools/exit-intent-code-generator.html": "'sha256-6Wto9Y2PtPM81z8ahttfxS0G/wPPDzpuv3fxwW2+tcM='",
-  "tools/popup-copy-generator.html": "'sha256-So6mNUD81AFHUj9fGNeH9US+OGvqyr2oRy1RgcFBykQ='",
-  "tools/popup-copy-swipe-file.html": "'sha256-ylooB3bHS8316gr3pFIKXsqhhOxhpah+rXIVDtVxKSY='",
-  "tools/popup-roi-calculator.html": "'sha256-AaThxETH2Ly5e1eELnuS/6IQ0DW+GFjYb2nGF+Cl0Yg='",
+  "tools/exit-intent-code-generator.html": "'sha256-LzWZKvBHcxifGZ65wXPAVy5Yz/zZD7uB/qtMZpT9ol8='",
+  "tools/index.html": "'sha256-IdBnC/Kswmhr6jOOq3ZjUkA42gdh7GCWW5AZIpIJ53w='",
+  "tools/popup-copy-generator.html": "'sha256-56MBH3TxlJmDee13sW9O5n8lcapZwGSY+M/57P5ENBM='",
+  "tools/popup-copy-swipe-file.html": "'sha256-G+qBQTHEz3xEzT2CNlBt2i7fPMBxjzeoHOy289TYKks='",
+  "tools/popup-roi-calculator.html": "'sha256-U3uKg9hbSRj+w+229gw8eB9m2xWaRwgOQZgFzDYo8N8='",
   "verify-email.html": ""
 }
