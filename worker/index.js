@@ -395,6 +395,24 @@ async function serveIndex(env, request, sec, cors, headOnly) {
 
 async function serveStatic(request, env, pathname, sec, cors, headOnly) {
   let file = pathname === "/" ? "/index.html" : pathname;
+  // ads.txt is derived from the runtime publisher ID. Generating it only at
+  // build time meant a deploy without the shell variable published a 404,
+  // which AdSense reports as "Not found". Serve it from the binding instead.
+  if (file === "/ads.txt") {
+    const publisher = String(env.ADSENSE_PUBLISHER_ID || "").trim();
+    if (!/^pub-\d{16}$/.test(publisher)) {
+      return new Response("Not found", { status: 404, headers: { ...sec, ...cors } });
+    }
+    const record = "google.com, " + publisher + ", DIRECT, f08c47fec0942fa0\n";
+    return new Response(headOnly ? null : record, {
+      status: 200,
+      headers: {
+        ...sec, ...cors,
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "public, max-age=3600"
+      }
+    });
+  }
   // Retired named-comparison pages keep their equity with a one-hop 301 to the
   // surviving page on the same topic.
   const retired = RETIRED_PAGES.get(file);

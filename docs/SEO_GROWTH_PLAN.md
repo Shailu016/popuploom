@@ -383,6 +383,33 @@ with 200, public cache, one H1, valid JSON-LD hash, no ads and no unsafe CSP
 directives. Deployed `11e20337-44a8-42a2-8357-c925c1f0342d`; IndexNow accepted all
 **56 URLs**. Audit: 56 pages, 0 issues, 56/56 structured data, 1,088 average words.
 
+### 2.14 ads.txt 404 incident (2026-11-17)
+
+AdSense reported **“Earnings at risk — ads.txt issues”** and the Sites table showed
+`popuploom.com` as **Not found**. The live URL was returning 404.
+
+**Cause:** `scripts/build-cf.cjs` wrote `ads.txt` only when
+`ADSENSE_PUBLISHER_ID` existed in the *build shell*. The Worker had the variable as
+a runtime binding (visible in the deploy output), but the last several builds ran
+without it, so the file was never copied into `.cf-build/public`. The Worker's
+`PUBLIC_FILES` set still listed `ads.txt`, so the asset lookup returned 404 instead
+of falling through.
+
+**Fix:** the Worker now derives `ads.txt` from `env.ADSENSE_PUBLISHER_ID` at request
+time, before any asset lookup. It is still fail-closed: no valid `pub-\d{16}` value
+means 404. The build-time generation is left in place as a fallback, which keeps the
+existing build tests valid.
+
+**Verified live:** `https://popuploom.com/ads.txt` returns 200,
+`text/plain; charset=utf-8`, exact body
+`google.com, pub-8947829712444522, DIRECT, f08c47fec0942fa0`, for browser, AdsBot and
+Googlebot user agents. `www` and `http` return 308 to the apex. Integration tests now
+assert the runtime route and the fail-closed case.
+
+**Lesson:** an allowlist entry decides what may be served, not what exists. Runtime
+bindings are the reliable source for a value that must not depend on the deploy
+shell.
+
 
 
 

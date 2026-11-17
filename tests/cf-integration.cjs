@@ -31,6 +31,13 @@ const env={JWT_SECRET:require('crypto').randomBytes(32).toString('hex'),RESEND_A
   }
   const disabled = await worker.fetch(new Request('https://popuploom.com/guides/install-popups.html'), env, { waitUntil() {} });
   assert.ok(!(await disabled.text()).includes('adsbygoogle.js'), 'disabled advertising must load no ad resource');
+  // ads.txt is derived from the runtime binding, not the build directory.
+  const adsTxt = await worker.fetch(new Request('https://popuploom.com/ads.txt'), adEnv, { waitUntil() {} });
+  assert.equal(adsTxt.status, 200, 'ads.txt is served at request time');
+  assert.match(adsTxt.headers.get('content-type'), /^text\/plain/);
+  assert.equal(await adsTxt.text(), 'google.com, pub-8947829712444522, DIRECT, f08c47fec0942fa0\n');
+  const adsTxtDisabled = await worker.fetch(new Request('https://popuploom.com/ads.txt'), { ...env, ADSENSE_PUBLISHER_ID: '' }, { waitUntil() {} });
+  assert.equal(adsTxtDisabled.status, 404, 'no ads.txt without a publisher id');
   console.log('PASS advertising boundary and nonce CSP');
 }
 {
