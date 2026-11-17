@@ -16,8 +16,12 @@ false claims are worse than a missing optional file.
 | `/.well-known/ai-catalog.json` | ARD predecessor path, kept as a compatibility alias | `application/json` |
 | `Link` response header on HTML | RFC 8288 discovery links | header |
 | `Content-Signal` response header | Reuse preferences after access | header |
-| `Content-Signal` in `robots.txt` | Same preference for crawlers that read robots only | text |
-| `Agentmap` in `robots.txt` | Points at the ARD manifest | text |
+
+`Content-Signal` and the ARD manifest used to be repeated inside `robots.txt`. They
+are not any more: both directives are non-standard, sat outside a `User-agent`
+group, and made strict parsers reject the file. The header is the only channel for
+the reuse preference; the manifest is discovered through the `Link` header and the
+well-known paths.
 
 Header value sent on every page:
 
@@ -116,4 +120,5 @@ curl.exe -s https://popuploom.com/robots.txt
 ```
 
 `tests/worker-test.js` asserts the catalog, manifest, OpenAPI document, `Link`
-header, `Content-Signal` header and `robots.txt` directives on every run.
+header and `Content-Signal` header on every run, and that `robots.txt` stays a
+plain file whose first directive is a `User-agent` group.

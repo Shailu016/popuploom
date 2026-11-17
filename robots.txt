@@ -1,12 +1,9 @@
 # Search engines and AI answer/retrieval crawlers are welcome on public pages.
 # App, account, lead and recovery surfaces stay excluded below.
-
-# Content Signals (contentsignals.org): reuse preferences after access.
-# Must match the Content-Signal response header sent by the server.
-Content-Signal: ai-train=yes, search=yes, ai-input=yes
-
-# Agentic Resource Discovery manifest for AI agents.
-Agentmap: https://popuploom.com/.well-known/ard.json
+# AI reuse preferences travel as the Content-Signal response header, and agent
+# discovery lives at /.well-known/ard.json and /.well-known/ai-catalog.json.
+# Keep this file plain: no directives outside a User-agent group, because a
+# strict parser rejects the whole file when it meets one.
 
 User-agent: GPTBot
 User-agent: OAI-SearchBot
