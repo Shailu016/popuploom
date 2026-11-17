@@ -554,6 +554,35 @@ byte-equality and 63 sitemap URLs all check out after the CI deploy.
 "this file in this folder", and test that the build's inputs are visible to git,
 because a green local build cannot see the difference.
 
+### 2.19 The embed checksum depended on the deploy machine (2026-11-17)
+
+Comparing every built file against the live site found one substantive
+difference that was not an ad-injection artefact: `/embed/1.1.0/SHA256SUMS`.
+
+- Live (built by Linux CI): `d4521160…`
+- Built here (Windows): `cb82fc…`
+
+Both files hashed their own local `popuploom.js`, so each was internally
+consistent and the regression test passed either way. The cause was line
+endings: a Windows checkout keeps CRLF, a Linux checkout keeps LF, and the hash
+was computed over whichever bytes were on that machine. A customer who pinned
+the published checksum could see a mismatch after an ordinary deploy — exactly
+what that file is supposed to prevent.
+
+**Fix:** `scripts/build-cf.cjs` normalises every text asset in the bundle to LF
+once, after all copies and before hashing, then hashes the built
+`embed/1.1.0/popuploom.js` rather than the source file. A Windows build now
+produces `d4521160…`, identical to CI. CSP hashes were already line-ending
+tolerant, so no script hash changed and `worker/csp-hashes.json` is untouched.
+
+**Verified:** 70/70 HTML pages byte-identical to the live site once the
+per-request ad script, ad slot, inline `push()` call and nonce attributes are
+removed; 47 text assets matched after CRLF normalisation; the three remaining
+"differences" were the same CRLF artefact in an extension-less `.well-known`
+file, `assets/source/README.md` and the checksum file itself. All three suites
+pass after the change.
+
+
 
 
 

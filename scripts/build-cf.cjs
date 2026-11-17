@@ -48,9 +48,30 @@ const embedVersion='1.1.0',embedDir=path.join(out,'embed',embedVersion);
 fs.mkdirSync(embedDir,{recursive:true});
 fs.copyFileSync('popuploom.js',path.join(embedDir,'popuploom.js'));
 fs.copyFileSync('popuploom.js',path.join(embedDir,'popforge.js'));
-const embedHash=require('crypto').createHash('sha256').update(fs.readFileSync('popuploom.js')).digest('hex');
-fs.writeFileSync(path.join(embedDir,'SHA256SUMS'),embedHash+'  popuploom.js\n'+embedHash+'  popforge.js\n');
 fs.cpSync('assets',path.join(out,'assets'),{recursive:true});
+
+// Line endings must not depend on the machine that built the bundle. A Windows
+// checkout writes CRLF, a Linux CI checkout writes LF, and that difference
+// changed both the served bytes and the published embed checksum: a customer
+// verifying /embed/1.1.0/popuploom.js against SHA256SUMS could see a mismatch
+// after a perfectly ordinary deploy. Normalise every text asset to LF once,
+// after all copies, so both paths produce byte-identical output. CSP hashes are
+// already line-ending tolerant, so script hashes do not change.
+const TEXT_ASSET=/\.(?:html?|css|js|mjs|json|xml|txt|svg|webmanifest|md|csv)$/i;
+(function normaliseLineEndings(dir){
+  for(const entry of fs.readdirSync(dir,{withFileTypes:true})){
+    const full=path.join(dir,entry.name);
+    if(entry.isDirectory()){normaliseLineEndings(full);continue;}
+    if(!TEXT_ASSET.test(entry.name)&&!/[\\/]\.well-known[\\/]/.test(full))continue;
+    const text=fs.readFileSync(full,'utf8');
+    if(text.includes('\r\n'))fs.writeFileSync(full,text.replace(/\r\n/g,'\n'));
+  }
+})(out);
+
+// Hash what is actually served, after normalisation, so the checksum always
+// describes the published bytes.
+const embedHash=require('crypto').createHash('sha256').update(fs.readFileSync(path.join(embedDir,'popuploom.js'))).digest('hex');
+fs.writeFileSync(path.join(embedDir,'SHA256SUMS'),embedHash+'  popuploom.js\n'+embedHash+'  popforge.js\n');
 
 // ---- Advertising readiness (enabled only by a complete reviewed config) ----
 // ads.txt is published only when the owner supplies a real publisher ID.
