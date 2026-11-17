@@ -582,6 +582,45 @@ removed; 47 text assets matched after CRLF normalisation; the three remaining
 file, `assets/source/README.md` and the checksum file itself. All three suites
 pass after the change.
 
+### 2.20 WordPress.org pre-review, round 1 (2026-11-17)
+
+The volunteer pre-review (review ID `AUTOPREREVIEW ❗TRM popuploom/shailu016/17Nov26/T1`)
+raised two items on 1.0.1:
+
+1. **Name.** `PopupLoom - Free Popup Builder Embeds` was flagged: "Free" is a
+   discouraged redundant term, and the AI classified "PopupLoom" as a potential
+   trademark it could not attribute to the submitting account.
+2. **Contributors.** The readme listed `shailu3597`, so no listed contributor
+   matched the owning WordPress.org account `shailu016`.
+
+**Decision:** keep the brand and fix the structure. PopupLoom is this project's
+own product name and domain; renaming to satisfy an automated similarity check
+would break the connection between the plugin and the site it loads its runtime
+from. "Free" is dropped because it adds nothing: the word is already in the
+short description and the body copy, where it is factual.
+
+**Changes in 1.0.2:** display name `PopupLoom Popup Builder Embeds` in both the
+plugin header and the readme title, `Contributors: shailu016`, `Stable tag:
+1.0.2` with a changelog entry, and a rebuilt `popuploom-1.0.2.zip`. The slug
+stays `popuploom`, so the text domain and every `wan_` install path are
+unchanged.
+
+**Verified:** `php -l` clean; a PHP harness with WordPress function stubs
+exercises 20 behaviours (hook registration, ID validation against markup and
+remote URLs, empty/invalid/valid render paths, enqueue arguments, settings
+page); WordPress Playground 7.1.4 activates the extracted zip and passes 11
+checks including a live `wp_remote_get` to `/api/health`; a readme/header
+compliance script confirms the name matches in both places, the version equals
+the stable tag, every text domain is the slug, there are no competitor names and
+no ranking claims.
+
+**Owner action:** upload the zip at the "Add your plugin" page and reply in the
+same email thread, briefly. Do not open a new thread or resubmit again while the
+review is open. If the team asks for proof of brand ownership, the cleanest
+answer is an `@popuploom.com` address on the WordPress.org account rather than a
+rename.
+
+
 
 
 
