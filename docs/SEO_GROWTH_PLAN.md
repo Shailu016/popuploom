@@ -400,15 +400,18 @@ time, before any asset lookup. It is still fail-closed: no valid `pub-\d{16}` va
 means 404. The build-time generation is left in place as a fallback, which keeps the
 existing build tests valid.
 
-**Verified live:** `https://popuploom.com/ads.txt` returns 200,
-`text/plain; charset=utf-8`, exact body
-`google.com, pub-8947829712444522, DIRECT, f08c47fec0942fa0`, for browser, AdsBot and
-Googlebot user agents. `www` and `http` return 308 to the apex. Integration tests now
-assert the runtime route and the fail-closed case.
+**Verified live:** `https://popuploom.com/ads.txt`, `https://www.popuploom.com/ads.txt`
+and `http://popuploom.com/ads.txt` all return 200, `text/plain; charset=utf-8`, with
+the exact body `google.com, pub-8947829712444522, DIRECT, f08c47fec0942fa0`, for
+browser, AdsBot and Googlebot user agents. The route answers before any host or
+scheme redirect, because AdSense may check the host it verified and a redirect is
+one more failure mode. Integration tests assert all three origins and the
+fail-closed case.
 
 **Lesson:** an allowlist entry decides what may be served, not what exists. Runtime
 bindings are the reliable source for a value that must not depend on the deploy
-shell.
+shell. A file that a third-party crawler fetches should not depend on a redirect
+either.
 
 
 
