@@ -474,6 +474,46 @@ the exact record. Lighthouse now reports SEO 100 with no failures.
 **Lesson:** a duplicate channel that trips validators is worse than a single channel
 that does not. Keep the signal on the header, keep the file plain.
 
+### 2.17 Six template guides for the untouched categories (2026-11-17)
+
+The template cluster covered ten designs but skipped six categories that the
+product actually ships: video, feedback, referral, checkout trust, giveaway and
+shipping notices. Each new page is a setup guide rather than a gallery entry, in
+the 1,170–1,340-word range, with `Article` + `FAQPage` + `BreadcrumbList` schema,
+a visible author line and a "template checked" date.
+
+**What each page refuses to claim:** the video page says playback data belongs to
+the video provider and that the player loads only when the panel opens; the
+feedback page says a `choice` value is stored but no sentiment scoring, branching
+or follow-up exists; the referral page says codes are pasted by the owner, not
+generated or validated; the trust page says a popup cannot certify PCI compliance
+or verify a guarantee; the giveaway page says the draw, eligibility and winner
+contact are the owner's; the shipping page says there is no start/end scheduler.
+
+**Internal links:** every category page that owns one of these designs now carries
+a "Read the full guide" card link plus a Related-guides entry, and each guide
+links back to its category, two sibling guides, and the relevant install or
+vertical guide. Depth stays home → `templates.html` → category → guide.
+
+**Generator fix:** `scripts/generate-template-pages.cjs` used to rewrite category
+pages from scratch, which would have deleted the author lines, the long-form
+sections, the H1 overrides and the new guide links on the next run. It now carries
+`TEMPLATE_GUIDES` for all 16 guide pages, keeps the manual `guides` arrays and the
+`SECTIONS` copy, and renders the author line and CollectionPage author. Dry-run
+output was diffed against the live files: the only differences left are
+indentation and the card links added in this wave.
+
+**Verified live:** all six URLs 200, self-canonical, one `h1`, JSON-LD parses,
+hash-based CSP with no nonce and no `script-src` `unsafe-inline`/`unsafe-eval`,
+`public, max-age=0, must-revalidate`, present in `sitemap.xml` (63 URLs, no
+duplicates) and `llms.txt`. All three test suites pass; the no-names guard now
+includes these six pages. IndexNow submitted 63 URLs and returned 200.
+
+**Still owner-side:** Search Console URL Inspection requests for the six new
+guides, `/tools/` and the six platform guides from the previous wave. Sitemap
+discovery should reach 63 pages on the next read.
+
+
 
 
 
