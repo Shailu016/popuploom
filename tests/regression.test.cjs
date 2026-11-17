@@ -113,6 +113,27 @@ test('every template asset reference points at a shipped file',()=>{
  assert.ok(refs.length>=10,'catalog should ship real artwork references');
  for(const file of new Set(refs))assert.ok(fs.existsSync(path.join(root,'assets',file)),'template references a missing asset: '+file);
 });
+test('every build input is visible to git so a CI deploy cannot go missing',()=>{
+ // 2026-11-17: an unanchored `google*.html` ignore rule swallowed
+ // guides/google-tag-manager-popup.html. The page existed on disk and shipped
+ // from the working tree, but a fresh clone had no such file, so build-cf.cjs
+ // threw ENOENT and every GitHub deployment failed while the live site looked
+ // healthy. Ignored build inputs are the silent version of that bug.
+ const src=fs.readFileSync(path.join(root,'scripts','build-cf.cjs'),'utf8');
+ const block=src.match(/for\(const f of \[([\s\S]*?)\]\)\{fs\.mkdirSync/);
+ assert.ok(block,'build-cf.cjs keeps its explicit file list');
+ const listed=[...block[1].matchAll(/'([^']+)'/g)].map(m=>m[1]);
+ assert.ok(listed.length>30,'the build list should not collapse to a few files');
+ const walk=(dir)=>fs.readdirSync(path.join(root,dir),{withFileTypes:true}).flatMap((e)=>e.isDirectory()?walk(path.join(dir,e.name)):[path.join(dir,e.name)]);
+ const files=[...listed,...['templates','tools','assets'].flatMap(walk)];
+ for(const f of files)assert.ok(fs.existsSync(path.join(root,f)),'build input is missing: '+f);
+ let hasGit=true;try{require('child_process').execFileSync('git',['rev-parse','--is-inside-work-tree'],{cwd:root,stdio:'ignore'});}catch(e){hasGit=false;}
+ if(!hasGit)return;
+ // One git process with a stdin list: spawning one per file is too slow on Windows.
+ const probe=require('child_process').spawnSync('git',['check-ignore','--no-index','--stdin'],{cwd:root,input:files.join('\n')+'\n',encoding:'utf8'});
+ const ignored=probe.status===0?probe.stdout.split(/\r?\n/).filter(Boolean):[];
+ assert.deepEqual(ignored,[],'these build inputs are gitignored and would never reach CI: '+ignored.join(', '));
+});
 test('owner verification drop files serve exactly and lookalikes stay hardened 404s',async()=>{
  // Drop files are owner-provided, so a name is only written when absent and
  // removed in finally — a real owner file is asserted to serve but never

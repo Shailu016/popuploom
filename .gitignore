@@ -27,6 +27,8 @@ recovered-*.json
 wordpress-plugin/*.zip
 
 # Owner site-verification drop files are deployed from the working tree
-# (npm run deploy:cf) but are never committed.
-google*.html
-BingSiteAuth.xml
+# (npm run deploy:cf) but are never committed. Anchor these to the repo root:
+# an unanchored `google*.html` also swallowed guides/google-tag-manager-popup.html
+# and silently broke every CI deploy from 2026-11-17 until it was fixed.
+/google*.html
+/BingSiteAuth.xml

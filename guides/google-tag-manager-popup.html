@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Add a Popup With Google Tag Manager | PopupLoom</title>
+<meta name="description" content="Deploy the PopupLoom snippet as a Google Tag Manager Custom HTML tag, with page triggers, consent, CSP and duplicate-load checks.">
+<link rel="canonical" href="https://popuploom.com/guides/google-tag-manager-popup.html">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="PopupLoom">
+<meta property="og:title" content="Add a Popup With Google Tag Manager | PopupLoom">
+<meta property="og:description" content="Deploy the PopupLoom snippet as a Google Tag Manager Custom HTML tag, with triggers, consent and CSP notes.">
+<meta property="og:url" content="https://popuploom.com/guides/google-tag-manager-popup.html">
+<meta property="og:image" content="https://popuploom.com/assets/og-popuploom.png">
+<meta property="og:image:alt" content="PopupLoom: free website popup builder with 45 templates">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Add a Popup With Google Tag Manager | PopupLoom">
+<meta name="twitter:description" content="A Custom HTML tag, the right trigger and the checks that stop it loading twice.">
+<meta name="twitter:image" content="https://popuploom.com/assets/og-popuploom.png">
+<link rel="stylesheet" href="/ui.css"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://popuploom.com/"},{"@type":"ListItem","position":2,"name":"Guides","item":"https://popuploom.com/guides/"},{"@type":"ListItem","position":3,"name":"Google Tag Manager popup","item":"https://popuploom.com/guides/google-tag-manager-popup.html"}]},{"@type":"Article","@id":"https://popuploom.com/guides/google-tag-manager-popup.html#article","headline":"Add a Popup With Google Tag Manager","description":"A Custom HTML tag deployment for the PopupLoom widget, with triggers, consent, CSP and duplicate-load checks.","datePublished":"2026-11-17","dateModified":"2026-11-17","author":{"@type":"Person","name":"Shailu","url":"https://popuploom.com/about.html"},"publisher":{"@id":"https://popuploom.com/#organization"},"mainEntityOfPage":"https://popuploom.com/guides/google-tag-manager-popup.html"},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Which tag type should I use for the popup?","acceptedAnswer":{"@type":"Answer","text":"Custom HTML. Paste the widget div and the script tag exactly as the studio provides them. Do not use the conversion or remarketing templates; they expect a different payload."}},{"@type":"Question","name":"Which trigger should the tag use?","acceptedAnswer":{"@type":"Answer","text":"All Pages is the simplest. If the popup should only appear on some routes, use Page Path conditions instead, and add the same restriction in the popup's URL rule so the two do not disagree."}},{"@type":"Question","name":"Why is the tag not firing after I publish?","acceptedAnswer":{"@type":"Answer","text":"Check Preview mode first. Common causes are a trigger that does not match the route, a consent setting that blocks the tag until a choice is made, an ad blocker in the test browser, or a second hardcoded snippet loading the same widget."}},{"@type":"Question","name":"Can I hardcode the snippet and use Tag Manager too?","acceptedAnswer":{"@type":"Answer","text":"No. Two copies load the widget twice and can initialise it twice. Pick one deployment method for a given site."}}]}]}</script>
+<style>
+.pl-meta{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-size:13px;color:var(--muted-2);margin:14px 0 22px}
+.pl-note{padding:18px 20px;margin:22px 0;border-left:3px solid rgba(255,106,31,.7);background:rgba(255,106,31,.05);border-radius:0 12px 12px 0}
+.pl-note p:last-child{margin-bottom:0}
+.pl-code{padding:16px;border:1px solid var(--line);border-radius:12px;background:#0b0d12;overflow:auto;font-size:13px;line-height:1.65}
+.pl-code code{font-family:var(--font-mono);color:#dbe3f4}
+.pl-table{width:100%;border-collapse:collapse;font-size:14px}
+.pl-table th,.pl-table td{padding:10px;border-bottom:1px solid rgba(255,255,255,.1);vertical-align:top;text-align:left}
+.pl-table th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-2)}
+.pl-wrap{overflow-x:auto}
+.pl-small{font-size:12.5px;color:var(--muted-2)}
+</style>
+</head>
+<body>
+<header class="wrap" style="padding:24px 26px">
+  <nav aria-label="Main"><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/">Guides</a> · <a href="/free-popup-builder-no-limits.html">No pageview limits</a> · <a href="/about.html">About</a></nav>
+  <nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/guides/">Guides</a> › <span>Google Tag Manager</span></nav>
+</header>
+<main class="wrap" style="padding:30px 26px 80px;max-width:900px">
+  <article>
+    <h1>Add a popup with Google Tag Manager</h1>
+    <div class="pl-meta">
+      <span>By <a href="/about.html">Shailu</a>, founder of PopupLoom</span>
+      <span>Published 17 November 2026</span>
+      <span>Last updated 17 November 2026</span>
+      <span>Checked against the Tag Manager docs on 17 November 2026</span>
+    </div>
+
+    <p class="mut">Tag Manager is a good fit when you cannot edit the site's templates or want to control the popup without a deploy. It is a worse fit when the site already hardcodes the snippet: two copies initialise the widget twice. This guide assumes the GTM container is already installed on the site and was checked against the Tag Manager documentation, not tested on a live container.</p>
+
+    <h2>Create the tag</h2>
+    <ol>
+      <li>In Tag Manager, open <strong>Tags</strong> and choose <strong>New</strong>.</li>
+      <li>For tag type, choose <strong>Custom HTML</strong>.</li>
+      <li>Paste both lines from the studio's publish panel:</li>
+    </ol>
+    <pre class="pl-code"><code>&lt;div data-popuploom="YOUR_WIDGET_ID"&gt;&lt;/div&gt;
+&lt;script src="https://popuploom.com/embed/1.1.0/popuploom.js"&gt;&lt;/script&gt;</code></pre>
+    <p>Keep the div and the script together in the same tag. Splitting them across two tags makes the order unpredictable.</p>
+
+    <h2>Choose the trigger</h2>
+    <div class="pl-wrap">
+      <table class="pl-table card">
+        <thead><tr><th>Goal</th><th>Trigger</th><th>Note</th></tr></thead>
+        <tbody>
+          <tr><td>Popup everywhere</td><td>All Pages</td><td>Simplest. Let the popup's own URL rule narrow it if needed.</td></tr>
+          <tr><td>One section</td><td>Page Path contains <code>/blog/</code></td><td>Match the same path in the popup's URL rule so the two agree.</td></tr>
+          <tr><td>One page</td><td>Page Path equals the route</td><td>Exact matching avoids firing on query-string variants.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The trigger decides where the widget is <em>available</em>; the popup's own targeting decides when it appears. Two layers can disagree, and the symptom is a popup that never shows on a page you expected. Set both deliberately.</p>
+
+    <h2>Consent and privacy</h2>
+    <p>If the site runs a consent banner or Consent Mode, a Custom HTML tag can be held until a choice is made. Check that the tag is permitted after consent and that the popup's own storage (frequency rules) is described in your privacy notice. Tag Manager does not make a third-party widget compliant by itself.</p>
+
+    <div class="pl-note">
+      <p><strong>Blocked by an ad blocker.</strong> Custom HTML tags under a GTM container can be blocked when a visitor blocks Tag Manager. That is a reason some sites hardcode the snippet instead. Decide which failure mode you prefer: no popup for blockers, or a deploy needed for every change.</p>
+    </div>
+
+    <h2>Test before publishing</h2>
+    <ol>
+      <li>Use <strong>Preview</strong> and connect to the site.</li>
+      <li>Confirm the tag fired on the intended route, not on checkout or account pages.</li>
+      <li>In the browser console, check for the script request and for widget errors.</li>
+      <li>Submit a test response and confirm it reaches the lead inbox.</li>
+      <li>Publish a container version. Preview mode alone does not change the live site.</li>
+    </ol>
+
+    <h2>CSP and checkout</h2>
+    <p>If the site sends a Content Security Policy, add <code>https://popuploom.com</code> to <code>script-src</code> and <code>connect-src</code>, and keep the Tag Manager domains allowed. Checkout flows that run on a separate domain or a stripped template may not include the GTM container at all; test the real checkout, not the cart page.</p>
+
+    <h2>Removal</h2>
+    <p>Pause or delete the tag and publish a new container version. The saved popup remains in the studio.</p>
+
+    <h2>Common questions</h2>
+    <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Which tag type should I use for the popup?</strong></summary><p style="margin:10px 0 0">Custom HTML. Paste the widget div and the script tag exactly as the studio provides them. Do not use the conversion or remarketing templates; they expect a different payload.</p></details>
+    <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Which trigger should the tag use?</strong></summary><p style="margin:10px 0 0">All Pages is the simplest. If the popup should only appear on some routes, use Page Path conditions instead, and add the same restriction in the popup's URL rule so the two do not disagree.</p></details>
+    <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Why is the tag not firing after I publish?</strong></summary><p style="margin:10px 0 0">Check Preview mode first. Common causes are a trigger that does not match the route, a consent setting that blocks the tag until a choice is made, an ad blocker in the test browser, or a second hardcoded snippet loading the same widget.</p></details>
+    <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Can I hardcode the snippet and use Tag Manager too?</strong></summary><p style="margin:10px 0 0">No. Two copies load the widget twice and can initialise it twice. Pick one deployment method for a given site.</p></details>
+
+    <h2>Official references</h2>
+    <ul class="pl-small">
+      <li><a href="https://developers.google.com/tag-platform/tag-manager/web" target="_blank" rel="noopener">Google Tag Manager: web developer guide</a> — container installation, tags and triggers.</li>
+      <li><a href="https://developers.google.com/tag-platform/security/guides/csp" target="_blank" rel="noopener">Google: CSP for tag platforms</a> — the domains a Tag Manager deployment needs.</li>
+    </ul>
+
+    <p class="pl-small">Written by <a href="/about.html">Shailu</a>, founder of PopupLoom. Checked against the Tag Manager documentation on 17 November 2026; not tested on a live container. No ranking, traffic or conversion claim is made. Related: <a href="/guides/install-popups.html">the general install guide</a>, <a href="/guides/static-html-popup.html">static HTML</a> and <a href="/guides/bigcommerce-popup.html">BigCommerce</a>.</p>
+  </article>
+</main>
+<footer class="wrap" style="padding:24px 0;font-size:13px">
+  <div><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/">Guides</a> · <a href="/free-popup-builder-no-limits.html">No pageview limits</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></div>
+</footer>
+</body>
+</html>
