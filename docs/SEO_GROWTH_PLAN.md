@@ -513,6 +513,48 @@ includes these six pages. IndexNow submitted 63 URLs and returned 200.
 guides, `/tools/` and the six platform guides from the previous wave. Sitemap
 discovery should reach 63 pages on the next read.
 
+### 2.18 An ignore rule that broke every deploy (2026-11-17)
+
+GitHub showed a wall of red `production` deployments. They were records from the
+"Test and deploy to Cloudflare" workflow, not Cloudflare deploys, and every run
+since `af32ec5` died in about 17 seconds at *Check Worker build and API
+integration* with:
+
+```
+[custom build] Error: ENOENT: no such file or directory, copyfile
+'guides/google-tag-manager-popup.html' -> '.cf-build/public/guides/...'
+```
+
+**Cause:** `.gitignore` carried an unanchored `google*.html` entry, meant for
+Search Console verification drop files at the repo root. Git matches an
+unanchored pattern at every depth, so it also swallowed
+`guides/google-tag-manager-popup.html`. The page existed on disk and shipped from
+the working tree, so the live site looked perfect, but a fresh clone had no such
+file. `scripts/build-cf.cjs` hardcodes that path, so the build threw before any
+test step could run.
+
+**Blast radius:** the guide was live only because the deploy ran from this
+machine. Any deploy from CI, from a fresh clone or from another machine would
+have shipped a Worker whose allowlist advertises a page with no file behind it —
+a 404 on a URL that the sitemap and five internal links point at.
+
+**Fix:** anchor the drop-file patterns to the repo root (`/google*.html`,
+`/BingSiteAuth.xml`), commit the missing guide, and add a regression test that
+reads the build list plus `templates/`, `tools/` and `assets/` and fails if any
+build input is gitignored. The first version of that test spawned one `git
+check-ignore` per file and slowed the suite enough to cause an unrelated
+ECONNRESET flake; it now pipes the whole list into one process.
+
+**Verified:** a shallow clone of `HEAD` runs `node scripts/build-cf.cjs` with no
+error and produces 166 files; CI run `44030138485` is the first green deploy
+since `af32ec5` at 1m27s; live health, `ads.txt`, the ad slot, the legacy runtime
+byte-equality and 63 sitemap URLs all check out after the CI deploy.
+
+**Lesson:** an ignore pattern is a deployment input. Anchor every glob that means
+"this file in this folder", and test that the build's inputs are visible to git,
+because a green local build cannot see the difference.
+
+
 
 
 
