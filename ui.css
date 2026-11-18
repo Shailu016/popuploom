@@ -1140,3 +1140,11 @@ ins.adsbygoogle[data-ad-status="unfilled"] { display: none !important; }
 
 .doc-hero div.doc-byline { display: flex; flex-wrap: wrap; gap: 4px 18px; align-items: center; margin: 0 0 24px; font-size: 13.5px; color: var(--muted); }
 .doc-hero div.doc-byline a { color: var(--text-2); }
+
+/* template category pages: hero on top, wide card grid, readable text measure */
+.doc-cat-body { max-width: 1180px; padding-top: 44px; padding-bottom: 64px; }
+.doc-cat-body > p, .doc-cat-body > ul, .doc-cat-body > ol, .doc-cat-body > details, .doc-cat-body > h2 { max-width: 760px; }
+.doc-cat-body > h2 { margin-top: 2em; }
+.doc-cat-body .tg-grid { max-width: none; }
+.doc-cat-body .tg-jump { max-width: none; }
+.doc-cat-body a:not(.btn):not(.doc-card):not(.tg-chip) { color: var(--acc-hi); text-underline-offset: 3px; }

@@ -590,6 +590,14 @@ function renderPage(categoryKey, templates) {
   const items = templates.filter((t) => t.category === categoryKey);
   const list = `<div class="tg-grid">\n${items.map((t, index) => cardHTML(t, { heading: "h3", lazy: index > 1 })).join("\n")}\n</div>`;
   const lead = items[0];
+  // Three other categories (rotating, so each page links to different ones) as image cards.
+  const at = ORDER.indexOf(categoryKey);
+  const otherTypes = [1, 2, 3].map((k) => ORDER[(at + k) % ORDER.length]).map((key) => {
+    const oc = CATEGORIES[key];
+    const first = templates.find((t) => t.category === key);
+    const count = templates.filter((t) => t.category === key).length;
+    return `<a class="doc-card" href="/templates/${oc.slug}.html"><span class="doc-card-img">${media.pictureHTML(first, { sizes: "(max-width: 700px) 100vw, 300px" }).replace('class="tpl-shot-img"', 'class="doc-card-pic"')}</span><span class="doc-card-name">${esc(oc.label)} popup templates</span><span class="doc-card-tag">${count} template${count === 1 ? "" : "s"}</span><span class="doc-card-go">See the templates →</span></a>`;
+  }).join("");
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -657,13 +665,16 @@ function renderPage(categoryKey, templates) {
 <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
 </head>
 <body>
-<header class="wrap" style="padding:24px 26px">
-  <nav aria-label="Main"><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/">Guides</a> · <a href="/about.html">About</a> · <a href="/studio.html?tpl=blank">Open the studio</a></nav>
+<main id="main" class="doc doc-cat">
+<div class="doc-hero"><div class="wrap doc-hero-in"><div class="doc-hero-copy">
   <nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/templates.html">Templates</a> › <span>${esc(c.label)}</span></nav>
-</header>
-<main class="wrap" style="padding:30px 26px 80px;max-width:900px">
+  <div class="kicker">${items.length} template${items.length === 1 ? "" : "s"} in this set</div>
   <h1>${esc(c.h1)}</h1>
-  <p class="mut" style="font-size:13px;margin:6px 0 18px">By <a href="/about.html">Shailu</a>, founder of PopupLoom · Last updated ${LAST_UPDATED}</p>
+  <p class="mut doc-byline">By <a href="/about.html">Shailu</a>, founder of PopupLoom · Last updated ${LAST_UPDATED}</p>
+  <nav class="doc-actions" aria-label="Next steps"><a class="btn primary" href="/studio.html?tpl=${lead.id}">Open ${esc(lead.name)} in the studio</a><a class="btn ghost" href="/templates.html">Browse all ${TEMPLATE_COUNT} templates</a></nav>
+  <p class="doc-trust">Free to use · no credit card · no pageview cap</p>
+</div><aside class="doc-hero-vis"><figure class="doc-shot">${media.pictureHTML(lead, { lazy: false, sizes: "(max-width: 1000px) 100vw, 520px" }).replace('class="tpl-shot-img"', 'class="doc-shot-img"')}<figcaption>Preview: ${esc(lead.name)}</figcaption></figure></aside></div></div>
+<div class="wrap doc-cat-body">
   <p class="mut">Free to edit and install. No pageview cap, no trial and no credit card.</p>
   ${c.intro.map((p) => `<p>${esc(p)}</p>`).join("\n  ")}
   ${navHTML()}
@@ -702,11 +713,14 @@ ${guides}
 ${faq}
 
   <p style="margin-top:26px"><a class="btn primary" href="/studio.html?tpl=blank">Start from a blank popup</a> <a class="btn ghost" href="/templates.html">Browse all ${TEMPLATE_COUNT} templates</a></p>
+
+  <aside class="doc-after" aria-label="More template types">
+    <p class="doc-after-h">More popup template types</p>
+    <p class="doc-after-sub">Each type has its own guide, setup notes and designs.</p>
+    <div class="doc-card-row">${otherTypes}</div>
+  </aside>
+</div>
 </main>
-<footer class="wrap" style="padding:24px 0;font-size:13px">
-  <div><a href="/">PopupLoom — free website popup builder</a> · <a href="/templates.html">Templates</a> · <a href="/guides/">Guides</a> · <a href="/free-popup-builder-no-limits.html">No pageview limits</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></div>
-  <div style="margin-top:8px"><a href="/guides/wordpress-popup.html">WordPress</a> · <a href="/guides/shopify-popup.html">Shopify</a> · <a href="/guides/webflow-popup.html">Webflow</a> · <a href="/guides/squarespace-wix-popup.html">Squarespace and Wix</a> · <a href="/free-popup-builder-no-limits.html">No pageview limits</a></div>
-</footer>
 </body>
 </html>
 `;
