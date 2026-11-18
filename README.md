@@ -33,7 +33,7 @@ Canonical site: **https://popuploom.com/**
 cd popuploom
 npm install
 npm start
-# → http://localhost:3000   (API: /api, DB: popforge.db)
+# → http://localhost:3000   (API: /api, DB: popuploom.db)
 ```
 
 Requires Node 22.13+ (built and tested on Node 24). The server uses `node:sqlite`, `process.loadEnvFile`, and `fetch`. The database file is created automatically on first boot. Copy `.env.example` to `.env` first if you want Google sign-in or a production secret.
@@ -41,7 +41,7 @@ Requires Node 22.13+ (built and tested on Node 24). The server uses `node:sqlite
 | Env var | Default | Purpose |
 |---|---|---|
 | `PORT` | `3000` | HTTP port |
-| `DB_PATH` | `<project>/popforge.db` | SQLite file location |
+| `DB_PATH` | `<project>/popuploom.db` | SQLite file location |
 | `JWT_SECRET` | random per-process development secret | Required in production; use a unique random secret of at least 32 characters. Signs 30-day login tokens |
 | `GOOGLE_CLIENT_ID` | empty | Enables Sign in with Google. Empty = the Google button is hidden and `/api/auth/google` answers 503 |
 | `RESEND_API_KEY` | empty | Resend API key used to send password reset and signup verification links. Empty = those emails stay disabled with a clear 503 setup message |
@@ -205,7 +205,7 @@ Platform notes:
 
 See [SECURITY.md](SECURITY.md) for the security review, deployment settings and public-config trust boundaries. New passwords require at least 12 characters. Set APP_ORIGINS for additional trusted frontend origins; private APIs otherwise accept only the app origin.
 
-Run `npm test` for isolated API, auth, password-reset and browser regression checks. Browser checks use Chrome/Edge when available; the `POPFORGE_BROWSER` environment variable still overrides the executable path for compatibility. Existing project data is never used by the tests. Password-reset tests replace the Resend sender with a local stub, so they never call the provider or need an API key.
+Run `npm test` for isolated API, auth, password-reset and browser regression checks. Browser checks use Chrome/Edge when available; the `POPUPLOOM_BROWSER` environment variable still overrides the executable path for compatibility. Existing project data is never used by the tests. Password-reset tests replace the Resend sender with a local stub, so they never call the provider or need an API key.
 
 Reverse proxy deployments must set `TRUST_PROXY` to the trusted proxy IPs/subnets; forwarded headers are ignored by default.
 

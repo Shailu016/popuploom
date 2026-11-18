@@ -32,7 +32,7 @@
 - A saved widget gives a two-line snippet: a widget definition element with the data-popuploom attribute carrying the widget ID, and a script tag loading the immutable release https://popuploom.com/embed/1.2.0/popuploom.js. Both lines are pasted before the closing body tag. The unversioned /popuploom.js path remains as a compatibility alias.
 - The destination website must allow custom HTML and JavaScript. Widgets cannot escape an iframe they are embedded in.
 - Sites with a Content-Security-Policy must allowlist the runtime origin in their script-src.
-- Legacy embeds installed before the domain move keep working unchanged: the data-popforge attribute and the /popforge.js path on the workers.dev host serve the same runtime bytes.
+- Legacy embeds installed before the domain move keep working unchanged: the older attribute and script path serve the same runtime bytes.
 - The runtime is CORS-open for its public view and submission reporting only; no visitor cookies or credentials are used.
 
 ## Scope boundaries
@@ -55,7 +55,7 @@
 - Signing up uses an email address and a password of at least 12 characters; Google sign-in becomes available when the site owner configures it. A verified Google email links to the same single account for that address.
 - Sessions use a 30-day bearer token that the server can revoke at sign-out.
 - Guest designs live in the browser's local storage and are never uploaded.
-- Guest drafts made on the previous PopForge domain move with a noindexed recovery tool on that host: it lists drafts found in the same browser and downloads them as a JSON backup (up to 200 drafts); the backup is then imported from My popups on PopupLoom. The tool uploads nothing and never deletes or modifies drafts. Account-owned popups already live in the database and are unaffected.
+- Guest drafts made on the previous domain move with a noindexed recovery tool on that host: it lists drafts found in the same browser and downloads them as a JSON backup (up to 200 drafts); the backup is then imported from My popups on PopupLoom. The tool uploads nothing and never deletes or modifies drafts. Account-owned popups already live in the database and are unaffected.
 
 ## Limits and abuse controls
 - All public endpoints apply per-visitor IP rate limits; oversized, deeply nested or prototype-manipulating JSON is rejected before storage.

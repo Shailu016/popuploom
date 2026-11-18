@@ -40,7 +40,6 @@ Inconsistent facts are the most common reason directories and AI systems fail to
 | Field | Value |
 | --- | --- |
 | Name | PopupLoom |
-| Previous name | PopForge (legacy embed domain only; not the current product name) |
 | Website | https://popuploom.com/ |
 | Category | Website popup builder / lead-capture widget |
 | Tagline | Free website popup builder with 53 templates |
@@ -94,7 +93,7 @@ Do not list PopupLoom under “AI tools” or “email marketing.” It is neith
 ## 3. Brand and claim rules
 
 - Write **PopupLoom** — one word, capital P and L.
-- Never write “Popup Loom”, “PopUpLoom”, “Popuploom” or “PopForge” as the current name.
+- Never write “Popup Loom”, “PopUpLoom” or “Popuploom” as the current name.
 - Use “free website popup builder”. Do not call it a CRM, email platform, SMS platform, checkout tool or analytics suite.
 - Do not claim awards, user counts, G2/Capterra ratings, “#1”, “best” or revenue lift unless a specific verified figure is supplied.
 - Do not claim native mobile app support, cart recovery emails, coupon generation or A/B testing.

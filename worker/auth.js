@@ -77,7 +77,7 @@ async function sha256Hex(text) {
 // Every Worker environment requires a stable configured signing secret.
 function secretKey(env) {
   const configured = String(env.JWT_SECRET || "").trim();
-  if (configured.length < 32 || ["popforge-dev-secret-change-in-prod", "change-me-to-a-long-random-string"].includes(configured)) throw new ApiError(500, "Configure a unique JWT_SECRET of at least 32 characters");
+  if (configured.length < 32 || /dev-secret|change-me|change-in-prod/i.test(configured)) throw new ApiError(500, "Configure a unique JWT_SECRET of at least 32 characters");
   return new TextEncoder().encode(configured);
 }
 

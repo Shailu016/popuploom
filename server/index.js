@@ -9,7 +9,7 @@ try {
   const envPath = path.join(__dirname, "..", ".env");
   if (fs.existsSync(envPath) && typeof process.loadEnvFile === "function") process.loadEnvFile(envPath);
 } catch (e) {
-  console.warn("[popforge] could not read .env:", e.message);
+  console.warn("[popuploom] could not read .env:", e.message);
 }
 
 const express = require("express");
@@ -401,7 +401,7 @@ if (require.main === module) app.listen(PORT, () => {
   console.log("  ⚡ PopupLoom server running");
   console.log("  → http://localhost:" + PORT);
   console.log("  → API: http://localhost:" + PORT + "/api");
-  console.log("  → DB:  " + (process.env.DB_PATH || path.join(__dirname, "..", "popforge.db")));
+  console.log("  → DB:  " + (process.env.DB_PATH || path.join(__dirname, "..", "popuploom.db")));
   console.log("  → Google sign-in: " + (isConfigured() ? "enabled" : "not configured (set GOOGLE_CLIENT_ID in .env)"));
   console.log("");
 });

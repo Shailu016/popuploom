@@ -45,9 +45,9 @@ jobs:
         run: npm run test:cf
       - name: Check application and browser regressions
         env:
-          POPFORGE_BROWSER: /usr/bin/google-chrome
+          POPUPLOOM_BROWSER: /usr/bin/google-chrome
         run: |
-          test -x "$POPFORGE_BROWSER"
+          test -x "$POPUPLOOM_BROWSER"
           npm test
       - name: Deploy production
         env:

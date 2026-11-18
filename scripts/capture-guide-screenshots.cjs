@@ -2,9 +2,9 @@ const fs = require("fs");
 const path = require("path");
 const puppeteer = require("puppeteer-core");
 
-const root = "C:\\Users\\ahmad\\popforge";
+const root = path.resolve(__dirname, "..");
 const out = path.join(root, "assets", "guides");
-const browserPath = process.env.POPFORGE_BROWSER || [
+const browserPath = process.env.POPUPLOOM_BROWSER || [
   "C:/Program Files/Google/Chrome/Application/chrome.exe",
   "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
 ].find((candidate) => fs.existsSync(candidate));

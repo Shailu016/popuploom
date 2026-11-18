@@ -17,12 +17,12 @@ const root = path.resolve(__dirname, "..");
 const out = path.join(root, "assets", "guides");
 fs.mkdirSync(out, { recursive: true });
 
-const browserPath = process.env.POPFORGE_BROWSER || [
+const browserPath = process.env.POPUPLOOM_BROWSER || [
   "C:/Program Files/Google/Chrome/Application/chrome.exe",
   "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",
   "/usr/bin/google-chrome", "/usr/bin/chromium", "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 ].find((p) => fs.existsSync(p));
-if (!browserPath) throw new Error("No Chrome or Edge binary found; set POPFORGE_BROWSER");
+if (!browserPath) throw new Error("No Chrome or Edge binary found; set POPUPLOOM_BROWSER");
 
 const A = (n) => "/assets/art/" + n + ".jpg";
 const CSS = `

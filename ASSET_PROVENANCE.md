@@ -8,7 +8,7 @@ This register covers every file shipped from `assets/` by `scripts/build-cf.cjs`
 
 Git history and the repository were checked before replacement:
 
-- The 12 original template JPEGs were added in commit `ea80efd` (“Initial PopForge application with security fixes and regression tests”). The repository contained no license, purchase record, creator note, EXIF source/copyright field or generation record for them.
+- The 12 original template JPEGs were added in the initial application commit `ea80efd`. The repository contained no license, purchase record, creator note, EXIF source/copyright field or generation record for them.
 - The original branding PNG/SVG files were added in commit `f7eb9ee` (“Rebrand as PopupLoom with dual runtime and host migration policy”). The commit messages describe the rebrand, but no explicit license/source record for the image files was present.
 - `assets/age-gate-ambient.svg` was added in commit `5feaa3b` with an explicit commit message describing it as an “authored, license-clean ambient SVG”. That SVG is retained and documented as project-authored.
 - No stock-photo credits, paid-license receipts or external asset manifests were found.

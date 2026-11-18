@@ -269,7 +269,7 @@ test("untrusted browser origins still cannot submit reset requests", async () =>
   assert.equal(response.data.error, "Origin is not allowed");
 });
 
-const browserPath = process.env.POPFORGE_BROWSER || [
+const browserPath = process.env.POPUPLOOM_BROWSER || [
   "C:/Program Files/Google/Chrome/Application/chrome.exe",
   "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
 ].find((candidate) => fs.existsSync(candidate));

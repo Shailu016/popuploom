@@ -3,7 +3,7 @@ const { DatabaseSync } = require("node:sqlite");
 const path = require("path");
 const fs = require("fs");
 
-const DB_PATH = process.env.DB_PATH || path.join(__dirname, "..", "popforge.db");
+const DB_PATH = process.env.DB_PATH || path.join(__dirname, "..", "popuploom.db");
 
 // ensure parent dir exists
 fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });

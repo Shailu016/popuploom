@@ -195,7 +195,7 @@ test('owner CRUD, validation, live config and lead isolation',async()=>{
  assert.equal((await api('/api/widgets/'+widget.id+'/submissions',{token:account.token})).data.length,1);
  assert.equal((await api('/api/does-not-exist')).status,404);
  const bad=await fetch(base+'/api/widgets',{method:'POST',headers:{'Content-Type':'application/json'},body:'{' });assert.equal(bad.status,400);assert.equal(typeof (await bad.json()).error,'string');
- const forged=require('jsonwebtoken').sign({userId:account.user.id},'popforge-dev-secret-change-in-prod');
+ const forged=require('jsonwebtoken').sign({userId:account.user.id},'dev-secret-change-in-prod');
  assert.equal((await api('/api/widgets',{token:forged})).status,401);
 });
 test('verified Google linking revokes unverified passwords and previous sessions',async()=>{
@@ -276,7 +276,7 @@ test('production rejects missing or placeholder signing secrets',()=>{
  const src=fs.readFileSync(path.join(root,'server/auth.js'),'utf8');
  function load(env){const box={module:{exports:{}},process:{env},require:n=>n==='./db'?{}:require(n)};vm.runInNewContext(src+'\nglobalThis.secret=JWT_SECRET;',box);return box;}
  assert.throws(()=>load({NODE_ENV:'production'}),/required/);
- for(const secret of ['short','popforge-dev-secret-change-in-prod','change-me-to-a-long-random-string'])assert.throws(()=>load({JWT_SECRET:secret}),/unique random/);
+ for(const secret of ['short','dev-secret-change-in-prod-0123456789','change-me-to-a-long-random-string'])assert.throws(()=>load({JWT_SECRET:secret}),/unique random/);
  assert.notEqual(load({}).secret,load({}).secret);
  load({NODE_ENV:'production',JWT_SECRET:crypto.randomBytes(32).toString('hex')});
 });
@@ -848,7 +848,7 @@ test('advertising allowlist covers public content and excludes private surfaces'
  assert.ok(!/adsbygoogle|googlesyndication|doubleclick|fundingchoicesmessages/i.test(runtime),'customer runtime has no ad code');
  const adsTxt=await api('/ads.txt');assert.equal(adsTxt.status,404,'ads.txt is absent until a real publisher id is configured');
 });
-const browserPath=process.env.POPFORGE_BROWSER||['C:/Program Files/Google/Chrome/Application/chrome.exe','C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'].find(p=>fs.existsSync(p));
+const browserPath=process.env.POPUPLOOM_BROWSER||['C:/Program Files/Google/Chrome/Application/chrome.exe','C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'].find(p=>fs.existsSync(p));
 test('browser: all templates, save failures, installation, test mode, delete and hostile imports',{skip:!browserPath,timeout:120000},async()=>{
  const puppeteer=require('puppeteer-core');const browser=await puppeteer.launch({executablePath:browserPath,headless:true,args:['--no-sandbox'],userDataDir:path.join(temp,'browser')});
  try{
