@@ -619,7 +619,7 @@ test('identity, metadata and crawler files agree on the apex origin',async()=>{
  assert.ok(llms.includes('/tools/popup-roi-calculator.html')&&llms.includes('/tools/popup-copy-swipe-file.html'),'llms links the tools');
  assert.ok(llms.includes('[Free popup tools](https://popuploom.com/tools/)'),'llms links the tools hub');
  const llmsFull=(await api('/llms-full.txt')).data;
- assert.ok(llmsFull.startsWith('# PopupLoom')&&llmsFull.includes('45 templates')&&llmsFull.includes('data-popuploom')&&!llmsFull.includes('<!doctype'));
+ assert.ok(llmsFull.startsWith('# PopupLoom')&&llmsFull.includes('53 templates')&&llmsFull.includes('data-popuploom')&&!llmsFull.includes('<!doctype'));
  assert.ok(llmsFull.includes('/tools/popup-roi-calculator.html')&&llmsFull.includes('/tools/popup-copy-swipe-file.txt'),'llms-full links the tools and the download');
  assert.ok(llmsFull.includes('https://popuploom.com/tools/'),'llms-full links the tools hub');
  for(const url of ['/tools/popup-roi-calculator.html','/tools/popup-copy-swipe-file.html']){

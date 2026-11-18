@@ -77,6 +77,16 @@ const motifs = {
     <rect x="0" y="455" width="${W}" height="${H - 455}" fill="url(#ground)"/>
     <line x1="0" y1="455" x2="${W}" y2="455" stroke="${c.line}" stroke-opacity=".4" stroke-width="1.2"/>
     ${[0, 1, 2, 3].map((i) => `<line x1="0" y1="${490 + i * i * 22}" x2="${W}" y2="${490 + i * i * 22}" stroke="${c.line}" stroke-opacity="${(0.16 - i * 0.03).toFixed(2)}" stroke-width="1"/>`).join("")}`,
+  /* Layered flowing ribbons: calm, premium, works for campaigns and guides. */
+  waves: (c) => {
+    let out = "";
+    for (let i = 0; i < 6; i++) {
+      const y = 330 + i * 62, a = 26 + (i % 2) * 18, k = 0.5 + i * 0.07;
+      out += `<path d="M-20 ${y} C 220 ${y - a * 4}, 420 ${y + a * 3}, 640 ${y - a * k} S 1000 ${y + a * 3}, 1240 ${y - a}" fill="none" stroke="${c.line}" stroke-opacity="${(0.5 - i * 0.07).toFixed(2)}" stroke-width="${i === 1 ? 2.2 : 1.2}"/>`;
+      out += `<path d="M-20 ${y} C 220 ${y - a * 4}, 420 ${y + a * 3}, 640 ${y - a * k} S 1000 ${y + a * 3}, 1240 ${y - a} V 800 H -20 Z" fill="${c.glow}" opacity="${(0.1 - i * 0.012).toFixed(3)}"/>`;
+    }
+    return out;
+  },
   /* A receding perspective grid: digital events. */
   grid: (c) => {
     let out = "";
@@ -146,6 +156,24 @@ const art = {
   "gold-orb": ["Gold orb", "A lit gold sphere on midnight navy.",
     { motif: "orb", dark: true, bg: ["#0A0F1C", "#121A2E"], line: "#FFD58A", glow: "#F59E0B", orb: ["#FFE7B0", "#D98A0B", "#2A1A06"],
       blobs: [[780, 380, 380, 300, "#8A5A08", 0.5], [1080, 110, 220, 180, "#F59E0B", 0.22]] }],
+  "rose-waves": ["Rose waves", "Layered rose ribbons on soft blush.",
+    { motif: "waves", bg: ["#FFF6F6", "#F8DCE0"], line: "#B33A55", glow: "#E58AA0",
+      blobs: [[860, 300, 360, 260, "#F6B8C6", 0.85], [220, 160, 300, 200, "#FFEAEA", 0.9], [1050, 620, 240, 180, "#F3C9D2", 0.7]] }],
+  "dusk-orb": ["Dusk orb", "A lit amber moon on deep aubergine.",
+    { motif: "orb", dark: true, bg: ["#0E0A14", "#1E1030"], line: "#FFC58A", glow: "#FF8A3D", orb: ["#FFE0B8", "#F2852E", "#2A1208"], cx: 800,
+      blobs: [[800, 380, 380, 300, "#7A3A12", 0.5], [1060, 120, 220, 180, "#8B4FD6", 0.22]] }],
+  "harvest-horizon": ["Harvest horizon", "A low amber sun over a quiet field in harvest tones.",
+    { motif: "horizon", bg: ["#FFF7EA", "#EBCFA6"], line: "#9A5A1E", glow: "#E8A24E",
+      blobs: [[800, 380, 380, 270, "#F3C98C", 0.9], [220, 160, 300, 200, "#FFF0D8", 0.9]] }],
+  "lagoon-waves": ["Lagoon waves", "Layered aqua ribbons on a bright morning sky.",
+    { motif: "waves", bg: ["#F2FCFF", "#CFEFF6"], line: "#0E7C93", glow: "#38B8D0",
+      blobs: [[860, 320, 360, 260, "#9EE0EE", 0.85], [1060, 120, 240, 180, "#FFF2B8", 0.8], [220, 600, 300, 200, "#D8F4FA", 0.7]] }],
+  "ink-arch": ["Ink arch", "A navy arch of light on warm paper.",
+    { motif: "arch", bg: ["#F6F5F1", "#E6E4DC"], line: "#1F3A6B", glow: "#9DB4E0",
+      blobs: [[830, 300, 340, 280, "#C9D6F0", 0.85], [240, 180, 280, 200, "#F4EBDA", 0.9], [1050, 640, 240, 180, "#D9DCE6", 0.7]] }],
+  "teal-glass": ["Teal glass", "Two frosted panes over teal light.",
+    { motif: "glass", bg: ["#EEFAF8", "#CDEBE6"], line: "#0F8A7A", glow: "#3DBBA8",
+      blobs: [[820, 360, 360, 300, "#8FDACB", 0.8], [1080, 120, 260, 200, "#C9F0E8", 0.8], [240, 620, 300, 200, "#D3EEE9", 0.7]] }],
   "coral-orb": ["Coral orb", "A lit coral sphere on warm near-black.",
     { motif: "orb", dark: true, bg: ["#0E0A0C", "#1E0E0E"], line: "#FFB3A8", glow: "#FF4D3D", orb: ["#FFD2C8", "#E2483A", "#2A0C0A"], cx: 760,
       blobs: [[760, 380, 380, 300, "#8F2218", 0.5], [1060, 120, 220, 180, "#FF6B4A", 0.22]] }],

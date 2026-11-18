@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750" role="img" aria-label="Rose waves">
+<title>Rose waves</title>
+<desc>Original PopupLoom abstract artwork authored for this project on 2026-11-18. Layered rose ribbons on soft blush.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF6F6"/><stop offset="1" stop-color="#F8DCE0"/></linearGradient>
+  <filter id="blur" filterUnits="userSpaceOnUse" x="-400" y="-400" width="2000" height="1550"><feGaussianBlur stdDeviation="90"/></filter>
+  <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="18"/></filter>
+  <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+  <linearGradient id="pane" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.55"/><stop offset="1" stop-color="#fff" stop-opacity="0.12"/></linearGradient>
+  <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#B33A55" stop-opacity=".9"/><stop offset=".35" stop-color="#B33A55" stop-opacity="0"/></linearGradient>
+  <linearGradient id="archfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E58AA0" stop-opacity=".55"/><stop offset="1" stop-color="#E58AA0" stop-opacity="0"/></linearGradient>
+  <radialGradient id="orbfill" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="#E58AA0"/><stop offset=".55" stop-color="#E58AA0"/><stop offset="1" stop-color="#F8DCE0"/></radialGradient>
+  <radialGradient id="sun" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#E58AA0" stop-opacity=".95"/><stop offset=".7" stop-color="#E58AA0" stop-opacity=".35"/><stop offset="1" stop-color="#E58AA0" stop-opacity="0"/></radialGradient>
+  <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F8DCE0" stop-opacity=".9"/><stop offset="1" stop-color="#F8DCE0"/></linearGradient>
+  <linearGradient id="fadeTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF6F6"/><stop offset=".85" stop-color="#FFF6F6" stop-opacity=".0"/></linearGradient>
+  <radialGradient id="vig" cx="55%" cy="45%" r="80%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.12"/></radialGradient>
+</defs>
+<rect width="1200" height="750" fill="url(#bg)"/>
+<g filter="url(#blur)"><ellipse cx="860" cy="300" rx="360" ry="260" fill="#F6B8C6" opacity="0.85"/><ellipse cx="220" cy="160" rx="300" ry="200" fill="#FFEAEA" opacity="0.9"/><ellipse cx="1050" cy="620" rx="240" ry="180" fill="#F3C9D2" opacity="0.7"/></g>
+<path d="M-20 330 C 220 226, 420 408, 640 317 S 1000 408, 1240 304" fill="none" stroke="#B33A55" stroke-opacity="0.50" stroke-width="1.2"/><path d="M-20 330 C 220 226, 420 408, 640 317 S 1000 408, 1240 304 V 800 H -20 Z" fill="#E58AA0" opacity="0.100"/><path d="M-20 392 C 220 216, 420 524, 640 366.92 S 1000 524, 1240 348" fill="none" stroke="#B33A55" stroke-opacity="0.43" stroke-width="2.2"/><path d="M-20 392 C 220 216, 420 524, 640 366.92 S 1000 524, 1240 348 V 800 H -20 Z" fill="#E58AA0" opacity="0.088"/><path d="M-20 454 C 220 350, 420 532, 640 437.36 S 1000 532, 1240 428" fill="none" stroke="#B33A55" stroke-opacity="0.36" stroke-width="1.2"/><path d="M-20 454 C 220 350, 420 532, 640 437.36 S 1000 532, 1240 428 V 800 H -20 Z" fill="#E58AA0" opacity="0.076"/><path d="M-20 516 C 220 340, 420 648, 640 484.76 S 1000 648, 1240 472" fill="none" stroke="#B33A55" stroke-opacity="0.29" stroke-width="1.2"/><path d="M-20 516 C 220 340, 420 648, 640 484.76 S 1000 648, 1240 472 V 800 H -20 Z" fill="#E58AA0" opacity="0.064"/><path d="M-20 578 C 220 474, 420 656, 640 557.72 S 1000 656, 1240 552" fill="none" stroke="#B33A55" stroke-opacity="0.22" stroke-width="1.2"/><path d="M-20 578 C 220 474, 420 656, 640 557.72 S 1000 656, 1240 552 V 800 H -20 Z" fill="#E58AA0" opacity="0.052"/><path d="M-20 640 C 220 464, 420 772, 640 602.6 S 1000 772, 1240 596" fill="none" stroke="#B33A55" stroke-opacity="0.15" stroke-width="1.2"/><path d="M-20 640 C 220 464, 420 772, 640 602.6 S 1000 772, 1240 596 V 800 H -20 Z" fill="#E58AA0" opacity="0.040"/>
+<rect width="1200" height="750" fill="url(#vig)"/>
+<rect width="1200" height="750" filter="url(#grain)" opacity="0.06" style="mix-blend-mode:overlay"/>
+</svg>

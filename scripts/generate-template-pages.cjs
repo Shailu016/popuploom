@@ -32,6 +32,8 @@ const CATEGORY_OF = {
   tapMeter: "engage", microYes: "engage", cornerPeek: "engage", transit: "engage",
   loyaltyCard: "engage", referFriend: "engage", reviewAsk: "engage",
   birthdayClub: "engage",
+  valentine: "seasonal", halloween: "seasonal", thanksgiving: "seasonal", summerSale: "seasonal", backToSchool: "seasonal",
+  welcomeHero: "email", guideSplit: "email", eventSplit: "email",
   player: "video",
   fullscreenExit: "exit", cartRescue: "exit", cancelSave: "exit"
 };
@@ -42,9 +44,9 @@ const CATEGORIES = {
     label: "Email signup",
     title: "Free Email Signup Popup Templates | PopupLoom",
     h1: "Free email signup popup templates",
-    description: "10 free email signup and waitlist popup templates. Collect emails, offer a lead magnet or open a waitlist, then install with two lines of code.",
+    description: "13 free email signup, lead magnet and waitlist popup templates. Collect emails, offer a lead magnet or open a waitlist, then install with two lines of code.",
     intro: [
-      "Email is the one audience a site owner keeps even when an algorithm changes. These ten templates cover the common reasons a visitor gives an address: a welcome offer, a launch waitlist, a lead magnet, a restock alert or a webinar seat. Each is an editable starting design, not a promise of a particular conversion rate.",
+      "Email is the one audience a site owner keeps even when an algorithm changes. These thirteen templates cover the common reasons a visitor gives an address: a welcome offer, a launch waitlist, a lead magnet, a restock alert or a webinar seat. Each is an editable starting design, not a promise of a particular conversion rate.",
       "Every template installs on any site that allows custom HTML or JavaScript. The form, success message and follow-up are yours; PopupLoom stores the response in your lead inbox and can export it as CSV."
     ],
     who: [
@@ -61,7 +63,7 @@ const CATEGORIES = {
       "Keep consent language honest and link to your privacy notice."
     ],
     faq: [
-      ["Are these email popup templates free?", "Yes. All ten designs are free to edit and use. A free account is required to save a popup and get its install code; there is no pageview cap."],
+      ["Are these email popup templates free?", "Yes. All thirteen designs are free to edit and use. A free account is required to save a popup and get its install code; there is no pageview cap."],
       ["Can I collect emails without a plugin?", "Yes, if your site allows custom HTML or JavaScript. Paste the two-line install code before the closing body tag. WordPress, Shopify, Webflow, Squarespace and Wix each have a guide."],
       ["Where do the emails go?", "They appear in your PopupLoom lead inbox, where you can export them as CSV. An optional signed server webhook can forward them to another tool."],
       ["Do I need a consent checkbox?", "PopupLoom forms do not render a separate consent checkbox. The owner is responsible for the consent language and lawful basis required in their jurisdiction."]
@@ -332,9 +334,9 @@ const CATEGORIES = {
     label: "Seasonal",
     title: "Free Black Friday and Holiday Popup Templates | PopupLoom",
     h1: "Free Black Friday and seasonal popup templates",
-    description: "3 free Black Friday, Cyber Monday and winter holiday popup templates. Customize the dates and offers for your campaign.",
+    description: "8 free Black Friday, Cyber Monday, holiday and seasonal popup templates. Customize the dates and offers for your campaign.",
     intro: [
-      "Seasonal campaigns have a short window and a clear reason to act. These three templates cover Black Friday, Cyber Monday and a winter holiday offer. Change the dates, code and terms before publishing.",
+      "Seasonal campaigns have a short window and a clear reason to act. These eight templates cover Black Friday, Cyber Monday, a winter holiday offer, Valentine's Day, Halloween, Thanksgiving, summer and back to school. Change the dates, code and terms before publishing.",
       "A seasonal template is not a license to fake urgency. If the sale ends on Sunday, say Sunday and honor it. If the code is limited, state the limit."
     ],
     who: [
@@ -402,9 +404,9 @@ const CATEGORIES = {
 };
 
 const ORDER = ["email", "discount", "exit", "announce", "engage", "social", "age", "gamified", "seasonal", "video"];
-// Page copy says "45 templates" in several places; parseTemplates() fails the
+// Page copy states the template count in several places; parseTemplates() fails the
 // build if the catalog size changes without this being updated.
-const TEMPLATE_COUNT = 45;
+const TEMPLATE_COUNT = 53;
 const LAST_UPDATED = "18 November 2026";
 const ICONS = `<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png"><link rel="icon" href="/assets/favicon-16.png" sizes="16x16" type="image/png"><link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">`;
 
@@ -699,7 +701,7 @@ ${guides}
   <h2>Common questions</h2>
 ${faq}
 
-  <p style="margin-top:26px"><a class="btn primary" href="/studio.html?tpl=blank">Start from a blank popup</a> <a class="btn ghost" href="/templates.html">Browse all 45 templates</a></p>
+  <p style="margin-top:26px"><a class="btn primary" href="/studio.html?tpl=blank">Start from a blank popup</a> <a class="btn ghost" href="/templates.html">Browse all ${TEMPLATE_COUNT} templates</a></p>
 </main>
 <footer class="wrap" style="padding:24px 0;font-size:13px">
   <div><a href="/">PopupLoom — free website popup builder</a> · <a href="/templates.html">Templates</a> · <a href="/guides/">Guides</a> · <a href="/free-popup-builder-no-limits.html">No pageview limits</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></div>

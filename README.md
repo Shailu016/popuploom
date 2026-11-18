@@ -12,7 +12,7 @@ Canonical site: **https://popuploom.com/**
 
 | File | What it is |
 |---|---|
-| `index.html` | Landing page + template gallery (45 live mini-previews, category filters) + My popups shelf/dashboard |
+| `index.html` | Landing page + template gallery (53 live mini-previews, category filters) + My popups shelf/dashboard |
 | `studio.html` + `studio.js` | The editor ("studio"): Content / Design / Behavior / Publish tabs with live preview |
 | `popuploom.js` | The runtime. The drop-in embed engine your visitors paste onto their sites. Canonical source, also served as `/popforge.js` through a byte-for-byte alias |
 | `app.js` | Shared code: API-aware storage, auth, the template catalog (original designs), helpers |
@@ -247,7 +247,7 @@ Reverse proxy deployments must set `TRUST_PROXY` to the trusted proxy IPs/subnet
 }
 ```
 
-## The template catalog (45 original builds across 6 journeys)
+## The template catalog (53 original builds across 6 journeys)
 
 Gallery categories with live previews on `index.html`. Every design is original (our own imagery in `assets/`, our own copy and palettes):
 

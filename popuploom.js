@@ -125,6 +125,13 @@
   .pf-card.pf-split .pf-title { font-size: 24px; }
   .pf-card.pf-split .pf-age-row { flex-direction: column; gap: 10px; margin-top: 18px; }
 }
+/* hero layout: image runs edge to edge above the text */
+.pf-card.pf-hero { padding: 0; overflow: hidden; }
+.pf-card.pf-hero > .pf-hero-media img { width: 100%; display: block; aspect-ratio: 16 / 9; object-fit: cover; margin: 0; border-radius: 0; }
+.pf-card.pf-hero > .pf-body { padding: 26px 30px 28px; }
+.pf-card.pf-hero .pf-close { background: rgba(255,255,255,.9); color: #101314; opacity: 1; box-shadow: 0 1px 4px rgba(0,0,0,.25); }
+.pf-card.pf-hero .pf-close:hover { background: #fff; }
+.pf-card.pf-split-left > .pf-media { order: -1; }
 .pf-close {
   position: absolute; top: 14px; right: 14px; width: 30px; height: 30px; border: none; border-radius: 999px;
   cursor: pointer; font-size: 12px; line-height: 1; display: grid; place-items: center;
@@ -703,14 +710,18 @@
   function cardHTML(self) {
     var c = self.cfg, th = c.theme || {}, mc = c.content || {};
     var p = placementClass(c.placement);
-    var split = th.layout === "split" && !!mc.image && p === "modal";
-    var cls = ["pf-card", animName(th.animation, c.placement), p === "modal" ? "" : "", th.style === "ink" ? "pf-ink" : "", split ? "pf-split" : ""].join(" ");
+    var left = th.layout === "splitLeft";
+    var split = (th.layout === "split" || left) && !!mc.image && p === "modal";
+    var hero = th.layout === "hero" && !!mc.image && p === "modal";
+    var cls = ["pf-card", animName(th.animation, c.placement), p === "modal" ? "" : "", th.style === "ink" ? "pf-ink" : "", split ? "pf-split" : "", split && left ? "pf-split-left" : "", hero ? "pf-hero" : ""].join(" ");
     var corner = cornerClass(c.placement);
     var h = '<div class="' + cls + (th.bgImage ? " pf-bgimg" : "") + (corner ? ' pf-corner-' + corner : "") + '"' + cardAttrs(th) + (th.bgImage ? ' data-bg="' + escAttr(th.bgImage) + '"' : "") + ">";
-    h += '<button class="pf-close" aria-label="Close">&#10005;</button><div class="pf-body">';
+    h += '<button class="pf-close" aria-label="Close">&#10005;</button>';
+    if (hero) h += '<div class="pf-media pf-hero-media"><img loading="lazy" decoding="async" src="' + escAttr(safeUrl(mc.image, true)) + '" alt=""></div>';
+    h += '<div class="pf-body">';
     var A = safeColor(th.accent, "#F99A1F");
     if (mc.badge) h += '<div class="pf-badge">' + esc(mc.badge) + "</div>";
-    if (mc.image && !split) h += '<div class="pf-media"><img loading="lazy" decoding="async" src="' + escAttr(safeUrl(mc.image, true)) + '" alt=""></div>';
+    if (mc.image && !split && !hero) h += '<div class="pf-media"><img loading="lazy" decoding="async" src="' + escAttr(safeUrl(mc.image, true)) + '" alt=""></div>';
     if (mc.videoEmbed) h += '<div class="pf-vid">' + videoFrame(mc.videoEmbed, !!(self.preview && self.stage && self.stage.classList && self.stage.classList.contains("tpl-canvas"))) + "</div>";
     if (mc.title) h += '<div class="pf-title">' + esc(mc.title) + "</div>";
     if (mc.body) h += '<div class="pf-text">' + esc(mc.body) + "</div>";

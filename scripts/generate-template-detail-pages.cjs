@@ -60,7 +60,7 @@ function render(page) {
 <meta property="og:description" content="${page.description}">
 <meta property="og:url" content="${url}">
 <meta property="og:image" content="https://popuploom.com/assets/og-popuploom.png">
-<meta property="og:image:alt" content="PopupLoom: free website popup builder with 45 templates">
+<meta property="og:image:alt" content="PopupLoom: free website popup builder with 53 templates">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${page.title}">
 <meta name="twitter:description" content="${page.description}">
@@ -106,7 +106,7 @@ function render(page) {
     <h2>Common questions</h2>
     ${faq}
 
-    <p style="margin-top:26px"><a class="btn primary" href="/studio.html?tpl=${page.featuredId}">Open ${page.featuredName}</a> <a class="btn ghost" href="/templates.html">Browse all 45 templates</a></p>
+    <p style="margin-top:26px"><a class="btn primary" href="/studio.html?tpl=${page.featuredId}">Open ${page.featuredName}</a> <a class="btn ghost" href="/templates.html">Browse all 53 templates</a></p>
   </article>
 </main>
 ${FOOTER}

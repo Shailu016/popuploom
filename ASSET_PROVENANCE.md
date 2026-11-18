@@ -142,3 +142,7 @@ Still outstanding for advertising:
 3. Phase B strict-CSP/CMP integration and review.
 4. Owner decision on the retained Big Buck Bunny demo video and attribution.
 5. Legal review of Terms/privacy for the operator's actual jurisdiction.
+
+## Additional artwork and previews (2026-11-18, second batch)
+
+Six more original pieces were added with the same generator (`scripts/generate-template-art.cjs`): `rose-waves`, `dusk-orb`, `harvest-horizon`, `lagoon-waves`, `ink-arch` and `teal-glass`, plus a new layered-ribbon motif. Sources are in `assets/source/art/`, renders in `assets/art/`. Previews for the eight new templates were captured with `scripts/capture-template-previews.cjs`. All generated in-house from code: no stock media, photographs or third-party material.

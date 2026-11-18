@@ -410,7 +410,7 @@
     // design
     var th = state.theme || (state.theme = {});
     th.style = gsell("d-style");
- th.layout = gsell("d-layout") === "split" ? "split" : "stack";
+ th.layout = ["split", "splitLeft", "hero"].indexOf(gsell("d-layout")) !== -1 ? gsell("d-layout") : "stack";
     th.accent = document.getElementById("d-accent").value;
     th.accentText = document.getElementById("d-accentText").value;
     th.text = document.getElementById("d-text").value;
