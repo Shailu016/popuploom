@@ -37,7 +37,8 @@ async function get(url, binary) {
   const css = await get(CSS_URL, false);
   const blocks = [...css.matchAll(/\/\*\s*([a-z-]+)\s*\*\/\s*@font-face\s*\{([^}]*)\}/g)];
   if (!blocks.length) throw new Error("No @font-face blocks in the CSS response");
-  const faces = [];
+  // Parse everything first, so licences are checked before anything is downloaded or written.
+  const parsed = [];
   for (const [, subset, body] of blocks) {
     if (!KEEP.has(subset)) continue;
     const family = (body.match(/font-family:\s*'([^']+)'/) || [])[1];
@@ -46,6 +47,17 @@ async function get(url, binary) {
     const url = (body.match(/url\((https:[^)]+\.woff2)\)/) || [])[1];
     const range = (body.match(/unicode-range:\s*([^;]+)/) || [])[1];
     if (!family || !url) throw new Error("Could not parse a font-face block for " + subset);
+    parsed.push({ subset, family, style, weight, url, range });
+  }
+  // Never ship a family without its licence text: LICENSES.txt must name every family.
+  const squash = (x) => String(x).toLowerCase().replace(/[^a-z]/g, "");
+  const licencePath = path.join(dir, "LICENSES.txt");
+  const licences = fs.existsSync(licencePath) ? squash(fs.readFileSync(licencePath, "utf8")) : "";
+  const unlicensed = [...new Set(parsed.map((p) => p.family))].filter((fam) => !licences.includes(squash(fam)));
+  if (unlicensed.length) throw new Error("No licence text in assets/fonts/LICENSES.txt for: " + unlicensed.join(", ") + ". Add its OFL text first. Nothing was downloaded or changed.");
+
+  const faces = [];
+  for (const { subset, family, style, weight, url, range } of parsed) {
     const buf = await get(url, true);
     if (buf.slice(0, 4).toString("latin1") !== "wOF2") throw new Error(family + ": downloaded file is not woff2");
     const hash = crypto.createHash("sha256").update(buf).digest("hex").slice(0, 10);
@@ -56,17 +68,8 @@ async function get(url, binary) {
     if (prior) { prior.weights.push(+weight); continue; }
     faces.push({ family, style, weights: [+weight], file, range, bytes: buf.length });
   }
-  // Never ship a family without its licence text: LICENSES.txt must name every family downloaded.
-  const squash = (x) => String(x).toLowerCase().replace(/[^a-z]/g, "");
-  const licencePath = path.join(dir, "LICENSES.txt");
-  const licences = fs.existsSync(licencePath) ? squash(fs.readFileSync(licencePath, "utf8")) : "";
-  const unlicensed = [...new Set(faces.map((f) => f.family))].filter((fam) => !licences.includes(squash(fam)));
-  if (unlicensed.length) {
-    for (const f of faces) if (unlicensed.includes(f.family)) fs.unlinkSync(path.join(dir, f.file));
-    throw new Error("No licence text in assets/fonts/LICENSES.txt for: " + unlicensed.join(", ") + ". Add its OFL text first.");
-  }
   // remove files from an older run
-  const keep =new Set(faces.map((f) => f.file).concat(["manifest.json", "LICENSES.txt"]));
+  const keep = new Set(faces.map((f) => f.file).concat(["manifest.json", "LICENSES.txt"]));
   for (const f of fs.readdirSync(dir)) if (/\.woff2$/.test(f) && !keep.has(f)) fs.unlinkSync(path.join(dir, f));
   fs.writeFileSync(path.join(dir, "manifest.json"), JSON.stringify(faces, null, 2) + "\n");
 
