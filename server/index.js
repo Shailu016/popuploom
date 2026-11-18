@@ -9,7 +9,7 @@ try {
   const envPath = path.join(__dirname, "..", ".env");
   if (fs.existsSync(envPath) && typeof process.loadEnvFile === "function") process.loadEnvFile(envPath);
 } catch (e) {
-  console.warn("[popforge] could not read .env:", e.message);
+  console.warn("[popuploom] could not read .env:", e.message);
 }
 
 const express = require("express");
@@ -32,16 +32,16 @@ const resetEmail = require("../shared/email");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Permanent browser-page moves (apex canonicalization and legacy-host moves),
+// Permanent browser-page moves (www to apex canonicalization),
 // plus a single-hop HTTPS upgrade when a trusted proxy reports a plaintext
 // request. API/runtime/asset requests are never moved across hosts.
 app.use((req, res, next) => {
   const host = req.get("host");
   const forwardedProto = String(req.get("x-forwarded-proto") || "").split(",")[0].trim().toLowerCase();
   const plaintext = forwardedProto === "http" && host
-    ? hostPolicy.secureRedirect("http://" + host + req.originalUrl, process.env.DOMAIN_CUTOVER_ENABLED)
+    ? hostPolicy.secureRedirect("http://" + host + req.originalUrl)
     : null;
-  const target = plaintext || hostPolicy.pageRedirect(req.protocol + "://" + host + req.originalUrl, req.method, process.env.DOMAIN_CUTOVER_ENABLED);
+  const target = plaintext || hostPolicy.pageRedirect(req.protocol + "://" + host + req.originalUrl, req.method);
   if (!target) return next();
   res.setHeader("Location", target);
   res.setHeader("Cache-Control", "no-store");
@@ -269,7 +269,7 @@ app.get('/ads.txt', (req, res, next) => {
 });
 const publicFiles = new Set([
   "templates.html", "faq.html", "press.html", "security.html", "guides/install-popups.html", "guides/index.html", "guides/wordpress-popup.html", "guides/shopify-popup.html", "guides/webflow-popup.html", "guides/squarespace-wix-popup.html", "guides/exit-intent-popup.html", "guides/email-signup-popup.html", "guides/free-popup-builders-without-pageview-limits.html", "guides/collect-and-export-leads.html", "guides/popup-not-showing.html", "guides/popup-builder-for-ecommerce.html", "guides/popup-builder-for-quick-commerce.html", "guides/popup-builder-for-lead-generation.html", "guides/nextjs-popup.html", "guides/react-popup.html", "guides/astro-popup.html", "guides/google-tag-manager-popup.html", "guides/static-html-popup.html", "guides/bigcommerce-popup.html", "ccf2a9f45165c635253d22748df4a573.txt", "robots.txt", "sitemap.xml", "llms.txt", "llms-full.txt", "index.html", "studio.html", "profile.html", "demo.html", "migration.html", "reset-password.html",
-  "leads.html", "privacy.html", "about.html", "contact.html", "terms.html", ".well-known/security.txt", "security.txt", ".well-known/api-catalog", ".well-known/ard.json", ".well-known/ai-catalog.json", "openapi.json", "lead-csv.js", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "verify-email.html", "verify-email.js", "popuploom.js", "popforge.js", "embed/1.1.0/popuploom.js", "embed/1.1.0/popforge.js", "embed/1.1.0/SHA256SUMS", "ui.css", "ads.txt",
+  "leads.html", "privacy.html", "about.html", "contact.html", "terms.html", ".well-known/security.txt", "security.txt", ".well-known/api-catalog", ".well-known/ard.json", ".well-known/ai-catalog.json", "openapi.json", "lead-csv.js", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "verify-email.html", "verify-email.js", "popuploom.js", "embed/1.1.0/popuploom.js", "embed/1.1.0/SHA256SUMS", "embed/1.2.0/popuploom.js", "embed/1.2.0/SHA256SUMS", "ui.css", "ads.txt",
   "templates/email-signup.html", "templates/discount.html", "templates/exit-intent.html", "templates/announcements.html", "templates/engagement.html", "templates/social-proof.html", "templates/age-gates.html", "templates/gamified.html", "templates/seasonal.html", "templates/video.html",
   "free-popup-builder-no-limits.html", "best-free-popup-builder.html", "guides/wordpress-popup-without-plugin.html",
   "templates/exit-intent-popup.html", "templates/discount-popup.html", "templates/email-signup-popup.html", "templates/spin-to-win-popup.html",
@@ -306,6 +306,12 @@ app.use((req, res, next) => {
   }
   // A hub typed without its trailing slash goes to the directory URL, not a 404.
   if (pathname === "/guides" || pathname === "/tools") return res.redirect(301, pathname + "/");
+  // /templates/ is the parent of every template page and the URL people type;
+  // the gallery itself lives at /templates.html. One hop, query preserved.
+  if (pathname === "/templates" || pathname === "/templates/" || pathname === "/templates/index.html") {
+    const qs = req.originalUrl.indexOf("?") === -1 ? "" : req.originalUrl.slice(req.originalUrl.indexOf("?"));
+    return res.redirect(301, "/templates.html" + qs);
+  }
   // Retired named-comparison pages: send indexed URLs to the surviving page on
   // the same topic in one hop instead of letting them fall through to a 404.
   if (retiredPages.has(pathname)) return res.redirect(301, retiredPages.get(pathname));
@@ -325,7 +331,7 @@ app.use((req, res, next) => {
     if (!dropStat || !dropStat.isFile()) return next();
   }
   const verificationDrop = !publicFiles.has(pathname.slice(1)) && verification.verificationFile(pathname.slice(1));
-  const file = pathname === "/popforge.js" ? "/popuploom.js" : pathname;
+  const file = pathname;
   const agentTypes = {
     "/.well-known/api-catalog": "application/linkset+json; charset=utf-8",
     "/.well-known/ard.json": "application/json; charset=utf-8",
@@ -348,11 +354,15 @@ app.use((req, res, next) => {
   }
   // The immutable embed path is materialised by the Cloudflare build. The
   // Express runtime serves the same bytes from the canonical source file.
-  if (file === "/embed/1.1.0/SHA256SUMS") {
-    const digest = crypto.createHash("sha256").update(fs.readFileSync(path.join(__dirname, "..", "popuploom.js"))).digest("hex");
-    return res.type("text/plain").send(digest + "  popuploom.js\n" + digest + "  popforge.js\n");
+  // Each published version maps to its own frozen source; 1.2.0 is the current runtime.
+  const embedSources = { "1.1.0": "/embed-releases/1.1.0/popuploom.js", "1.2.0": "/popuploom.js" };
+  const embedMatch = /^\/embed\/(\d+\.\d+\.\d+)\/(popuploom\.js|SHA256SUMS)$/.exec(file);
+  if (embedMatch && embedSources[embedMatch[1]] && embedMatch[2] === "SHA256SUMS") {
+    const bytes = fs.readFileSync(path.join(__dirname, "..", embedSources[embedMatch[1]].slice(1)), "utf8").replace(/\r\n/g, "\n");
+    const digest = crypto.createHash("sha256").update(bytes).digest("hex");
+    return res.type("text/plain").send(digest + "  popuploom.js\n");
   }
-  const sourceFile = (file === "/embed/1.1.0/popuploom.js" || file === "/embed/1.1.0/popforge.js") ? "/popuploom.js" : (file === "/security.txt" ? "/.well-known/security.txt" : file);
+  const sourceFile = (embedMatch && embedSources[embedMatch[1]]) ? embedSources[embedMatch[1]] : (file === "/security.txt" ? "/.well-known/security.txt" : file);
   const diskPath = path.join(__dirname, "..", sourceFile.slice(1));
   if (!fs.existsSync(diskPath)) return next();
   if (file.endsWith(".html") && !noMarkdown.has(file) && /\btext\/markdown\b/i.test(req.get("Accept") || "")) {
@@ -374,7 +384,7 @@ app.use((req, res, next) => {
 });
 app.use("/assets", express.static(path.join(__dirname, "..", "assets"), {
   dotfiles: "deny", index: false, redirect: false,
-  setHeaders: res => res.setHeader("Cache-Control", "no-store")
+  setHeaders: (res, filePath) => res.setHeader("Cache-Control", /[\\/]fonts[\\/][^\\/]+\.woff2$/.test(filePath) ? "public, max-age=31536000, immutable" : "no-store")
 }));
 
 // Unknown routes are real 404s, not a soft homepage. Express 5 no longer
@@ -391,7 +401,7 @@ if (require.main === module) app.listen(PORT, () => {
   console.log("  ⚡ PopupLoom server running");
   console.log("  → http://localhost:" + PORT);
   console.log("  → API: http://localhost:" + PORT + "/api");
-  console.log("  → DB:  " + (process.env.DB_PATH || path.join(__dirname, "..", "popforge.db")));
+  console.log("  → DB:  " + (process.env.DB_PATH || path.join(__dirname, "..", "popuploom.db")));
   console.log("  → Google sign-in: " + (isConfigured() ? "enabled" : "not configured (set GOOGLE_CLIENT_ID in .env)"));
   console.log("");
 });

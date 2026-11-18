@@ -2,7 +2,7 @@
 
 Automatic deployment is configured for the private `Shailu016/popuploom` repository. Every push to `main` runs the tests and deploys the PopupLoom build if they pass. Manual deployment is also available through the **Test and deploy to Cloudflare** workflow.
 
-The repository is now named `popuploom` to match the product. The local project folder, Worker service, D1 database, CI token and workflow names retain the original `popforge` identifier; those are infrastructure names, not visible branding.
+The repository is now named `popuploom` to match the product. The Worker service, D1 database, CI token and workflow names keep the names they were created with; they are infrastructure names, not visible branding.
 
 Workflow: `.github/workflows/deploy-cloudflare.yml`. It installs locked dependencies, checks Worker integration and unit tests, and runs application/browser regressions before deployment. Production releases run sequentially. Repository permissions are read-only, official actions are pinned to commit hashes, and the deployment credential is available only in the deployment step.
 
@@ -16,8 +16,8 @@ Verified on 2026-11-01: all tests, production deployment, and live health verifi
 
 Schema migrations and customer-data imports are not executed automatically. Review and apply migrations separately using the existing deployment instructions. No paid plan or billing upgrade was enabled by this setup; GitHub Actions and Cloudflare account allowances still apply.
 
-## Domain redirect safety gate
+## Domain redirects
 
-Production explicitly sets `DOMAIN_CUTOVER_ENABLED = "true"` after DNS, TLS, public-page and external-embed verification. The shared policy and `.env.example` default to disabled. Runtime/API/recovery paths remain direct on the legacy host. For rollback, disable future legacy redirects while retaining the new domain and compatibility bindings because clients may have cached permanent redirects.
+The shared policy moves `www` browser pages to the apex and upgrades plaintext requests in one hop. Runtime, API and asset paths are never redirected. The workers.dev address is disabled (`workers_dev = false`), so only the custom domains serve the site.
 
-First rebrand release verified: https://github.com/Shailu016/popuploom/actions/runs/41374596216 . The same main-push pipeline publishes the final redirect cutover and checks apex API health plus byte-identical old/new runtime responses.
+First rebrand release verified: https://github.com/Shailu016/popuploom/actions/runs/41374596216 . The same main-push pipeline checks apex API health and that the current runtime alias matches the newest immutable release.

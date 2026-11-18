@@ -10,7 +10,7 @@ Implemented for the production PopupLoom domain:
 - `HowTo` JSON-LD on the installation guide whose four steps mirror the visible numbered headings verbatim, with no invented times or ratings
 - `BreadcrumbList` JSON-LD on the template catalog and guide, each matching a visible `Home › …` breadcrumb line
 - Visible FAQs matching the structured data
-- A static catalog of 45 templates and an installation guide
+- A static catalog of 53 templates and an installation guide
 - `sitemap.xml` containing only public, indexable pages: the homepage, template catalog, guide hub, nine guides and the four trust pages
 - `robots.txt` advertising the apex sitemap
 - `llms.txt` product summary, explicitly not a ranking or AI-visibility promise

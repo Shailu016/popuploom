@@ -14,7 +14,6 @@ process.env.DB_PATH = path.join(temp, "reset-test.db");
 process.env.JWT_SECRET = crypto.randomBytes(32).toString("hex");
 process.env.NODE_ENV = "test";
 process.env.TRUST_PROXY = "";
-process.env.DOMAIN_CUTOVER_ENABLED = "false";
 process.env.GOOGLE_CLIENT_ID = "";
 process.env.RESEND_API_KEY = "test-resend-key";
 process.env.RESET_EMAIL_FROM = "PopupLoom <reset@popuploom.com>";
@@ -269,7 +268,7 @@ test("untrusted browser origins still cannot submit reset requests", async () =>
   assert.equal(response.data.error, "Origin is not allowed");
 });
 
-const browserPath = process.env.POPFORGE_BROWSER || [
+const browserPath = process.env.POPUPLOOM_BROWSER || [
   "C:/Program Files/Google/Chrome/Application/chrome.exe",
   "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
 ].find((candidate) => fs.existsSync(candidate));

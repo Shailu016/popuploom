@@ -726,7 +726,7 @@ These cannot be completed by engineering alone:
 
 **Worker version:** `eb8c17df-5a1a-46d2-aa7c-929782495a42`
 
-**Not changed:** AdSense eligibility, the 20-page ad allowlist, CSP nonce handling, ad injection, private-page `no-store`, auth, webhooks, D1, lead data, the legacy `/popforge.js` path, or the Worker/D1 names.
+**Not changed:** AdSense eligibility, the 20-page ad allowlist, CSP nonce handling, ad injection, private-page `no-store`, auth, webhooks, D1, lead data, or the Worker/D1 names.
 
 ---
 

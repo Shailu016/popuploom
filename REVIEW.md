@@ -23,7 +23,7 @@ All reproduced findings from the two reviews and follow-up failure-path checks h
 - Avoid duplicate runtime initialization and keep per-widget API overrides isolated.
 - Destroy old preview timers/listeners. Fetch cloud submission counts without downloading every lead into the dashboard; sort saved dates correctly.
 - Require Node 22.13+ so node:sqlite is available without an experimental launch flag.
-- Keep one runtime implementation served at both `/popuploom.js` and `/popforge.js`; accept both widget attributes; share one `window.PopupLoom`/`window.PopForge` object; preserve legacy analytics and storage keys.
+- Keep one runtime implementation served at `/popuploom.js` and as immutable releases; one `window.PopupLoom` object; preserve storage keys.
 - Add a noindex old-origin draft recovery page and confined host-policy redirects that never move API, runtime, asset or recovery requests.
 
 ## Validation

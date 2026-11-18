@@ -13,7 +13,7 @@
 <meta property="og:description" content="Paste the PopupLoom snippet before the closing body tag on a static site, with testing and CSP notes.">
 <meta property="og:url" content="https://popuploom.com/guides/static-html-popup.html">
 <meta property="og:image" content="https://popuploom.com/assets/og-popuploom.png">
-<meta property="og:image:alt" content="PopupLoom: free website popup builder with 45 templates">
+<meta property="og:image:alt" content="PopupLoom: free website popup builder with 53 templates">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Add a Popup to a Static HTML Site | PopupLoom">
 <meta name="twitter:description" content="Placement, local testing and caching notes for a plain HTML site.">
@@ -32,31 +32,29 @@
 .pl-wrap{overflow-x:auto}
 .pl-small{font-size:12.5px;color:var(--muted-2)}
 </style>
+<!--pl:fonts--><link rel="preload" href="/assets/fonts/bricolage-grotesque-normal-latin.a79fdb52d4.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/assets/fonts/geist-normal-latin.19f9c92546.woff2" as="font" type="font/woff2" crossorigin><!--/pl:fonts-->
 </head>
 <body>
-<header class="wrap" style="padding:24px 26px">
-  <nav aria-label="Main"><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/">Guides</a> · <a href="/free-popup-builder-no-limits.html">No pageview limits</a> · <a href="/about.html">About</a></nav>
-  <nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/guides/">Guides</a> › <span>Static HTML</span></nav>
-</header>
-<main class="wrap" style="padding:30px 26px 80px;max-width:900px">
-  <article>
-    <h1>Add a popup to a static HTML site</h1>
-    <div class="pl-meta">
+<!--pl:nav--><a class="skip-link" href="#main">Skip to content</a><nav class="site-nav" aria-label="Main"><div class="wrap inner"><a class="logo" href="/"><span class="mark"><svg viewBox="0 0 32 32" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.8"><circle cx="12.2" cy="16" r="5.4"/><circle cx="19.8" cy="16" r="5.4"/></svg></span> Popup<span><i>Loom</i></span></a><div class="nav-links"><a href="/templates.html">Templates</a><a href="/guides/">Guides</a><a href="/tools/">Tools</a><a href="/free-popup-builder-no-limits.html">No limits</a><a href="/faq.html">FAQ</a></div><div class="nav-cta"><a class="btn primary small" href="/studio.html?tpl=blank">Open the studio</a></div></div></nav><div class="pl-progress" aria-hidden="true"><i></i></div><!--/pl:nav-->
+<main id="main" class="doc">
+<!--pl:hero--><div class="doc-hero"><div class="wrap doc-hero-in"><div class="doc-hero-copy"><nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/guides/">Guides</a> › <span>Static HTML</span></nav><div class="kicker">Guide</div><h1>Add a popup to a static HTML site</h1><div class="pl-meta doc-byline">
       <span>By <a href="/about.html">Shailu</a>, founder of PopupLoom</span>
       <span>Published 17 November 2026</span>
       <span>Last updated 17 November 2026</span>
       <span>Checked 17 November 2026</span>
-    </div>
+    <span class="doc-rt">3 min read</span></div><nav class="doc-actions" aria-label="Next steps"><a class="btn primary" href="/studio.html?tpl=welcomeHero">Try Welcome Offer in the studio</a><a class="btn ghost" href="/templates.html">Browse 53 templates</a></nav><p class="doc-trust">Free to use · no credit card · no pageview cap</p></div><aside class="doc-hero-vis"><figure class="doc-shot"><img class="doc-shot-img" src="/assets/templates/welcomeHero.webp" srcset="/assets/templates/welcomeHero-600.webp 600w, /assets/templates/welcomeHero.webp 1200w" sizes="(max-width: 1000px) 100vw, 520px" width="1200" height="750" alt="Welcome Offer, Image Header popup template preview: Light modal with an image running edge to edge above a one-field email signup" fetchpriority="high" decoding="async"><figcaption>Preview: Welcome Offer, Image Header</figcaption></figure></aside></div></div><!--/pl:hero-->
+<div class="wrap doc-wrap"><div class="doc-grid"><!--pl:grid-->
+<!--pl:toc-m--><nav class="doc-toc-m" aria-label="On this page"><details><summary>On this page</summary><ol><li><a href="#where-the-two-lines-go">Where the two lines go</a></li><li><a href="#every-page-or-a-shared-footer">Every page, or a shared footer</a></li><li><a href="#caching-and-updates">Caching and updates</a></li><li><a href="#csp">CSP</a></li><li><a href="#test-checklist">Test checklist</a></li><li><a href="#removal">Removal</a></li><li><a href="#official-references">Official references</a></li></ol></details></nav><!--/pl:toc-m-->
+<article class="doc-body">
+<p class="mut">If you can edit the HTML, you can install the widget. This guide covers a plain static site: hand-written pages, a static host, or a generator that lets you edit a shared footer. It was not tested on a live deployment.</p>
 
-    <p class="mut">If you can edit the HTML, you can install the widget. This guide covers a plain static site: hand-written pages, a static host, or a generator that lets you edit a shared footer. It was not tested on a live deployment.</p>
-
-    <h2>Where the two lines go</h2>
+    <h2 id="where-the-two-lines-go">Where the two lines go</h2>
     <p>Paste them immediately before the closing <code>&lt;/body&gt;</code> tag, after all your content and your own scripts:</p>
     <pre class="pl-code"><code>&lt;div data-popuploom="YOUR_WIDGET_ID"&gt;&lt;/div&gt;
-&lt;script src="https://popuploom.com/embed/1.1.0/popuploom.js"&gt;&lt;/script&gt;</code></pre>
+&lt;script src="https://popuploom.com/embed/1.2.0/popuploom.js"&gt;&lt;/script&gt;</code></pre>
     <p>Order matters a little: the div must exist before the script runs. Placing both at the end of the body guarantees that, and keeps the popup from delaying the content above it.</p>
 
-    <h2>Every page, or a shared footer</h2>
+    <h2 id="every-page-or-a-shared-footer">Every page, or a shared footer</h2>
     <div class="pl-wrap">
       <table class="pl-table card">
         <thead><tr><th>Setup</th><th>What to do</th><th>Risk</th></tr></thead>
@@ -73,14 +71,15 @@
       <p><strong>Do not test from the file system.</strong> Opening the page with <code>file://</code> blocks the configuration request in most browsers. Serve the folder over http, for example with <code>python -m http.server</code>, and test at <code>http://localhost:8000</code>. A popup that “does not work” locally is often just the protocol.</p>
     </div>
 
-    <h2>Caching and updates</h2>
-    <p>The script URL is versioned and immutable: <code>/embed/1.1.0/popuploom.js</code>. Browsers and CDNs can cache it for a long time, which is why the version is in the path. Your popup's content and targeting are fetched as configuration at runtime, so editing the popup in the studio does not require touching the HTML.</p>
+    <!--pl:inline-cta--><aside class="doc-inline-cta"><span class="doc-inline-img"><img class="doc-card-pic" src="/assets/templates/welcomeHero.webp" srcset="/assets/templates/welcomeHero-600.webp 600w, /assets/templates/welcomeHero.webp 1200w" sizes="180px" width="1200" height="750" alt="Welcome Offer, Image Header popup template preview: Light modal with an image running edge to edge above a one-field email signup" loading="lazy" decoding="async"></span><div><strong>Try it on your own page</strong><p>Open the Welcome Offer, Image Header template, replace the sample text with your own and preview it on desktop and mobile. Free, no credit card.</p><a class="btn primary small" href="/studio.html?tpl=welcomeHero">Open it in the studio</a></div></aside><!--/pl:inline-cta-->
+<h2 id="caching-and-updates">Caching and updates</h2>
+    <p>The script URL is versioned and immutable: <code>/embed/1.2.0/popuploom.js</code>. Browsers and CDNs can cache it for a long time, which is why the version is in the path. Your popup's content and targeting are fetched as configuration at runtime, so editing the popup in the studio does not require touching the HTML.</p>
     <p>If you change the snippet itself, update the HTML and redeploy. If the site sits behind a cache, purge the page, not the script.</p>
 
-    <h2>CSP</h2>
+    <h2 id="csp">CSP</h2>
     <p>If the site sends a Content Security Policy, allow <code>https://popuploom.com</code> in <code>script-src</code> and <code>connect-src</code>. A blocked script shows as a console error; a blocked config request shows as an invisible popup.</p>
 
-    <h2>Test checklist</h2>
+    <h2 id="test-checklist">Test checklist</h2>
     <ul>
       <li>Serve over http, open the page in a private window.</li>
       <li>Confirm the popup appears once, not twice.</li>
@@ -89,16 +88,16 @@
       <li>Check the page on a phone width and with caching enabled on the host.</li>
     </ul>
 
-    <h2>Removal</h2>
+    <h2 id="removal">Removal</h2>
     <p>Delete the two lines and redeploy. The saved popup remains in the studio.</p>
 
-    <h2>Common questions</h2>
+    <h2 id="common-questions">Common questions</h2>
     <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Do I need to add the snippet to every page?</strong></summary><p style="margin:10px 0 0">If every page has its own HTML file, yes, or add it to the shared footer include your build uses. One copy per page is enough. Two copies load the widget twice.</p></details>
     <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Why does the popup not appear when I open the file directly?</strong></summary><p style="margin:10px 0 0">Opening an HTML file from disk uses the file:// protocol, which blocks the configuration request and can behave differently for scripts. Serve the folder over http with any local server and test again.</p></details>
     <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Can I self-host the script file?</strong></summary><p style="margin:10px 0 0">You can host a copy of the versioned file, but the widget still needs to fetch its configuration from PopupLoom. Self-hosting changes where the code is served from, not how the saved popup is loaded, and it means you own updates.</p></details>
     <details class="card" style="margin:10px 0;padding:16px"><summary><strong>How do I update a popup after installing the snippet?</strong></summary><p style="margin:10px 0 0">Edit and save it in the studio. The page loads the saved configuration at runtime, so you do not need to change the HTML again. Only a change to the snippet itself requires editing the page.</p></details>
 
-    <h2>Official references</h2>
+    <h2 id="official-references">Official references</h2>
     <ul class="pl-small">
       <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script" target="_blank" rel="noopener">MDN: script element</a> — placement, async and defer.</li>
       <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP" target="_blank" rel="noopener">MDN: Content Security Policy</a> — script-src and connect-src.</li>
@@ -106,9 +105,39 @@
 
     <p class="pl-small">Written by <a href="/about.html">Shailu</a>, founder of PopupLoom. Checked on 17 November 2026; not tested on a live deployment. No ranking, traffic or conversion claim is made. Related: <a href="/guides/install-popups.html">the general install guide</a>, <a href="/guides/google-tag-manager-popup.html">Tag Manager</a>, <a href="/guides/astro-popup.html">Astro</a>, <a href="/guides/nextjs-popup.html">Next.js</a> and <a href="/guides/popup-not-showing.html">popup not showing</a>.</p>
   </article>
+<!--pl:aside--><aside class="doc-aside" aria-label="Page tools"><nav class="doc-toc" aria-label="Table of contents"><div class="doc-aside-h">On this page</div><ol><li><a href="#where-the-two-lines-go">Where the two lines go</a></li><li><a href="#every-page-or-a-shared-footer">Every page, or a shared footer</a></li><li><a href="#caching-and-updates">Caching and updates</a></li><li><a href="#csp">CSP</a></li><li><a href="#test-checklist">Test checklist</a></li><li><a href="#removal">Removal</a></li><li><a href="#official-references">Official references</a></li></ol></nav><div class="doc-more"><div class="doc-aside-h">Keep reading</div><ul><li><a href="/guides/bigcommerce-popup.html">Add a popup to BigCommerce</a></li><li><a href="/guides/wordpress-popup-without-plugin.html">How to add a popup to WordPress without a plugin</a></li><li><a href="/guides/install-popups.html">How to add a popup to your website</a></li><li><a href="/guides/wordpress-popup.html">Add a popup to WordPress without a plugin</a></li></ul></div></aside><!--/pl:aside-->
+<!--/pl:grid--></div><!--pl:after--><aside class="doc-after" aria-label="Next steps"><p class="doc-after-h">Start from a template</p><p class="doc-after-sub">Each one opens in the studio. Change the words, colours and trigger, then install it with two lines of code.</p><div class="doc-card-row"><a class="doc-card" href="/studio.html?tpl=drop48"><span class="doc-card-img"><img class="doc-card-pic" src="/assets/templates/drop48.webp" srcset="/assets/templates/drop48-600.webp 600w, /assets/templates/drop48.webp 1200w" sizes="(max-width: 700px) 100vw, 300px" width="1200" height="750" alt="48-Hour Drop popup template preview: Ember-lit modal with a live countdown and a copyable code field" loading="lazy" decoding="async"></span><span class="doc-card-name">48-Hour Drop</span><span class="doc-card-tag">Flash deal</span><span class="doc-card-go">Open in the studio →</span></a><a class="doc-card" href="/studio.html?tpl=firstCode"><span class="doc-card-img"><img class="doc-card-pic" src="/assets/templates/firstCode.webp" srcset="/assets/templates/firstCode-600.webp 600w, /assets/templates/firstCode.webp 1200w" sizes="(max-width: 700px) 100vw, 300px" width="1200" height="750" alt="First-Order Code popup template preview: Editorial cream modal that collects an email for a first-order code; the owner sends the code" loading="lazy" decoding="async"></span><span class="doc-card-name">First-Order Code</span><span class="doc-card-tag">Email for code</span><span class="doc-card-go">Open in the studio →</span></a><a class="doc-card" href="/studio.html?tpl=tapMeter"><span class="doc-card-img"><img class="doc-card-pic" src="/assets/templates/tapMeter.webp" srcset="/assets/templates/tapMeter-600.webp 600w, /assets/templates/tapMeter.webp 1200w" sizes="(max-width: 700px) 100vw, 300px" width="1200" height="750" alt="Tap Meter popup template preview: One-tap page rating with three text choices and an instant thank-you" loading="lazy" decoding="async"></span><span class="doc-card-name">Tap Meter</span><span class="doc-card-tag">Feedback</span><span class="doc-card-go">Open in the studio →</span></a></div><div class="doc-band"><div><p class="doc-band-h">Ready to build your popup?</p><p>The studio is free to use. Save a popup to get its install code and read your leads in the inbox.</p></div><a class="btn primary" href="/studio.html?tpl=blank">Open the studio</a></div></aside><!--/pl:after--></div>
 </main>
-<footer class="wrap" style="padding:24px 0;font-size:13px">
-  <div><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/">Guides</a> · <a href="/free-popup-builder-no-limits.html">No pageview limits</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></div>
-</footer>
+<!--pl:footer--><footer class="site-foot"><div class="wrap"><div class="foot-grid">
+<div class="foot-brand"><a class="logo" href="/"><span class="mark"><svg viewBox="0 0 32 32" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.8"><circle cx="12.2" cy="16" r="5.4"/><circle cx="19.8" cy="16" r="5.4"/></svg></span> Popup<span><i>Loom</i></span></a><p>A free website popup builder with 53 editable templates, a visual studio and a lead inbox. No pageview cap, no credit card.</p><p><a class="btn primary small" href="/studio.html?tpl=blank">Open the studio</a></p></div>
+<div><p class="foot-h">Product</p><ul><li><a href="/studio.html?tpl=blank">Popup studio</a></li><li><a href="/templates.html">All 53 templates</a></li><li><a href="/tools/">Free tools</a></li><li><a href="/free-popup-builder-no-limits.html">No pageview limits</a></li><li><a href="/best-free-popup-builder.html">Nine-point checklist</a></li></ul></div>
+<div><p class="foot-h">Guides</p><ul><li><a href="/guides/install-popups.html">Add a popup to your site</a></li><li><a href="/guides/wordpress-popup.html">WordPress</a></li><li><a href="/guides/shopify-popup.html">Shopify</a></li><li><a href="/guides/webflow-popup.html">Webflow</a></li><li><a href="/guides/popup-builder-for-ecommerce.html">Ecommerce</a></li><li><a href="/guides/">All guides</a></li></ul></div>
+<div><p class="foot-h">Company</p><ul><li><a href="/about.html">About</a></li><li><a href="/faq.html">FAQ</a></li><li><a href="/contact.html">Contact</a></li><li><a href="/security.html">Security</a></li><li><a href="/press.html">Press kit</a></li><li><a href="/privacy.html">Privacy</a></li><li><a href="/terms.html">Terms</a></li></ul></div>
+</div><p class="foot-legal">PopupLoom is an independent product. Template offers, codes and countdowns are sample copy; every claim a site publishes must be true and is the site owner's responsibility.</p></div></footer><!--/pl:footer-->
+<!--pl:script--><script>
+(function () {
+  var bar = document.querySelector(".pl-progress i"), nav = document.querySelector(".site-nav");
+  function tick() {
+    var d = document.documentElement, max = d.scrollHeight - innerHeight, p = max > 0 ? scrollY / max : 0;
+    if (bar) bar.style.transform = "scaleX(" + Math.min(1, Math.max(0, p)) + ")";
+    if (nav) nav.classList.toggle("scrolled", scrollY > 8);
+  }
+  addEventListener("scroll", tick, { passive: true });
+  tick();
+  var links = document.querySelectorAll(".doc-aside .doc-toc a");
+  if (!links.length || !("IntersectionObserver" in window)) return;
+  var map = {};
+  links.forEach(function (a) { map[a.getAttribute("href").slice(1)] = a; });
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      links.forEach(function (a) { a.classList.remove("on"); });
+      var a = map[e.target.id];
+      if (a) a.classList.add("on");
+    });
+  }, { rootMargin: "-80px 0px -70% 0px" });
+  Object.keys(map).forEach(function (id) { var el = document.getElementById(id); if (el) io.observe(el); });
+})();
+</script><!--/pl:script-->
 </body>
 </html>

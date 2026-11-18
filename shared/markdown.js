@@ -83,6 +83,7 @@ function fromHtml(html, options) {
     .replace(/<nav\b[\s\S]*?<\/nav>/gi, "")
     .replace(/<header\b[\s\S]*?<\/header>/gi, "")
     .replace(/<footer\b[\s\S]*?<\/footer>/gi, "")
+    .replace(/<aside\b[\s\S]*?<\/aside>/gi, "")
     .replace(/<form\b[\s\S]*?<\/form>/gi, "");
 
   const blocks = [];

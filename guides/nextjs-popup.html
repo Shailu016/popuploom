@@ -13,7 +13,7 @@
 <meta property="og:description" content="Where the PopupLoom snippet goes in a Next.js App Router layout or Pages Router document, with routing and CSP notes.">
 <meta property="og:url" content="https://popuploom.com/guides/nextjs-popup.html">
 <meta property="og:image" content="https://popuploom.com/assets/og-popuploom.png">
-<meta property="og:image:alt" content="PopupLoom: free website popup builder with 45 templates">
+<meta property="og:image:alt" content="PopupLoom: free website popup builder with 53 templates">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Add a Popup to Next.js | PopupLoom">
 <meta name="twitter:description" content="App Router and Pages Router placement for the PopupLoom snippet.">
@@ -32,25 +32,23 @@
 .pl-wrap{overflow-x:auto}
 .pl-small{font-size:12.5px;color:var(--muted-2)}
 </style>
+<!--pl:fonts--><link rel="preload" href="/assets/fonts/bricolage-grotesque-normal-latin.a79fdb52d4.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/assets/fonts/geist-normal-latin.19f9c92546.woff2" as="font" type="font/woff2" crossorigin><!--/pl:fonts-->
 </head>
 <body>
-<header class="wrap" style="padding:24px 26px">
-  <nav aria-label="Main"><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/">Guides</a> · <a href="/free-popup-builder-no-limits.html">No pageview limits</a> · <a href="/about.html">About</a></nav>
-  <nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/guides/">Guides</a> › <span>Next.js</span></nav>
-</header>
-<main class="wrap" style="padding:30px 26px 80px;max-width:900px">
-  <article>
-    <h1>Add a popup to Next.js</h1>
-    <div class="pl-meta">
+<!--pl:nav--><a class="skip-link" href="#main">Skip to content</a><nav class="site-nav" aria-label="Main"><div class="wrap inner"><a class="logo" href="/"><span class="mark"><svg viewBox="0 0 32 32" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.8"><circle cx="12.2" cy="16" r="5.4"/><circle cx="19.8" cy="16" r="5.4"/></svg></span> Popup<span><i>Loom</i></span></a><div class="nav-links"><a href="/templates.html">Templates</a><a href="/guides/">Guides</a><a href="/tools/">Tools</a><a href="/free-popup-builder-no-limits.html">No limits</a><a href="/faq.html">FAQ</a></div><div class="nav-cta"><a class="btn primary small" href="/studio.html?tpl=blank">Open the studio</a></div></div></nav><div class="pl-progress" aria-hidden="true"><i></i></div><!--/pl:nav-->
+<main id="main" class="doc">
+<!--pl:hero--><div class="doc-hero"><div class="wrap doc-hero-in"><div class="doc-hero-copy"><nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/guides/">Guides</a> › <span>Next.js</span></nav><div class="kicker">Guide</div><h1>Add a popup to Next.js</h1><div class="pl-meta doc-byline">
       <span>By <a href="/about.html">Shailu</a>, founder of PopupLoom</span>
       <span>Published 17 November 2026</span>
       <span>Last updated 17 November 2026</span>
       <span>Checked against the Next.js script docs on 17 November 2026</span>
-    </div>
+    <span class="doc-rt">4 min read</span></div><nav class="doc-actions" aria-label="Next steps"><a class="btn primary" href="/studio.html?tpl=welcomeHero">Try Welcome Offer in the studio</a><a class="btn ghost" href="/templates.html">Browse 53 templates</a></nav><p class="doc-trust">Free to use · no credit card · no pageview cap</p></div><aside class="doc-hero-vis"><figure class="doc-shot"><img class="doc-shot-img" src="/assets/templates/welcomeHero.webp" srcset="/assets/templates/welcomeHero-600.webp 600w, /assets/templates/welcomeHero.webp 1200w" sizes="(max-width: 1000px) 100vw, 520px" width="1200" height="750" alt="Welcome Offer, Image Header popup template preview: Light modal with an image running edge to edge above a one-field email signup" fetchpriority="high" decoding="async"><figcaption>Preview: Welcome Offer, Image Header</figcaption></figure></aside></div></div><!--/pl:hero-->
+<div class="wrap doc-wrap"><div class="doc-grid"><!--pl:grid-->
+<!--pl:toc-m--><nav class="doc-toc-m" aria-label="On this page"><details><summary>On this page</summary><ol><li><a href="#the-short-version">The short version</a></li><li><a href="#app-router-app-layout-tsx">App Router: app/layout.tsx</a></li><li><a href="#pages-router-pages-app-tsx">Pages Router: pages/_app.tsx</a></li><li><a href="#client-side-navigation">Client-side navigation</a></li><li><a href="#test-checklist">Test checklist</a></li><li><a href="#removal">Removal</a></li><li><a href="#official-references">Official references</a></li></ol></details></nav><!--/pl:toc-m-->
+<article class="doc-body">
+<p class="mut">This guide names the exact files for the App Router and the Pages Router. It was not tested on a live Next.js deployment; the placement and the warnings come from the Next.js documentation and the widget's own install requirements. Test on a preview deployment before shipping.</p>
 
-    <p class="mut">This guide names the exact files for the App Router and the Pages Router. It was not tested on a live Next.js deployment; the placement and the warnings come from the Next.js documentation and the widget's own install requirements. Test on a preview deployment before shipping.</p>
-
-    <h2>The short version</h2>
+    <h2 id="the-short-version">The short version</h2>
     <ol>
       <li>Save the popup in the studio and copy its two-line snippet.</li>
       <li>App Router: put the div and a <code>next/script</code> in <code>app/layout.tsx</code>, inside <code>&lt;body&gt;</code>.</li>
@@ -58,7 +56,7 @@
       <li>Deploy a preview, load a page, and confirm the popup appears and a test response reaches the inbox.</li>
     </ol>
 
-    <h2>App Router: app/layout.tsx</h2>
+    <h2 id="app-router-app-layout-tsx">App Router: app/layout.tsx</h2>
     <p>Render the widget div after <code>{children}</code> and load the script with <code>next/script</code> and <code>strategy="afterInteractive"</code>. That strategy loads the widget after hydration, so it does not compete with the page's own JavaScript.</p>
     <pre class="pl-code"><code>import Script from "next/script";
 
@@ -69,7 +67,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         &lt;div data-popuploom="YOUR_WIDGET_ID" /&gt;
         &lt;Script
-          src="https://popuploom.com/embed/1.1.0/popuploom.js"
+          src="https://popuploom.com/embed/1.2.0/popuploom.js"
           strategy="afterInteractive"
         /&gt;
       &lt;/body&gt;
@@ -78,7 +76,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }</code></pre>
     <p>Keep <code>YOUR_WIDGET_ID</code> exactly as the studio gives it. The div is empty and static, so it does not cause a hydration mismatch.</p>
 
-    <h2>Pages Router: pages/_app.tsx</h2>
+    <!--pl:inline-cta--><aside class="doc-inline-cta"><span class="doc-inline-img"><img class="doc-card-pic" src="/assets/templates/welcomeHero.webp" srcset="/assets/templates/welcomeHero-600.webp 600w, /assets/templates/welcomeHero.webp 1200w" sizes="180px" width="1200" height="750" alt="Welcome Offer, Image Header popup template preview: Light modal with an image running edge to edge above a one-field email signup" loading="lazy" decoding="async"></span><div><strong>Try it on your own page</strong><p>Open the Welcome Offer, Image Header template, replace the sample text with your own and preview it on desktop and mobile. Free, no credit card.</p><a class="btn primary small" href="/studio.html?tpl=welcomeHero">Open it in the studio</a></div></aside><!--/pl:inline-cta-->
+<h2 id="pages-router-pages-app-tsx">Pages Router: pages/_app.tsx</h2>
     <p>If you use the Pages Router, load the script once from <code>_app.tsx</code> and render the div in the same tree:</p>
     <pre class="pl-code"><code>import Script from "next/script";
 import type { AppProps } from "next/app";
@@ -89,7 +88,7 @@ export default function App({ Component, pageProps }: AppProps) {
       &lt;Component {...pageProps} /&gt;
       &lt;div data-popuploom="YOUR_WIDGET_ID" /&gt;
       &lt;Script
-        src="https://popuploom.com/embed/1.1.0/popuploom.js"
+        src="https://popuploom.com/embed/1.2.0/popuploom.js"
         strategy="afterInteractive"
       /&gt;
     &lt;/&gt;
@@ -100,10 +99,10 @@ export default function App({ Component, pageProps }: AppProps) {
   &lt;Main /&gt;
   &lt;NextScript /&gt;
   &lt;div data-popuploom="YOUR_WIDGET_ID" /&gt;
-  &lt;script async src="https://popuploom.com/embed/1.1.0/popuploom.js" /&gt;
+  &lt;script async src="https://popuploom.com/embed/1.2.0/popuploom.js" /&gt;
 &lt;/body&gt;</code></pre>
 
-    <h2>Client-side navigation</h2>
+    <h2 id="client-side-navigation">Client-side navigation</h2>
     <p>Next.js changes routes without reloading the document. The widget loads once, with the first document. That is fine for a popup triggered by a timer, a click or a scroll, because those events keep working. It matters for page targeting: a route reached by client-side navigation may not re-evaluate a URL rule the way a full load does.</p>
     <p>Test the exact case you care about: open the site, navigate to the target route through the UI, and see whether the popup fires. If it does not, load that route directly or attach the popup to a click instead. Do not assume a route change behaved like a page load.</p>
 
@@ -111,7 +110,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <p><strong>If your site sets a Content Security Policy</strong>, the widget needs <code>https://popuploom.com</code> in <code>script-src</code> and <code>connect-src</code>. If the overlay renders but looks unstyled, the policy may be blocking the widget's style injection. Check the browser console on the preview deployment, not just locally.</p>
     </div>
 
-    <h2>Test checklist</h2>
+    <h2 id="test-checklist">Test checklist</h2>
     <ul>
       <li>The popup appears on a fresh preview deployment, in a private window.</li>
       <li>A test submission lands in the lead inbox.</li>
@@ -121,16 +120,16 @@ export default function App({ Component, pageProps }: AppProps) {
       <li>Removing the two lines removes the popup on the next deploy.</li>
     </ul>
 
-    <h2>Removal</h2>
+    <h2 id="removal">Removal</h2>
     <p>Delete the div and the <code>Script</code> component, then redeploy. The saved popup stays in the studio; nothing is deleted from your account when you remove the embed.</p>
 
-    <h2>Common questions</h2>
+    <h2 id="common-questions">Common questions</h2>
     <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Where does the PopupLoom script go in the Next.js App Router?</strong></summary><p style="margin:10px 0 0">In app/layout.tsx, render the widget div and the next/script component inside the body, after {children}. Use strategy="afterInteractive" so the widget loads after hydration rather than blocking the page.</p></details>
     <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Should I use next/script in pages/_document.tsx?</strong></summary><p style="margin:10px 0 0">No. The Next.js documentation says next/script should not be used in _document. For the Pages Router, either load the script from _app.tsx with next/script, or add a plain async script tag in _document.tsx.</p></details>
     <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Does the popup appear after a client-side route change?</strong></summary><p style="margin:10px 0 0">Test it on your router. The document does not reload on client-side navigation, so a page-level script may not re-evaluate route targeting. If it does not appear on a navigated route, load that route directly or trigger the popup from an event instead of assuming it fired.</p></details>
     <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Will the widget slow down the Next.js build or page?</strong></summary><p style="margin:10px 0 0">The snippet is one small external script loaded after hydration. It does not run at build time and adds no dependency to your bundle. Configuration is fetched from PopupLoom at runtime.</p></details>
 
-    <h2>Official references</h2>
+    <h2 id="official-references">Official references</h2>
     <ul class="pl-small">
       <li><a href="https://nextjs.org/docs/app/guides/scripts" target="_blank" rel="noopener">Next.js: Scripts guide</a> — loading strategies and when each one runs.</li>
       <li><a href="https://nextjs.org/docs/pages/api-reference/components/script" target="_blank" rel="noopener">Next.js: next/script API reference</a> — including the warning about _document.</li>
@@ -138,9 +137,39 @@ export default function App({ Component, pageProps }: AppProps) {
 
     <p class="pl-small">Written by <a href="/about.html">Shailu</a>, founder of PopupLoom. Checked against the Next.js documentation on 17 November 2026; not tested on a live deployment. No ranking, traffic or conversion claim is made. Related: <a href="/guides/react-popup.html">React</a>, <a href="/guides/astro-popup.html">Astro</a>, <a href="/guides/static-html-popup.html">static HTML</a>, <a href="/guides/install-popups.html">the general install guide</a> and <a href="/guides/exit-intent-popup.html">exit intent</a>.</p>
   </article>
+<!--pl:aside--><aside class="doc-aside" aria-label="Page tools"><nav class="doc-toc" aria-label="Table of contents"><div class="doc-aside-h">On this page</div><ol><li><a href="#the-short-version">The short version</a></li><li><a href="#app-router-app-layout-tsx">App Router: app/layout.tsx</a></li><li><a href="#pages-router-pages-app-tsx">Pages Router: pages/_app.tsx</a></li><li><a href="#client-side-navigation">Client-side navigation</a></li><li><a href="#test-checklist">Test checklist</a></li><li><a href="#removal">Removal</a></li><li><a href="#official-references">Official references</a></li></ol></nav><div class="doc-more"><div class="doc-aside-h">Keep reading</div><ul><li><a href="/guides/react-popup.html">Add a popup to React</a></li><li><a href="/guides/astro-popup.html">Add a popup to Astro</a></li><li><a href="/guides/google-tag-manager-popup.html">Add a popup with Google Tag Manager</a></li><li><a href="/guides/static-html-popup.html">Add a popup to a static HTML site</a></li></ul></div></aside><!--/pl:aside-->
+<!--/pl:grid--></div><!--pl:after--><aside class="doc-after" aria-label="Next steps"><p class="doc-after-h">Start from a template</p><p class="doc-after-sub">Each one opens in the studio. Change the words, colours and trigger, then install it with two lines of code.</p><div class="doc-card-row"><a class="doc-card" href="/studio.html?tpl=drop48"><span class="doc-card-img"><img class="doc-card-pic" src="/assets/templates/drop48.webp" srcset="/assets/templates/drop48-600.webp 600w, /assets/templates/drop48.webp 1200w" sizes="(max-width: 700px) 100vw, 300px" width="1200" height="750" alt="48-Hour Drop popup template preview: Ember-lit modal with a live countdown and a copyable code field" loading="lazy" decoding="async"></span><span class="doc-card-name">48-Hour Drop</span><span class="doc-card-tag">Flash deal</span><span class="doc-card-go">Open in the studio →</span></a><a class="doc-card" href="/studio.html?tpl=firstCode"><span class="doc-card-img"><img class="doc-card-pic" src="/assets/templates/firstCode.webp" srcset="/assets/templates/firstCode-600.webp 600w, /assets/templates/firstCode.webp 1200w" sizes="(max-width: 700px) 100vw, 300px" width="1200" height="750" alt="First-Order Code popup template preview: Editorial cream modal that collects an email for a first-order code; the owner sends the code" loading="lazy" decoding="async"></span><span class="doc-card-name">First-Order Code</span><span class="doc-card-tag">Email for code</span><span class="doc-card-go">Open in the studio →</span></a><a class="doc-card" href="/studio.html?tpl=tapMeter"><span class="doc-card-img"><img class="doc-card-pic" src="/assets/templates/tapMeter.webp" srcset="/assets/templates/tapMeter-600.webp 600w, /assets/templates/tapMeter.webp 1200w" sizes="(max-width: 700px) 100vw, 300px" width="1200" height="750" alt="Tap Meter popup template preview: One-tap page rating with three text choices and an instant thank-you" loading="lazy" decoding="async"></span><span class="doc-card-name">Tap Meter</span><span class="doc-card-tag">Feedback</span><span class="doc-card-go">Open in the studio →</span></a></div><div class="doc-band"><div><p class="doc-band-h">Ready to build your popup?</p><p>The studio is free to use. Save a popup to get its install code and read your leads in the inbox.</p></div><a class="btn primary" href="/studio.html?tpl=blank">Open the studio</a></div></aside><!--/pl:after--></div>
 </main>
-<footer class="wrap" style="padding:24px 0;font-size:13px">
-  <div><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/">Guides</a> · <a href="/free-popup-builder-no-limits.html">No pageview limits</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></div>
-</footer>
+<!--pl:footer--><footer class="site-foot"><div class="wrap"><div class="foot-grid">
+<div class="foot-brand"><a class="logo" href="/"><span class="mark"><svg viewBox="0 0 32 32" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.8"><circle cx="12.2" cy="16" r="5.4"/><circle cx="19.8" cy="16" r="5.4"/></svg></span> Popup<span><i>Loom</i></span></a><p>A free website popup builder with 53 editable templates, a visual studio and a lead inbox. No pageview cap, no credit card.</p><p><a class="btn primary small" href="/studio.html?tpl=blank">Open the studio</a></p></div>
+<div><p class="foot-h">Product</p><ul><li><a href="/studio.html?tpl=blank">Popup studio</a></li><li><a href="/templates.html">All 53 templates</a></li><li><a href="/tools/">Free tools</a></li><li><a href="/free-popup-builder-no-limits.html">No pageview limits</a></li><li><a href="/best-free-popup-builder.html">Nine-point checklist</a></li></ul></div>
+<div><p class="foot-h">Guides</p><ul><li><a href="/guides/install-popups.html">Add a popup to your site</a></li><li><a href="/guides/wordpress-popup.html">WordPress</a></li><li><a href="/guides/shopify-popup.html">Shopify</a></li><li><a href="/guides/webflow-popup.html">Webflow</a></li><li><a href="/guides/popup-builder-for-ecommerce.html">Ecommerce</a></li><li><a href="/guides/">All guides</a></li></ul></div>
+<div><p class="foot-h">Company</p><ul><li><a href="/about.html">About</a></li><li><a href="/faq.html">FAQ</a></li><li><a href="/contact.html">Contact</a></li><li><a href="/security.html">Security</a></li><li><a href="/press.html">Press kit</a></li><li><a href="/privacy.html">Privacy</a></li><li><a href="/terms.html">Terms</a></li></ul></div>
+</div><p class="foot-legal">PopupLoom is an independent product. Template offers, codes and countdowns are sample copy; every claim a site publishes must be true and is the site owner's responsibility.</p></div></footer><!--/pl:footer-->
+<!--pl:script--><script>
+(function () {
+  var bar = document.querySelector(".pl-progress i"), nav = document.querySelector(".site-nav");
+  function tick() {
+    var d = document.documentElement, max = d.scrollHeight - innerHeight, p = max > 0 ? scrollY / max : 0;
+    if (bar) bar.style.transform = "scaleX(" + Math.min(1, Math.max(0, p)) + ")";
+    if (nav) nav.classList.toggle("scrolled", scrollY > 8);
+  }
+  addEventListener("scroll", tick, { passive: true });
+  tick();
+  var links = document.querySelectorAll(".doc-aside .doc-toc a");
+  if (!links.length || !("IntersectionObserver" in window)) return;
+  var map = {};
+  links.forEach(function (a) { map[a.getAttribute("href").slice(1)] = a; });
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      links.forEach(function (a) { a.classList.remove("on"); });
+      var a = map[e.target.id];
+      if (a) a.classList.add("on");
+    });
+  }, { rootMargin: "-80px 0px -70% 0px" });
+  Object.keys(map).forEach(function (id) { var el = document.getElementById(id); if (el) io.observe(el); });
+})();
+</script><!--/pl:script-->
 </body>
 </html>

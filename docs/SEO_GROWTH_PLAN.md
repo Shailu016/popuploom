@@ -417,7 +417,7 @@ either.
 
 An external blueprint proposed a second Cloudflare Worker on `popuploom.com/tools*`
 reverse-proxying a separate Pages origin, rewriting canonicals with `HTMLRewriter`.
-It was rejected. `/tools/*` is already served by the `popforge` Worker, four tool
+It was rejected. `/tools/*` is already served by the Worker, four tool
 URLs are already indexed in `sitemap.xml`, and a second Worker on that route would
 detach the subtree from `PUBLIC_FILES`, the CSP hash set, `hostPolicy` redirects and
 404 handling. The sample code also proxied every path instead of the declared slug

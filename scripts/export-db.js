@@ -5,7 +5,7 @@ const fs = require("fs");
 const path = require("path");
 const { DatabaseSync } = require("node:sqlite");
 
-const DB_PATH = process.env.DB_PATH || path.join(__dirname, "..", "popforge.db");
+const DB_PATH = process.env.DB_PATH || path.join(__dirname, "..", "popuploom.db");
 const OUT_PATH = path.resolve(process.env.EXPORT_PATH || path.join(__dirname, "..", "private-data", "snapshot.sql"));
 
 const db = new DatabaseSync(DB_PATH, { readOnly: true });

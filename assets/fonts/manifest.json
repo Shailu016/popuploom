@@ -1,0 +1,58 @@
+[
+  {
+    "family": "Bricolage Grotesque",
+    "style": "normal",
+    "weights": [
+      600,
+      700,
+      800
+    ],
+    "file": "bricolage-grotesque-normal-latin.a79fdb52d4.woff2",
+    "range": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+    "bytes": 76888
+  },
+  {
+    "family": "Geist",
+    "style": "normal",
+    "weights": [
+      400,
+      500,
+      600,
+      700
+    ],
+    "file": "geist-normal-latin.19f9c92546.woff2",
+    "range": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+    "bytes": 29400
+  },
+  {
+    "family": "Geist Mono",
+    "style": "normal",
+    "weights": [
+      400,
+      500
+    ],
+    "file": "geist-mono-normal-latin.684ad5b531.woff2",
+    "range": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+    "bytes": 23128
+  },
+  {
+    "family": "Instrument Serif",
+    "style": "italic",
+    "weights": [
+      400
+    ],
+    "file": "instrument-serif-italic-latin.5a51946dff.woff2",
+    "range": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+    "bytes": 22128
+  },
+  {
+    "family": "Instrument Serif",
+    "style": "normal",
+    "weights": [
+      400
+    ],
+    "file": "instrument-serif-normal-latin.5eb09b5ac0.woff2",
+    "range": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+    "bytes": 21032
+  }
+]

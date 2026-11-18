@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750" role="img" aria-label="Harvest horizon">
+<title>Harvest horizon</title>
+<desc>Original PopupLoom abstract artwork authored for this project on 2026-11-18. A low amber sun over a quiet field in harvest tones.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF7EA"/><stop offset="1" stop-color="#EBCFA6"/></linearGradient>
+  <filter id="blur" filterUnits="userSpaceOnUse" x="-400" y="-400" width="2000" height="1550"><feGaussianBlur stdDeviation="90"/></filter>
+  <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="18"/></filter>
+  <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+  <linearGradient id="pane" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.55"/><stop offset="1" stop-color="#fff" stop-opacity="0.12"/></linearGradient>
+  <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9A5A1E" stop-opacity=".9"/><stop offset=".35" stop-color="#9A5A1E" stop-opacity="0"/></linearGradient>
+  <linearGradient id="archfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E8A24E" stop-opacity=".55"/><stop offset="1" stop-color="#E8A24E" stop-opacity="0"/></linearGradient>
+  <radialGradient id="orbfill" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="#E8A24E"/><stop offset=".55" stop-color="#E8A24E"/><stop offset="1" stop-color="#EBCFA6"/></radialGradient>
+  <radialGradient id="sun" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#E8A24E" stop-opacity=".95"/><stop offset=".7" stop-color="#E8A24E" stop-opacity=".35"/><stop offset="1" stop-color="#E8A24E" stop-opacity="0"/></radialGradient>
+  <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EBCFA6" stop-opacity=".9"/><stop offset="1" stop-color="#EBCFA6"/></linearGradient>
+  <linearGradient id="fadeTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF7EA"/><stop offset=".85" stop-color="#FFF7EA" stop-opacity=".0"/></linearGradient>
+  <radialGradient id="vig" cx="55%" cy="45%" r="80%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.12"/></radialGradient>
+</defs>
+<rect width="1200" height="750" fill="url(#bg)"/>
+<g filter="url(#blur)"><ellipse cx="800" cy="380" rx="380" ry="270" fill="#F3C98C" opacity="0.9"/><ellipse cx="220" cy="160" rx="300" ry="200" fill="#FFF0D8" opacity="0.9"/></g>
+
+    <circle cx="800" cy="455" r="150" fill="url(#sun)"/>
+    <rect x="0" y="455" width="1200" height="295" fill="url(#ground)"/>
+    <line x1="0" y1="455" x2="1200" y2="455" stroke="#9A5A1E" stroke-opacity=".4" stroke-width="1.2"/>
+    <line x1="0" y1="490" x2="1200" y2="490" stroke="#9A5A1E" stroke-opacity="0.16" stroke-width="1"/><line x1="0" y1="512" x2="1200" y2="512" stroke="#9A5A1E" stroke-opacity="0.13" stroke-width="1"/><line x1="0" y1="578" x2="1200" y2="578" stroke="#9A5A1E" stroke-opacity="0.10" stroke-width="1"/><line x1="0" y1="688" x2="1200" y2="688" stroke="#9A5A1E" stroke-opacity="0.07" stroke-width="1"/>
+<rect width="1200" height="750" fill="url(#vig)"/>
+<rect width="1200" height="750" filter="url(#grain)" opacity="0.06" style="mix-blend-mode:overlay"/>
+</svg>

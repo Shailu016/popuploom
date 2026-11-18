@@ -43,10 +43,10 @@ function check(name, condition, detail) {
   check("guide CSP no unsafe-eval", !(guide.headers.get("content-security-policy") || "").includes("unsafe-eval"));
   const account = await get(SITE + "/profile.html");
   check("ads absent on private pages", !/adsbygoogle|data-pl-ad/.test(account.text), "ad code on account page");
-  check("versioned embed in install docs", home.text.includes("/embed/1.1.0/popuploom.js"));
+  check("versioned embed in install docs", home.text.includes("/embed/1.2.0/popuploom.js"));
 
-  const embed = await get(SITE + "/embed/1.1.0/popuploom.js");
-  const sums = await get(SITE + "/embed/1.1.0/SHA256SUMS");
+  const embed = await get(SITE + "/embed/1.2.0/popuploom.js");
+  const sums = await get(SITE + "/embed/1.2.0/SHA256SUMS");
   const hash = crypto.createHash("sha256").update(embed.text).digest("hex");
   check(
     "embed checksum",
@@ -54,7 +54,9 @@ function check(name, condition, detail) {
     "served hash " + hash
   );
   check("embed immutable cache", (embed.headers.get("cache-control") || "").includes("immutable"));
-  check("embed version marker", embed.text.includes('Runtime.version = "1.1.0"'));
+  check("embed version marker", embed.text.includes('Runtime.version = "1.2.0"'));
+  const frozen = await get(SITE + "/embed/1.1.0/popuploom.js");
+  check("frozen 1.1.0 embed unchanged", require("crypto").createHash("sha256").update(frozen.text).digest("hex") === "d452116065ed9181726309d96306665ae1d6c95dce9bffe5ea22922ab6e50ac5");
 
   for (const path of ["/security.html", "/faq.html", "/press.html", "/sitemap.xml"]) {
     const r = await get(SITE + path);

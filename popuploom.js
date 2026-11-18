@@ -1,10 +1,9 @@
 /*!
- * PopupLoom: self-serve popup runtime (v1.1)
+ * PopupLoom: self-serve popup runtime (v1.2)
  * Drop-in widget engine. No dependencies. Everything rendered by this file.
- * Served byte-for-byte at both /popuploom.js and /popforge.js.
+ * Served at /popuploom.js and, as an immutable release, at /embed/<version>/popuploom.js.
  * Usage: <div data-popuploom="<hosted widget id>"></div><script src="popuploom.js"></script>
- * The legacy data-popforge attribute, inline base64 payloads and window.PopForge
- * namespace keep working for sites that installed the previous snippet.
+ * Inline base64 payloads are supported for self-contained embeds.
  * © You, 2026. MIT-ish. Do what you want.
  */
 (function () {
@@ -14,10 +13,9 @@
   // filenames, including when the script is relocated by a bundler.
   var executingScript = document.currentScript || null;
 
-  // One runtime, two public names. Either filename may load first; the second
-  // one re-scans and returns instead of mounting a second copy of everything.
-  var existing = (window.PopupLoom && window.PopupLoom.scan && window.PopupLoom) ||
-    (window.PopForge && window.PopForge.scan && window.PopForge) || null;
+  // A second copy of this script on the same page re-scans and returns instead
+  // of mounting everything twice.
+  var existing = (window.PopupLoom && window.PopupLoom.scan && window.PopupLoom) || null;
   if (existing) {
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", existing.scan);
     else existing.scan();
@@ -29,15 +27,14 @@
   /* ------------------------------------------------------------------ */
   function detectApiBase() {
     // Precedence: per-node data-api (see apiFor) > window.POPUPLOOM_API >
-    // legacy window.POPFORGE_API > the origin that served this script.
+    // the origin that served this script.
     if (window.POPUPLOOM_API) return String(window.POPUPLOOM_API).replace(/\/$/, "");
-    if (window.POPFORGE_API) return String(window.POPFORGE_API).replace(/\/$/, "");
     if (executingScript && executingScript.src) {
       try { return new URL(executingScript.src).origin; } catch (e) {}
     }
     // Fallback for async/injected scripts: the last matching tag is the one
     // most likely to have started this boot.
-    var scripts = document.querySelectorAll('script[src*="popuploom.js"], script[src*="popforge.js"]');
+    var scripts = document.querySelectorAll('script[src*="popuploom.js"]');
     for (var i = scripts.length - 1; i >= 0; i--) {
       try { return new URL(scripts[i].src).origin; } catch (e) {}
     }
@@ -70,11 +67,8 @@
     for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
     return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
   }
-  // Both public names point at the same object, so scripts that look for either
-  // one see the same instances, helpers and settings.
-  var Runtime = window.PopupLoom || window.PopForge || {};
+  var Runtime = window.PopupLoom || {};
   window.PopupLoom = Runtime;
-  window.PopForge = Runtime;
   Runtime.encodeCfg = encodeCfg;
 
   /* ------------------------------------------------------------------ */
@@ -84,16 +78,17 @@
 :root { --pf-font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Inter, Arial, sans-serif; }
 .pf-root, .pf-root * { box-sizing: border-box; font-family: var(--pf-font); margin: 0; }
 .pf-overlay {
-  position: fixed; inset: 0; background: rgba(7,9,13,.6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  position: fixed; inset: 0; background: rgba(9,11,15,.52); backdrop-filter: blur(4px) saturate(.9); -webkit-backdrop-filter: blur(4px) saturate(.9);
   z-index: 2147483000; display: flex; align-items: center; justify-content: center; padding: 20px;
 }
 .pf-card {
   position: relative; color: var(--pf-text, #101314); background: var(--pf-bg, #fff); border-radius: var(--pf-radius, 20px);
-  width: min(430px, 92vw); padding: 30px 28px 28px; text-align: left;
-  border: 1px solid rgba(15,20,26,.07);
-  box-shadow: 0 1px 0 rgba(255,255,255,.5) inset, 0 2px 6px rgba(0,0,0,.08), 0 30px 80px rgba(0,0,0,.4);
+  width: min(440px, 92vw); padding: 32px 30px 28px; text-align: left;
+  border: 1px solid rgba(15,20,26,.08);
+  box-shadow: 0 0 0 1px rgba(15,20,26,.02), 0 1px 2px rgba(15,20,26,.06), 0 8px 24px -6px rgba(15,20,26,.14), 0 32px 72px -12px rgba(15,20,26,.32);
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
 }
-.pf-card.pf-ink { border-color: rgba(255,255,255,.09); }
+.pf-card.pf-ink { border-color: rgba(255,255,255,.08); box-shadow: 0 0 0 1px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.05) inset, 0 32px 72px -12px rgba(0,0,0,.6); }
 .pf-card.pf-bgimg { background-size: cover; background-position: center; }
 .pf-card.pf-bgimg::before {
   content: ""; position: absolute; inset: 0; border-radius: inherit;
@@ -124,90 +119,121 @@
   .pf-card.pf-split .pf-title { font-size: 24px; }
   .pf-card.pf-split .pf-age-row { flex-direction: column; gap: 10px; margin-top: 18px; }
 }
+/* hero layout: image runs edge to edge above the text */
+.pf-card.pf-hero { padding: 0; overflow: hidden; }
+.pf-card.pf-hero > .pf-hero-media img { width: 100%; display: block; aspect-ratio: 16 / 9; object-fit: cover; margin: 0; border-radius: 0; }
+.pf-card.pf-hero > .pf-body { padding: 26px 30px 28px; }
+.pf-card.pf-hero .pf-close { background: rgba(255,255,255,.9); color: #101314; opacity: 1; box-shadow: 0 1px 4px rgba(0,0,0,.25); }
+.pf-card.pf-hero .pf-close:hover { background: #fff; }
+.pf-card.pf-split-left > .pf-media { order: -1; }
 .pf-close {
-  position: absolute; top: 14px; right: 14px; width: 32px; height: 32px; border: none; border-radius: 999px;
-  cursor: pointer; font-size: 13px; line-height: 1; display: grid; place-items: center;
-  background: rgba(0,0,0,.07); color: inherit; z-index: 2; transition: background .12s ease, transform .12s ease;
+  position: absolute; top: 14px; right: 14px; width: 30px; height: 30px; border: none; border-radius: 999px;
+  cursor: pointer; font-size: 12px; line-height: 1; display: grid; place-items: center;
+  background: rgba(15,20,26,.06); color: inherit; opacity: .72; z-index: 2;
+  transition: background .15s ease, opacity .15s ease;
 }
-.pf-ink .pf-close { background: rgba(255,255,255,.1); }
-.pf-close:hover { background: rgba(0,0,0,.14); transform: rotate(90deg); }
+.pf-ink .pf-close { background: rgba(255,255,255,.08); }
+.pf-close:hover { background: rgba(15,20,26,.11); opacity: 1; }
+.pf-ink .pf-close:hover { background: rgba(255,255,255,.14); }
+.pf-close:focus-visible, .pf-btn:focus-visible, .pf-choice:focus-visible, .pf-coupon:focus-visible, .pf-age-deny:focus-visible { outline: 2px solid var(--pf-accent, #F99A1F); outline-offset: 2px; }
 
 /* interior blocks */
+/* Eyebrow label: an accent dot and quiet uppercase text on a tinted chip.
+   Reads against light and dark cards and any accent, unlike a filled pill. */
 .pf-badge {
-  display: inline-flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 800;
-  letter-spacing: .1em; text-transform: uppercase; padding: 6px 12px; border-radius: 999px;
-  color: var(--pf-on-accent, #0C110E); background: var(--pf-accent, #F99A1F); margin-bottom: 14px;
+  display: inline-flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase; padding: 5px 10px 5px 9px; border-radius: 999px;
+  color: inherit; background: rgba(127,127,127,.1); background: color-mix(in srgb, var(--pf-accent, #F99A1F) 13%, transparent);
+  border: 1px solid rgba(127,127,127,.14); border-color: color-mix(in srgb, var(--pf-accent, #F99A1F) 26%, transparent);
+  margin-bottom: 16px;
 }
-.pf-title { font-size: 27px; line-height: 1.14; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 10px; }
-.pf-text { font-size: 15px; line-height: 1.6; opacity: .82; margin-bottom: 18px; white-space: pre-line; }
-.pf-media img { width: 100%; display: block; border-radius: 14px; margin-bottom: 16px; }
-.pf-vid { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 14px; overflow: hidden; margin-bottom: 16px; }
+.pf-badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--pf-accent, #F99A1F); flex-shrink: 0; }
+.pf-title { font-size: 26px; line-height: 1.16; font-weight: 700; letter-spacing: -0.022em; margin-bottom: 10px; white-space: pre-line; text-wrap: balance; }
+.pf-text { font-size: 15px; line-height: 1.58; opacity: .74; margin-bottom: 20px; white-space: pre-line; text-wrap: pretty; }
+.pf-media img { width: 100%; display: block; aspect-ratio: 16 / 10; object-fit: cover; border-radius: max(6px, calc(var(--pf-radius, 20px) - 10px)); margin-bottom: 20px; }
+.pf-vid { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: max(6px, calc(var(--pf-radius, 20px) - 10px)); overflow: hidden; margin-bottom: 20px; }
 .pf-vid iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 .pf-vid-ph {
-  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 10px;
-  background: linear-gradient(135deg, #1B2029, #0D1015); color: #fff;
-  font: 700 13px/1 var(--pf-font, ui-sans-serif, system-ui, sans-serif); letter-spacing: .02em;
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 12px;
+  background: radial-gradient(120% 90% at 30% 20%, #2A3140, #0D1015 70%); color: #fff;
+  font: 600 13px/1 var(--pf-font, ui-sans-serif, system-ui, sans-serif); letter-spacing: .01em;
 }
 .pf-vid-ph span {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 34px; height: 34px; border-radius: 50%; background: rgba(255, 255, 255, .14); font-size: 12px;
+  display: inline-flex; align-items: center; justify-content: center; padding-left: 3px;
+  width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,.95); color: #0D1015; font-size: 13px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
 }
 .pf-countdown { display: flex; gap: 8px; margin-bottom: 18px; }
 .pf-countdown .u {
-  flex: 1; text-align: center; padding: 11px 4px 9px; border-radius: 12px;
-  background: rgba(127,127,127,.09); border: 1px solid rgba(127,127,127,.16);
+  flex: 1; text-align: center; padding: 12px 4px 10px; border-radius: 10px;
+  background: rgba(127,127,127,.07); border: 1px solid rgba(127,127,127,.14);
 }
-.pf-countdown .n { font-size: 24px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
-.pf-countdown .l { font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; opacity: .6; margin-top: 2px; }
+.pf-countdown .n { font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; line-height: 1.1; }
+.pf-countdown .l { font-size: 10px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; opacity: .55; margin-top: 4px; }
 .pf-coupon {
   display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: pointer;
-  border: 1.5px dashed rgba(127,127,127,.5); border-radius: 12px; padding: 12px 15px; margin-bottom: 18px;
-  font-weight: 700; background: rgba(127,127,127,.05);
-  transition: transform .12s ease, border-color .12s ease;
+  border: 1px dashed rgba(127,127,127,.45); border-radius: 10px; padding: 8px 8px 8px 16px; margin-bottom: 14px;
+  font-weight: 600; background: rgba(127,127,127,.05);
+  transition: border-color .15s ease, background .15s ease;
 }
-.pf-coupon:hover { transform: translateY(-1px); border-color: currentColor; }
-.pf-coupon .code { font-family: ui-monospace, "Cascadia Mono", Menlo, monospace; font-size: 15px; letter-spacing: .08em; }
-.pf-coupon .hint { font-size: 10px; font-weight: 700; opacity: .55; text-transform: uppercase; letter-spacing: .08em; }
+.pf-coupon:hover { border-color: var(--pf-accent, #F99A1F); background: rgba(127,127,127,.08); }
+.pf-coupon .code { font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace; font-size: 15px; font-weight: 600; letter-spacing: .1em; }
+.pf-coupon .hint {
+  font-size: 11px; font-weight: 600; letter-spacing: .02em; padding: 7px 11px; border-radius: 7px;
+  background: rgba(127,127,127,.12); opacity: .9; white-space: nowrap;
+}
 .pf-form .field { margin-bottom: 10px; }
 .pf-form input, .pf-form .inp {
-  width: 100%; padding: 12px 14px; border-radius: 12px; font-size: 14.5px; outline: none;
-  border: 1px solid rgba(127,127,127,.32); background: rgba(127,127,127,.06); color: inherit;
-  transition: border-color .12s ease, background .12s ease;
+  width: 100%; padding: 13px 14px; border-radius: 10px; font-size: 15px; outline: none;
+  border: 1px solid rgba(127,127,127,.3); background: rgba(127,127,127,.04); color: inherit;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
 }
-.pf-form input:focus { border-color: var(--pf-accent, #F99A1F); background: rgba(249,154,31,.08); background: color-mix(in srgb, var(--pf-accent, #F99A1F) 10%, transparent); }
-.pf-form .err { color: #FF7A66; font-size: 12px; margin-bottom: 8px; display: none; }
+.pf-form input::placeholder { color: inherit; opacity: .5; }
+.pf-form input:focus { border-color: var(--pf-accent, #F99A1F); box-shadow: 0 0 0 3px rgba(249,154,31,.18); box-shadow: 0 0 0 3px color-mix(in srgb, var(--pf-accent, #F99A1F) 22%, transparent); }
+.pf-form .err { color: #E5484D; font-size: 12.5px; margin-bottom: 8px; display: none; }
+.pf-ink .pf-form .err { color: #FF8A80; }
 .pf-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
-  padding: 14px 18px; font-size: 15.5px; font-weight: 700; border: 0; border-radius: 14px; cursor: pointer;
+  padding: 14px 18px; font-size: 15px; font-weight: 600; letter-spacing: -0.005em; border: 0; border-radius: 10px; cursor: pointer;
   color: var(--pf-on-accent, #261303); background: var(--pf-accent, #F99A1F); text-decoration: none;
-  box-shadow: 0 10px 26px rgba(0,0,0,.16);
-  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+  box-shadow: 0 1px 0 rgba(255,255,255,.18) inset, 0 1px 2px rgba(15,20,26,.16), 0 6px 16px -6px rgba(15,20,26,.3);
+  transition: box-shadow .15s ease, filter .15s ease, transform .15s ease;
 }
 .pf-btn.pf-dark { background: var(--pf-text, #14181F); color: var(--pf-bg, #fff); }
-.pf-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(0,0,0,.2); filter: brightness(1.03); }
+.pf-btn:hover { filter: brightness(1.06); box-shadow: 0 1px 0 rgba(255,255,255,.18) inset, 0 2px 4px rgba(15,20,26,.18), 0 10px 22px -8px rgba(15,20,26,.38); }
+.pf-btn:active { transform: translateY(1px); }
 .pf-btn.pf-dark { background: #14181F; color: #fff; }
-.pf-btn-demo { cursor: default; opacity: .86; }
-.pf-btn-demo:hover { transform: none; box-shadow: none; filter: none; }
-.pf-choice-row { display: flex; gap: 9px; margin-bottom: 18px; }
+.pf-btn-demo { cursor: default; }
+.pf-btn-demo:hover { filter: none; }
+.pf-btn-demo:active { transform: none; }
+.pf-choice-row { display: flex; gap: 8px; margin-bottom: 18px; }
 .pf-choice {
-  flex: 1; padding: 15px 6px 12px; border-radius: 12px; cursor: pointer; text-align: center; border: 1px solid rgba(127,127,127,.26);
-  background: rgba(127,127,127,.05); font-size: 22px; transition: transform .1s ease, border-color .1s ease, background .1s ease;
+  flex: 1; padding: 14px 8px 12px; border-radius: 10px; cursor: pointer; text-align: center; border: 1px solid rgba(127,127,127,.24);
+  background: rgba(127,127,127,.04); font-size: 20px; line-height: 1.1; transition: border-color .15s ease, background .15s ease;
 }
-.pf-choice small { display: block; font-size: 10.5px; font-weight: 700; opacity: .65; margin-top: 4px; }
-.pf-choice:hover { transform: translateY(-2px); border-color: #F99A1F; background: rgba(249,154,31,.1); }
-.pf-links { display: flex; gap: 9px; margin-top: 16px; flex-wrap: wrap; }
+.pf-choice small { display: block; font-size: 12px; font-weight: 600; opacity: .8; margin-top: 6px; line-height: 1.3; }
+.pf-choice.pf-choice-text { padding: 13px 10px; display: flex; align-items: center; justify-content: center; }
+.pf-choice.pf-choice-text small { font-size: 13.5px; opacity: 1; margin: 0; }
+.pf-choice:hover { border-color: var(--pf-accent, #F99A1F); background: rgba(127,127,127,.08); background: color-mix(in srgb, var(--pf-accent, #F99A1F) 9%, transparent); }
+.pf-links { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
 .pf-links a, .pf-links .pf-link-demo {
-  flex: 1; min-width: 90px; text-align: center; font-size: 13px; font-weight: 700; text-decoration: none;
-  color: inherit; padding: 11px 8px; border-radius: 12px; background: rgba(127,127,127,.08);
-  border: 1px solid rgba(127,127,127,.18);
+  flex: 1; min-width: 90px; text-align: center; font-size: 13px; font-weight: 600; text-decoration: none;
+  color: inherit; padding: 11px 10px; border-radius: 10px; background: rgba(127,127,127,.05);
+  border: 1px solid rgba(127,127,127,.2);
   display: inline-flex; align-items: center; justify-content: center;
+  transition: border-color .15s ease, background .15s ease;
 }
-.pf-link-demo { cursor: default; opacity: .82; }
-.pf-preview-tag { position: absolute; z-index: 2147483646; top: 0; left: 50%; transform: translateX(-50%); padding: 7px 14px; border-radius: 0 0 10px 10px; background: #FF6A1F; color: #1A1005; font: 800 10.5px/1.2 ui-sans-serif, system-ui, sans-serif; letter-spacing: .1em; text-transform: uppercase; pointer-events: none; white-space: nowrap; box-shadow: 0 8px 24px rgba(0,0,0,.35); }
-.pf-links a:hover { border-color: #F99A1F; }
-.pf-note { font-size: 11.5px; opacity: .55; margin-top: 12px; text-align: center; }
-.pf-thanks { text-align: center; padding: 14px 0 6px; }
-.pf-thanks .big { font-size: 34px; margin-bottom: 8px; }
+.pf-link-demo { cursor: default; }
+.pf-preview-tag { position: absolute; z-index: 2147483646; top: 0; left: 50%; transform: translateX(-50%); padding: 6px 12px; border-radius: 0 0 8px 8px; background: rgba(17,19,24,.92); color: #fff; font: 600 10.5px/1.2 ui-sans-serif, system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; pointer-events: none; white-space: nowrap; box-shadow: 0 6px 18px rgba(0,0,0,.28); }
+.pf-links a:hover { border-color: var(--pf-accent, #F99A1F); background: rgba(127,127,127,.09); }
+.pf-note { font-size: 12px; line-height: 1.45; opacity: .5; margin-top: 14px; text-align: center; }
+.pf-thanks { text-align: center; padding: 16px 0 6px; }
+.pf-thanks .big { font-size: 30px; margin-bottom: 12px; }
+.pf-thanks .pf-check {
+  width: 48px; height: 48px; margin: 0 auto 14px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--pf-accent, #F99A1F); color: var(--pf-on-accent, #261303);
+}
+.pf-thanks .pf-check svg { width: 22px; height: 22px; }
 
 /* placements */
 .pf-holder { position: fixed; z-index: 2147483001; }
@@ -223,20 +249,28 @@
 .pf-holder.pf-bar.top { top: 0; }
 .pf-holder.pf-bar.bottom { bottom: 0; }
 .pf-holder.pf-bar .pf-card {
-  width: 100%; border-radius: 0; padding: 14px 22px; display: flex; align-items: center; gap: 18px;
+  width: 100%; border-radius: 0; padding: 12px 64px 12px 24px; display: flex; align-items: center; justify-content: center; gap: 16px;
+  border-width: 0 0 1px; box-shadow: 0 1px 0 rgba(15,20,26,.04), 0 8px 24px -12px rgba(15,20,26,.3);
 }
-.pf-holder.pf-bar .pf-title { font-size: 15.5px; margin: 0; }
-.pf-holder.pf-bar .pf-text { margin: 0; font-size: 13px; flex: 1; }
+.pf-holder.pf-bar.bottom .pf-card { border-width: 1px 0 0; }
+.pf-holder.pf-bar .pf-body { display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; max-width: 1080px; }
+.pf-holder.pf-bar .pf-title { font-size: 14.5px; font-weight: 600; letter-spacing: -0.01em; margin: 0; }
+.pf-holder.pf-bar .pf-text { margin: 0; font-size: 13.5px; flex: 0 1 auto; }
 .pf-holder.pf-bar .pf-badge { display: none; }
-.pf-holder.pf-bar .pf-btn { width: auto; padding: 10px 18px; font-size: 13.5px; flex-shrink: 0; }
+.pf-holder.pf-bar .pf-btn { width: auto; padding: 8px 14px; font-size: 13px; flex-shrink: 0; border-radius: 8px; }
+@media (max-width: 640px) {
+  .pf-holder.pf-bar .pf-card { padding: 12px 52px 12px 16px; }
+  .pf-holder.pf-bar .pf-body { justify-content: flex-start; gap: 6px 12px; }
+  .pf-holder.pf-bar .pf-text { display: none; }
+}
 .pf-holder.pf-bar .pf-close { top: 50%; transform: translateY(-50%); }
 .pf-holder.pf-bar .pf-close:hover { transform: translateY(-50%) rotate(90deg); }
 
 /* sticky opener button */
 .pf-sticky {
   position: fixed; z-index: 2147482999; right: 22px; bottom: 22px; border: none; cursor: pointer;
-  padding: 13px 20px; border-radius: 999px; font-weight: 700; font-size: 14px; color: #261303;
-  background: #F99A1F; box-shadow: 0 12px 30px rgba(0,0,0,.3); letter-spacing: -0.01em;
+  padding: 12px 18px; border-radius: 999px; font-weight: 600; font-size: 14px; color: #261303;
+  background: #F99A1F; box-shadow: 0 1px 2px rgba(0,0,0,.2), 0 10px 26px -8px rgba(0,0,0,.4); letter-spacing: -0.01em;
   transition: transform .12s ease, box-shadow .12s ease;
 }
 .pf-sticky:hover { transform: translateY(-2px); box-shadow: 0 16px 36px rgba(0,0,0,.34); }
@@ -245,8 +279,8 @@
 .pf-age-row { display: flex; flex-direction: column; gap: 10px; margin-bottom: 4px; }
 .pf-age-deny {
   display: inline-flex; align-items: center; justify-content: center; width: 100%;
-  padding: 13px 18px; font-size: 15px; font-weight: 700; border-radius: 14px; cursor: pointer;
-  border: 1.5px solid rgba(127,127,127,.32); background: transparent; color: inherit; text-decoration: none;
+  padding: 13px 18px; font-size: 15px; font-weight: 600; border-radius: 10px; cursor: pointer;
+  border: 1px solid rgba(127,127,127,.32); background: transparent; color: inherit; text-decoration: none;
   transition: border-color .12s ease, background .12s ease;
 }
 .pf-age-deny:hover { border-color: currentColor; background: rgba(127,127,127,.07); }
@@ -256,8 +290,8 @@
 .pf-spin-stage { position: relative; width: 216px; height: 216px; margin: 0 auto 14px; }
 .pf-spin-wheel {
   position: absolute; inset: 0; border-radius: 50%;
-  border: 6px solid rgba(255,255,255,.92);
-  box-shadow: 0 14px 36px rgba(0,0,0,.28), 0 0 0 1px rgba(0,0,0,.06) inset;
+  border: 3px solid rgba(255,255,255,.9);
+  box-shadow: 0 12px 32px -8px rgba(0,0,0,.4), 0 0 0 1px rgba(0,0,0,.08);
   transition: transform 4.3s cubic-bezier(.12,.72,.08,1);
   will-change: transform;
 }
@@ -271,16 +305,15 @@
 .pf-spin-hub {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); z-index: 2;
   width: 64px; height: 64px; border-radius: 50%; border: none; cursor: pointer;
-  background: #12161D; color: #fff; font-weight: 800; font-size: 12px; letter-spacing: .04em;
-  box-shadow: 0 8px 20px rgba(0,0,0,.4), 0 0 0 4px rgba(255,255,255,.28);
+  background: #12161D; color: #fff; font-weight: 600; font-size: 12px; letter-spacing: .02em; line-height: 1.15;
+  box-shadow: 0 6px 16px rgba(0,0,0,.4), 0 0 0 3px rgba(255,255,255,.85);
   transition: transform .12s ease;
 }
 .pf-spin-hub:hover { transform: translate(-50%,-50%) scale(1.07); }
 .pf-spin-hub:disabled { cursor: default; opacity: .85; }
 .pf-spin-seg {
   position: absolute; left: 50%; top: 50%; width: 76px; margin: -9px 0 0 -38px;
-  text-align: center; font-size: 10.5px; font-weight: 800; letter-spacing: .01em; line-height: 1.2;
-  text-shadow: 0 1px 2px rgba(0,0,0,.18);
+  text-align: center; font-size: 10px; font-weight: 700; letter-spacing: .03em; line-height: 1.2;
 }
 
 /* social proof */
@@ -295,7 +328,7 @@
 .pf-proof .pf-pname { font-weight: 800; font-size: 14px; letter-spacing: -0.01em; }
 .pf-proof .pf-paction { font-size: 13px; opacity: .78; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pf-proof .pf-pago { font-size: 11px; opacity: .5; margin-top: 2px; }
-.pf-proof-sample { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .62; margin-bottom: 8px; }
+.pf-proof-sample { font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; opacity: .62; margin-bottom: 8px; }
 .pf-proof-empty { font-size: 12.5px; opacity: .72; line-height: 1.4; }
 .pf-proof-card .pf-close { top: 10px; right: 10px; width: 26px; height: 26px; font-size: 11px; }
 
@@ -306,16 +339,20 @@
 }
 
 /* animations */
-@keyframes pfPop { from { transform: scale(.86); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes pfPop { from { transform: translateY(8px) scale(.97); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes pfFade { from { opacity: 0; } to { opacity: 1; } }
-@keyframes pfSlideUp { from { transform: translateY(28px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-@keyframes pfSlideDown { from { transform: translateY(-28px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-@keyframes pfOut { to { transform: scale(.94); opacity: 0; } }
-.pf-anim-pop { animation: pfPop .32s cubic-bezier(.2,.9,.3,1.25); }
+@keyframes pfSlideUp { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes pfSlideDown { from { transform: translateY(-16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes pfOut { to { transform: translateY(4px) scale(.98); opacity: 0; } }
+.pf-anim-pop { animation: pfPop .34s cubic-bezier(.16,1,.3,1); }
 .pf-anim-fade { animation: pfFade .28s ease; }
-.pf-anim-slideUp { animation: pfSlideUp .32s cubic-bezier(.2,.8,.2,1); }
-.pf-anim-slideDown { animation: pfSlideDown .32s cubic-bezier(.2,.8,.2,1); }
+.pf-anim-slideUp { animation: pfSlideUp .34s cubic-bezier(.16,1,.3,1); }
+.pf-anim-slideDown { animation: pfSlideDown .34s cubic-bezier(.16,1,.3,1); }
 .pf-anim-out { animation: pfOut .16s ease forwards; }
+@media (prefers-reduced-motion: reduce) {
+  .pf-anim-pop, .pf-anim-fade, .pf-anim-slideUp, .pf-anim-slideDown, .pf-anim-out { animation-duration: .01ms; }
+  .pf-spin-wheel { transition-duration: .01ms; }
+}
 
 /* preview mode (editor / gallery) */
 .pf-stage { position: relative; overflow: hidden; border-radius: 14px; }
@@ -517,7 +554,10 @@
       if (this.preview && closeBtn) closeBtn.onclick = function () { /* disabled in preview */ };
 
       var cpn = holder.querySelector(".pf-coupon");
-      if (cpn) cpn.onclick = function () { copyText(this.querySelector(".code").textContent, this.querySelector(".hint")); };
+      if (cpn) {
+        cpn.onclick = function () { copyText(this.querySelector(".code").textContent, this.querySelector(".hint")); };
+        cpn.onkeydown = function (ev) { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); cpn.onclick(); } };
+      }
 
       var spinEl = holder.querySelector(".pf-spin");
       if (spinEl) wireSpin(self, spinEl);
@@ -532,13 +572,16 @@
         var ag = mc.ageGate || {};
         if (!self.preview && ag.denyUrl) { location.href = safeUrl(ag.denyUrl, false); return; }
         var cv = self.holderEl.querySelector(".pf-body");
-        if (cv) cv.innerHTML = '<div class="pf-thanks"><div class="big">&#128683;</div><div class="pf-title" style="font-size:18px">' + esc(ag.denyMessage || "Sorry, this site is for adults only.") + '</div></div>';
+        if (cv) cv.innerHTML = '<div class="pf-thanks">' + thanksIcon(null, "deny") + '<div class="pf-title" style="font-size:18px">' + esc(ag.denyMessage || "Sorry, this site is for adults only.") + '</div></div>';
       };
 
       var choices = holder.querySelectorAll(".pf-choice");
       choices.forEach(function (el) {
         el.onclick = function () {
           submitLike(self, { choice: el.getAttribute("data-v") });
+        };
+        el.onkeydown = function (ev) {
+          if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); el.onclick(); }
         };
       });
 
@@ -612,8 +655,8 @@
     notify: function (evName) {
       if (this.preview || this.test) return;
       try {
-        if (window.dataLayer) window.dataLayer.push({ event: "popforge_" + evName, popupId: this.cfg.id, popupName: this.cfg.name });
-        dispatchEvent(new CustomEvent("popforge:" + evName, { detail: { id: this.cfg.id, name: this.cfg.name } }));
+        if (window.dataLayer) window.dataLayer.push({ event: "popuploom_" + evName, popupId: this.cfg.id, popupName: this.cfg.name });
+        dispatchEvent(new CustomEvent("popuploom:" + evName, { detail: { id: this.cfg.id, name: this.cfg.name } }));
       } catch (e) {}
     },
     destroy: function () { this.unbind(); if (this.stickyEl) this.stickyEl.remove(); this.close({ persist: false }); }
@@ -661,19 +704,23 @@
   function cardHTML(self) {
     var c = self.cfg, th = c.theme || {}, mc = c.content || {};
     var p = placementClass(c.placement);
-    var split = th.layout === "split" && !!mc.image && p === "modal";
-    var cls = ["pf-card", animName(th.animation, c.placement), p === "modal" ? "" : "", th.style === "ink" ? "pf-ink" : "", split ? "pf-split" : ""].join(" ");
+    var left = th.layout === "splitLeft";
+    var split = (th.layout === "split" || left) && !!mc.image && p === "modal";
+    var hero = th.layout === "hero" && !!mc.image && p === "modal";
+    var cls = ["pf-card", animName(th.animation, c.placement), p === "modal" ? "" : "", th.style === "ink" ? "pf-ink" : "", split ? "pf-split" : "", split && left ? "pf-split-left" : "", hero ? "pf-hero" : ""].join(" ");
     var corner = cornerClass(c.placement);
     var h = '<div class="' + cls + (th.bgImage ? " pf-bgimg" : "") + (corner ? ' pf-corner-' + corner : "") + '"' + cardAttrs(th) + (th.bgImage ? ' data-bg="' + escAttr(th.bgImage) + '"' : "") + ">";
-    h += '<button class="pf-close" aria-label="Close">&#10005;</button><div class="pf-body">';
+    h += '<button class="pf-close" aria-label="Close">&#10005;</button>';
+    if (hero) h += '<div class="pf-media pf-hero-media"><img loading="lazy" decoding="async" src="' + escAttr(safeUrl(mc.image, true)) + '" alt=""></div>';
+    h += '<div class="pf-body">';
     var A = safeColor(th.accent, "#F99A1F");
     if (mc.badge) h += '<div class="pf-badge">' + esc(mc.badge) + "</div>";
-    if (mc.image && !split) h += '<div class="pf-media"><img loading="lazy" decoding="async" src="' + escAttr(safeUrl(mc.image, true)) + '" alt=""></div>';
+    if (mc.image && !split && !hero) h += '<div class="pf-media"><img loading="lazy" decoding="async" src="' + escAttr(safeUrl(mc.image, true)) + '" alt=""></div>';
     if (mc.videoEmbed) h += '<div class="pf-vid">' + videoFrame(mc.videoEmbed, !!(self.preview && self.stage && self.stage.classList && self.stage.classList.contains("tpl-canvas"))) + "</div>";
     if (mc.title) h += '<div class="pf-title">' + esc(mc.title) + "</div>";
     if (mc.body) h += '<div class="pf-text">' + esc(mc.body) + "</div>";
     if (mc.countdown && mc.countdown.target) h += '<div class="pf-countdown" data-target="' + escAttr(mc.countdown.target) + '"><div class="u"><div class="n d">00</div><div class="l">Days</div></div><div class="u"><div class="n h">00</div><div class="l">Hrs</div></div><div class="u"><div class="n m">00</div><div class="l">Min</div></div><div class="u"><div class="n s">00</div><div class="l">Sec</div></div></div>';
-    if (mc.coupon && mc.coupon.code) h += '<div class="pf-coupon"><span class="code">' + esc(mc.coupon.code) + '</span><span class="hint">Click to copy</span></div>';
+    if (mc.coupon && mc.coupon.code) h += '<div class="pf-coupon" role="button" tabindex="0" aria-label="' + escAttr("Copy code " + mc.coupon.code) + '"><span class="code">' + esc(mc.coupon.code) + '</span><span class="hint">Copy</span></div>';
     if (mc.spin && mc.spin.enabled && (mc.spin.segments || []).length) {
       var segs = mc.spin.segments;
       var segA = 360 / segs.length;
@@ -691,7 +738,7 @@
     }
     if (mc.choices && mc.choices.length) {
       h += '<div class="pf-choice-row">';
-      mc.choices.forEach(function (ch) { h += '<div class="pf-choice" data-v="' + escAttr(ch.value || ch.label) + '">' + esc(ch.emoji || "") + "<small>" + esc(ch.label || "") + "</small></div>"; });
+      mc.choices.forEach(function (ch) { h += '<div class="pf-choice' + (ch.emoji ? "" : " pf-choice-text") + '" role="button" tabindex="0" data-v="' + escAttr(ch.value || ch.label) + '">' + esc(ch.emoji || "") + "<small>" + esc(ch.label || "") + "</small></div>"; });
       h += "</div>";
     }
     if (mc.form && mc.form.enabled) {
@@ -792,7 +839,7 @@
     var segA = 360 / segs.length;
     var prizeView = function (prize) {
       var parent = spinEl.parentNode;
-      if (parent) parent.innerHTML = '<div class="pf-thanks"><div class="big">' + esc(prize.emoji || "&#127881;") + '</div><div class="pf-title" style="font-size:20px">' + esc(prize.label || "You won!") + '</div><div class="pf-note">' + ((self.preview || self.test) ? "(preview, nothing was recorded)" : "We logged your spin. Check the fine print below.") + "</div></div>";
+      if (parent) parent.innerHTML = '<div class="pf-thanks">' + thanksIcon(prize.emoji) + '<div class="pf-title" style="font-size:20px">' + esc(prize.label || "You won!") + '</div><div class="pf-note">' + ((self.preview || self.test) ? "(preview, nothing was recorded)" : "We logged your spin. Check the fine print below.") + "</div></div>";
     };
     var pendingPrize = null;
     async function savePrize() {
@@ -908,9 +955,9 @@
           }, safeUrl(formCfg.webhookUrl, false)).catch(function () {});
         }
       }
-      var thanksMsg = formCfg.success || ((mc.ageGate && mc.ageGate.allowMessage) || mc.thanks || "Done! Thanks a bunch.");
+      var thanksMsg = formCfg.success || ((mc.ageGate && mc.ageGate.allowMessage) || mc.thanks || "Thank you. Your response has been saved.");
       var cv = self.holderEl && self.holderEl.querySelector(".pf-body");
-      if (cv) cv.innerHTML = '<div class="pf-thanks"><div class="big">' + esc(mc.successEmoji || mc.emoji || "🎉") + '</div><div class="pf-title" style="font-size:19px">' + esc(thanksMsg) + '</div><div class="pf-note">' + ((self.preview || self.test) ? "(preview, nothing was recorded)" : "We saved your response.") + "</div></div>";
+      if (cv) cv.innerHTML = '<div class="pf-thanks">' + thanksIcon(mc.successEmoji || mc.emoji) + '<div class="pf-title" style="font-size:19px">' + esc(thanksMsg) + '</div><div class="pf-note">' + ((self.preview || self.test) ? "(preview, nothing was recorded)" : "We saved your response.") + "</div></div>";
       self.notify("submit");
       return true;
     } catch (e) {
@@ -937,8 +984,14 @@
     return image ? "" : "#";
   }
   function closeAgainHTMLExcluded() { return ""; }
+  /* Confirmation mark: an owner-set emoji wins; otherwise a clean drawn icon. */
+  function thanksIcon(emoji, kind) {
+    if (emoji) return '<div class="big">' + esc(emoji) + "</div>";
+    var path = kind === "deny" ? '<path d="M7 7l10 10M17 7L7 17"/>' : '<path d="M5 12.5l4.5 4.5L19 7.5"/>';
+    return '<div class="pf-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">' + path + "</svg></div>";
+  }
   function copyText(txt, hintEl) {
-    var done = function () { if (hintEl) { var old = hintEl.textContent; hintEl.textContent = "Copied!"; setTimeout(function () { hintEl.textContent = old; }, 1400); } };
+    var done = function () { if (hintEl) { var old = hintEl.textContent; hintEl.textContent = "Copied"; setTimeout(function () { hintEl.textContent = old; }, 1400); } };
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, function () { fallback(); done(); });
     else { fallback(); done(); }
     function fallback() {
@@ -966,8 +1019,7 @@
   PopupInstance.prototype.mount = function (stage) { this.stage = stage; this.preview = true; };
 
   window.PopupLoom = Runtime;
-  window.PopForge = Runtime;
-  Runtime.version = "1.1.0";
+  Runtime.version = "1.2.0";
   Runtime.show = function (cfg, options) {
     if (!Runtime.EncodeDemo) Runtime.encodeCfg = encodeCfg;
     var inst = new PopupInstance(cfg, null);
@@ -1002,10 +1054,8 @@
     return override ? String(override).replace(/\/$/, "") : API_BASE;
   }
 
-  // A node may carry the new and the old attribute at once. The canonical
-  // data-popuploom value wins deterministically; only one instance is mounted.
-  var MOUNT_ATTRS = ["data-popuploom", "data-popforge"];
-  var READY_ATTRS = ["data-popuploom-ready", "data-popforge-ready"];
+  var MOUNT_ATTRS = ["data-popuploom"];
+  var READY_ATTRS = ["data-popuploom-ready"];
 
   function refFor(node) {
     for (var i = 0; i < MOUNT_ATTRS.length; i++) {
@@ -1024,7 +1074,7 @@
     for (var i = 0; i < READY_ATTRS.length; i++) node.removeAttribute(READY_ATTRS[i]);
   }
   function isTestNode(node) {
-    return node.getAttribute("data-popuploom-test") === "1" || node.getAttribute("data-popforge-test") === "1";
+    return node.getAttribute("data-popuploom-test") === "1";
   }
 
   function mountCfg(cfg, node) {
@@ -1077,7 +1127,7 @@
 
   function boot() {
     clearLegacyLeadCache();
-    document.querySelectorAll("[data-popuploom], [data-popforge]").forEach(function (node) {
+    document.querySelectorAll("[data-popuploom]").forEach(function (node) {
       if (isReady(node)) return;
       setReady(node, "loading");
       var ref = refFor(node);

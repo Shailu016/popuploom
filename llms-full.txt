@@ -1,6 +1,6 @@
 # PopupLoom — full product documentation
 
-> PopupLoom (https://popuploom.com/) is a free website popup builder with 45 templates, a visual editor, hosted widget configuration and lead capture. This file extends /llms.txt for AI readers. Every fact here is checked against the shipped product source. Nothing in this documentation promises conversions, availability or search-engine visibility.
+> PopupLoom (https://popuploom.com/) is a free website popup builder with 53 templates, a visual editor, hosted widget configuration and lead capture. This file extends /llms.txt for AI readers. Every fact here is checked against the shipped product source. Nothing in this documentation promises conversions, availability or search-engine visibility.
 
 ## Product summary
 - PopupLoom builds website popups for any site that can run custom HTML and JavaScript.
@@ -9,7 +9,7 @@
 - Widget identifiers are long random strings such as wan_6c45c0f81a23d95c5d5dbe72.
 
 ## Builder capabilities
-- 45 starting templates grouped by purpose: email signup and waitlist, discount and coupon, countdown and seasonal sales, spin the wheel, feedback and micro-survey, link lists and availability, age self-declaration gates, video, social-proof toasts for owner-supplied activity, and announcement bars.
+- 53 starting templates grouped by purpose: email signup and waitlist, discount and coupon, countdown and seasonal sales, spin the wheel, feedback and micro-survey, link lists and availability, age self-declaration gates, video, social-proof toasts for owner-supplied activity, and announcement bars.
 - Popup placements: centered modal, full screen, slide-ins from four corners, top bar and bottom bar.
 - One automatic trigger per widget, chosen from: page load, timed delay in seconds, scroll depth percentage, scroll to a CSS selector, click on a CSS selector, or desktop exit intent.
 - Show-frequency rules: every time, once per day, once per week, once ever, or silent for 24 hours after the visitor closes it.
@@ -29,10 +29,10 @@
 - A widget configuration is limited to 128 KB. A visitor response is limited to 16 KB. Retries with the same request ID are stored once.
 
 ## Embedding and compatibility
-- A saved widget gives a two-line snippet: a widget definition element with the data-popuploom attribute carrying the widget ID, and a script tag loading the immutable release https://popuploom.com/embed/1.1.0/popuploom.js. Both lines are pasted before the closing body tag. The unversioned /popuploom.js path remains as a compatibility alias.
+- A saved widget gives a two-line snippet: a widget definition element with the data-popuploom attribute carrying the widget ID, and a script tag loading the immutable release https://popuploom.com/embed/1.2.0/popuploom.js. Both lines are pasted before the closing body tag. The unversioned /popuploom.js path remains as a compatibility alias.
 - The destination website must allow custom HTML and JavaScript. Widgets cannot escape an iframe they are embedded in.
 - Sites with a Content-Security-Policy must allowlist the runtime origin in their script-src.
-- Legacy embeds installed before the domain move keep working unchanged: the data-popforge attribute and the /popforge.js path on the workers.dev host serve the same runtime bytes.
+- Legacy embeds installed before the domain move keep working unchanged: the older attribute and script path serve the same runtime bytes.
 - The runtime is CORS-open for its public view and submission reporting only; no visitor cookies or credentials are used.
 
 ## Scope boundaries
@@ -55,14 +55,14 @@
 - Signing up uses an email address and a password of at least 12 characters; Google sign-in becomes available when the site owner configures it. A verified Google email links to the same single account for that address.
 - Sessions use a 30-day bearer token that the server can revoke at sign-out.
 - Guest designs live in the browser's local storage and are never uploaded.
-- Guest drafts made on the previous PopForge domain move with a noindexed recovery tool on that host: it lists drafts found in the same browser and downloads them as a JSON backup (up to 200 drafts); the backup is then imported from My popups on PopupLoom. The tool uploads nothing and never deletes or modifies drafts. Account-owned popups already live in the database and are unaffected.
+- Guest drafts made on the previous domain move with a noindexed recovery tool on that host: it lists drafts found in the same browser and downloads them as a JSON backup (up to 200 drafts); the backup is then imported from My popups on PopupLoom. The tool uploads nothing and never deletes or modifies drafts. Account-owned popups already live in the database and are unaffected.
 
 ## Limits and abuse controls
 - All public endpoints apply per-visitor IP rate limits; oversized, deeply nested or prototype-manipulating JSON is rejected before storage.
 - Stored widget configs and lead data are separate; the public API never exposes owner identifiers, counters or lead payloads.
 
 ## Homepage questions and answers (verbatim from the visible FAQ page and its FAQPage markup)
-- What is PopupLoom? — A free website popup builder with a visual editor, 45 templates, saved designs, website embed code and lead capture.
+- What is PopupLoom? — A free website popup builder with a visual editor, 53 templates, saved designs, website embed code and lead capture.
 - Do I need an account? — You can design and preview popups as a guest. Create an account to save popups online and get installation code. Guest drafts are stored in your browser.
 - How do I add a popup to my website? — Save your design, open Publish in the studio, and copy the installation code. Paste the widget div and script before the closing body tag of your website.
 - Can I use PopupLoom with WordPress, Shopify or Webflow? — Install the embed where your platform permits custom HTML or theme code. WordPress Custom HTML, Shopify theme code and Webflow embeds are options, depending on your plan and permissions. Popups placed inside an iframe cannot extend outside that iframe.
@@ -72,7 +72,7 @@
 
 ## Page map
 - Overview and FAQ: https://popuploom.com/
-- All 45 templates grouped by purpose: https://popuploom.com/templates.html
+- All 53 templates grouped by purpose: https://popuploom.com/templates.html
 - FAQ with key facts, platform support and limits: https://popuploom.com/faq.html
 - Press kit with approved descriptions, logos and screenshots: https://popuploom.com/press.html
 - Security and responsible disclosure: https://popuploom.com/security.html

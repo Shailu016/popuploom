@@ -119,7 +119,7 @@ Only launch when these are true:
 - [ ] The launch post says what PopupLoom does **not** do.
 
 Suggested one-line description: “Free popup builder with no pageview limits,
-45 templates and a two-line install.”
+53 templates and a two-line install.”
 
 ---
 

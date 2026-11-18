@@ -266,7 +266,7 @@ https://localtest.me/hook              -> ACCEPTED
 
 **Location:** `contact.html`, `privacy.html`, `terms.html`, `.well-known/security.txt`, homepage line 235, `SECURITY.md`.
 
-**Evidence:** About, Contact, Privacy and Terms exist and are accurate at a high level. There is no `/security` page, no vulnerability disclosure policy page, no domain-based `security@` or `support@` address, no expected response window, no changelog or status page. `security.txt` points to a Gmail address and to the contact page, not a security policy. The homepage links draft recovery to `https://popforge.shailu3597.workers.dev/migration.html`, which weakens the branded identity.
+**Evidence:** About, Contact, Privacy and Terms exist and are accurate at a high level. There is no `/security` page, no vulnerability disclosure policy page, no domain-based `security@` or `support@` address, no expected response window, no changelog or status page. `security.txt` points to a Gmail address and to the contact page, not a security policy. The homepage linked draft recovery to a separate host that did not match the brand (since removed).
 
 **Impact:** Visitors and reviewers cannot easily verify ownership, disclosure process or operational status. A Gmail contact on a security-sensitive page looks less accountable than a domain address. The workers.dev link is exactly the kind of unexplained third-party host that automated scanners and cautious users distrust.
 

@@ -1,6 +1,6 @@
 # SEO scorecard
 
-Last run: 2026-11-17 · https://popuploom.com
+Last run: 2026-11-18 · https://popuploom.com
 
 | Metric | Value |
 |---|---:|
@@ -15,7 +15,6 @@ Last run: 2026-11-17 · https://popuploom.com
 
 | Date | Pages | Issues | Avg words | Thin | Schema | Clicks / impressions |
 |---|---:|---:|---:|---:|---:|---:|
-| 2026-11-16 | 45 | 0 | 873 | 0 | 45/45 | n/a |
 | 2026-11-16 | 45 | 0 | 983 | 0 | 45/45 | n/a |
 | 2026-11-16 | 47 | 0 | 1091 | 0 | 47/47 | n/a |
 | 2026-11-16 | 47 | 0 | 1344 | 0 | 47/47 | n/a |
@@ -27,6 +26,7 @@ Last run: 2026-11-17 · https://popuploom.com
 | 2026-11-16 | 56 | 0 | 1088 | 0 | 56/56 | n/a |
 | 2026-11-17 | 57 | 0 | 1096 | 0 | 57/57 | n/a |
 | 2026-11-17 | 63 | 0 | 1118 | 0 | 63/63 | n/a |
+| 2026-11-18 | 63 | 0 | 1118 | 0 | 63/63 | n/a |
 
 ## How to record GSC data
 

@@ -1,6 +1,6 @@
 # PopupLoom
 
-> PopupLoom is a free website popup builder with 45 templates, a visual editor, hosted widget configuration, optional lead capture, CSV export and signed webhooks. It is built for site owners who can add custom HTML or JavaScript to their own website.
+> PopupLoom is a free website popup builder with 53 templates, a visual editor, hosted widget configuration, optional lead capture, CSV export and signed webhooks. It is built for site owners who can add custom HTML or JavaScript to their own website.
 
 Last reviewed: 2026-11-12. Canonical site: https://popuploom.com/
 
@@ -8,8 +8,8 @@ Last reviewed: 2026-11-12. Canonical site: https://popuploom.com/
 - Category: website popup builder / lead-capture widget.
 - Price: free. No credit card, trial countdown or paid upgrade inside the product.
 - Account: optional for designing and previewing; required to save a widget and get its hosted install code.
-- Templates: 45 original starting designs, plus a blank canvas.
-- Installation: two lines pasted before the closing body tag: a widget element with the saved widget id, and a script tag loading the immutable release https://popuploom.com/embed/1.1.0/popuploom.js. The unversioned /popuploom.js path remains as a compatibility alias.
+- Templates: 53 original starting designs, plus a blank canvas.
+- Installation: two lines pasted before the closing body tag: a widget element with the saved widget id, and a script tag loading the immutable release https://popuploom.com/embed/1.2.0/popuploom.js. The unversioned /popuploom.js path remains as a compatibility alias.
 - Hosting: saved widget configuration is hosted by PopupLoom and fetched by the runtime on each embedded page, so owner edits go live without replacing the snippet.
 - Platform requirement: the destination site must allow custom HTML and JavaScript. A widget cannot escape an iframe it is embedded in.
 
@@ -56,7 +56,7 @@ Last reviewed: 2026-11-12. Canonical site: https://popuploom.com/
 - [FAQ](https://popuploom.com/faq.html): complete answers with key facts, platform support and limits.
 - [Press kit and brand facts](https://popuploom.com/press.html): approved short, medium and long descriptions, key facts, logo and screenshot links, and claim guidance for directories and publications.
 - [Security and responsible disclosure](https://popuploom.com/security.html): security contact, scope, safe testing rules, account/lead protections, incident response and what the project does not claim.
-- [Template catalog](https://popuploom.com/templates.html): all 45 starting designs grouped by purpose.
+- [Template catalog](https://popuploom.com/templates.html): all 53 starting designs grouped by purpose.
 - Template categories: [email signup](https://popuploom.com/templates/email-signup.html), [discounts](https://popuploom.com/templates/discount.html), [exit intent](https://popuploom.com/templates/exit-intent.html), [announcements](https://popuploom.com/templates/announcements.html), [engagement](https://popuploom.com/templates/engagement.html), [trust](https://popuploom.com/templates/social-proof.html), [age gates](https://popuploom.com/templates/age-gates.html), [gamified](https://popuploom.com/templates/gamified.html), [seasonal](https://popuploom.com/templates/seasonal.html) and [video](https://popuploom.com/templates/video.html).
 - [No pageview limits](https://popuploom.com/free-popup-builder-no-limits.html): what a traffic meter is, how pageview, visitor and impression limits differ, and what “no limits” does and does not promise here.
 - [How to choose a free popup builder](https://popuploom.com/best-free-popup-builder.html): nine checks for any shortlist — the metered unit, the reset, feature gates, branding, export and the paid cliff. Vendors are not named.

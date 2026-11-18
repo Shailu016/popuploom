@@ -4,19 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Popup ROI Calculator: Signups, Value, Break-Even | PopupLoom</title>
-<meta name="description" content="Work out popup displays, signups, annual value, break-even conversion and free-tier cap pressure from your own numbers. No benchmarks, forecasts or data collection.">
+<meta name="description" content="Work out popup displays, signups, annual value and break-even conversion from your own numbers. No benchmarks, forecasts or data collection.">
 <link rel="canonical" href="https://popuploom.com/tools/popup-roi-calculator.html">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="PopupLoom">
 <meta property="og:title" content="Popup ROI Calculator: Signups, Value, Break-Even | PopupLoom">
-<meta property="og:description" content="Work out popup displays, signups, annual value, break-even conversion and free-tier cap pressure from your own numbers. No benchmarks, forecasts or data collection.">
+<meta property="og:description" content="Work out popup displays, signups, annual value and break-even conversion from your own numbers. No benchmarks, forecasts or data collection.">
 <meta property="og:url" content="https://popuploom.com/tools/popup-roi-calculator.html">
 <meta property="og:image" content="https://popuploom.com/assets/og-popuploom.png">
-<meta property="og:image:alt" content="PopupLoom: free website popup builder with 45 templates">
+<meta property="og:image:alt" content="PopupLoom: free website popup builder with 53 templates">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Popup ROI Calculator: Signups, Value, Break-Even | PopupLoom">
-<meta name="twitter:description" content="Work out popup displays, signups, annual value, break-even conversion and free-tier cap pressure from your own numbers. No benchmarks, forecasts or data collection.">
+<meta name="twitter:description" content="Work out popup displays, signups, annual value and break-even conversion from your own numbers. No benchmarks, forecasts or data collection.">
 <meta name="twitter:image" content="https://popuploom.com/assets/og-popuploom.png">
 <link rel="stylesheet" href="/ui.css"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://popuploom.com/"},{"@type":"ListItem","position":2,"name":"Tools","item":"https://popuploom.com/tools/"},{"@type":"ListItem","position":3,"name":"Popup ROI calculator","item":"https://popuploom.com/tools/popup-roi-calculator.html"}]},{"@type":"WebApplication","@id":"https://popuploom.com/tools/popup-roi-calculator.html#app","name":"Popup ROI Calculator","url":"https://popuploom.com/tools/popup-roi-calculator.html","description":"A free browser calculator for popup displays, signups, annual value, break-even conversion rate and free-tier cap pressure, using only the visitor's own inputs.","applicationCategory":"BusinessApplication","operatingSystem":"Any modern browser","browserRequirements":"Requires JavaScript","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@id":"https://popuploom.com/#organization"},"datePublished":"2026-11-16","dateModified":"2026-11-16","author":{"@type":"Person","name":"Shailu","url":"https://popuploom.com/about.html"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What counts as a popup display?","acceptedAnswer":{"@type":"Answer","text":"A display is one rendering of the popup on a page. It is the unit many vendors meter as an impression. If a popup can appear on every pageview and a visitor reads four pages, that visitor can produce four displays."}},{"@type":"Question","name":"Should I enter visitors or pageviews?","acceptedAnswer":{"@type":"Answer","text":"The main traffic field is monthly visitors. A separate pageviews-per-visitor field lets the calculator compare your usage with a pageview cap. If you only track pageviews, divide by your average pageviews per visitor before entering the visitor number."}},{"@type":"Question","name":"What conversion rate should I enter?","acceptedAnswer":{"@type":"Answer","text":"Enter a rate you measured for a popup or a closely comparable offer, and keep the measurement period consistent with the traffic period. PopupLoom does not publish a benchmark rate, and the example value in the form is a placeholder, not a recommendation."}},{"@type":"Question","name":"What is value per signup?","acceptedAnswer":{"@type":"Answer","text":"It is what one captured signup or lead is worth to your business over the period you are measuring. Use your own margin, repeat-purchase rate or sales follow-up data. Do not use gross revenue if the offer carries a discount or refund cost."}},{"@type":"Question","name":"How is the break-even conversion rate calculated?","acceptedAnswer":{"@type":"Answer","text":"The calculator divides the monthly tool cost by the product of monthly displays and value per signup, then multiplies by 100. That is the conversion rate at which the estimated monthly value exactly covers the monthly tool cost."}},{"@type":"Question","name":"Does the calculator include email, SMS or design costs?","acceptedAnswer":{"@type":"Answer","text":"No. It only includes the monthly tool cost you enter. Email delivery, SMS credits, design time, discount margin, refunds, chargebacks and staff time are not modelled. Add those costs separately before treating a positive result as profit."}},{"@type":"Question","name":"Does the calculator predict revenue or guarantee a return?","acceptedAnswer":{"@type":"Answer","text":"No. It performs arithmetic on the numbers you supply. It does not forecast traffic, conversion rates or revenue, and it does not account for seasonality, audience quality or offer fit. Treat every output as a scenario, not a promise."}},{"@type":"Question","name":"Does PopupLoom meter pageviews or popup impressions?","acceptedAnswer":{"@type":"Answer","text":"No. PopupLoom does not meter pageviews, visitors or popup impressions for the widget. Public endpoints apply rate limits to prevent abuse, but there is no traffic cap or trial countdown. Hosting and fair-use limits still apply."}},{"@type":"Question","name":"Is my data sent anywhere?","acceptedAnswer":{"@type":"Answer","text":"No. The calculator runs in your browser and does not submit the values to PopupLoom or any third party. Reloading the page resets the fields to their example values."}}]}]}</script>
@@ -65,13 +65,12 @@
 @media (max-width:900px){.roi-result-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:760px){.roi-grid,.roi-two{grid-template-columns:1fr}.roi-result-grid{grid-template-columns:1fr}}
 </style>
+<!--pl:fonts--><link rel="preload" href="/assets/fonts/bricolage-grotesque-normal-latin.a79fdb52d4.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/assets/fonts/geist-normal-latin.19f9c92546.woff2" as="font" type="font/woff2" crossorigin><!--/pl:fonts-->
 </head>
 <body>
-<header class="wrap" style="padding:24px 26px">
-  <nav aria-label="Main"><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/">Guides</a> · <a href="/tools/popup-roi-calculator.html">ROI calculator</a> · <a href="/tools/popup-copy-swipe-file.html">Copy swipe file</a> · <a href="/studio.html?tpl=blank">Open the studio</a></nav>
+<!--pl:nav--><a class="skip-link" href="#main">Skip to content</a><nav class="site-nav" aria-label="Main"><div class="wrap inner"><a class="logo" href="/"><span class="mark"><svg viewBox="0 0 32 32" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.8"><circle cx="12.2" cy="16" r="5.4"/><circle cx="19.8" cy="16" r="5.4"/></svg></span> Popup<span><i>Loom</i></span></a><div class="nav-links"><a href="/templates.html">Templates</a><a href="/guides/">Guides</a><a href="/tools/">Tools</a><a href="/free-popup-builder-no-limits.html">No limits</a><a href="/faq.html">FAQ</a></div><div class="nav-cta"><a class="btn primary small" href="/studio.html?tpl=blank">Open the studio</a></div></div></nav><div class="pl-progress" aria-hidden="true"><i></i></div><!--/pl:nav-->
+<main id="main" class="wrap" style="padding:30px 26px 80px;max-width:1000px">
   <nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/tools/">Tools</a> › <span>Popup ROI calculator</span></nav>
-</header>
-<main class="wrap" style="padding:30px 26px 80px;max-width:1000px">
   <article>
     <h1>Popup ROI calculator</h1>
     <div class="roi-meta">
@@ -322,15 +321,42 @@
       <li><a href="/tools/popup-copy-swipe-file.html">Popup copy swipe file</a> — reusable copy patterns with placeholders, not conversion claims.</li>
       <li><a href="/tools/exit-intent-code-generator.html">Exit-intent code generator</a> — a vanilla JS snippet with sensitivity, delay and cooldown controls.</li>
       <li><a href="/tools/popup-copy-generator.html">Popup copy generator</a> — twelve deterministic copy sets from industry, goal and tone.</li>
-      <li><a href="/templates.html">Popup template catalog</a> — all 45 starting designs grouped by purpose.</li>
+      <li><a href="/templates.html">Popup template catalog</a> — all 53 starting designs grouped by purpose.</li>
     </ul>
     <p class="roi-small">Cap presets are illustrative allowances, not quotes. They describe plan shapes, not any named product, and they can change. Verify current terms before you buy.</p>
   </article>
 </main>
-<footer class="wrap" style="padding:24px 26px;font-size:13px">
-  <div><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/">Guides</a> · <a href="/tools/popup-roi-calculator.html">ROI calculator</a> · <a href="/tools/popup-copy-swipe-file.html">Copy swipe file</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></div>
-  <div class="mut" style="margin-top:8px;font-size:12px">The calculator runs in your browser. It does not send your inputs anywhere. Results are arithmetic on user-supplied assumptions, not forecasts.</div>
-</footer>
 <script src="/tools/roi-calculator.js" defer></script>
+<!--pl:footer--><footer class="site-foot"><div class="wrap"><div class="foot-grid">
+<div class="foot-brand"><a class="logo" href="/"><span class="mark"><svg viewBox="0 0 32 32" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.8"><circle cx="12.2" cy="16" r="5.4"/><circle cx="19.8" cy="16" r="5.4"/></svg></span> Popup<span><i>Loom</i></span></a><p>A free website popup builder with 53 editable templates, a visual studio and a lead inbox. No pageview cap, no credit card.</p><p><a class="btn primary small" href="/studio.html?tpl=blank">Open the studio</a></p></div>
+<div><p class="foot-h">Product</p><ul><li><a href="/studio.html?tpl=blank">Popup studio</a></li><li><a href="/templates.html">All 53 templates</a></li><li><a href="/tools/">Free tools</a></li><li><a href="/free-popup-builder-no-limits.html">No pageview limits</a></li><li><a href="/best-free-popup-builder.html">Nine-point checklist</a></li></ul></div>
+<div><p class="foot-h">Guides</p><ul><li><a href="/guides/install-popups.html">Add a popup to your site</a></li><li><a href="/guides/wordpress-popup.html">WordPress</a></li><li><a href="/guides/shopify-popup.html">Shopify</a></li><li><a href="/guides/webflow-popup.html">Webflow</a></li><li><a href="/guides/popup-builder-for-ecommerce.html">Ecommerce</a></li><li><a href="/guides/">All guides</a></li></ul></div>
+<div><p class="foot-h">Company</p><ul><li><a href="/about.html">About</a></li><li><a href="/faq.html">FAQ</a></li><li><a href="/contact.html">Contact</a></li><li><a href="/security.html">Security</a></li><li><a href="/press.html">Press kit</a></li><li><a href="/privacy.html">Privacy</a></li><li><a href="/terms.html">Terms</a></li></ul></div>
+</div><p class="foot-legal">PopupLoom is an independent product. Template offers, codes and countdowns are sample copy; every claim a site publishes must be true and is the site owner's responsibility.</p></div></footer><!--/pl:footer-->
+<!--pl:script--><script>
+(function () {
+  var bar = document.querySelector(".pl-progress i"), nav = document.querySelector(".site-nav");
+  function tick() {
+    var d = document.documentElement, max = d.scrollHeight - innerHeight, p = max > 0 ? scrollY / max : 0;
+    if (bar) bar.style.transform = "scaleX(" + Math.min(1, Math.max(0, p)) + ")";
+    if (nav) nav.classList.toggle("scrolled", scrollY > 8);
+  }
+  addEventListener("scroll", tick, { passive: true });
+  tick();
+  var links = document.querySelectorAll(".doc-aside .doc-toc a");
+  if (!links.length || !("IntersectionObserver" in window)) return;
+  var map = {};
+  links.forEach(function (a) { map[a.getAttribute("href").slice(1)] = a; });
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      links.forEach(function (a) { a.classList.remove("on"); });
+      var a = map[e.target.id];
+      if (a) a.classList.add("on");
+    });
+  }, { rootMargin: "-80px 0px -70% 0px" });
+  Object.keys(map).forEach(function (id) { var el = document.getElementById(id); if (el) io.observe(el); });
+})();
+</script><!--/pl:script-->
 </body>
 </html>

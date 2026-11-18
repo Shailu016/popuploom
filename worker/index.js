@@ -53,7 +53,7 @@ function clientScheme(request) {
 // Explicit public allowlist, same as the Express server's static middleware.
 const PUBLIC_FILES = new Set([
   "templates.html", "faq.html", "press.html", "security.html", "guides/install-popups.html", "guides/index.html", "guides/wordpress-popup.html", "guides/shopify-popup.html", "guides/webflow-popup.html", "guides/squarespace-wix-popup.html", "guides/exit-intent-popup.html", "guides/email-signup-popup.html", "guides/free-popup-builders-without-pageview-limits.html", "guides/collect-and-export-leads.html", "guides/popup-not-showing.html", "guides/popup-builder-for-ecommerce.html", "guides/popup-builder-for-quick-commerce.html", "guides/popup-builder-for-lead-generation.html", "guides/nextjs-popup.html", "guides/react-popup.html", "guides/astro-popup.html", "guides/google-tag-manager-popup.html", "guides/static-html-popup.html", "guides/bigcommerce-popup.html", "ccf2a9f45165c635253d22748df4a573.txt", "robots.txt", "sitemap.xml", "llms.txt", "llms-full.txt", "index.html", "studio.html", "profile.html", "demo.html", "migration.html", "reset-password.html",
-  "leads.html", "privacy.html", "about.html", "contact.html", "terms.html", ".well-known/security.txt", "security.txt", ".well-known/api-catalog", ".well-known/ard.json", ".well-known/ai-catalog.json", "openapi.json", "lead-csv.js", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "verify-email.html", "verify-email.js", "popuploom.js", "popforge.js", "embed/1.1.0/popuploom.js", "embed/1.1.0/popforge.js", "embed/1.1.0/SHA256SUMS", "ui.css", "ads.txt",
+  "leads.html", "privacy.html", "about.html", "contact.html", "terms.html", ".well-known/security.txt", "security.txt", ".well-known/api-catalog", ".well-known/ard.json", ".well-known/ai-catalog.json", "openapi.json", "lead-csv.js", "leads.js", "account.js", "app.js", "studio.js", "reset-password.js", "verify-email.html", "verify-email.js", "popuploom.js", "embed/1.1.0/popuploom.js", "embed/1.1.0/SHA256SUMS", "embed/1.2.0/popuploom.js", "embed/1.2.0/SHA256SUMS", "ui.css", "ads.txt",
   "templates/email-signup.html", "templates/discount.html", "templates/exit-intent.html", "templates/announcements.html", "templates/engagement.html", "templates/social-proof.html", "templates/age-gates.html", "templates/gamified.html", "templates/seasonal.html", "templates/video.html",
   "free-popup-builder-no-limits.html", "best-free-popup-builder.html", "guides/wordpress-popup-without-plugin.html",
   "templates/exit-intent-popup.html", "templates/discount-popup.html", "templates/email-signup-popup.html", "templates/spin-to-win-popup.html",
@@ -81,6 +81,8 @@ const DIRECTORY_HUBS = new Map([
   ["/guides/index.html", "/guides/"],
   ["/tools/index.html", "/tools/"]
 ]);
+// Typed and parent-directory forms of the template gallery address.
+const TEMPLATE_HUB_ALIASES = new Set(["/templates", "/templates/", "/templates/index.html"]);
 
 // Machine-readable discovery documents. Served with their required media
 // types and a permissive CORS header so agents on other origins can read them.
@@ -413,6 +415,15 @@ async function serveStatic(request, env, pathname, sec, cors, headOnly) {
       headers: { ...sec, ...cors, Location: retired, "Cache-Control": "public, max-age=3600" }
     });
   }
+  // The template gallery lives at /templates.html, but /templates/ is the
+  // parent of every template page and the URL people type. Send it to the
+  // gallery in one hop instead of answering 404 next to live children.
+  if (TEMPLATE_HUB_ALIASES.has(file)) {
+    return new Response(null, {
+      status: 301,
+      headers: { ...sec, ...cors, Location: "/templates.html" + new URL(request.url).search, "Cache-Control": "public, max-age=3600" }
+    });
+  }
   // A directory URL is the public address for its hub page. Keep one canonical
   // form per hub so /guides/index.html and /tools/index.html never compete with
   // the slash form in the index.
@@ -468,7 +479,7 @@ async function serveStatic(request, env, pathname, sec, cors, headOnly) {
     // Express falls through to the SPA fallback when a static asset is missing.
     if (asset.status === 404) return new Response("Not found", {status:404,headers:{...sec,...cors,"X-Robots-Tag":"noindex"}});
     const headers = new Headers(asset.headers);
-    headers.set("Cache-Control", "no-store");
+    headers.set("Cache-Control", cachePolicy.cacheControlFor(file));
     return new Response(headOnly ? null : asset.body, { status: asset.status, headers: { ...sec, ...cors, ...Object.fromEntries(headers) } });
   }
   // Search Console / Bing verification drop files. The strict name pattern
@@ -540,9 +551,9 @@ export default {
     // pages additionally move to the apex; API calls, runtime files, assets
     // and the recovery page stay on their current host.
     const redirect = scheme === "http"
-      ? (hostPolicy.secureRedirect(canonicalUrl, env.DOMAIN_CUTOVER_ENABLED)
-        || hostPolicy.pageRedirect(canonicalUrl, method, env.DOMAIN_CUTOVER_ENABLED))
-      : hostPolicy.pageRedirect(canonicalUrl, method, env.DOMAIN_CUTOVER_ENABLED);
+      ? (hostPolicy.secureRedirect(canonicalUrl)
+        || hostPolicy.pageRedirect(canonicalUrl, method))
+      : hostPolicy.pageRedirect(canonicalUrl, method);
     if (redirect) {
       return new Response(null, {
         status: 308,

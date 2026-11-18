@@ -14,25 +14,24 @@
 <meta property="og:description" content="How PopupLoom stores form responses, exports leads as CSV, and uses browser or signed server webhooks. Includes privacy and delivery limits.">
 <meta property="og:url" content="https://popuploom.com/guides/collect-and-export-leads.html">
 <meta property="og:image" content="https://popuploom.com/assets/og-popuploom.png">
-<meta property="og:image:alt" content="PopupLoom: free website popup builder with 45 templates">
+<meta property="og:image:alt" content="PopupLoom: free website popup builder with 53 templates">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Collect and Export Popup Leads | PopupLoom">
 <meta name="twitter:description" content="How PopupLoom stores form responses, exports leads as CSV, and uses browser or signed server webhooks. Includes privacy and delivery limits.">
 <meta name="twitter:image" content="https://popuploom.com/assets/og-popuploom.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://popuploom.com/"},{"@type":"ListItem","position":2,"name":"Guides","item":"https://popuploom.com/guides/"},{"@type":"ListItem","position":3,"name":"Collect and export leads","item":"https://popuploom.com/guides/collect-and-export-leads.html"}]},{"@type":"Article","@id":"https://popuploom.com/guides/collect-and-export-leads.html#article","headline":"Collect and export popup leads","description":"How PopupLoom stores form responses, exports leads as CSV, and uses browser or signed server webhooks. Includes privacy and delivery limits.","datePublished":"2026-11-12","dateModified":"2026-11-16","author":{"@id":"https://popuploom.com/#organization"},"publisher":{"@id":"https://popuploom.com/#organization"},"mainEntityOfPage":"https://popuploom.com/guides/collect-and-export-leads.html"}]}</script>
+<!--pl:fonts--><link rel="preload" href="/assets/fonts/bricolage-grotesque-normal-latin.a79fdb52d4.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/assets/fonts/geist-normal-latin.19f9c92546.woff2" as="font" type="font/woff2" crossorigin><!--/pl:fonts-->
 </head>
 <body>
-<header class="wrap" style="padding:24px 26px">
-  <nav aria-label="Main"><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/">Guides</a> · <a href="/about.html">About</a> · <a href="/studio.html?tpl=blank">Open the studio</a></nav>
-  <nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/guides/">Guides</a> › <span>Collect and export leads</span></nav>
-</header>
-<main class="wrap" style="padding:30px 26px 80px;max-width:900px">
-  <article>
-    <h1>Collect and export popup leads</h1>
-    <p class="mut" style="font-size:13px;margin:6px 0 18px">By <a href="/about.html">Shailu</a>, founder of PopupLoom · Last updated 16 November 2026</p>
-    <p class="mut">Product behavior checked on 5 November 2026. Screenshots use isolated demonstration data, not customer records.</p>
+<!--pl:nav--><a class="skip-link" href="#main">Skip to content</a><nav class="site-nav" aria-label="Main"><div class="wrap inner"><a class="logo" href="/"><span class="mark"><svg viewBox="0 0 32 32" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.8"><circle cx="12.2" cy="16" r="5.4"/><circle cx="19.8" cy="16" r="5.4"/></svg></span> Popup<span><i>Loom</i></span></a><div class="nav-links"><a href="/templates.html">Templates</a><a href="/guides/">Guides</a><a href="/tools/">Tools</a><a href="/free-popup-builder-no-limits.html">No limits</a><a href="/faq.html">FAQ</a></div><div class="nav-cta"><a class="btn primary small" href="/studio.html?tpl=blank">Open the studio</a></div></div></nav><div class="pl-progress" aria-hidden="true"><i></i></div><!--/pl:nav-->
+<main id="main" class="doc">
+<!--pl:hero--><div class="doc-hero"><div class="wrap doc-hero-in"><div class="doc-hero-copy"><nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/guides/">Guides</a> › <span>Collect and export leads</span></nav><div class="kicker">Guide</div><h1>Collect and export popup leads</h1><p class="mut doc-byline" style="font-size:13px;margin:6px 0 18px">By <a href="/about.html">Shailu</a>, founder of PopupLoom · Last updated 16 November 2026 · <span class="doc-rt">3 min read</span></p><nav class="doc-actions" aria-label="Next steps"><a class="btn primary" href="/studio.html?tpl=blank">Open the studio, it's free</a><a class="btn ghost" href="/templates.html">Browse 53 templates</a></nav><p class="doc-trust">Free to use · no credit card · no pageview cap</p></div><aside class="doc-hero-vis"><figure class="doc-shot"><img class="doc-shot-img" src="/assets/guides/lead-inbox-demo.webp" width="1366" height="900" alt="The PopupLoom lead inbox showing sample rows" fetchpriority="high" decoding="async"><figcaption>The lead inbox, shown with sample rows.</figcaption></figure></aside></div></div><!--/pl:hero-->
+<div class="wrap doc-wrap"><div class="doc-grid"><!--pl:grid-->
+<!--pl:toc-m--><nav class="doc-toc-m" aria-label="On this page"><details><summary>On this page</summary><ol><li><a href="#where-a-response-goes">Where a response goes</a></li><li><a href="#open-the-lead-inbox">Open the lead inbox</a></li><li><a href="#export-csv">Export CSV</a></li><li><a href="#browser-webhook-best-effort">Browser webhook: best effort</a></li><li><a href="#server-side-webhook-signed-and-retried">Server-side webhook: signed and retried</a></li><li><a href="#what-popuploom-does-not-deliver">What PopupLoom does not deliver</a></li><li><a href="#privacy-and-retention">Privacy and retention</a></li><li><a href="#a-safe-test">A safe test</a></li></ol></details></nav><!--/pl:toc-m-->
+<article class="doc-body">
+<p class="mut">Product behavior checked on 5 November 2026. Screenshots use isolated demonstration data, not customer records.</p>
 
-    <h2>Where a response goes</h2>
+    <h2 id="where-a-response-goes">Where a response goes</h2>
     <ol>
       <li>A visitor submits a popup form or a choice control.</li>
       <li>The runtime sends the response to the hosted PopupLoom API for the saved widget.</li>
@@ -41,14 +40,15 @@
     </ol>
     <p>Guest drafts are different: they live in the browser and do not produce a hosted widget or hosted leads. The install code is issued for a saved account-owned popup.</p>
 
-    <h2>Open the lead inbox</h2>
+    <h2 id="open-the-lead-inbox">Open the lead inbox</h2>
     <p>From <strong>My popups</strong>, choose <strong>Leads</strong> on a saved popup. The inbox pages responses newest first and shows every field that was captured. The screenshot below uses fabricated rows so no real person appears.</p>
     <figure>
-      <img src="/assets/guides/lead-inbox-demo.webp" alt="PopupLoom lead inbox with three fabricated sample rows and the webhook settings panel" style="max-width:100%;height:auto;border-radius:12px;border:1px solid rgba(127,127,127,.25)">
+      <img src="/assets/guides/lead-inbox-demo.webp" alt="PopupLoom lead inbox with three fabricated sample rows and the webhook settings panel" style="max-width:100%;height:auto;border-radius:12px;border:1px solid rgba(127,127,127,.25)" width="1366" height="900" loading="lazy" decoding="async">
       <figcaption class="mut" style="font-size:13px;margin-top:8px">Lead inbox with demonstration rows. The webhook panel is per popup and owner-only.</figcaption>
     </figure>
 
-    <h2>Export CSV</h2>
+    <!--pl:inline-cta--><aside class="doc-inline-cta"><span class="doc-inline-img"><img class="doc-card-pic" src="/assets/templates/welcomeHero.webp" srcset="/assets/templates/welcomeHero-600.webp 600w, /assets/templates/welcomeHero.webp 1200w" sizes="180px" width="1200" height="750" alt="Welcome Offer, Image Header popup template preview: Light modal with an image running edge to edge above a one-field email signup" loading="lazy" decoding="async"></span><div><strong>Try it on your own page</strong><p>Open the Welcome Offer, Image Header template, replace the sample text with your own and preview it on desktop and mobile. Free, no credit card.</p><a class="btn primary small" href="/studio.html?tpl=welcomeHero">Open it in the studio</a></div></aside><!--/pl:inline-cta-->
+<h2 id="export-csv">Export CSV</h2>
     <p><strong>Export all leads as CSV</strong> in a popup's inbox follows every API page, not just the visible 100 rows. The workspace-level <strong>Export leads (.csv)</strong> combines every popup and adds the popup name and id columns. Both exports:</p>
     <ul>
       <li>include a UTF-8 byte-order mark for spreadsheet compatibility;</li>
@@ -58,7 +58,7 @@
     </ul>
     <p>The CSV is a browser download. Treat it as personal data: store it with access control, avoid shared drives and delete it when no longer needed. The JSON configuration backup does not contain leads.</p>
 
-    <h2>Browser webhook: best effort</h2>
+    <h2 id="browser-webhook-best-effort">Browser webhook: best effort</h2>
     <p>A popup can include an optional browser webhook URL in its form settings. After a successful submission, the visitor's browser posts plain JSON to that URL with <code>no-cors</code>. This path:</p>
     <ul>
       <li>cannot confirm delivery or retry reliably;</li>
@@ -67,14 +67,14 @@
       <li>is not a server-side automation service.</li>
     </ul>
 
-    <h2>Server-side webhook: signed and retried</h2>
+    <h2 id="server-side-webhook-signed-and-retried">Server-side webhook: signed and retried</h2>
     <p>Open a popup's lead inbox and configure <strong>Webhook events</strong> with an HTTPS endpoint. Delivery is made by PopupLoom after the lead is stored. The request includes a <code>lead.created</code> event, popup id and name, lead id/time and captured data. Headers include a timestamp and an HMAC-SHA256 signature over <code>timestamp.body</code> using the owner-only signing secret. Delivery is retried on network errors, timeouts, 408, 429 and 5xx responses, and the delivery log records status, attempts and response codes.</p>
     <p>This is retried background delivery, not a durable queue. Use the delivery log and your receiver's own monitoring. Rotate the secret if it is exposed. Test with the <strong>Send test</strong> button before relying on it.</p>
 
-    <h2>What PopupLoom does not deliver</h2>
+    <h2 id="what-popuploom-does-not-deliver">What PopupLoom does not deliver</h2>
     <p>PopupLoom does not send marketing email campaigns, SMS messages, PDF files, calendar invitations, invoices or customer support replies. It stores the response and can notify an integration. Any follow-up is the website owner's responsibility and must match the copy shown to visitors. Do not publish a promise that a code, file or invitation is “on its way” unless your own system actually sends it.</p>
 
-    <h2>Privacy and retention</h2>
+    <h2 id="privacy-and-retention">Privacy and retention</h2>
     <ul>
       <li>Collect only the fields you need and explain the purpose before collection.</li>
       <li>Do not put sensitive data in a popup unless you have a lawful basis and appropriate safeguards.</li>
@@ -83,7 +83,7 @@
       <li>Webhook receivers are third parties with their own privacy practices. Choose them deliberately.</li>
     </ul>
 
-    <h2>A safe test</h2>
+    <h2 id="a-safe-test">A safe test</h2>
     <ol>
       <li>Use a saved test popup, not a live customer campaign.</li>
       <li>Submit clearly fake data such as <code>test@example.com</code>.</li>
@@ -94,7 +94,39 @@
 
     <p class="mut">Read the <a href="/privacy.html">privacy and data handling page</a> for storage, browser storage and advertising disclosures. Questions: <a href="/contact.html">contact us</a>.</p>
   </article>
+<!--pl:aside--><aside class="doc-aside" aria-label="Page tools"><nav class="doc-toc" aria-label="Table of contents"><div class="doc-aside-h">On this page</div><ol><li><a href="#where-a-response-goes">Where a response goes</a></li><li><a href="#open-the-lead-inbox">Open the lead inbox</a></li><li><a href="#export-csv">Export CSV</a></li><li><a href="#browser-webhook-best-effort">Browser webhook: best effort</a></li><li><a href="#server-side-webhook-signed-and-retried">Server-side webhook: signed and retried</a></li><li><a href="#what-popuploom-does-not-deliver">What PopupLoom does not deliver</a></li><li><a href="#privacy-and-retention">Privacy and retention</a></li><li><a href="#a-safe-test">A safe test</a></li></ol></nav><div class="doc-more"><div class="doc-aside-h">Keep reading</div><ul><li><a href="/guides/popup-not-showing.html">Popup not showing? A diagnostic guide</a></li><li><a href="/guides/free-popup-builders-without-pageview-limits.html">Popup pageview limits: how to audit a free plan in 20 minutes</a></li><li><a href="/guides/popup-builder-for-ecommerce.html">Free popup builder for ecommerce stores</a></li><li><a href="/guides/popup-builder-for-quick-commerce.html">Free popup builder for quick commerce websites</a></li></ul></div></aside><!--/pl:aside-->
+<!--/pl:grid--></div><!--pl:after--><aside class="doc-after" aria-label="Next steps"><p class="doc-after-h">Start from a template</p><p class="doc-after-sub">Each one opens in the studio. Change the words, colours and trigger, then install it with two lines of code.</p><div class="doc-card-row"><a class="doc-card" href="/studio.html?tpl=leadShelf"><span class="doc-card-img"><img class="doc-card-pic" src="/assets/templates/leadShelf.webp" srcset="/assets/templates/leadShelf-600.webp 600w, /assets/templates/leadShelf.webp 1200w" sizes="(max-width: 700px) 100vw, 300px" width="1200" height="750" alt="Lead Magnet Shelf popup template preview: Corner slide-in with an email field for a content upgrade; the owner delivers the file" loading="lazy" decoding="async"></span><span class="doc-card-name">Lead Magnet Shelf</span><span class="doc-card-tag">Content upgrade</span><span class="doc-card-go">Open in the studio →</span></a><a class="doc-card" href="/studio.html?tpl=waitlist"><span class="doc-card-img"><img class="doc-card-pic" src="/assets/templates/waitlist.webp" srcset="/assets/templates/waitlist-600.webp 600w, /assets/templates/waitlist.webp 1200w" sizes="(max-width: 700px) 100vw, 300px" width="1200" height="750" alt="Queue Ticket popup template preview: Ink launch modal with a violet light motif and an email field for waitlist interest" loading="lazy" decoding="async"></span><span class="doc-card-name">Queue Ticket</span><span class="doc-card-tag">Launch</span><span class="doc-card-go">Open in the studio →</span></a><a class="doc-card" href="/studio.html?tpl=smsPass"><span class="doc-card-img"><img class="doc-card-pic" src="/assets/templates/smsPass.webp" srcset="/assets/templates/smsPass-600.webp 600w, /assets/templates/smsPass.webp 1200w" sizes="(max-width: 700px) 100vw, 300px" width="1200" height="750" alt="SMS Speed Pass popup template preview: Phone-first signup layout; the owner handles SMS delivery and consent" loading="lazy" decoding="async"></span><span class="doc-card-name">SMS Speed Pass</span><span class="doc-card-tag">Text list</span><span class="doc-card-go">Open in the studio →</span></a></div><div class="doc-band"><div><p class="doc-band-h">Ready to build your popup?</p><p>The studio is free to use. Save a popup to get its install code and read your leads in the inbox.</p></div><a class="btn primary" href="/studio.html?tpl=blank">Open the studio</a></div></aside><!--/pl:after--></div>
 </main>
-<footer class="wrap" style="padding:24px 26px"><a href="/">PopupLoom — free website popup builder</a> · <a href="/guides/">Guides</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></footer>
+<!--pl:footer--><footer class="site-foot"><div class="wrap"><div class="foot-grid">
+<div class="foot-brand"><a class="logo" href="/"><span class="mark"><svg viewBox="0 0 32 32" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.8"><circle cx="12.2" cy="16" r="5.4"/><circle cx="19.8" cy="16" r="5.4"/></svg></span> Popup<span><i>Loom</i></span></a><p>A free website popup builder with 53 editable templates, a visual studio and a lead inbox. No pageview cap, no credit card.</p><p><a class="btn primary small" href="/studio.html?tpl=blank">Open the studio</a></p></div>
+<div><p class="foot-h">Product</p><ul><li><a href="/studio.html?tpl=blank">Popup studio</a></li><li><a href="/templates.html">All 53 templates</a></li><li><a href="/tools/">Free tools</a></li><li><a href="/free-popup-builder-no-limits.html">No pageview limits</a></li><li><a href="/best-free-popup-builder.html">Nine-point checklist</a></li></ul></div>
+<div><p class="foot-h">Guides</p><ul><li><a href="/guides/install-popups.html">Add a popup to your site</a></li><li><a href="/guides/wordpress-popup.html">WordPress</a></li><li><a href="/guides/shopify-popup.html">Shopify</a></li><li><a href="/guides/webflow-popup.html">Webflow</a></li><li><a href="/guides/popup-builder-for-ecommerce.html">Ecommerce</a></li><li><a href="/guides/">All guides</a></li></ul></div>
+<div><p class="foot-h">Company</p><ul><li><a href="/about.html">About</a></li><li><a href="/faq.html">FAQ</a></li><li><a href="/contact.html">Contact</a></li><li><a href="/security.html">Security</a></li><li><a href="/press.html">Press kit</a></li><li><a href="/privacy.html">Privacy</a></li><li><a href="/terms.html">Terms</a></li></ul></div>
+</div><p class="foot-legal">PopupLoom is an independent product. Template offers, codes and countdowns are sample copy; every claim a site publishes must be true and is the site owner's responsibility.</p></div></footer><!--/pl:footer-->
+<!--pl:script--><script>
+(function () {
+  var bar = document.querySelector(".pl-progress i"), nav = document.querySelector(".site-nav");
+  function tick() {
+    var d = document.documentElement, max = d.scrollHeight - innerHeight, p = max > 0 ? scrollY / max : 0;
+    if (bar) bar.style.transform = "scaleX(" + Math.min(1, Math.max(0, p)) + ")";
+    if (nav) nav.classList.toggle("scrolled", scrollY > 8);
+  }
+  addEventListener("scroll", tick, { passive: true });
+  tick();
+  var links = document.querySelectorAll(".doc-aside .doc-toc a");
+  if (!links.length || !("IntersectionObserver" in window)) return;
+  var map = {};
+  links.forEach(function (a) { map[a.getAttribute("href").slice(1)] = a; });
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      links.forEach(function (a) { a.classList.remove("on"); });
+      var a = map[e.target.id];
+      if (a) a.classList.add("on");
+    });
+  }, { rootMargin: "-80px 0px -70% 0px" });
+  Object.keys(map).forEach(function (id) { var el = document.getElementById(id); if (el) io.observe(el); });
+})();
+</script><!--/pl:script-->
 </body>
 </html>

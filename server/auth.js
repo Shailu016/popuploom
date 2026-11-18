@@ -6,9 +6,7 @@ const db = require("./db");
 const verifyShared = require("../shared/email-verification");
 
 const configuredSecret = String(process.env.JWT_SECRET || "").trim();
-if (configuredSecret && (configuredSecret.length < 32 || [
-  "popforge-dev-secret-change-in-prod", "change-me-to-a-long-random-string"
-].includes(configuredSecret))) {
+if (configuredSecret && (configuredSecret.length < 32 || /dev-secret|change-me|change-in-prod/i.test(configuredSecret))) {
   throw new Error("JWT_SECRET must be a unique random secret of at least 32 characters");
 }
 if (!configuredSecret && process.env.NODE_ENV === "production") {

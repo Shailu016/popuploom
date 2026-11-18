@@ -12,14 +12,16 @@
 <meta property="og:title" content="Free Back-in-Stock Popup Template | PopupLoom">
 <meta property="og:description" content="A free back-in-stock popup template that opens from a notify-me button, captures an email and explains how follow-up works.">
 <meta property="og:url" content="https://popuploom.com/templates/back-in-stock-popup.html">
-<meta property="og:image" content="https://popuploom.com/assets/og-popuploom.png">
-<meta property="og:image:alt" content="PopupLoom: free website popup builder with 45 templates">
+<meta property="og:image" content="https://popuploom.com/assets/templates/backStock.jpg">
+<meta property="og:image:alt" content="Back in Stock popup template preview: Sage slide-in that collects restock requests; the owner provides monitoring and alerts">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="750">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Free Back-in-Stock Popup Template | PopupLoom">
 <meta name="twitter:description" content="A free back-in-stock popup template that opens from a notify-me button.">
-<meta name="twitter:image" content="https://popuploom.com/assets/og-popuploom.png">
+<meta name="twitter:image" content="https://popuploom.com/assets/templates/backStock.jpg">
 <link rel="stylesheet" href="/ui.css"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://popuploom.com/"},{"@type":"ListItem","position":2,"name":"Templates","item":"https://popuploom.com/templates.html"},{"@type":"ListItem","position":3,"name":"Back-in-stock popup","item":"https://popuploom.com/templates/back-in-stock-popup.html"}]},{"@type":"Article","@id":"https://popuploom.com/templates/back-in-stock-popup.html#article","headline":"Free Back-in-Stock Popup Template","description":"A notify-me popup opened by a click trigger, with email capture, export and follow-up guidance.","datePublished":"2026-11-16","dateModified":"2026-11-16","author":{"@type":"Person","name":"Shailu","url":"https://popuploom.com/about.html"},"publisher":{"@id":"https://popuploom.com/#organization"},"mainEntityOfPage":"https://popuploom.com/templates/back-in-stock-popup.html"},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Does PopupLoom send the back-in-stock email automatically?","acceptedAnswer":{"@type":"Answer","text":"No. It captures the address into the lead inbox, exports it as CSV or forwards it to a webhook. Sending the notification is your job, through your email provider or store app."}},{"@type":"Question","name":"Can the popup detect whether a product is in stock?","acceptedAnswer":{"@type":"Answer","text":"Not natively. PopupLoom does not read inventory or product state. The practical approach is a click trigger on your own notify button, shown only on out-of-stock pages, or a URL rule that targets those pages."}},{"@type":"Question","name":"How do I know which product a signup is for?","acceptedAnswer":{"@type":"Answer","text":"The simplest reliable method is one popup per product page group with the product name in the popup copy, or a form field the visitor fills. Do not assume the captured email alone tells you the SKU."}},{"@type":"Question","name":"Should the popup open on page load or on a click?","acceptedAnswer":{"@type":"Answer","text":"On a click. The visitor has already shown intent by pressing notify me; opening a modal on load interrupts people who are only checking the price. A click trigger also keeps the list cleaner."}}]}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://popuploom.com/"},{"@type":"ListItem","position":2,"name":"Templates","item":"https://popuploom.com/templates.html"},{"@type":"ListItem","position":3,"name":"Back-in-stock popup","item":"https://popuploom.com/templates/back-in-stock-popup.html"}]},{"@type":"Article","@id":"https://popuploom.com/templates/back-in-stock-popup.html#article","headline":"Free Back-in-Stock Popup Template","description":"A notify-me popup opened by a click trigger, with email capture, export and follow-up guidance.","datePublished":"2026-11-16","dateModified":"2026-11-16","author":{"@type":"Person","name":"Shailu","url":"https://popuploom.com/about.html"},"publisher":{"@id":"https://popuploom.com/#organization"},"mainEntityOfPage":"https://popuploom.com/templates/back-in-stock-popup.html","image":{"@type":"ImageObject","url":"https://popuploom.com/assets/templates/backStock.jpg","width":1200,"height":750,"caption":"Back in Stock popup template preview: Sage slide-in that collects restock requests; the owner provides monitoring and alerts"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Does PopupLoom send the back-in-stock email automatically?","acceptedAnswer":{"@type":"Answer","text":"No. It captures the address into the lead inbox, exports it as CSV or forwards it to a webhook. Sending the notification is your job, through your email provider or store app."}},{"@type":"Question","name":"Can the popup detect whether a product is in stock?","acceptedAnswer":{"@type":"Answer","text":"Not natively. PopupLoom does not read inventory or product state. The practical approach is a click trigger on your own notify button, shown only on out-of-stock pages, or a URL rule that targets those pages."}},{"@type":"Question","name":"How do I know which product a signup is for?","acceptedAnswer":{"@type":"Answer","text":"The simplest reliable method is one popup per product page group with the product name in the popup copy, or a form field the visitor fills. Do not assume the captured email alone tells you the SKU."}},{"@type":"Question","name":"Should the popup open on page load or on a click?","acceptedAnswer":{"@type":"Answer","text":"On a click. The visitor has already shown intent by pressing notify me; opening a modal on load interrupts people who are only checking the price. A click trigger also keeps the list cleaner."}}]}]}</script>
 <style>
 .tpl-meta{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-size:13px;color:var(--muted-2);margin:14px 0 22px}
 .tpl-table{width:100%;border-collapse:collapse;font-size:14px}
@@ -31,26 +33,24 @@
 .tpl-small{font-size:12.5px;color:var(--muted-2)}
 .tpl-copy{padding:18px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.02);font-size:14px;line-height:1.8}
 </style>
+<!--pl:fonts--><link rel="preload" href="/assets/fonts/bricolage-grotesque-normal-latin.a79fdb52d4.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/assets/fonts/geist-normal-latin.19f9c92546.woff2" as="font" type="font/woff2" crossorigin><!--/pl:fonts-->
 </head>
 <body>
-<header class="wrap" style="padding:24px 26px">
-  <nav aria-label="Main"><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/">Guides</a> · <a href="/free-popup-builder-no-limits.html">No pageview limits</a> · <a href="/about.html">About</a> · <a href="/studio.html?tpl=blank">Open the studio</a></nav>
-  <nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/templates.html">Templates</a> › <a href="/templates/email-signup.html">Email signup</a> › <span>Back in stock</span></nav>
-</header>
-<main class="wrap" style="padding:30px 26px 80px;max-width:900px">
-  <article>
-    <h1>Free back-in-stock popup template</h1>
-    <div class="tpl-meta">
+<!--pl:nav--><a class="skip-link" href="#main">Skip to content</a><nav class="site-nav" aria-label="Main"><div class="wrap inner"><a class="logo" href="/"><span class="mark"><svg viewBox="0 0 32 32" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.8"><circle cx="12.2" cy="16" r="5.4"/><circle cx="19.8" cy="16" r="5.4"/></svg></span> Popup<span><i>Loom</i></span></a><div class="nav-links"><a href="/templates.html">Templates</a><a href="/guides/">Guides</a><a href="/tools/">Tools</a><a href="/free-popup-builder-no-limits.html">No limits</a><a href="/faq.html">FAQ</a></div><div class="nav-cta"><a class="btn primary small" href="/studio.html?tpl=blank">Open the studio</a></div></div></nav><div class="pl-progress" aria-hidden="true"><i></i></div><!--/pl:nav-->
+<main id="main" class="doc">
+<!--pl:hero--><div class="doc-hero"><div class="wrap doc-hero-in"><div class="doc-hero-copy"><nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/templates.html">Templates</a> › <a href="/templates/email-signup.html">Email signup</a> › <span>Back in stock</span></nav><div class="kicker">Template guide</div><h1>Free back-in-stock popup template</h1><div class="tpl-meta doc-byline">
       <span>By <a href="/about.html">Shailu</a>, founder of PopupLoom</span>
       <span>Published 16 November 2026</span>
       <span>Last updated 16 November 2026</span>
       <span>Template checked 16 November 2026</span>
-    </div>
-
-    <p><strong>A back-in-stock popup captures an email from someone who wants a product that is currently unavailable.</strong> It opens when the visitor presses a notify-me button, asks for one address and confirms what happens next. The value is intent: the visitor has already chosen the product, so the popup only has to remove uncertainty.</p>
+    <span class="doc-rt">4 min read</span></div><nav class="doc-actions" aria-label="Next steps"><a class="btn primary" href="/studio.html?tpl=backStock">Open Back in Stock in the studio</a><a class="btn ghost" href="/templates.html">Browse 53 templates</a></nav><p class="doc-trust">Free to use · no credit card · no pageview cap</p></div><aside class="doc-hero-vis"><figure class="doc-shot"><img class="doc-shot-img" src="/assets/templates/backStock.webp" srcset="/assets/templates/backStock-600.webp 600w, /assets/templates/backStock.webp 1200w" sizes="(max-width: 1000px) 100vw, 520px" width="1200" height="750" alt="Back in Stock popup template preview: Sage slide-in that collects restock requests; the owner provides monitoring and alerts" fetchpriority="high" decoding="async"><figcaption>Preview: Back in Stock</figcaption></figure></aside></div></div><!--/pl:hero-->
+<div class="wrap doc-wrap"><div class="doc-grid"><!--pl:grid-->
+<!--pl:toc-m--><nav class="doc-toc-m" aria-label="On this page"><details><summary>On this page</summary><ol><li><a href="#what-this-template-is-for">What this template is for</a></li><li><a href="#use-it-when">Use it when</a></li><li><a href="#recommended-configuration">Recommended configuration</a></li><li><a href="#copy-you-can-adapt">Copy you can adapt</a></li><li><a href="#set-it-up">Set it up</a></li><li><a href="#what-to-measure">What to measure</a></li><li><a href="#common-mistakes">Common mistakes</a></li></ol></details></nav><!--/pl:toc-m-->
+<article class="doc-body">
+<p><strong>A back-in-stock popup captures an email from someone who wants a product that is currently unavailable.</strong> It opens when the visitor presses a notify-me button, asks for one address and confirms what happens next. The value is intent: the visitor has already chosen the product, so the popup only has to remove uncertainty.</p>
     <p>The important limitation is on this page, not buried in a footnote: <strong>PopupLoom does not watch inventory and does not send the notification email.</strong> It captures the address, stores it in the lead inbox and hands it to you as CSV or a webhook. The rest of the sequence is yours.</p>
 
-    <h2>What this template is for</h2>
+    <h2 id="what-this-template-is-for">What this template is for</h2>
     <ul>
       <li><strong>The out-of-stock product page.</strong> One message: this item is unavailable, we can tell you when it returns.</li>
       <li><strong>One field.</strong> Email is enough. A phone number or size selector adds friction before the product exists again.</li>
@@ -58,7 +58,7 @@
       <li><strong>A visible close.</strong> Some visitors only want to read the restock date, not join a list.</li>
     </ul>
 
-    <h2>Use it when</h2>
+    <h2 id="use-it-when">Use it when</h2>
     <ul>
       <li>The product is genuinely unavailable, not merely low on stock.</li>
       <li>You can send the follow-up yourself, or connect the webhook to a system that can.</li>
@@ -67,7 +67,8 @@
     </ul>
     <p>Do not show it on in-stock products or on collection pages where nothing is unavailable. A notify-me prompt on a product someone can buy today is confusing and collects low-intent addresses.</p>
 
-    <h2>Recommended configuration</h2>
+    <!--pl:inline-cta--><aside class="doc-inline-cta"><span class="doc-inline-img"><img class="doc-card-pic" src="/assets/templates/backStock.webp" srcset="/assets/templates/backStock-600.webp 600w, /assets/templates/backStock.webp 1200w" sizes="180px" width="1200" height="750" alt="Back in Stock popup template preview: Sage slide-in that collects restock requests; the owner provides monitoring and alerts" loading="lazy" decoding="async"></span><div><strong>Try it on your own page</strong><p>Open the Back in Stock template, replace the sample text with your own and preview it on desktop and mobile. Free, no credit card.</p><a class="btn primary small" href="/studio.html?tpl=backStock">Open it in the studio</a></div></aside><!--/pl:inline-cta-->
+<h2 id="recommended-configuration">Recommended configuration</h2>
     <div class="tpl-wrap">
       <table class="tpl-table card">
         <thead><tr><th>Setting</th><th>Recommended value</th><th>Why</th></tr></thead>
@@ -82,7 +83,7 @@
       </table>
     </div>
 
-    <h2>Copy you can adapt</h2>
+    <h2 id="copy-you-can-adapt">Copy you can adapt</h2>
     <div class="tpl-copy">
       <p><strong>Badge:</strong> OUT OF STOCK</p>
       <p><strong>Headline:</strong> We can tell you when it is back</p>
@@ -92,7 +93,7 @@
     </div>
     <p>If you cannot promise a single email, change the small print. The promise in the popup is the one a visitor will hold you to.</p>
 
-    <h2>Set it up</h2>
+    <h2 id="set-it-up">Set it up</h2>
     <ol>
       <li>Open the <a href="/studio.html?tpl=backStock">Back in Stock template</a> in the studio.</li>
       <li>Put the product context in the copy, or add a field the visitor fills, so the signup is attributable.</li>
@@ -104,7 +105,7 @@
     </ol>
     <p>The <a href="/guides/collect-and-export-leads.html">collect and export leads guide</a> covers the inbox, CSV and signed webhook in detail.</p>
 
-    <h2>What to measure</h2>
+    <h2 id="what-to-measure">What to measure</h2>
     <ul>
       <li><strong>Signups per unavailable product</strong>, not one sitewide number.</li>
       <li><strong>Fulfilment time</strong>: how long between restock and the email you send.</li>
@@ -112,7 +113,7 @@
       <li><strong>Unsubscribe rate</strong> against the promise you made.</li>
     </ul>
 
-    <h2>Common mistakes</h2>
+    <h2 id="common-mistakes">Common mistakes</h2>
     <ul>
       <li>Promising an automatic email that nothing in the stack will send.</li>
       <li>Showing the popup on in-stock products because the URL rule is too broad.</li>
@@ -121,7 +122,7 @@
       <li>Leaving the notify button visible when the product returns.</li>
     </ul>
 
-    <h2>Related pages</h2>
+    <h2 id="related-pages">Related pages</h2>
     <ul>
       <li><a href="/templates/email-signup.html">All email signup templates</a></li>
       <li><a href="/templates/email-signup-popup.html">Email signup popup template</a></li>
@@ -130,7 +131,7 @@
       <li><a href="/guides/collect-and-export-leads.html">Collect and export leads</a></li>
     </ul>
 
-    <h2>Common questions</h2>
+    <h2 id="common-questions">Common questions</h2>
     <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Does PopupLoom send the back-in-stock email automatically?</strong></summary><p style="margin:10px 0 0">No. It captures the address into the lead inbox, exports it as CSV or forwards it to a webhook. Sending the notification is your job, through your email provider or store app.</p></details>
     <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Can the popup detect whether a product is in stock?</strong></summary><p style="margin:10px 0 0">Not natively. PopupLoom does not read inventory or product state. The practical approach is a click trigger on your own notify button, shown only on out-of-stock pages, or a URL rule that targets those pages.</p></details>
     <details class="card" style="margin:10px 0;padding:16px"><summary><strong>How do I know which product a signup is for?</strong></summary><p style="margin:10px 0 0">The simplest reliable method is one popup per product page group with the product name in the popup copy, or a form field the visitor fills. Do not assume the captured email alone tells you the SKU.</p></details>
@@ -138,9 +139,39 @@
 
     <p class="tpl-small">Written by <a href="/about.html">Shailu</a>, founder of PopupLoom. Template behaviour checked on 16 November 2026. PopupLoom does not send email or read inventory. No conversion, revenue or ranking claim is made.</p>
   </article>
+<!--pl:aside--><aside class="doc-aside" aria-label="Page tools"><nav class="doc-toc" aria-label="Table of contents"><div class="doc-aside-h">On this page</div><ol><li><a href="#what-this-template-is-for">What this template is for</a></li><li><a href="#use-it-when">Use it when</a></li><li><a href="#recommended-configuration">Recommended configuration</a></li><li><a href="#copy-you-can-adapt">Copy you can adapt</a></li><li><a href="#set-it-up">Set it up</a></li><li><a href="#what-to-measure">What to measure</a></li><li><a href="#common-mistakes">Common mistakes</a></li></ol></nav><div class="doc-more"><div class="doc-aside-h">Keep reading</div><ul><li><a href="/templates/black-friday-popup.html">Free Black Friday popup template with countdown</a></li><li><a href="/templates/cart-rescue-popup.html">Free cart rescue popup template</a></li><li><a href="/templates/discount-popup.html">Free discount popup template</a></li><li><a href="/templates/email-signup-popup.html">Free email signup popup template</a></li></ul></div></aside><!--/pl:aside-->
+<!--/pl:grid--></div><!--pl:after--><aside class="doc-after" aria-label="Next steps"><p class="doc-after-h">Start from a template</p><p class="doc-after-sub">Each one opens in the studio. Change the words, colours and trigger, then install it with two lines of code.</p><div class="doc-card-row"><a class="doc-card" href="/studio.html?tpl=drop48"><span class="doc-card-img"><img class="doc-card-pic" src="/assets/templates/drop48.webp" srcset="/assets/templates/drop48-600.webp 600w, /assets/templates/drop48.webp 1200w" sizes="(max-width: 700px) 100vw, 300px" width="1200" height="750" alt="48-Hour Drop popup template preview: Ember-lit modal with a live countdown and a copyable code field" loading="lazy" decoding="async"></span><span class="doc-card-name">48-Hour Drop</span><span class="doc-card-tag">Flash deal</span><span class="doc-card-go">Open in the studio →</span></a><a class="doc-card" href="/studio.html?tpl=chalkhat"><span class="doc-card-img"><img class="doc-card-pic" src="/assets/templates/chalkhat.webp" srcset="/assets/templates/chalkhat-600.webp 600w, /assets/templates/chalkhat.webp 1200w" sizes="(max-width: 700px) 100vw, 300px" width="1200" height="750" alt="Sticky Note Deal popup template preview: Light welcome-offer modal with soft sage artwork and a copyable code field" loading="lazy" decoding="async"></span><span class="doc-card-name">Sticky Note Deal</span><span class="doc-card-tag">Coupon</span><span class="doc-card-go">Open in the studio →</span></a><a class="doc-card" href="/studio.html?tpl=sneakerDrop"><span class="doc-card-img"><img class="doc-card-pic" src="/assets/templates/sneakerDrop.webp" srcset="/assets/templates/sneakerDrop-600.webp 600w, /assets/templates/sneakerDrop.webp 1200w" sizes="(max-width: 700px) 100vw, 300px" width="1200" height="750" alt="Fresh Kicks Drop popup template preview: Cobalt product-drop modal with a countdown and a code field" loading="lazy" decoding="async"></span><span class="doc-card-name">Fresh Kicks Drop</span><span class="doc-card-tag">Product drop</span><span class="doc-card-go">Open in the studio →</span></a></div><div class="doc-band"><div><p class="doc-band-h">Ready to build your popup?</p><p>The studio is free to use. Save a popup to get its install code and read your leads in the inbox.</p></div><a class="btn primary" href="/studio.html?tpl=blank">Open the studio</a></div></aside><!--/pl:after--></div>
 </main>
-<footer class="wrap" style="padding:24px 0;font-size:13px">
-  <div><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/">Guides</a> · <a href="/free-popup-builder-no-limits.html">No pageview limits</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></div>
-</footer>
+<!--pl:footer--><footer class="site-foot"><div class="wrap"><div class="foot-grid">
+<div class="foot-brand"><a class="logo" href="/"><span class="mark"><svg viewBox="0 0 32 32" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.8"><circle cx="12.2" cy="16" r="5.4"/><circle cx="19.8" cy="16" r="5.4"/></svg></span> Popup<span><i>Loom</i></span></a><p>A free website popup builder with 53 editable templates, a visual studio and a lead inbox. No pageview cap, no credit card.</p><p><a class="btn primary small" href="/studio.html?tpl=blank">Open the studio</a></p></div>
+<div><p class="foot-h">Product</p><ul><li><a href="/studio.html?tpl=blank">Popup studio</a></li><li><a href="/templates.html">All 53 templates</a></li><li><a href="/tools/">Free tools</a></li><li><a href="/free-popup-builder-no-limits.html">No pageview limits</a></li><li><a href="/best-free-popup-builder.html">Nine-point checklist</a></li></ul></div>
+<div><p class="foot-h">Guides</p><ul><li><a href="/guides/install-popups.html">Add a popup to your site</a></li><li><a href="/guides/wordpress-popup.html">WordPress</a></li><li><a href="/guides/shopify-popup.html">Shopify</a></li><li><a href="/guides/webflow-popup.html">Webflow</a></li><li><a href="/guides/popup-builder-for-ecommerce.html">Ecommerce</a></li><li><a href="/guides/">All guides</a></li></ul></div>
+<div><p class="foot-h">Company</p><ul><li><a href="/about.html">About</a></li><li><a href="/faq.html">FAQ</a></li><li><a href="/contact.html">Contact</a></li><li><a href="/security.html">Security</a></li><li><a href="/press.html">Press kit</a></li><li><a href="/privacy.html">Privacy</a></li><li><a href="/terms.html">Terms</a></li></ul></div>
+</div><p class="foot-legal">PopupLoom is an independent product. Template offers, codes and countdowns are sample copy; every claim a site publishes must be true and is the site owner's responsibility.</p></div></footer><!--/pl:footer-->
+<!--pl:script--><script>
+(function () {
+  var bar = document.querySelector(".pl-progress i"), nav = document.querySelector(".site-nav");
+  function tick() {
+    var d = document.documentElement, max = d.scrollHeight - innerHeight, p = max > 0 ? scrollY / max : 0;
+    if (bar) bar.style.transform = "scaleX(" + Math.min(1, Math.max(0, p)) + ")";
+    if (nav) nav.classList.toggle("scrolled", scrollY > 8);
+  }
+  addEventListener("scroll", tick, { passive: true });
+  tick();
+  var links = document.querySelectorAll(".doc-aside .doc-toc a");
+  if (!links.length || !("IntersectionObserver" in window)) return;
+  var map = {};
+  links.forEach(function (a) { map[a.getAttribute("href").slice(1)] = a; });
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      links.forEach(function (a) { a.classList.remove("on"); });
+      var a = map[e.target.id];
+      if (a) a.classList.add("on");
+    });
+  }, { rootMargin: "-80px 0px -70% 0px" });
+  Object.keys(map).forEach(function (id) { var el = document.getElementById(id); if (el) io.observe(el); });
+})();
+</script><!--/pl:script-->
 </body>
 </html>

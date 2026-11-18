@@ -5,8 +5,15 @@
 // The studio path is preserved: every category page has a "Use this template"
 // link to /studio.html?tpl=<id>. The gallery no longer links straight into a
 // noindex URL.
+//
+// Source of truth: the catalog in app.js (loaded by scripts/lib/catalog.cjs).
+// templates.html is rebuilt from it on every run, so names, blurbs and the
+// template count cannot drift between the app and the public pages.
+// Preview images come from scripts/capture-template-previews.cjs.
 const fs = require("fs");
 const path = require("path");
+const { loadCatalog } = require("./lib/catalog.cjs");
+const media = require("./lib/template-media.cjs");
 const root = path.join(__dirname, "..");
 
 const CATEGORY_OF = {
@@ -25,6 +32,8 @@ const CATEGORY_OF = {
   tapMeter: "engage", microYes: "engage", cornerPeek: "engage", transit: "engage",
   loyaltyCard: "engage", referFriend: "engage", reviewAsk: "engage",
   birthdayClub: "engage",
+  valentine: "seasonal", halloween: "seasonal", thanksgiving: "seasonal", summerSale: "seasonal", backToSchool: "seasonal",
+  welcomeHero: "email", guideSplit: "email", eventSplit: "email",
   player: "video",
   fullscreenExit: "exit", cartRescue: "exit", cancelSave: "exit"
 };
@@ -35,9 +44,9 @@ const CATEGORIES = {
     label: "Email signup",
     title: "Free Email Signup Popup Templates | PopupLoom",
     h1: "Free email signup popup templates",
-    description: "10 free email signup and waitlist popup templates. Collect emails, offer a lead magnet or open a waitlist, then install with two lines of code.",
+    description: "13 free email signup, lead magnet and waitlist popup templates. Collect emails, offer a lead magnet or open a waitlist, then install with two lines of code.",
     intro: [
-      "Email is the one audience a site owner keeps even when an algorithm changes. These ten templates cover the common reasons a visitor gives an address: a welcome offer, a launch waitlist, a lead magnet, a restock alert or a webinar seat. Each is an editable starting design, not a promise of a particular conversion rate.",
+      "Email is the one audience a site owner keeps even when an algorithm changes. These thirteen templates cover the common reasons a visitor gives an address: a welcome offer, a launch waitlist, a lead magnet, a restock alert or a webinar seat. Each is an editable starting design, not a promise of a particular conversion rate.",
       "Every template installs on any site that allows custom HTML or JavaScript. The form, success message and follow-up are yours; PopupLoom stores the response in your lead inbox and can export it as CSV."
     ],
     who: [
@@ -54,7 +63,7 @@ const CATEGORIES = {
       "Keep consent language honest and link to your privacy notice."
     ],
     faq: [
-      ["Are these email popup templates free?", "Yes. All ten designs are free to edit and use. A free account is required to save a popup and get its install code; there is no pageview cap."],
+      ["Are these email popup templates free?", "Yes. All thirteen designs are free to edit and use. A free account is required to save a popup and get its install code; there is no pageview cap."],
       ["Can I collect emails without a plugin?", "Yes, if your site allows custom HTML or JavaScript. Paste the two-line install code before the closing body tag. WordPress, Shopify, Webflow, Squarespace and Wix each have a guide."],
       ["Where do the emails go?", "They appear in your PopupLoom lead inbox, where you can export them as CSV. An optional signed server webhook can forward them to another tool."],
       ["Do I need a consent checkbox?", "PopupLoom forms do not render a separate consent checkbox. The owner is responsible for the consent language and lawful basis required in their jurisdiction."]
@@ -323,11 +332,11 @@ const CATEGORIES = {
   seasonal: {
     slug: "seasonal",
     label: "Seasonal",
-    title: "Seasonal Popup Templates: Black Friday and Holidays | PopupLoom",
+    title: "Free Black Friday and Holiday Popup Templates | PopupLoom",
     h1: "Free Black Friday and seasonal popup templates",
-    description: "3 free Black Friday, Cyber Monday and winter holiday popup templates. Customize the dates and offers for your campaign.",
+    description: "8 free Black Friday, Cyber Monday, holiday and seasonal popup templates. Customize the dates and offers for your campaign.",
     intro: [
-      "Seasonal campaigns have a short window and a clear reason to act. These three templates cover Black Friday, Cyber Monday and a winter holiday offer. Change the dates, code and terms before publishing.",
+      "Seasonal campaigns have a short window and a clear reason to act. These eight templates cover Black Friday, Cyber Monday, a winter holiday offer, Valentine's Day, Halloween, Thanksgiving, summer and back to school. Change the dates, code and terms before publishing.",
       "A seasonal template is not a license to fake urgency. If the sale ends on Sunday, say Sunday and honor it. If the code is limited, state the limit."
     ],
     who: [
@@ -395,6 +404,11 @@ const CATEGORIES = {
 };
 
 const ORDER = ["email", "discount", "exit", "announce", "engage", "social", "age", "gamified", "seasonal", "video"];
+// Page copy states the template count in several places; parseTemplates() fails the
+// build if the catalog size changes without this being updated.
+const TEMPLATE_COUNT = 53;
+const LAST_UPDATED = "18 November 2026";
+const ICONS = `<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png"><link rel="icon" href="/assets/favicon-16.png" sizes="16x16" type="image/png"><link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">`;
 
 // Individual template pages published in the first wave. The category cards
 // link to these guides in addition to opening the studio.
@@ -512,19 +526,58 @@ function esc(value) {
     .replace(/"/g, "&quot;");
 }
 
+const CATALOG = loadCatalog();
+
+/* Display format of a template, from its placement. Drives the card label and the gallery filter. */
+const FORMATS = [
+  ["modal", "Popup"], ["slide", "Corner slide-in"], ["topbar", "Top bar"], ["bottombar", "Bottom bar"], ["fullscreen", "Fullscreen"]
+];
+function formatOf(placement) {
+  const p = String(placement || "modal");
+  if (p.indexOf("slide:") === 0) return "slide";
+  return FORMATS.some(([k]) => k === p) ? p : "modal";
+}
+const formatLabel = (key) => (FORMATS.find(([k]) => k === key) || FORMATS[0])[1];
+
 function parseTemplates() {
-  const html = fs.readFileSync(path.join(root, "templates.html"), "utf8");
-  const entries = [];
-  const re = /<li style="margin:14px 0"><a href="(?:\/studio\.html\?tpl=|\/templates\/[a-z-]+\.html#)([A-Za-z0-9_-]+)"><strong>([\s\S]*?)<\/strong><\/a>\s*[—-]\s*([\s\S]*?)<\/li>/g;
-  let match;
-  while ((match = re.exec(html))) {
-    const id = match[1];
-    const category = CATEGORY_OF[id];
-    if (!category) throw new Error("Unknown template category for " + id);
-    entries.push({ id, name: match[2].trim(), description: match[3].trim(), category });
+  const entries = CATALOG.templates.map((t) => {
+    const category = CATEGORY_OF[t.id];
+    if (!category) throw new Error("Template " + t.id + " has no category in CATEGORY_OF; add it before publishing");
+    if (!media.hasPreview(t.id)) throw new Error("Missing preview image for " + t.id + "; run node scripts/capture-template-previews.cjs");
+    return { id: t.id, name: t.name, description: t.blurb, tag: t.tag, blurb: t.blurb, journey: t.journey, best: !!t.best, category, format: formatOf(t.cfg.placement) };
+  });
+  for (const id of Object.keys(CATEGORY_OF)) {
+    if (!entries.some((e) => e.id === id)) throw new Error("CATEGORY_OF lists " + id + " but app.js has no such template");
   }
-  if (entries.length !== 45) throw new Error("Expected 45 templates, found " + entries.length);
+  if (entries.length !== TEMPLATE_COUNT) throw new Error("Expected " + TEMPLATE_COUNT + " templates, found " + entries.length + "; update TEMPLATE_COUNT and the page copy");
   return entries;
+}
+
+/* One gallery card: preview image, name, type, blurb and the two next steps. */
+function cardHTML(t, opts) {
+  const o = opts || {};
+  const guide = TEMPLATE_GUIDES[t.id];
+  const heading = o.heading || "h3";
+  const sizes = "(max-width: 700px) 100vw, (max-width: 1060px) 50vw, 340px";
+  const img = media.pictureHTML(t, { lazy: o.lazy !== false, sizes });
+  // The gallery passes publicHref so it never links to the noindex studio URL;
+  // category pages are the public home of each card and do open the studio.
+  if (o.publicHref) {
+    return `<div class="tg-card" id="${t.id}" data-format="${t.format}" data-goal="${t.journey}">
+  <a class="tg-shot" href="${o.publicHref}" aria-label="${esc(t.name)}: see the template">${img}</a>
+  <div class="tg-meta"><${heading} class="tg-name"><a href="${o.publicHref}">${esc(t.name)}</a></${heading}><span class="tg-tag">${esc(formatLabel(t.format))}</span></div>
+  <p class="tg-kind">${esc(t.tag)}</p>
+  <p class="tg-blurb">${esc(t.blurb)}</p>
+  <p class="tg-actions"><a class="btn primary small" href="${o.publicHref}">View template</a>${guide ? ` <a class="btn ghost small" href="${guide}">Read the full guide</a>` : ""}</p>
+</div>`;
+  }
+  return `<div class="tg-card" id="${t.id}" data-format="${t.format}" data-goal="${t.journey}">
+  <a class="tg-shot" href="/studio.html?tpl=${t.id}" aria-label="Open ${esc(t.name)} in the studio">${img}</a>
+  <div class="tg-meta"><${heading} class="tg-name">${esc(t.name)}</${heading}><span class="tg-tag">${esc(formatLabel(t.format))}</span></div>
+  <p class="tg-kind">${esc(t.tag)}</p>
+  <p class="tg-blurb">${esc(t.blurb)}</p>
+  <p class="tg-actions"><a class="btn primary small" href="/studio.html?tpl=${t.id}">Use this template</a>${guide ? ` <a class="btn ghost small" href="${guide}">Read the full guide</a>` : ""}</p>
+</div>`;
 }
 
 function navHTML() {
@@ -535,11 +588,16 @@ function renderPage(categoryKey, templates) {
   const c = CATEGORIES[categoryKey];
   const url = `https://popuploom.com/templates/${c.slug}.html`;
   const items = templates.filter((t) => t.category === categoryKey);
-  const list = items.map((t, index) => `<article class="card" id="${t.id}" style="margin:18px 0;padding:20px">
-  <h2 style="margin:0 0 6px">${t.name}</h2>
-  <p style="margin:0 0 12px">${t.description}</p>
-  <p style="margin:0"><a class="btn primary small" href="/studio.html?tpl=${t.id}">Use this template</a> <a class="btn ghost small" href="/templates.html">Compare all 45</a>${TEMPLATE_GUIDES[t.id] ? ` <a class="btn ghost small" href="${TEMPLATE_GUIDES[t.id]}">Read the full guide</a>` : ""}</p>
-</article>`).join("\n");
+  const list = `<div class="tg-grid">\n${items.map((t, index) => cardHTML(t, { heading: "h3", lazy: index > 1 })).join("\n")}\n</div>`;
+  const lead = items[0];
+  // Three other categories (rotating, so each page links to different ones) as image cards.
+  const at = ORDER.indexOf(categoryKey);
+  const otherTypes = [1, 2, 3].map((k) => ORDER[(at + k) % ORDER.length]).map((key) => {
+    const oc = CATEGORIES[key];
+    const first = templates.find((t) => t.category === key);
+    const count = templates.filter((t) => t.category === key).length;
+    return `<a class="doc-card" href="/templates/${oc.slug}.html"><span class="doc-card-img">${media.pictureHTML(first, { sizes: "(max-width: 700px) 100vw, 300px" }).replace('class="tpl-shot-img"', 'class="doc-card-pic"')}</span><span class="doc-card-name">${esc(oc.label)} popup templates</span><span class="doc-card-tag">${count} template${count === 1 ? "" : "s"}</span><span class="doc-card-go">See the templates →</span></a>`;
+  }).join("");
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
@@ -565,7 +623,8 @@ function renderPage(categoryKey, templates) {
             "@type": "ListItem",
             position: index + 1,
             name: t.name,
-            url: url + "#" + t.id
+            url: url + "#" + t.id,
+            image: media.imageObject(t)
           }))
         },
         author: { "@type": "Person", name: "Shailu", url: "https://popuploom.com/about.html" }
@@ -593,23 +652,28 @@ function renderPage(categoryKey, templates) {
 <meta property="og:title" content="${esc(c.title)}">
 <meta property="og:description" content="${esc(c.description)}">
 <meta property="og:url" content="${url}">
-<meta property="og:image" content="https://popuploom.com/assets/og-popuploom.png">
-<meta property="og:image:alt" content="PopupLoom: free website popup builder with 45 templates">
+<meta property="og:image" content="https://popuploom.com/assets/templates/${lead.id}.jpg">
+<meta property="og:image:alt" content="${esc(media.altFor(lead))}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="750">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(c.title)}">
 <meta name="twitter:description" content="${esc(c.description)}">
-<meta name="twitter:image" content="https://popuploom.com/assets/og-popuploom.png">
-<link rel="stylesheet" href="/ui.css"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<meta name="twitter:image" content="https://popuploom.com/assets/templates/${lead.id}.jpg">
+<link rel="preload" as="image" href="/assets/templates/${lead.id}-600.webp" imagesrcset="/assets/templates/${lead.id}-600.webp 600w, /assets/templates/${lead.id}.webp 1200w" imagesizes="(max-width: 700px) 100vw, (max-width: 1060px) 50vw, 340px">
+<link rel="stylesheet" href="/ui.css">${ICONS}
 <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
 </head>
 <body>
-<header class="wrap" style="padding:24px 26px">
-  <nav aria-label="Main"><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/">Guides</a> · <a href="/about.html">About</a> · <a href="/studio.html?tpl=blank">Open the studio</a></nav>
+<main id="main" class="doc doc-cat">
+<div class="doc-hero"><div class="wrap doc-hero-in"><div class="doc-hero-copy">
   <nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/templates.html">Templates</a> › <span>${esc(c.label)}</span></nav>
-</header>
-<main class="wrap" style="padding:30px 26px 80px;max-width:900px">
+  <div class="kicker">${items.length} template${items.length === 1 ? "" : "s"} in this set</div>
   <h1>${esc(c.h1)}</h1>
-  <p class="mut" style="font-size:13px;margin:6px 0 18px">By <a href="/about.html">Shailu</a>, founder of PopupLoom · Last updated 16 November 2026</p>
+  <p class="mut doc-byline">By <a href="/about.html">Shailu</a>, founder of PopupLoom · Last updated ${LAST_UPDATED}</p>
+  <nav class="doc-actions" aria-label="Next steps"><a class="btn primary" href="/studio.html?tpl=${lead.id}">Open ${esc(lead.name)} in the studio</a><a class="btn ghost" href="/templates.html">Browse all ${TEMPLATE_COUNT} templates</a></nav>
+</div><aside class="doc-hero-vis"><figure class="doc-shot">${media.pictureHTML(lead, { lazy: false, sizes: "(max-width: 1000px) 100vw, 520px" }).replace('class="tpl-shot-img"', 'class="doc-shot-img"')}<figcaption>Preview: ${esc(lead.name)}</figcaption></figure></aside></div></div>
+<div class="wrap doc-cat-body">
   <p class="mut">Free to edit and install. No pageview cap, no trial and no credit card.</p>
   ${c.intro.map((p) => `<p>${esc(p)}</p>`).join("\n  ")}
   ${navHTML()}
@@ -647,32 +711,221 @@ ${guides}
   <h2>Common questions</h2>
 ${faq}
 
-  <p style="margin-top:26px"><a class="btn primary" href="/studio.html?tpl=blank">Start from a blank popup</a> <a class="btn ghost" href="/templates.html">Browse all 45 templates</a></p>
+  <p style="margin-top:26px"><a class="btn primary" href="/studio.html?tpl=blank">Start from a blank popup</a> <a class="btn ghost" href="/templates.html">Browse all ${TEMPLATE_COUNT} templates</a></p>
+
+  <aside class="doc-after" aria-label="More template types">
+    <p class="doc-after-h">More popup template types</p>
+    <p class="doc-after-sub">Each type has its own guide, setup notes and designs.</p>
+    <div class="doc-card-row">${otherTypes}</div>
+  </aside>
+</div>
 </main>
-<footer class="wrap" style="padding:24px 0;font-size:13px">
-  <div><a href="/">PopupLoom — free website popup builder</a> · <a href="/templates.html">Templates</a> · <a href="/guides/">Guides</a> · <a href="/free-popup-builder-no-limits.html">No pageview limits</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></div>
-  <div style="margin-top:8px"><a href="/guides/wordpress-popup.html">WordPress</a> · <a href="/guides/shopify-popup.html">Shopify</a> · <a href="/guides/webflow-popup.html">Webflow</a> · <a href="/guides/squarespace-wix-popup.html">Squarespace and Wix</a> · <a href="/free-popup-builder-no-limits.html">No pageview limits</a></div>
-</footer>
 </body>
 </html>
 `;
 }
 
-function rewriteGallery(entries) {
-  const file = path.join(root, "templates.html");
-  let html = fs.readFileSync(file, "utf8");
-  for (const entry of entries) {
-    const category = CATEGORIES[entry.category];
-    const target = `/templates/${category.slug}.html#${entry.id}`;
-    const escapeRe = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const linked = new RegExp(`<a href="(?:/studio\\.html\\?tpl=${entry.id}|${escapeRe(target)})">`, "g");
-    html = html.replace(linked, `<a href="${target}">`);
+/* Gallery sections follow the six journeys the studio and homepage use. */
+const JOURNEY_SECTIONS = {
+  capture: ["Email signup popup templates", "Collect email signups and waitlist interest with forms and offers."],
+  convert: ["Discount and offer popup templates", "Present discounts, product offers and promotions at an appropriate moment."],
+  retain: ["Feedback and loyalty popup templates", "Gather visitor feedback and share reasons to return."],
+  winback: ["Exit-intent popup templates", "Reach visitors before they leave with desktop exit-intent offers."],
+  announce: ["Announcement popup templates", "Share shipping information, product news and other announcements."],
+  trust: ["Age gates and trust notices", "Create age gates and configured social-proof notices. Use only truthful activity information."]
+};
+
+const DEEP_DIVES = [
+  ["/templates/exit-intent-popup.html", "Exit-intent popup template", "a last-chance save for desktop visitors, with the desktop-only rule spelled out."],
+  ["/templates/cart-rescue-popup.html", "Cart rescue popup template", "cart-page targeting, checkout exclusions and a mobile companion."],
+  ["/templates/discount-popup.html", "Discount popup template", "a 48-hour code layout with a countdown and the claims you must not invent."],
+  ["/templates/email-signup-popup.html", "Email signup popup template", "a lead-magnet layout with field and consent notes."],
+  ["/templates/back-in-stock-popup.html", "Back-in-stock popup template", "a click-triggered notify-me form and an honest follow-up path."],
+  ["/templates/spin-to-win-popup.html", "Spin-to-win popup template", "a gamified entry layout with the rules you have to supply."],
+  ["/templates/announcement-bar.html", "Announcement bar template", "one message, one link and a dismiss control that fits a phone."],
+  ["/templates/free-shipping-bar.html", "Free shipping bar template", "a static delivery threshold with the cart-reading limit stated."],
+  ["/templates/black-friday-popup.html", "Black Friday popup template", "a countdown tied to a real end date, not a resetting timer."],
+  ["/templates/age-verification-popup.html", "Age confirmation popup template", "a self-declaration gate with the compliance limits made clear."],
+  ["/templates/video-popup.html", "Video popup template", "a click-opened player with autoplay, consent and caption notes."],
+  ["/templates/feedback-popup.html", "Feedback popup template", "a one-tap rating that asks one question and stops."],
+  ["/templates/referral-popup.html", "Referral popup template", "a shareable code with the reward terms the owner must set."],
+  ["/templates/trust-badge-popup.html", "Trust badge popup template", "owner-supplied payment, returns and support facts, nothing invented."],
+  ["/templates/giveaway-popup.html", "Giveaway popup template", "an entry form plus the official rules a promotion needs."],
+  ["/templates/shipping-notice-popup.html", "Shipping notice template", "a top bar for delays and cut-off dates that comes down on time."]
+];
+
+const GALLERY_FAQ = [
+  ["Are these popup templates free?", "Yes. Every template is free to preview, edit and install, with no pageview cap and no trial. A free account is only needed to save a popup and get its install code."],
+  ["Do I need to code to use a template?", "No. Pick a template, change the words, colours, image and trigger in the studio, then paste a two-line snippet before the closing body tag of your site. WordPress, Shopify, Webflow, Squarespace and Wix each have a short guide."],
+  ["Can I change a template completely?", "Yes. A template is only a starting point. You can change every word, the colours, the image, the placement, the trigger, the frequency and which pages and devices it appears on, or start from a blank popup instead."],
+  ["Where do the leads from a template go?", "Responses land in your PopupLoom lead inbox, where you can export them as CSV. An optional signed webhook can forward them to another tool. Sending any follow-up email is up to you."],
+  ["Are the offers, codes and countdowns in the previews real?", "No. Every preview uses sample copy. Discounts, stock levels, prizes, deadlines and guarantees must be true and honored by the site owner, so replace the sample text with your own before you publish."],
+  ["Which template should I start with?", "Start from the job the popup has to do. Use an email signup popup to grow a list, an offer popup to move a visitor to checkout, an exit-intent popup to catch someone leaving on desktop, and an announcement bar for one line of news."]
+];
+
+const HOW_TO = [
+  ["Pick a template", "Choose the job first (capture an email, make a sale, announce news), then a layout that fits your page."],
+  ["Make it yours", "Open it in the studio and replace the sample text, colours and image. Set when it appears and how often."],
+  ["Preview on desktop and mobile", "Check both sizes, and test the trigger on a real page before you rely on it."],
+  ["Install and measure", "Save the popup, paste the two-line install code before the closing body tag, then read views and leads in your inbox."]
+];
+
+function writeGallery(entries) {
+  const url = "https://popuploom.com/templates.html";
+  const title = "Free Website Popup Templates | PopupLoom";
+  const socialTitle = `${TEMPLATE_COUNT} Free Website Popup Templates | PopupLoom`;
+  const description = `Browse ${TEMPLATE_COUNT} popup templates for email signup, discounts, announcements, feedback and age verification. Customize a template in the free PopupLoom studio.`;
+  const lead = entries.find((t) => t.id === "drop48") || entries[0];
+  const byJourney = CATALOG.journeys.map((j) => ({ j, items: entries.filter((t) => t.journey === j.id) })).filter((g) => g.items.length);
+  let position = 0;
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://popuploom.com/" },
+      { "@type": "ListItem", position: 2, name: "Popup templates", item: url }
+    ]
+  };
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        "@id": url + "#collection",
+        url,
+        name: "PopupLoom popup templates",
+        description,
+        isPartOf: { "@id": "https://popuploom.com/#website" },
+        primaryImageOfPage: media.imageObject(lead),
+        mainEntity: {
+          "@type": "ItemList",
+          numberOfItems: entries.length,
+          itemListElement: byJourney.flatMap((g) => g.items).map((t) => ({
+            "@type": "ListItem",
+            position: ++position,
+            name: t.name,
+            url: `https://popuploom.com/templates/${CATEGORIES[t.category].slug}.html#${t.id}`,
+            image: media.imageObject(t)
+          }))
+        },
+        author: { "@type": "Person", name: "Shailu", url: "https://popuploom.com/about.html" }
+      },
+      {
+        "@type": "FAQPage",
+        mainEntity: GALLERY_FAQ.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } }))
+      }
+    ]
+  };
+  let eager = 3;
+  const sections = byJourney.map(({ j, items }) => {
+    const [h2, intro] = JOURNEY_SECTIONS[j.id] || [j.label + " popup templates", j.blurb];
+    return `<section class="tg-section" aria-labelledby="${j.id}">
+<div class="tg-head"><h2 id="${j.id}">${esc(h2)}</h2><span class="tg-count">${items.length} template${items.length === 1 ? "" : "s"}</span></div>
+<p class="mut">${esc(intro)}</p>
+<div class="tg-grid">
+${items.map((t) => cardHTML(t, { heading: "h3", lazy: eager-- <= 0, publicHref: `/templates/${CATEGORIES[t.category].slug}.html#${t.id}` })).join("\n")}
+</div>
+</section>`;
+  }).join("\n");
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(title)}</title>
+<meta name="description" content="${esc(description)}">
+<link rel="canonical" href="${url}">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PopupLoom">
+<meta property="og:title" content="${esc(socialTitle)}">
+<meta property="og:description" content="${esc(description)}">
+<meta property="og:url" content="${url}">
+<meta property="og:image" content="https://popuploom.com/assets/templates/${lead.id}.jpg">
+<meta property="og:image:alt" content="${esc(media.altFor(lead))}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="750">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${esc(socialTitle)}">
+<meta name="twitter:description" content="${esc(description)}">
+<meta name="twitter:image" content="https://popuploom.com/assets/templates/${lead.id}.jpg">
+<link rel="stylesheet" href="/ui.css">${ICONS}
+<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
+<script type="application/ld+json">${JSON.stringify(breadcrumbLd)}</script>
+</head>
+<body>
+<header class="wrap" style="padding:24px 26px">
+  <nav aria-label="Main"><a href="/">PopupLoom</a> · <a href="/templates.html" aria-current="page">Templates</a> · <a href="/guides/">Guides</a> · <a href="/about.html">About</a> · <a href="/studio.html?tpl=blank">Open the studio</a></nav>
+  <nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <span>Popup templates</span></nav>
+</header>
+<main class="wrap tg-page" style="padding:30px 26px 80px">
+  <div class="tg-intro">
+  <h1>${TEMPLATE_COUNT} free website popup templates</h1>
+  <p class="mut" style="font-size:13px;margin:6px 0 18px">By <a href="/about.html">Shailu</a>, founder of PopupLoom · Last updated ${LAST_UPDATED}</p>
+  <p>Choose a starting design and customize its content, appearance and trigger. Preview as a guest; sign in to save and get your installation code. Template names describe designs, not guaranteed results.</p>
+  <p>Not sure where to start? Read the free playbooks for <a href="/guides/popup-builder-for-ecommerce.html">ecommerce stores</a>, <a href="/guides/popup-builder-for-quick-commerce.html">quick-commerce and grocery delivery</a>, or <a href="/guides/popup-builder-for-lead-generation.html">lead generation</a>.</p>
+  <div class="card" style="margin:18px 0;padding:16px 18px;border-color:rgba(255,106,31,.3)"><b>These are editable design examples, not live offers.</b> Any discount, stock level, prize, points balance, email/SMS/PDF delivery, guarantee or security claim must be true, and is supplied and honored by the website owner — not by PopupLoom. Demo social-proof names and times are labeled sample data.</div>
+  </div>
+  <nav class="tg-jump" aria-label="Template journeys">${byJourney.map(({ j, items }) => `<a href="#${j.id}">${esc(j.label)} <span>${items.length}</span></a>`).join("")}</nav>
+  <div class="tg-filter" id="tgFilter" role="group" aria-label="Filter templates by format" hidden>
+    <span class="tg-filter-label">Format</span>
+    <button type="button" class="tg-chip" data-format="all" aria-pressed="true">All <span>${entries.length}</span></button>
+    ${FORMATS.filter(([k]) => entries.some((t) => t.format === k)).map(([k, label]) => `<button type="button" class="tg-chip" data-format="${k}" aria-pressed="false">${esc(label)} <span>${entries.filter((t) => t.format === k).length}</span></button>`).join(" ")}
+    <span class="tg-filter-status" id="tgStatus" role="status" aria-live="polite"></span>
+  </div>
+${sections}
+  <section class="tg-scratch" aria-labelledby="scratch">
+    <h2 id="scratch">Nothing quite right? Start from a blank popup</h2>
+    <p>Every template here is a starting point. If none matches your page, open the studio with an empty popup and build your own layout, copy and trigger.</p>
+    <p><a class="btn primary" href="/studio.html?tpl=blank">Start from a blank popup</a></p>
+  </section>
+  <section aria-labelledby="how" style="margin:52px 0 0">
+    <h2 id="how">How to add a popup template to your website</h2>
+    <ol class="tg-steps">${HOW_TO.map(([h, p]) => `<li><strong>${esc(h)}.</strong> ${esc(p)}</li>`).join("")}</ol>
+  </section>
+  <section aria-labelledby="faq" style="margin:44px 0 0">
+    <h2 id="faq">Popup template questions</h2>
+    ${GALLERY_FAQ.map(([q, a]) => `<details class="card" style="margin:10px 0;padding:16px"><summary><strong>${esc(q)}</strong></summary><p style="margin:10px 0 0">${esc(a)}</p></details>`).join("")}
+  </section>
+  <section aria-labelledby="browse" style="margin:56px 0 0">
+    <h2 id="browse">Browse popup templates by category</h2>
+    <p>Start with the job you need the popup to do. Each category page explains when to use it, how to set it up and which template fits.</p>
+    <ul style="line-height:2">${NAV.map((c) => `<li><a href="/templates/${c.slug}.html"><strong>${esc(c.label)}</strong></a> — ${esc(c.description.split(". ")[0])}.</li>`).join("")}</ul>
+  </section>
+  <section aria-labelledby="deep-dives" style="margin:44px 0 0">
+    <h2 id="deep-dives">Full guides for ${DEEP_DIVES.length} popular templates</h2>
+    <p class="mut" style="font-size:14px">A gallery card shows the design. These guides cover the offer, the copy to adapt, the trigger and frequency to use, and what to measure once it is live.</p>
+    <ul>${DEEP_DIVES.map(([href, label, text]) => `<li style="margin:14px 0"><a href="${href}"><strong>${esc(label)}</strong></a> — ${esc(text)}</li>`).join("")}</ul>
+  </section>
+</main>
+<footer class="wrap" style="padding:24px 26px"><a href="/">PopupLoom — free website popup builder</a> · <a href="/guides/">Guides</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></footer>
+<script>
+(function () {
+  var bar = document.getElementById("tgFilter");
+  if (!bar) return;
+  bar.hidden = false;
+  var chips = bar.querySelectorAll(".tg-chip"), status = document.getElementById("tgStatus");
+  function apply(fmt) {
+    var shown = 0;
+    document.querySelectorAll(".tg-card").forEach(function (c) {
+      var on = fmt === "all" || c.getAttribute("data-format") === fmt;
+      c.hidden = !on;
+      if (on) shown++;
+    });
+    document.querySelectorAll(".tg-section").forEach(function (sec) {
+      sec.hidden = !sec.querySelector(".tg-card:not([hidden])");
+    });
+    chips.forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-format") === fmt ? "true" : "false"); });
+    status.textContent = fmt === "all" ? "" : "Showing " + shown + " template" + (shown === 1 ? "" : "s");
   }
-  if (!html.includes("<!-- category-nav -->")) {
-    const block = `<!-- category-nav --><section aria-labelledby="browse"><h2 id="browse">Browse popup templates by category</h2><p>Start with the job you need the popup to do. Each category page explains when to use it, how to set it up and which template fits.</p><ul style="line-height:2">${NAV.map((c) => `<li><a href="/templates/${c.slug}.html"><strong>${esc(c.label)}</strong></a> — ${esc(c.description.split(". ")[0])}.</li>`).join("")}</ul></section>`;
-    html = html.replace('<section aria-labelledby="capture">', block + '<section aria-labelledby="capture">');
-  }
-  fs.writeFileSync(file, html);
+  chips.forEach(function (b) { b.addEventListener("click", function () { apply(b.getAttribute("data-format")); }); });
+})();
+</script>
+</body>
+</html>
+`;
+  fs.writeFileSync(path.join(root, "templates.html"), html);
 }
 
 function updateSitemap() {
@@ -693,6 +946,9 @@ for (const key of ORDER) {
   const html = renderPage(key, entries);
   fs.writeFileSync(path.join(root, "templates", CATEGORIES[key].slug + ".html"), html);
 }
-rewriteGallery(entries);
+writeGallery(entries);
 updateSitemap();
-console.log("Wrote " + ORDER.length + " template category pages, repointed 45 gallery cards, updated sitemap.");
+// Detail pages are hand-maintained HTML; give each its template preview,
+// social image and Article image without touching the copy.
+for (const file of media.detailPages()) media.applyToDetailPage(file, CATALOG);
+console.log("Wrote " + ORDER.length + " template category pages, the " + entries.length + "-card gallery and " + media.detailPages().length + " detail page previews; updated sitemap.");

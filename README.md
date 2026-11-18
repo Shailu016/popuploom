@@ -4,7 +4,7 @@ Free website popup builder with a visual editor, popup templates, hosted embeds,
 
 Canonical site: **https://popuploom.com/**
 
-> The private repository is named `popuploom`. The local project folder, Worker service, D1 database and CI token keep their original `popforge` identifiers. Those are infrastructure names, not visible branding, and keeping them preserves existing deployments and data.
+> The private repository is named `popuploom`. The Worker service and D1 database keep the names they were created with. Those are infrastructure names, not visible branding, and keeping them preserves existing deployments and data.
 
 ---
 
@@ -12,9 +12,9 @@ Canonical site: **https://popuploom.com/**
 
 | File | What it is |
 |---|---|
-| `index.html` | Landing page + template gallery (45 live mini-previews, category filters) + My popups shelf/dashboard |
+| `index.html` | Landing page + template gallery (53 live mini-previews, category filters) + My popups shelf/dashboard |
 | `studio.html` + `studio.js` | The editor ("studio"): Content / Design / Behavior / Publish tabs with live preview |
-| `popuploom.js` | The runtime. The drop-in embed engine your visitors paste onto their sites. Canonical source, also served as `/popforge.js` through a byte-for-byte alias |
+| `popuploom.js` | The runtime. The drop-in embed engine your visitors paste onto their sites. Canonical source, also published as immutable releases under `/embed/<version>/` |
 | `app.js` | Shared code: API-aware storage, auth, the template catalog (original designs), helpers |
 | `migration.html` | Noindex recovery page on the former host for guest drafts saved in `localStorage` |
 | `reset-password.html` + `reset-password.js` | Noindex password reset page: request a link, then set a new password from a single-use URL fragment token |
@@ -33,7 +33,7 @@ Canonical site: **https://popuploom.com/**
 cd popuploom
 npm install
 npm start
-# → http://localhost:3000   (API: /api, DB: popforge.db)
+# → http://localhost:3000   (API: /api, DB: popuploom.db)
 ```
 
 Requires Node 22.13+ (built and tested on Node 24). The server uses `node:sqlite`, `process.loadEnvFile`, and `fetch`. The database file is created automatically on first boot. Copy `.env.example` to `.env` first if you want Google sign-in or a production secret.
@@ -41,7 +41,7 @@ Requires Node 22.13+ (built and tested on Node 24). The server uses `node:sqlite
 | Env var | Default | Purpose |
 |---|---|---|
 | `PORT` | `3000` | HTTP port |
-| `DB_PATH` | `<project>/popforge.db` | SQLite file location |
+| `DB_PATH` | `<project>/popuploom.db` | SQLite file location |
 | `JWT_SECRET` | random per-process development secret | Required in production; use a unique random secret of at least 32 characters. Signs 30-day login tokens |
 | `GOOGLE_CLIENT_ID` | empty | Enables Sign in with Google. Empty = the Google button is hidden and `/api/auth/google` answers 503 |
 | `RESEND_API_KEY` | empty | Resend API key used to send password reset and signup verification links. Empty = those emails stay disabled with a clear 503 setup message |
@@ -64,23 +64,20 @@ Every saved widget gets its own id (`wan_…`) and its own install code:
 ```html
 <!-- PopupLoom: paste once, before </body> -->
 <div data-popuploom="wan_your_widget_id"></div>
-<script src="https://popuploom.com/embed/1.1.0/popuploom.js"></script>
+<script src="https://popuploom.com/embed/1.2.0/popuploom.js"></script>
 ```
 
 The snippet carries only the id. `popuploom.js` fetches the live config from `GET /api/widgets/:id/config` when the page loads, so saving in the studio updates every installed copy without re-pasting. Old inline base64 snippets still work.
 
-### Compatibility with existing installs
+### Installing and versions
 
-The previous brand shipped `<div data-popforge="…"></div>` and `/popforge.js`. Both continue to work:
+- `/embed/1.2.0/popuploom.js` is the current immutable, checksum-published release. `/embed/1.1.0/` stays frozen with its original bytes for sites that pinned it (source: `embed-releases/1.1.0/`). `/popuploom.js` is a mutable alias of the current release; never put SRI on an alias. None redirects across domains.
+- The runtime mounts nodes carrying `data-popuploom` and marks them with `data-popuploom-ready`, so repeated scans stay idempotent.
+- `window.PopupLoom` exposes `show`, `preview`, `scan`, `encodeCfg`, `version`, `API`, `snippet` and the instance registry.
+- Analytics: `popuploom:*` window events and `popuploom_*` `dataLayer` pushes fire for view, open, close and submit (new in 1.2.0; 1.1.0 keeps its original event names).
+- Storage keys (`pf.*`) and runtime CSS classes (`.pf-*`) are stable, so saved drafts, tokens and frequency state keep working on the same origin.
 
-- `/embed/1.1.0/popuploom.js` is the immutable, checksum-published release. `/popuploom.js`, `/popforge.js` and `/embed/1.1.0/popforge.js` remain compatibility aliases with the same bytes; none redirects across domains.
-- The runtime accepts `data-popuploom` and `data-popforge`. If a node carries both, `data-popuploom` wins and only one popup is mounted.
-- `data-popforge-ready` / `data-popuploom-ready` are both written as mount markers, so repeated scans stay idempotent.
-- `window.PopupLoom` and `window.PopForge` are the same object, exposing `show`, `preview`, `scan`, `encodeCfg`, `version`, `API`, `snippet` and the instance registry.
-- Existing analytics contracts are unchanged: `popforge:*` window events and `popforge_*` `dataLayer` pushes still fire. No duplicate new-brand events are emitted.
-- Storage keys (`pf.*`) and runtime CSS classes (`.pf-*`) are unchanged, so saved drafts, tokens and frequency state keep working on the same origin.
-
-API base precedence is: per-widget `data-api` attribute → `window.POPUPLOOM_API` → legacy `window.POPFORGE_API` → the origin that served the executing script. The script origin is captured from `document.currentScript`, so both filenames work even when the tag is moved or injected.
+API base precedence is: per-widget `data-api` attribute → `window.POPUPLOOM_API` → the origin that served the executing script. The script origin is captured from `document.currentScript`, so it works even when the tag is moved or injected.
 
 ### Moving from the former host
 
@@ -97,7 +94,7 @@ Google Identity Services needs a client id. No client secret is used: the server
 3. **Create credentials → OAuth client ID → Web application.**
 4. Under **Authorized JavaScript origins** add:
    - `http://localhost:3000` for local development
-   - `https://popuploom.com` and, if used, `https://popforge.shailu3597.workers.dev` while old sessions remain
+   - `https://popuploom.com`
    Do **not** add a redirect URI; the button flow does not use one.
 5. Copy the **Client ID** (ends in `.apps.googleusercontent.com`).
 6. Create `.env` next to `package.json`:
@@ -151,7 +148,7 @@ Public endpoints keep their permissive CORS behavior so embeds on external sites
 - `https://popuploom.com` is the canonical apex. It serves pages directly.
 - `https://www.popuploom.com` permanently redirects browser pages to the same apex path and query in one hop.
 - The former host redirects only known browser pages (`/`, `/index.html`, templates, guide, studio, account, demo) to the apex.
-- On every host, `/popuploom.js`, `/popforge.js`, `/assets/*`, `/api/*`, `/migration.html`, `/robots.txt` and `/sitemap.xml` are served directly. Installed embeds and API clients never cross a host boundary.
+- On every host, `/popuploom.js`, `/assets/*`, `/api/*`, `/migration.html`, `/robots.txt` and `/sitemap.xml` are served directly. Installed embeds and API clients never cross a host boundary.
 - Unknown paths return a real 404, never a homepage redirect.
 - Localhost, `127.0.0.1` and test hosts are never redirected to production. Only same-origin `/index.html` normalization applies.
 
@@ -182,7 +179,7 @@ Public endpoints keep their permissive CORS behavior so embeds on external sites
 | Age gate | allow passes through (logs a verified event, then auto-closes); deny shows a message or redirects to a configurable URL |
 | Social proof | bottom-left corner card that cycles through configured activity items on an interval |
 | Sticky button | optional pill that reopens the popup |
-| Analytics | `popforge:view / open / close / submit` window events + `dataLayer` pushes when GTM exists (retained for compatibility) |
+| Analytics | `popuploom:view / open / close / submit` window events + `dataLayer` pushes when GTM exists |
 | Safety | URL/image inputs sanitized (HTML-escaped), CSS-selector errors caught, lazy render (nothing loads until summoned) |
 | Animations | pop (spring) · fade · slideUp · slideDown; all opt-in |
 
@@ -191,7 +188,7 @@ Public endpoints keep their permissive CORS behavior so embeds on external sites
 ```html
 <!-- PopupLoom install. Paste once, before </body> -->
 <div data-popuploom="wan_your_widget_id"></div>
-<script src="https://popuploom.com/embed/1.1.0/popuploom.js"></script>
+<script src="https://popuploom.com/embed/1.2.0/popuploom.js"></script>
 ```
 
 Each account-owned widget has its own id in that `data-popuploom` attribute. The runtime resolves it against `GET /api/widgets/:id/config`, so the site never needs re-editing after a design change. The studio fills in the absolute script URL for you.
@@ -205,7 +202,7 @@ Platform notes:
 
 See [SECURITY.md](SECURITY.md) for the security review, deployment settings and public-config trust boundaries. New passwords require at least 12 characters. Set APP_ORIGINS for additional trusted frontend origins; private APIs otherwise accept only the app origin.
 
-Run `npm test` for isolated API, auth, password-reset and browser regression checks. Browser checks use Chrome/Edge when available; the `POPFORGE_BROWSER` environment variable still overrides the executable path for compatibility. Existing project data is never used by the tests. Password-reset tests replace the Resend sender with a local stub, so they never call the provider or need an API key.
+Run `npm test` for isolated API, auth, password-reset and browser regression checks. Browser checks use Chrome/Edge when available; the `POPUPLOOM_BROWSER` environment variable still overrides the executable path for compatibility. Existing project data is never used by the tests. Password-reset tests replace the Resend sender with a local stub, so they never call the provider or need an API key.
 
 Reverse proxy deployments must set `TRUST_PROXY` to the trusted proxy IPs/subnets; forwarded headers are ignored by default.
 
@@ -247,7 +244,7 @@ Reverse proxy deployments must set `TRUST_PROXY` to the trusted proxy IPs/subnet
 }
 ```
 
-## The template catalog (45 original builds across 6 journeys)
+## The template catalog (53 original builds across 6 journeys)
 
 Gallery categories with live previews on `index.html`. Every design is original (our own imagery in `assets/`, our own copy and palettes):
 

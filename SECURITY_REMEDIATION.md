@@ -83,10 +83,10 @@ Residual risk: DNS rebinding between our lookup and the platform's own lookup is
 
 ### 2.4 Versioned embed runtime (F-02)
 
-- Build creates `embed/1.1.0/popuploom.js`, `popforge.js` and `SHA256SUMS`.
+- Build creates `embed/<version>/popuploom.js` and `SHA256SUMS` for each published release.
 - The new install snippet points to `/embed/1.1.0/popuploom.js`.
 - The versioned path is served with `Cache-Control: public, max-age=31536000, immutable`.
-- `/popuploom.js`, `/popforge.js` and `/embed/1.1.0/popforge.js` remain compatibility aliases.
+- `/popuploom.js` remains a mutable alias of the current release.
 - `Runtime.version` is now `1.1.0`.
 - The Express runtime serves the same bytes from the canonical source file and generates the same checksum.
 - Live checksum verified: `633468cef2cb8837dce749d0c9673d74b23f6dae299037998436304a3129d017`.

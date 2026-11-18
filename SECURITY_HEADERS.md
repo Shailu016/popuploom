@@ -36,7 +36,7 @@ CORS:
 Cache-Control: public, max-age=31536000, immutable
 ```
 
-The legacy `/popuploom.js` and `/popforge.js` aliases remain `no-store` so a compatibility path never pins a stale script unexpectedly.
+The `/popuploom.js` alias remains `no-store` so a compatibility path never pins a stale script unexpectedly.
 
 ## 404 responses
 

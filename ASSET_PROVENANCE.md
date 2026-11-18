@@ -8,7 +8,7 @@ This register covers every file shipped from `assets/` by `scripts/build-cf.cjs`
 
 Git history and the repository were checked before replacement:
 
-- The 12 original template JPEGs were added in commit `ea80efd` (“Initial PopForge application with security fixes and regression tests”). The repository contained no license, purchase record, creator note, EXIF source/copyright field or generation record for them.
+- The 12 original template JPEGs were added in the initial application commit `ea80efd`. The repository contained no license, purchase record, creator note, EXIF source/copyright field or generation record for them.
 - The original branding PNG/SVG files were added in commit `f7eb9ee` (“Rebrand as PopupLoom with dual runtime and host migration policy”). The commit messages describe the rebrand, but no explicit license/source record for the image files was present.
 - `assets/age-gate-ambient.svg` was added in commit `5feaa3b` with an explicit commit message describing it as an “authored, license-clean ambient SVG”. That SVG is retained and documented as project-authored.
 - No stock-photo credits, paid-license receipts or external asset manifests were found.
@@ -40,9 +40,21 @@ Because defensible provenance for the 12 JPEGs and the uncertain branding files 
 | Age-gate illustration | `age-gate-ambient.svg` | Retained authored/license-clean SVG | Commit `5feaa3b` |
 | Product screenshots | `assets/guides/*.png` | Original captures from the local build; fake data | Capture record below; depicts the new original illustrations |
 | External video | `player` template / `demo.html` YouTube embed | Verified available 2026-11-05; CC BY 3.0 | YouTube oEmbed HTTP 200; Blender Foundation license |
-| Google Fonts | `fonts.googleapis.com` / `fonts.gstatic.com` | Third-party service; no font files shipped | Privacy page disclosure |
+| Web fonts | `assets/fonts/*.woff2` | Self-hosted since 2026-11-18; official latin-subset releases of Bricolage Grotesque, Geist, Geist Mono and Instrument Serif, all SIL Open Font Licence 1.1 | `assets/fonts/LICENSES.txt`, `scripts/self-host-fonts.cjs` |
 
 The product screenshots now depict the new original vector illustrations. They no longer depend on the replaced template photography. The screenshots still use fabricated lead data and the isolated test account described below.
+
+## Template artwork, second edition (2026-11-18)
+
+The first-edition product illustrations read as clip art next to a paid-quality template catalog. The catalog now uses abstract editorial artwork instead: gradient light fields, fine geometry (rings, arches, glass panes, a sphere, light beams, a horizon, a perspective grid) and film grain. No objects, no photographs, no third-party media.
+
+- **Source of truth:** `assets/source/art/*.svg` (13 files, `<title>`/`<desc>` mark them as original PopupLoom artwork authored 2026-11-18).
+- **Generator:** `scripts/generate-template-art.cjs` renders `assets/art/*.jpg` at 1200×750 (16:10), JPEG quality 86, with Sharp.
+- **First edition kept:** `assets/*.jpg` stay in place because saved customer popups may reference those URLs. New templates point at `assets/art/`.
+
+## Template previews (2026-11-18)
+
+`assets/templates/<id>.webp` (1200×750), `<id>-600.webp` (600×375) and `<id>.jpg` (1200×750, social cards) are screenshots of each catalog template drawn by the project's own runtime (`popuploom.js`) over a neutral, obviously mock website. Generator: `scripts/capture-template-previews.cjs` (local Chrome or Edge, local server, no network media). They contain only project artwork and sample copy.
 
 ## External video
 
@@ -130,3 +142,15 @@ Still outstanding for advertising:
 3. Phase B strict-CSP/CMP integration and review.
 4. Owner decision on the retained Big Buck Bunny demo video and attribution.
 5. Legal review of Terms/privacy for the operator's actual jurisdiction.
+
+## Additional artwork and previews (2026-11-18, second batch)
+
+Six more original pieces were added with the same generator (`scripts/generate-template-art.cjs`): `rose-waves`, `dusk-orb`, `harvest-horizon`, `lagoon-waves`, `ink-arch` and `teal-glass`, plus a new layered-ribbon motif. Sources are in `assets/source/art/`, renders in `assets/art/`. Previews for the eight new templates were captured with `scripts/capture-template-previews.cjs`. All generated in-house from code: no stock media, photographs or third-party material.
+
+## Guide hero scenes (2026-11-18)
+
+`assets/guides/scene-*.webp` (1200x750 and 600x375) are in-context scenes: a catalog template drawn by the project runtime over a small original sample page (store, grocery, blog, cart). The pages are built in `scripts/capture-guide-heroes.cjs` from project artwork in `assets/art/`; the copy is sample text and the pages are labelled as sample pages in the image alt text. No photographs, stock images or third-party products.
+
+## Self-hosted fonts (2026-11-18)
+
+Fonts moved from the Google Fonts service to this origin: five content-hashed `.woff2` files (latin subset, about 169 KB) in `assets/fonts/`, generated by `scripts/self-host-fonts.cjs`. The files are unmodified official releases as served by Google Fonts. Licence texts for all four families are in `assets/fonts/LICENSES.txt` (copied from the Google Fonts repository). Cached as immutable because the file names carry a hash. The Content-Security-Policy still lists Google font hosts; it was left unchanged on purpose because Google sign-in may use them.

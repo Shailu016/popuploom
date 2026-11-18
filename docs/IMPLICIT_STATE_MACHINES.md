@@ -51,7 +51,7 @@ production password auth failed.
 | SM-17 | Webhook delivery attempts | `webhook_deliveries.status/attempts/completed_at` | `shared/webhook.js`, `worker/widgets.js` |
 | SM-18 | Ad eligibility / consent gate | env flags, `ADSENSE_SLOTS`, nonce per response | `shared/ads.js`, `shared/ad-pages.js` |
 | SM-19 | Rate-limit windows | `rate_limits` (D1) or in-memory `Map` (Express) | `worker/http.js`, `server/limits.js` |
-| SM-20 | Host / cutover redirects | `DOMAIN_CUTOVER_ENABLED`, host sets | `shared/host-policy.js` |
+| SM-20 | Host redirects | host sets | `shared/host-policy.js` |
 | SM-21 | Leads inbox paging / export | `rows`, `cursor`, `busy`, `exporting`, `controller` | `leads.js`, `app.js` (`Leads.all`) |
 | SM-22 | Manual legacy recovery page | `pf.widgets` read once | `migration.html` |
 
@@ -374,7 +374,7 @@ UI needs, and it would give autosave or an unload guard a natural home.
 `destroyed`.
 
 **Transitions**
-- `boot()` scans `[data-popuploom], [data-popforge]`, skips nodes already marked
+- `boot()` scans `[data-popuploom]`, skips nodes already marked
   ready, sets `loading`, then either mounts inline config or fetches `/config`
   (`popuploom.js:1050-1068`).
 - `mountCfg` constructs one `PopupInstance`, pushes it into `Runtime._inst`, calls
@@ -385,11 +385,11 @@ UI needs, and it would give autosave or an unload guard a natural home.
   (`popuploom.js:591-607`).
 - `destroy()` unbinds, removes the sticky button, and calls `close()`.
 
-**Persisted in:** instance fields plus `data-popuploom-ready` / `data-popforge-ready`.
+**Persisted in:** instance fields plus `data-popuploom-ready`.
 
 **Invariants**
 - One node mounts at most one instance, even if both attribute names are present.
-- A second copy of the runtime reuses the first (`window.PopupLoom` / `PopForge`).
+- A second copy of the runtime reuses the first (`window.PopupLoom`).
 - Preview and test instances never write storage or send telemetry.
 
 **Failure modes**
@@ -698,18 +698,16 @@ the at-most-once-ish semantics explicitly.
 
 ---
 
-### SM-20 — Host and cutover redirects
+### SM-20 — Host redirects
 
 **States per request:** `plaintext` → `https` → `canonical | served-in-place`,
-gated by `DOMAIN_CUTOVER_ENABLED` for the legacy host.
+applied to the apex and www hosts only.
 
 **Transitions** (`shared/host-policy.js:55-118`)
-- Any `http:` on apex/www/legacy upgrades to `https:` and then applies the canonical
+- Any `http:` on apex/www upgrades to `https:` and then applies the canonical
   target in one hop.
-- `www.popuploom.com` always redirects to the apex (regardless of the cutover flag).
-- The legacy `workers.dev` host redirects only when the cutover flag is true, and only
-  for the explicit `LEGACY_PAGES` map.
-- `/popuploom.js`, `/popforge.js`, `/api/*`, `/assets/*`, `/migration.html`,
+- `www.popuploom.com` always redirects to the apex.
+- `/popuploom.js`, `/api/*`, `/assets/*`, `/migration.html`,
   `/reset-password.html`, robots and sitemap are never redirected.
 
 **Invariants**

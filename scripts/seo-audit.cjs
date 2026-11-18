@@ -57,7 +57,12 @@ async function get(url) {
   const locs = [...sitemap.text.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].trim());
   const pages = [];
   for (const loc of locs) {
-    const r = await get(loc);
+    // The sitemap always lists production URLs. Fetch each path from the
+    // origin under audit so a local or staging run audits that build, not
+    // the live site. Reported URLs stay canonical.
+    let target = loc;
+    try { const u = new URL(loc); target = ORIGIN + u.pathname + u.search; } catch (e) {}
+    const r = await get(target);
     if (r.type.indexOf("html") === -1) {
       pages.push({ url: loc, status: r.status, error: "not html: " + r.type });
       continue;
@@ -86,7 +91,8 @@ async function get(url) {
     }
     const words = text(h).split(" ").filter(Boolean).length;
     pages.push({
-      url: loc, status: r.status, final: r.url, title, titleLen: title.length,
+      // final is reported on the production host so redirects are judged the same locally.
+      url: loc, status: r.status, final: r.url.indexOf(ORIGIN) === 0 ? new URL(loc).origin + r.url.slice(ORIGIN.length) : r.url, title, titleLen: title.length,
       desc, descLen: desc.length, robots, canonical, wordCount: words,
       h1, h1Count: h1.length, h2Count: h2.length, missingAlt, imgCount: imgs.length,
       internalLinks: internal.size, schema: [...new Set(jsonLd(h))],

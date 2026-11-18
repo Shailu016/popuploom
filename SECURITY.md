@@ -8,7 +8,7 @@ Current status and remaining work: `SECURITY_AUDIT.md` and `SECURITY_REMEDIATION
 
 The PopupLoom identity migration keeps the security model unchanged:
 
-- `/popuploom.js` and `/popforge.js` serve the same bytes and are never redirected across hosts, so an installed site's CSP can keep allowing its existing script origin.
+- `/popuploom.js` serves the current runtime and is never redirected across hosts, so an installed site's CSP can keep allowing its existing script origin.
 - Page redirects are limited to an exact allowlist of known browser pages and method GET/HEAD. `/api/*`, runtime files, assets and `/migration.html` stay on the host that received the request.
 - Redirect targets are built from a fixed apex origin plus the validated request path/query. The Worker does not trust a user-supplied Host header.
 - The migration page is `noindex,nofollow`, reads only `pf.widgets` in the browser, performs no upload, and never clears or overwrites drafts.
@@ -51,7 +51,7 @@ Password reset is available for email/password accounts and deliberately unavail
 - `npm test`: **43 groups passed, 0 failed, 0 skipped** (33 existing regression groups + 10 password-reset groups, including a real headless-browser pass of the reset UI).
 - Worker unit suite: **12 tests passed**, covering legacy password upgrade, secret enforcement, shared rate counters, server-generated widget ids, generic login failures, packaging, reset token hashing/expiry/single-use/session revocation, generic unknown/Google-only responses and hashed email rate-limit keys.
 - Worker integration suite: **106 assertions passed**, including legacy/new host policy, HTTPS upgrades, hardened 404s, runtime alias identity, migration noindex and the Worker reset endpoints.
-- Real headless Chrome tested every one of the 45 templates, studio behavior, mobile layouts, blocked script/event-handler injections, legitimate inline controls, server-revoked logout, the login **Forgot password?** link, the request form, the tokenized reset form, fragment-token cleanup and the absence of token leakage into storage, request URLs, headers or console logs.
+- Real headless Chrome tested every one of the 53 templates, studio behavior, mobile layouts, blocked script/event-handler injections, legitimate inline controls, server-revoked logout, the login **Forgot password?** link, the request form, the tokenized reset form, fragment-token cleanup and the absence of token leakage into storage, request URLs, headers or console logs.
 - API checks cover cross-account access, private files, forged/revoked sessions, origin rejection, public embed compatibility, depth/size/encoding rejection, rate-limit bypass attempts, retry deduplication and pagination.
 - Migration checks cover dual runtime paths loaded in either order, dual attribute handling, API override precedence, legacy analytics, host-specific redirects, non-redirected API/runtime requests and replayed scans.
 - Authentication fixtures verify the signed-claim mapping and Gmail/Workspace/third-party linking rules. CSP tests cover per-page hashes, line endings and edits.
