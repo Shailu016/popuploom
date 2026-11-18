@@ -21,8 +21,8 @@ A saved widget produces two lines:
 
 - `/embed/1.2.0/popuploom.js` is the current release and is immutable for the life of that version.
 - `/embed/1.1.0/popuploom.js` is frozen: its exact bytes live in `embed-releases/1.1.0/` and the build fails if they change (sha256 `d452116065ed9181726309d96306665ae1d6c95dce9bffe5ea22922ab6e50ac5`). The WordPress plugin and the npm integration still pin 1.1.0.
-- Each version directory publishes `SHA256SUMS` for `popuploom.js` and `popforge.js`.
-- Legacy `/popuploom.js` and `/popforge.js` are mutable aliases of the current release.
+- Each version directory publishes `SHA256SUMS` for `popuploom.js`.
+- `/popuploom.js` is a mutable alias of the current release; never put SRI on it.
 - A future release must use a new version directory. Do not overwrite a published version.
 - Customers who pin a version can verify the checksum. SRI is possible for a pinned URL but must not be applied to a mutable alias.
 - The current checksum is recorded in `SECURITY_REMEDIATION.md` and can be reproduced with `Get-FileHash`/`sha256sum`.

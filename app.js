@@ -7,8 +7,6 @@
   /* ------------------------------------------------------------------ */
   function apiBase() {
     if (window.POPUPLOOM_API) return String(window.POPUPLOOM_API).replace(/\/$/, "");
-    // Legacy override kept for self-hosted copies of the previous snippet.
-    if (window.POPFORGE_API) return String(window.POPFORGE_API).replace(/\/$/, "");
     // derive from where this script was loaded (same origin as the server)
     try {
       var scripts = document.querySelectorAll('script[src*="app.js"]');
@@ -929,10 +927,9 @@
     mountAuthUI: mountAuthUI
   };
   // The runtime owns the scan/show/preview helpers; app.js only adds the
-  // shared API base and snippet helper. Both names point at the same object.
-  var shared = window.PopupLoom || window.PopForge || {};
+  // shared API base and snippet helper.
+  var shared = window.PopupLoom || {};
   shared.API = API;
   shared.snippet = snippetFor;
   window.PopupLoom = shared;
-  window.PopForge = shared;
 })();

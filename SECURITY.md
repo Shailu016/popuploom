@@ -8,7 +8,7 @@ Current status and remaining work: `SECURITY_AUDIT.md` and `SECURITY_REMEDIATION
 
 The PopupLoom identity migration keeps the security model unchanged:
 
-- `/popuploom.js` and `/popforge.js` serve the same bytes and are never redirected across hosts, so an installed site's CSP can keep allowing its existing script origin.
+- `/popuploom.js` serves the current runtime and is never redirected across hosts, so an installed site's CSP can keep allowing its existing script origin.
 - Page redirects are limited to an exact allowlist of known browser pages and method GET/HEAD. `/api/*`, runtime files, assets and `/migration.html` stay on the host that received the request.
 - Redirect targets are built from a fixed apex origin plus the validated request path/query. The Worker does not trust a user-supplied Host header.
 - The migration page is `noindex,nofollow`, reads only `pf.widgets` in the browser, performs no upload, and never clears or overwrites drafts.

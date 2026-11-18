@@ -90,28 +90,14 @@ const env={JWT_SECRET:require('crypto').randomBytes(32).toString('hex'),RESEND_A
   console.log('PASS tools hub serves one canonical URL with an allowed CSP hash');
 }
 
-for(const flag of [undefined,'false','true']){
- const enabled=flag==='true';
- for(const path of ['/','/studio.html?tpl=cafeClub','/index.html?ref=1']){
-  const url='https://popforge.shailu3597.workers.dev'+path;
-  const response=await worker.fetch(new Request(url),{...env,DOMAIN_CUTOVER_ENABLED:flag},{waitUntil(){}});
-  const index=path.startsWith('/index.html');
-  assert.equal(response.status,enabled||index?308:200);
-  assert.equal(response.headers.get('Location'),enabled?'https://popuploom.com'+(index?'/?ref=1':path):index?'https://popforge.shailu3597.workers.dev/?ref=1':null);
- }
-}
-console.log('PASS Worker legacy cutover disabled by default and explicitly enabled');
 {
- const plainEnv={...env,DOMAIN_CUTOVER_ENABLED:'true'},plainHeaders={'cf-visitor':JSON.stringify({scheme:'http'})};
+ const plainEnv={...env},plainHeaders={'cf-visitor':JSON.stringify({scheme:'http'})};
  const cases=[
   ['https://popuploom.com/studio.html?tpl=cafeClub','https://popuploom.com/studio.html?tpl=cafeClub'],
   ['https://popuploom.com/index.html?ref=1','https://popuploom.com/?ref=1'],
   ['https://www.popuploom.com/studio.html?x=1','https://popuploom.com/studio.html?x=1'],
   ['https://www.popuploom.com/api/health','https://www.popuploom.com/api/health'],
-  ['https://www.popuploom.com/popforge.js','https://www.popuploom.com/popforge.js'],
-  ['https://popforge.shailu3597.workers.dev/templates.html?ref=1','https://popuploom.com/templates.html?ref=1'],
-  ['https://popforge.shailu3597.workers.dev/migration.html','https://popforge.shailu3597.workers.dev/migration.html'],
-  ['https://popforge.shailu3597.workers.dev/popforge.js','https://popforge.shailu3597.workers.dev/popforge.js']
+  ['https://www.popuploom.com/popuploom.js','https://www.popuploom.com/popuploom.js']
  ];
  for(const [url,location] of cases){const response=await worker.fetch(new Request(url,{headers:plainHeaders}),plainEnv,{waitUntil(){}});assert.equal(response.status,308,url);assert.equal(response.headers.get('Location'),location,url);}
  const local=await worker.fetch(new Request('http://localhost:3000/studio.html',{headers:plainHeaders}),env,{waitUntil(){}});

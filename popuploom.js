@@ -1,10 +1,9 @@
 /*!
- * PopupLoom: self-serve popup runtime (v1.1)
+ * PopupLoom: self-serve popup runtime (v1.2)
  * Drop-in widget engine. No dependencies. Everything rendered by this file.
- * Served byte-for-byte at both /popuploom.js and /popforge.js.
+ * Served at /popuploom.js and, as an immutable release, at /embed/<version>/popuploom.js.
  * Usage: <div data-popuploom="<hosted widget id>"></div><script src="popuploom.js"></script>
- * The legacy data-popforge attribute, inline base64 payloads and window.PopForge
- * namespace keep working for sites that installed the previous snippet.
+ * Inline base64 payloads are supported for self-contained embeds.
  * © You, 2026. MIT-ish. Do what you want.
  */
 (function () {
@@ -14,10 +13,9 @@
   // filenames, including when the script is relocated by a bundler.
   var executingScript = document.currentScript || null;
 
-  // One runtime, two public names. Either filename may load first; the second
-  // one re-scans and returns instead of mounting a second copy of everything.
-  var existing = (window.PopupLoom && window.PopupLoom.scan && window.PopupLoom) ||
-    (window.PopForge && window.PopForge.scan && window.PopForge) || null;
+  // A second copy of this script on the same page re-scans and returns instead
+  // of mounting everything twice.
+  var existing = (window.PopupLoom && window.PopupLoom.scan && window.PopupLoom) || null;
   if (existing) {
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", existing.scan);
     else existing.scan();
@@ -29,15 +27,14 @@
   /* ------------------------------------------------------------------ */
   function detectApiBase() {
     // Precedence: per-node data-api (see apiFor) > window.POPUPLOOM_API >
-    // legacy window.POPFORGE_API > the origin that served this script.
+    // the origin that served this script.
     if (window.POPUPLOOM_API) return String(window.POPUPLOOM_API).replace(/\/$/, "");
-    if (window.POPFORGE_API) return String(window.POPFORGE_API).replace(/\/$/, "");
     if (executingScript && executingScript.src) {
       try { return new URL(executingScript.src).origin; } catch (e) {}
     }
     // Fallback for async/injected scripts: the last matching tag is the one
     // most likely to have started this boot.
-    var scripts = document.querySelectorAll('script[src*="popuploom.js"], script[src*="popforge.js"]');
+    var scripts = document.querySelectorAll('script[src*="popuploom.js"]');
     for (var i = scripts.length - 1; i >= 0; i--) {
       try { return new URL(scripts[i].src).origin; } catch (e) {}
     }
@@ -70,11 +67,8 @@
     for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
     return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
   }
-  // Both public names point at the same object, so scripts that look for either
-  // one see the same instances, helpers and settings.
-  var Runtime = window.PopupLoom || window.PopForge || {};
+  var Runtime = window.PopupLoom || {};
   window.PopupLoom = Runtime;
-  window.PopForge = Runtime;
   Runtime.encodeCfg = encodeCfg;
 
   /* ------------------------------------------------------------------ */
@@ -661,8 +655,8 @@
     notify: function (evName) {
       if (this.preview || this.test) return;
       try {
-        if (window.dataLayer) window.dataLayer.push({ event: "popforge_" + evName, popupId: this.cfg.id, popupName: this.cfg.name });
-        dispatchEvent(new CustomEvent("popforge:" + evName, { detail: { id: this.cfg.id, name: this.cfg.name } }));
+        if (window.dataLayer) window.dataLayer.push({ event: "popuploom_" + evName, popupId: this.cfg.id, popupName: this.cfg.name });
+        dispatchEvent(new CustomEvent("popuploom:" + evName, { detail: { id: this.cfg.id, name: this.cfg.name } }));
       } catch (e) {}
     },
     destroy: function () { this.unbind(); if (this.stickyEl) this.stickyEl.remove(); this.close({ persist: false }); }
@@ -1025,7 +1019,6 @@
   PopupInstance.prototype.mount = function (stage) { this.stage = stage; this.preview = true; };
 
   window.PopupLoom = Runtime;
-  window.PopForge = Runtime;
   Runtime.version = "1.2.0";
   Runtime.show = function (cfg, options) {
     if (!Runtime.EncodeDemo) Runtime.encodeCfg = encodeCfg;
@@ -1061,10 +1054,8 @@
     return override ? String(override).replace(/\/$/, "") : API_BASE;
   }
 
-  // A node may carry the new and the old attribute at once. The canonical
-  // data-popuploom value wins deterministically; only one instance is mounted.
-  var MOUNT_ATTRS = ["data-popuploom", "data-popforge"];
-  var READY_ATTRS = ["data-popuploom-ready", "data-popforge-ready"];
+  var MOUNT_ATTRS = ["data-popuploom"];
+  var READY_ATTRS = ["data-popuploom-ready"];
 
   function refFor(node) {
     for (var i = 0; i < MOUNT_ATTRS.length; i++) {
@@ -1083,7 +1074,7 @@
     for (var i = 0; i < READY_ATTRS.length; i++) node.removeAttribute(READY_ATTRS[i]);
   }
   function isTestNode(node) {
-    return node.getAttribute("data-popuploom-test") === "1" || node.getAttribute("data-popforge-test") === "1";
+    return node.getAttribute("data-popuploom-test") === "1";
   }
 
   function mountCfg(cfg, node) {
@@ -1136,7 +1127,7 @@
 
   function boot() {
     clearLegacyLeadCache();
-    document.querySelectorAll("[data-popuploom], [data-popforge]").forEach(function (node) {
+    document.querySelectorAll("[data-popuploom]").forEach(function (node) {
       if (isReady(node)) return;
       setReady(node, "loading");
       var ref = refFor(node);

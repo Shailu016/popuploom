@@ -37,10 +37,6 @@ if(metaTags){
   }
   console.log('injected '+verification.verificationMetas(process.env).length+' verification meta tag(s)');
 }
-// The legacy filename is a byte-for-byte build alias of the one runtime, so an
-// old installed snippet and a new one can never drift apart.
-fs.copyFileSync('popuploom.js',path.join(out,'popforge.js'));
-
 // Immutable embed release. Customers can pin this path and verify the hash;
 // the live configuration still syncs through the API, so content edits do not
 // require a new script URL.
@@ -53,7 +49,6 @@ for(const [version,source] of Object.entries(EMBED_RELEASES)){
   const dir=path.join(out,'embed',version);
   fs.mkdirSync(dir,{recursive:true});
   fs.copyFileSync(source,path.join(dir,'popuploom.js'));
-  fs.copyFileSync(source,path.join(dir,'popforge.js'));
   embedDirs.push(dir);
 }
 if(!fs.readFileSync('popuploom.js','utf8').includes('Runtime.version = "'+EMBED_CURRENT+'"'))throw new Error('popuploom.js version does not match EMBED_CURRENT '+EMBED_CURRENT);
@@ -81,7 +76,7 @@ const TEXT_ASSET=/\.(?:html?|css|js|mjs|json|xml|txt|svg|webmanifest|md|csv)$/i;
 // describes the published bytes.
 for(const dir of embedDirs){
   const embedHash=require('crypto').createHash('sha256').update(fs.readFileSync(path.join(dir,'popuploom.js'))).digest('hex');
-  fs.writeFileSync(path.join(dir,'SHA256SUMS'),embedHash+'  popuploom.js\n'+embedHash+'  popforge.js\n');
+  fs.writeFileSync(path.join(dir,'SHA256SUMS'),embedHash+'  popuploom.js\n');
 }
 // The frozen 1.1.0 release must keep the exact bytes customers already pinned.
 const FROZEN={'1.1.0':'d452116065ed9181726309d96306665ae1d6c95dce9bffe5ea22922ab6e50ac5'};

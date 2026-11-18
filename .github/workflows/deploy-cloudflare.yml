@@ -63,6 +63,7 @@ jobs:
       - name: Verify live health
         run: |
           curl --fail --show-error --retry 5 --retry-delay 5 https://popuploom.com/api/health | node -e "let s=''; process.stdin.on('data',c=>s+=c); process.stdin.on('end',()=>{if(JSON.parse(s).ok!==true)process.exit(1)})"
-          curl --fail --show-error --retry 5 --retry-delay 5 https://popforge.shailu3597.workers.dev/popforge.js -o /tmp/popuploom-legacy.js
+          # The current-runtime alias and the newest immutable release must be the same bytes.
+          curl --fail --show-error --retry 5 --retry-delay 5 https://popuploom.com/embed/1.2.0/popuploom.js -o /tmp/popuploom-release.js
           curl --fail --show-error --retry 5 --retry-delay 5 https://popuploom.com/popuploom.js -o /tmp/popuploom-current.js
-          cmp /tmp/popuploom-legacy.js /tmp/popuploom-current.js
+          cmp /tmp/popuploom-release.js /tmp/popuploom-current.js

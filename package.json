@@ -9,7 +9,7 @@
     "test": "node --test tests/regression.test.cjs tests/password-reset.test.cjs",
     "dev:cf": "wrangler dev",
     "deploy:cf": "node scripts/check-cf.cjs && wrangler deploy",
-    "db:migrate:local": "wrangler d1 migrations apply popforge --local",
+    "db:migrate:local": "wrangler d1 migrations apply DB --local",
     "db:export": "node scripts/export-db.js",
     "art:generate": "node scripts/generate-project-art.cjs",
     "test:cf": "node --test tests/cf-unit.test.cjs",

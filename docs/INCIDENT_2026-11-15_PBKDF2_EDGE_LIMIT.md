@@ -4,7 +4,7 @@
 **Severity:** High — password sign-in, registration and password reset were
 failing in production.
 **Status:** Fixed and verified.
-**Affected surface:** Cloudflare Worker `popforge` (production), password auth
+**Affected surface:** Cloudflare Worker (production), password auth
 only. Google sign-in for existing linked accounts was not affected.
 
 ---

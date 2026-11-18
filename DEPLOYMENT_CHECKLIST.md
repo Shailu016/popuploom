@@ -49,8 +49,8 @@ Use this before and after every production deployment.
 - [ ] Workflow completes successfully.
 - [ ] Live health check passes:
   `curl -fsS https://popuploom.com/api/health`
-- [ ] Legacy and current runtime bytes match:
-  `/popforge.js` and `/popuploom.js`.
+- [ ] The current runtime alias and the newest release match:
+  `/popuploom.js` and `/embed/1.2.0/popuploom.js`.
 - [ ] `/embed/1.2.0/popuploom.js` returns 200 with immutable cache.
 - [ ] `/embed/1.2.0/SHA256SUMS` matches the served bytes.
 - [ ] `/embed/1.1.0/popuploom.js` still hashes to `d452116065ed9181726309d96306665ae1d6c95dce9bffe5ea22922ab6e50ac5` (frozen release).

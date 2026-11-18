@@ -2,7 +2,7 @@
 # The Worker, database and binding keep their original names for continuity.
 name = "popforge"
 account_id = "66d3b261587ce5aeb4849141b6cca30d"
-workers_dev = true
+workers_dev = false
 main = "worker/index.js"
 compatibility_date = "2026-10-01"
 
@@ -59,9 +59,6 @@ ADSENSE_SLOT = "4931611985"
 # (SPF + DKIM). An empty sender keeps reset email disabled with a clear error.
 RESET_EMAIL_FROM = "PopupLoom <reset@popuploom.com>"
 PUBLIC_ORIGIN = "https://popuploom.com"
-
-# Enable only after apex DNS, HTTPS and application smoke checks pass.
-DOMAIN_CUTOVER_ENABLED = "true"
 
 NODE_ENV = "production"
 
