@@ -672,7 +672,6 @@ function renderPage(categoryKey, templates) {
   <h1>${esc(c.h1)}</h1>
   <p class="mut doc-byline">By <a href="/about.html">Shailu</a>, founder of PopupLoom · Last updated ${LAST_UPDATED}</p>
   <nav class="doc-actions" aria-label="Next steps"><a class="btn primary" href="/studio.html?tpl=${lead.id}">Open ${esc(lead.name)} in the studio</a><a class="btn ghost" href="/templates.html">Browse all ${TEMPLATE_COUNT} templates</a></nav>
-  <p class="doc-trust">Free to use · no credit card · no pageview cap</p>
 </div><aside class="doc-hero-vis"><figure class="doc-shot">${media.pictureHTML(lead, { lazy: false, sizes: "(max-width: 1000px) 100vw, 520px" }).replace('class="tpl-shot-img"', 'class="doc-shot-img"')}<figcaption>Preview: ${esc(lead.name)}</figcaption></figure></aside></div></div>
 <div class="wrap doc-cat-body">
   <p class="mut">Free to edit and install. No pageview cap, no trial and no credit card.</p>

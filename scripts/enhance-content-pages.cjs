@@ -242,7 +242,8 @@ function doc(html, file) {
     return `<h2${attrs}>${text}</h2>`;
   });
   const tocItems = toc.filter((x) => !/^(common questions|keep reading|related|faq)/i.test(x.label) || toc.length < 5).slice(0, 12);
-  const words = stripTags(body).split(" ").length;
+  const bodyText = stripTags(body);
+  const words = bodyText.split(" ").length;
   const mins = Math.max(2, Math.round(words / 210));
 
   const featuredId = isTemplatePage ? (html.match(/studio\.html\?tpl=([A-Za-z0-9_-]+)/g) || []).map((s) => s.split("=")[1]).find((i) => i !== "blank") : null;
@@ -250,7 +251,13 @@ function doc(html, file) {
   const shot = shotFor(file, feat && feat.id);
   const ctaTpl = shot.tpl || feat;
   const primaryHref = ctaTpl ? `/studio.html?tpl=${ctaTpl.id}` : "/studio.html?tpl=blank";
-  const primaryLabel = feat ? `Open ${feat.name} in the studio` : (ctaTpl ? `Try ${ctaTpl.name} in the studio` : "Open the studio, it's free");
+  // Template names can carry a layout suffix ("Welcome Offer, Image Header").
+  // The short form reads as a sentence: "Try Welcome Offer in the studio".
+  const shortName = (name) => String(name).split(",")[0].trim();
+  const primaryLabel = feat ? `Open ${shortName(feat.name)} in the studio` : (ctaTpl ? `Try ${shortName(ctaTpl.name)} in the studio` : "Open the studio, it's free");
+  // Category pages already say "no pageview cap" in their own intro; repeating it
+  // directly under the hero CTA reads as copy-paste, so the hero line stands down.
+  const trust = /no pageview cap/i.test(bodyText) ? "" : `<p class="doc-trust">Free to use · no credit card · no pageview cap</p>`;
   const tpls = pickTemplates(file, feat && feat.id);
   const more = relatedPages(file);
 
@@ -260,7 +267,7 @@ function doc(html, file) {
   const byline2 = byline ? (/^\s*<div/.test(byline)
     ? byline.trim().replace(/^<div class="([a-z-]*meta)">/, '<div class="$1 doc-byline">').replace(/<\/div>$/, `<span class="doc-rt">${mins} min read</span></div>`)
     : byline.replace('<p class="mut"', '<p class="mut doc-byline"').replace(/<\/p>$/, ` · <span class="doc-rt">${mins} min read</span></p>`)) :`<p class="mut doc-byline"><span class="doc-rt">${mins} min read</span></p>`;
-  const hero = `<!--pl:hero--><div class="doc-hero"><div class="wrap doc-hero-in"><div class="doc-hero-copy">${crumb}<div class="kicker">${isTemplatePage ? "Template guide" : "Guide"}</div>${h1m[0]}${byline2}<nav class="doc-actions" aria-label="Next steps"><a class="btn primary" href="${primaryHref}">${esc(primaryLabel)}</a><a class="btn ghost" href="/templates.html">Browse ${COUNT} templates</a></nav><p class="doc-trust">Free to use · no credit card · no pageview cap</p></div>${shot.html ? `<aside class="doc-hero-vis"><figure class="doc-shot">${shot.html}<figcaption>${esc(shot.cap)}</figcaption></figure></aside>` : ""}</div></div><!--/pl:hero-->`;
+  const hero = `<!--pl:hero--><div class="doc-hero"><div class="wrap doc-hero-in"><div class="doc-hero-copy">${crumb}<div class="kicker">${isTemplatePage ? "Template guide" : "Guide"}</div>${h1m[0]}${byline2}<nav class="doc-actions" aria-label="Next steps"><a class="btn primary" href="${primaryHref}">${esc(primaryLabel)}</a><a class="btn ghost" href="/templates.html">Browse ${COUNT} templates</a></nav>${trust}</div>${shot.html ? `<aside class="doc-hero-vis"><figure class="doc-shot">${shot.html}<figcaption>${esc(shot.cap)}</figcaption></figure></aside>` : ""}</div></div><!--/pl:hero-->`;
 
   // Inline call to action before the third section (only on longer pages).
   let inline = "";

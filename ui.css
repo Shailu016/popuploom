@@ -174,8 +174,17 @@ img { max-width: 100%; }
 
 /* mobile nav: links would overflow — collapse to essentials */
 @media (max-width: 860px) {
-  .site-nav .inner { gap: 12px; }
-  .nav-links { display: none; }
+  /* Keep the links reachable instead of hiding them: the bar becomes two rows
+     (logo + CTA, then one scrollable link row) so a phone still has navigation. */
+  .site-nav .inner { gap: 8px 12px; flex-wrap: wrap; height: auto; padding: 10px 0 8px; row-gap: 8px; }
+  .site-nav.scrolled .inner { height: auto; padding: 8px 0 6px; }
+  .nav-links {
+    order: 3; display: flex; flex: 1 0 100%; margin: 0; gap: 2px;
+    overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  }
+  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links a { font-size: 13px; padding: 6px 9px; white-space: nowrap; }
+  .nav-cta { margin-left: auto; }
 }
 @media (max-width: 560px) {
   .nav-cta .btn.ghost { display: none; }         /* keep only the primary CTA */
