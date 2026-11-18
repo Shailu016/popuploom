@@ -288,6 +288,9 @@ function homepage(html) {
   if (/<!--pl:footer-->/.test(html)) html = html.replace(region("footer"), () => FOOTER + "\n");
   else if (/<footer class="foot">/.test(html)) html = html.replace(/<footer class="foot">[\s\S]*?<\/footer>\n?/, () => FOOTER + "\n");
   else throw new Error("index.html: footer not found");
+  // Every other page has a skip link; the home page nav is bespoke, so add the
+  // same first-tab escape here rather than leaving one page without it.
+  if (!/class="skip-link"/.test(html)) html = html.replace(/<body([^>]*)>\n?/, (m) => m + '<a class="skip-link" href="#main">Skip to content</a>\n');
   return fontsLinks.swap(html);
 }
 
