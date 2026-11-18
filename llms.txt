@@ -9,7 +9,7 @@ Last reviewed: 2026-11-12. Canonical site: https://popuploom.com/
 - Price: free. No credit card, trial countdown or paid upgrade inside the product.
 - Account: optional for designing and previewing; required to save a widget and get its hosted install code.
 - Templates: 53 original starting designs, plus a blank canvas.
-- Installation: two lines pasted before the closing body tag: a widget element with the saved widget id, and a script tag loading the immutable release https://popuploom.com/embed/1.1.0/popuploom.js. The unversioned /popuploom.js path remains as a compatibility alias.
+- Installation: two lines pasted before the closing body tag: a widget element with the saved widget id, and a script tag loading the immutable release https://popuploom.com/embed/1.2.0/popuploom.js. The unversioned /popuploom.js path remains as a compatibility alias.
 - Hosting: saved widget configuration is hosted by PopupLoom and fetched by the runtime on each embedded page, so owner edits go live without replacing the snippet.
 - Platform requirement: the destination site must allow custom HTML and JavaScript. A widget cannot escape an iframe it is embedded in.
 

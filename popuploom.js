@@ -1026,7 +1026,7 @@
 
   window.PopupLoom = Runtime;
   window.PopForge = Runtime;
-  Runtime.version = "1.1.0";
+  Runtime.version = "1.2.0";
   Runtime.show = function (cfg, options) {
     if (!Runtime.EncodeDemo) Runtime.encodeCfg = encodeCfg;
     var inst = new PopupInstance(cfg, null);

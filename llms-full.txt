@@ -29,7 +29,7 @@
 - A widget configuration is limited to 128 KB. A visitor response is limited to 16 KB. Retries with the same request ID are stored once.
 
 ## Embedding and compatibility
-- A saved widget gives a two-line snippet: a widget definition element with the data-popuploom attribute carrying the widget ID, and a script tag loading the immutable release https://popuploom.com/embed/1.1.0/popuploom.js. Both lines are pasted before the closing body tag. The unversioned /popuploom.js path remains as a compatibility alias.
+- A saved widget gives a two-line snippet: a widget definition element with the data-popuploom attribute carrying the widget ID, and a script tag loading the immutable release https://popuploom.com/embed/1.2.0/popuploom.js. Both lines are pasted before the closing body tag. The unversioned /popuploom.js path remains as a compatibility alias.
 - The destination website must allow custom HTML and JavaScript. Widgets cannot escape an iframe they are embedded in.
 - Sites with a Content-Security-Policy must allowlist the runtime origin in their script-src.
 - Legacy embeds installed before the domain move keep working unchanged: the data-popforge attribute and the /popforge.js path on the workers.dev host serve the same runtime bytes.

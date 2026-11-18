@@ -51,8 +51,9 @@ Use this before and after every production deployment.
   `curl -fsS https://popuploom.com/api/health`
 - [ ] Legacy and current runtime bytes match:
   `/popforge.js` and `/popuploom.js`.
-- [ ] `/embed/1.1.0/popuploom.js` returns 200 with immutable cache.
-- [ ] `/embed/1.1.0/SHA256SUMS` matches the served bytes.
+- [ ] `/embed/1.2.0/popuploom.js` returns 200 with immutable cache.
+- [ ] `/embed/1.2.0/SHA256SUMS` matches the served bytes.
+- [ ] `/embed/1.1.0/popuploom.js` still hashes to `d452116065ed9181726309d96306665ae1d6c95dce9bffe5ea22922ab6e50ac5` (frozen release).
 - [ ] `/security.html`, `/faq.html`, `/press.html` return 200.
 - [ ] No ad script is present while ads are disabled.
 - [ ] `npm run indexnow` submits the sitemap URLs (HTTP 202).
@@ -88,7 +89,7 @@ Use this before and after every production deployment.
 - Commit: `1cad808`
 - Deploy run: `42271385281` — success
 - Security page: live
-- Embed version: `1.1.0`
+- Embed version: `1.2.0` (1.1.0 frozen for pinned sites)
 - Embed SHA-256: `633468cef2cb8837dce749d0c9673d74b23f6dae299037998436304a3129d017`
 - IndexNow: 18 URLs accepted (HTTP 202)
 - Ads: disabled

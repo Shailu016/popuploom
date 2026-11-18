@@ -598,7 +598,7 @@
     var base = API || (window.location && window.location.origin) || "";
     return "<!-- PopupLoom: paste once, before </body> -->\n" +
       '<div data-popuploom="' + String(id) + '"></div>\n' +
-      '<script src="' + base + '/embed/1.1.0/popuploom.js"></script>';
+      '<script src="' + base + '/embed/1.2.0/popuploom.js"></script>';
   }
 
   /* ------------------------------------------------------------------ */

@@ -1,0 +1,2 @@
+# Published embed releases are frozen: serve the exact bytes, never convert line endings.
+embed-releases/** -text

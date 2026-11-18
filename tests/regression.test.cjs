@@ -631,17 +631,27 @@ test('identity, metadata and crawler files agree on the apex origin',async()=>{
  const home=(await api('/')).data;
  assert.ok(home.includes('popuploom-widgets-backup.json'));
  assert.ok(home.includes('data-popuploom="wan_your_widget_id"'));
- assert.ok(home.includes('https://popuploom.com/embed/1.1.0/popuploom.js'));
+ assert.ok(home.includes('https://popuploom.com/embed/1.2.0/popuploom.js'));
 });
 test('versioned embed is immutable and its checksum matches the served runtime',async()=>{
+ const runtime=await api('/embed/1.2.0/popuploom.js');
+ assert.equal(runtime.status,200);
+ assert.match(String(runtime.headers.get('cache-control')||''),/immutable/);
+ const sums=await api('/embed/1.2.0/SHA256SUMS');
+ assert.equal(sums.status,200);
+ const expected=require('crypto').createHash('sha256').update(String(runtime.data).replace(/\r\n/g,'\n')).digest('hex');
+ assert.ok(String(sums.data).startsWith(expected+'  popuploom.js'),'published checksum matches the immutable bytes');
+ assert.ok(String(runtime.data).includes('Runtime.version = "1.2.0"'));
+});
+test('a published embed release is frozen: 1.1.0 keeps its original bytes',async()=>{
  const runtime=await api('/embed/1.1.0/popuploom.js');
  assert.equal(runtime.status,200);
  assert.match(String(runtime.headers.get('cache-control')||''),/immutable/);
- const sums=await api('/embed/1.1.0/SHA256SUMS');
- assert.equal(sums.status,200);
- const expected=require('crypto').createHash('sha256').update(runtime.data).digest('hex');
- assert.ok(String(sums.data).startsWith(expected+'  popuploom.js'),'published checksum matches the immutable bytes');
+ const hash=require('crypto').createHash('sha256').update(String(runtime.data)).digest('hex');
+ assert.equal(hash,'d452116065ed9181726309d96306665ae1d6c95dce9bffe5ea22922ab6e50ac5','1.1.0 bytes must never change: sites may pin them with SRI');
  assert.ok(String(runtime.data).includes('Runtime.version = "1.1.0"'));
+ const sums=await api('/embed/1.1.0/SHA256SUMS');
+ assert.ok(String(sums.data).startsWith(hash+'  popuploom.js'));
 });
 test('failed leads preserve entered data, retry safely, escape success text, and keep spin prize',async()=>{
  const {c,setResponse,timers}=runtime();let body={innerHTML:'form',querySelector:()=>null,appendChild(el){this.error=el;}};

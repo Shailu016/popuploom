@@ -44,10 +44,19 @@ fs.copyFileSync('popuploom.js',path.join(out,'popforge.js'));
 // Immutable embed release. Customers can pin this path and verify the hash;
 // the live configuration still syncs through the API, so content edits do not
 // require a new script URL.
-const embedVersion='1.1.0',embedDir=path.join(out,'embed',embedVersion);
-fs.mkdirSync(embedDir,{recursive:true});
-fs.copyFileSync('popuploom.js',path.join(embedDir,'popuploom.js'));
-fs.copyFileSync('popuploom.js',path.join(embedDir,'popforge.js'));
+// Every published version keeps its own frozen bytes (embed-releases/<v>/);
+// the current runtime ships as the newest version. Never overwrite a release.
+const EMBED_CURRENT='1.2.0';
+const EMBED_RELEASES={'1.1.0':'embed-releases/1.1.0/popuploom.js',[EMBED_CURRENT]:'popuploom.js'};
+const embedDirs=[];
+for(const [version,source] of Object.entries(EMBED_RELEASES)){
+  const dir=path.join(out,'embed',version);
+  fs.mkdirSync(dir,{recursive:true});
+  fs.copyFileSync(source,path.join(dir,'popuploom.js'));
+  fs.copyFileSync(source,path.join(dir,'popforge.js'));
+  embedDirs.push(dir);
+}
+if(!fs.readFileSync('popuploom.js','utf8').includes('Runtime.version = "'+EMBED_CURRENT+'"'))throw new Error('popuploom.js version does not match EMBED_CURRENT '+EMBED_CURRENT);
 fs.cpSync('assets',path.join(out,'assets'),{recursive:true});
 
 // Line endings must not depend on the machine that built the bundle. A Windows
@@ -70,8 +79,16 @@ const TEXT_ASSET=/\.(?:html?|css|js|mjs|json|xml|txt|svg|webmanifest|md|csv)$/i;
 
 // Hash what is actually served, after normalisation, so the checksum always
 // describes the published bytes.
-const embedHash=require('crypto').createHash('sha256').update(fs.readFileSync(path.join(embedDir,'popuploom.js'))).digest('hex');
-fs.writeFileSync(path.join(embedDir,'SHA256SUMS'),embedHash+'  popuploom.js\n'+embedHash+'  popforge.js\n');
+for(const dir of embedDirs){
+  const embedHash=require('crypto').createHash('sha256').update(fs.readFileSync(path.join(dir,'popuploom.js'))).digest('hex');
+  fs.writeFileSync(path.join(dir,'SHA256SUMS'),embedHash+'  popuploom.js\n'+embedHash+'  popforge.js\n');
+}
+// The frozen 1.1.0 release must keep the exact bytes customers already pinned.
+const FROZEN={'1.1.0':'d452116065ed9181726309d96306665ae1d6c95dce9bffe5ea22922ab6e50ac5'};
+for(const [version,expected] of Object.entries(FROZEN)){
+  const got=require('crypto').createHash('sha256').update(fs.readFileSync(path.join(out,'embed',version,'popuploom.js'))).digest('hex');
+  if(got!==expected)throw new Error('Published embed '+version+' changed: '+got+' != '+expected);
+}
 
 // ---- Advertising readiness (enabled only by a complete reviewed config) ----
 // ads.txt is published only when the owner supplies a real publisher ID.
