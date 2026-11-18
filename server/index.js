@@ -306,6 +306,12 @@ app.use((req, res, next) => {
   }
   // A hub typed without its trailing slash goes to the directory URL, not a 404.
   if (pathname === "/guides" || pathname === "/tools") return res.redirect(301, pathname + "/");
+  // /templates/ is the parent of every template page and the URL people type;
+  // the gallery itself lives at /templates.html. One hop, query preserved.
+  if (pathname === "/templates" || pathname === "/templates/" || pathname === "/templates/index.html") {
+    const qs = req.originalUrl.indexOf("?") === -1 ? "" : req.originalUrl.slice(req.originalUrl.indexOf("?"));
+    return res.redirect(301, "/templates.html" + qs);
+  }
   // Retired named-comparison pages: send indexed URLs to the surviving page on
   // the same topic in one hop instead of letting them fall through to a 404.
   if (retiredPages.has(pathname)) return res.redirect(301, retiredPages.get(pathname));

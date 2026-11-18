@@ -4,6 +4,8 @@
 const fs = require("fs");
 const path = require("path");
 const root = path.join(__dirname, "..");
+const media = require("./lib/template-media.cjs");
+const catalog = require("./lib/catalog.cjs").loadCatalog();
 const ORG = "https://popuploom.com/#organization";
 
 const FOOTER = `<footer class="wrap" style="padding:24px 0;font-size:13px">
@@ -31,7 +33,7 @@ function render(page) {
         headline: page.h1,
         description: page.description,
         datePublished: "2026-11-14",
-        dateModified: "2026-11-14",
+        dateModified: "2026-11-16",
         author: { "@id": ORG },
         publisher: { "@id": ORG },
         mainEntityOfPage: url
@@ -74,6 +76,7 @@ function render(page) {
 <main class="wrap" style="padding:30px 26px 80px;max-width:900px">
   <article>
     <h1>${page.h1}</h1>
+    <p class="mut" style="font-size:13px;margin:6px 0 18px">By <a href="/about.html">Shailu</a>, founder of PopupLoom · Last updated 16 November 2026</p>
     <p class="mut">Free to edit and install. No pageview cap, no trial and no credit card. Template behavior checked on 14 November 2026.</p>
     ${page.intro.map((p) => `<p>${p}</p>`).join("\n    ")}
 
@@ -115,7 +118,7 @@ ${FOOTER}
 const PAGES = [
   {
     path: "/templates/exit-intent-popup.html",
-    title: "Free Exit-Intent Popup Template: Don't Leave Empty | PopupLoom",
+    title: "Free Exit-Intent Popup Template (Fullscreen) | PopupLoom",
     description: "Use the free Don't Leave Empty exit-intent template: a fullscreen last-chance offer with a code field. Desktop only, with copy examples and setup steps.",
     h1: "Free exit-intent popup template",
     shortName: "Exit intent",
@@ -167,6 +170,8 @@ const PAGES = [
     related: [
       ["/templates/exit-intent.html", "All exit-intent templates"],
       ["/guides/exit-intent-popup.html", "How exit intent works and how to test it"],
+      ["/templates/discount-popup.html", "Discount popup template (48-hour code)"],
+      ["/templates/spin-to-win-popup.html", "Spin-to-win popup template"],
       ["/guides/popup-not-showing.html", "Popup not showing? Diagnostic guide"],
       ["/guides/install-popups.html", "Install a popup on your site"]
     ],
@@ -181,7 +186,7 @@ const PAGES = [
   {
     path: "/templates/discount-popup.html",
     title: "Free Discount Popup Template: 48-Hour Drop | PopupLoom",
-    description: "Use the free 48-Hour Drop discount template: a countdown layout, copyable code field and product image. Set a real deadline and test the code.",
+    description: "Use the free 48-Hour Drop discount template: a countdown layout, copyable code field and an image slot. Set a real deadline and test the code.",
     h1: "Free discount popup template",
     shortName: "Discount",
     categoryName: "Discounts",
@@ -189,13 +194,13 @@ const PAGES = [
     featuredId: "drop48",
     featuredName: "48-Hour Drop",
     intro: [
-      "<strong>A discount popup works when the offer is real and the deadline is true.</strong> The 48-Hour Drop template combines a product image, a countdown layout and a copyable code field. It is designed for a short promotion, not for permanent urgency.",
-      "The template is a starting point. Replace the sample product art, code and deadline with your own. PopupLoom does not generate or validate coupon codes; you create the code in your store and paste it into the popup."
+      "<strong>A discount popup works when the offer is real and the deadline is true.</strong> The 48-Hour Drop template combines an image slot for your product, a countdown layout and a copyable code field. It is designed for a short promotion, not for permanent urgency.",
+      "The template is a starting point. Replace the sample artwork, code and deadline with your own. PopupLoom does not generate or validate coupon codes; you create the code in your store and paste it into the popup."
     ],
     why: [
       "The countdown layout makes the end of the offer visible without a wall of text.",
       "A copyable code field removes the step of retyping a code from a screenshot.",
-      "The product image gives the offer context, which is useful for a specific drop.",
+      "An image of your product gives the offer context, which is useful for a specific drop.",
       "The layout is compact enough for a modal on desktop and a smaller card on mobile."
     ],
     useWhen: [
@@ -232,6 +237,8 @@ const PAGES = [
     related: [
       ["/templates/discount.html", "All discount and offer templates"],
       ["/guides/popup-builder-for-ecommerce.html", "Popup builder for ecommerce"],
+      ["/templates/exit-intent-popup.html", "Exit-intent popup template"],
+      ["/templates/email-signup-popup.html", "Email signup popup template"],
       ["/guides/shopify-popup.html", "Shopify popup guide"],
       ["/guides/install-popups.html", "Install a popup on your site"]
     ],
@@ -297,6 +304,8 @@ const PAGES = [
     related: [
       ["/templates/email-signup.html", "All email signup templates"],
       ["/guides/email-signup-popup.html", "Email signup popup guide"],
+      ["/templates/discount-popup.html", "Discount popup template"],
+      ["/templates/spin-to-win-popup.html", "Spin-to-win popup template"],
       ["/guides/collect-and-export-leads.html", "Collect and export leads"],
       ["/guides/install-popups.html", "Install a popup on your site"]
     ],
@@ -362,6 +371,8 @@ const PAGES = [
     related: [
       ["/templates/gamified.html", "All gamified templates"],
       ["/guides/email-signup-popup.html", "Email signup popup guide"],
+      ["/templates/email-signup-popup.html", "Email signup popup template"],
+      ["/templates/exit-intent-popup.html", "Exit-intent popup template"],
       ["/guides/collect-and-export-leads.html", "Collect and export leads"],
       ["/faq.html", "PopupLoom FAQ"]
     ],
@@ -380,6 +391,8 @@ for (const page of PAGES) {
   const target = path.join(root, page.path.replace(/^\//, ""));
   fs.mkdirSync(path.dirname(target), { recursive: true });
   fs.writeFileSync(target, html);
+  // Keep the template preview, social image and Article image on regenerated pages.
+  media.applyToDetailPage(target, catalog);
 }
 
 function updateSitemap() {

@@ -81,6 +81,8 @@ const DIRECTORY_HUBS = new Map([
   ["/guides/index.html", "/guides/"],
   ["/tools/index.html", "/tools/"]
 ]);
+// Typed and parent-directory forms of the template gallery address.
+const TEMPLATE_HUB_ALIASES = new Set(["/templates", "/templates/", "/templates/index.html"]);
 
 // Machine-readable discovery documents. Served with their required media
 // types and a permissive CORS header so agents on other origins can read them.
@@ -411,6 +413,15 @@ async function serveStatic(request, env, pathname, sec, cors, headOnly) {
     return new Response(null, {
       status: 301,
       headers: { ...sec, ...cors, Location: retired, "Cache-Control": "public, max-age=3600" }
+    });
+  }
+  // The template gallery lives at /templates.html, but /templates/ is the
+  // parent of every template page and the URL people type. Send it to the
+  // gallery in one hop instead of answering 404 next to live children.
+  if (TEMPLATE_HUB_ALIASES.has(file)) {
+    return new Response(null, {
+      status: 301,
+      headers: { ...sec, ...cors, Location: "/templates.html" + new URL(request.url).search, "Cache-Control": "public, max-age=3600" }
     });
   }
   // A directory URL is the public address for its hub page. Keep one canonical

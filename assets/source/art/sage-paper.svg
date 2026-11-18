@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750" role="img" aria-label="Sage paper">
+<title>Sage paper</title>
+<desc>Original PopupLoom abstract artwork authored for this project on 2026-11-18. A soft arch of sage light on warm paper.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBFAF6"/><stop offset="1" stop-color="#EEF1E8"/></linearGradient>
+  <filter id="blur" filterUnits="userSpaceOnUse" x="-400" y="-400" width="2000" height="1550"><feGaussianBlur stdDeviation="90"/></filter>
+  <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="18"/></filter>
+  <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+  <linearGradient id="pane" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.55"/><stop offset="1" stop-color="#fff" stop-opacity="0.12"/></linearGradient>
+  <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5D7A5F" stop-opacity=".9"/><stop offset=".35" stop-color="#5D7A5F" stop-opacity="0"/></linearGradient>
+  <linearGradient id="archfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B9D3B2" stop-opacity=".55"/><stop offset="1" stop-color="#B9D3B2" stop-opacity="0"/></linearGradient>
+  <radialGradient id="orbfill" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="#B9D3B2"/><stop offset=".55" stop-color="#B9D3B2"/><stop offset="1" stop-color="#EEF1E8"/></radialGradient>
+  <radialGradient id="sun" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#B9D3B2" stop-opacity=".95"/><stop offset=".7" stop-color="#B9D3B2" stop-opacity=".35"/><stop offset="1" stop-color="#B9D3B2" stop-opacity="0"/></radialGradient>
+  <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EEF1E8" stop-opacity=".9"/><stop offset="1" stop-color="#EEF1E8"/></linearGradient>
+  <linearGradient id="fadeTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FBFAF6"/><stop offset=".85" stop-color="#FBFAF6" stop-opacity=".0"/></linearGradient>
+  <radialGradient id="vig" cx="55%" cy="45%" r="80%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.12"/></radialGradient>
+</defs>
+<rect width="1200" height="750" fill="url(#bg)"/>
+<g filter="url(#blur)"><ellipse cx="840" cy="300" rx="340" ry="280" fill="#CFE3C8" opacity="0.85"/><ellipse cx="260" cy="160" rx="280" ry="200" fill="#F6EAD8" opacity="0.9"/><ellipse cx="1050" cy="620" rx="260" ry="200" fill="#DCE8D3" opacity="0.7"/></g>
+
+    <path d="M610 760 V360 A190 190 0 0 1 990 360 V760 Z" fill="url(#archfill)"/>
+    <path d="M610 760 V360 A190 190 0 0 1 990 360 V760" fill="none" stroke="#5D7A5F" stroke-opacity=".45" stroke-width="1.4"/>
+    <path d="M560 760 V340 A240 240 0 0 1 1040 340 V760" fill="none" stroke="#5D7A5F" stroke-opacity=".18" stroke-width="1.1"/>
+    <line x1="0" y1="640" x2="1200" y2="640" stroke="#5D7A5F" stroke-opacity=".16" stroke-width="1.1"/>
+<rect width="1200" height="750" fill="url(#vig)"/>
+<rect width="1200" height="750" filter="url(#grain)" opacity="0.06" style="mix-blend-mode:overlay"/>
+</svg>

@@ -109,7 +109,7 @@ test('publisher verification is public without enabling ads and ads.txt requires
 
 test('every template asset reference points at a shipped file',()=>{
  const src=fs.readFileSync(path.join(root,'app.js'),'utf8');
- const refs=[...src.matchAll(/@assets\/([A-Za-z0-9._-]+\.(?:jpg|jpeg|png|svg|webp|gif))/g)].map(m=>m[1]);
+ const refs=[...src.matchAll(/@assets\/((?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9._-]+\.(?:jpg|jpeg|png|svg|webp|gif))/g)].map(m=>m[1]);
  assert.ok(refs.length>=10,'catalog should ship real artwork references');
  for(const file of new Set(refs))assert.ok(fs.existsSync(path.join(root,'assets',file)),'template references a missing asset: '+file);
 });
@@ -546,7 +546,7 @@ test('identity, metadata and crawler files agree on the apex origin',async()=>{
   '/templates/social-proof.html':['Free Trust and Social-Proof Popup Templates | PopupLoom','https://popuploom.com/templates/social-proof.html'],
   '/templates/age-gates.html':['Free Age Gate Popup Templates | PopupLoom','https://popuploom.com/templates/age-gates.html'],
   '/templates/gamified.html':['Free Spin-to-Win and Giveaway Popup Templates | PopupLoom','https://popuploom.com/templates/gamified.html'],
-  '/templates/seasonal.html':['Seasonal Popup Templates: Black Friday and Holidays | PopupLoom','https://popuploom.com/templates/seasonal.html'],
+  '/templates/seasonal.html':['Free Black Friday and Holiday Popup Templates | PopupLoom','https://popuploom.com/templates/seasonal.html'],
   '/templates/video.html':['Free Video Popup Template | PopupLoom','https://popuploom.com/templates/video.html'],
   '/free-popup-builder-no-limits.html':['Free Popup Builder, No Pageview Limits: What It Means','https://popuploom.com/free-popup-builder-no-limits.html'],
   '/best-free-popup-builder.html':['How to Choose a Free Popup Builder in 2026: 9 Checks','https://popuploom.com/best-free-popup-builder.html'],
@@ -554,7 +554,7 @@ test('identity, metadata and crawler files agree on the apex origin',async()=>{
   '/tools/':['Free Popup Tools: ROI, Copy and Exit-Intent | PopupLoom','https://popuploom.com/tools/'],
   '/tools/popup-roi-calculator.html':['Popup ROI Calculator: Signups, Value, Break-Even | PopupLoom','https://popuploom.com/tools/popup-roi-calculator.html'],
   '/tools/popup-copy-swipe-file.html':['Popup Copy Swipe File: 24 Reusable Patterns | PopupLoom','https://popuploom.com/tools/popup-copy-swipe-file.html'],
-  '/templates/exit-intent-popup.html':["Free Exit-Intent Popup Template: Don't Leave Empty | PopupLoom",'https://popuploom.com/templates/exit-intent-popup.html'],
+  '/templates/exit-intent-popup.html':["Free Exit-Intent Popup Template (Fullscreen) | PopupLoom",'https://popuploom.com/templates/exit-intent-popup.html'],
   '/templates/discount-popup.html':['Free Discount Popup Template: 48-Hour Drop | PopupLoom','https://popuploom.com/templates/discount-popup.html'],
   '/templates/email-signup-popup.html':['Free Email Signup Popup Template: Lead Magnet | PopupLoom','https://popuploom.com/templates/email-signup-popup.html'],
   '/templates/spin-to-win-popup.html':['Free Spin-to-Win Popup Template | PopupLoom','https://popuploom.com/templates/spin-to-win-popup.html'],
@@ -571,7 +571,10 @@ test('identity, metadata and crawler files agree on the apex origin',async()=>{
   assert.ok(html.includes('<title>'+title+'</title>'),url);
   assert.ok(html.includes('rel="canonical" href="'+canonical+'"'),url);
   assert.ok(html.includes('property="og:site_name" content="PopupLoom"'),url);
-  assert.ok(html.includes('https://popuploom.com/assets/og-popuploom.png'),url);
+  // Share images live on the apex: the brand card, or a template page's own preview.
+  const ogImage=(html.match(/<meta property="og:image" content="([^"]+)"/)||[])[1]||'';
+  assert.ok(ogImage==='https://popuploom.com/assets/og-popuploom.png'||/^https:\/\/popuploom\.com\/assets\/templates\/[A-Za-z0-9_-]+\.jpg$/.test(ogImage),url+' og:image '+ogImage);
+  if(ogImage.includes('/assets/templates/'))assert.ok(fs.existsSync(path.join(root,ogImage.replace('https://popuploom.com/',''))),url+' og:image file missing');
   assert.ok(!html.includes('og-popforge.png'),url);
   assert.ok(!html.includes('content="noindex'),url);
   if(url==='/')assert.ok(html.includes('Popup<span><i>Loom</i></span>'),url);

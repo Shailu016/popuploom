@@ -44,6 +44,18 @@ Because defensible provenance for the 12 JPEGs and the uncertain branding files 
 
 The product screenshots now depict the new original vector illustrations. They no longer depend on the replaced template photography. The screenshots still use fabricated lead data and the isolated test account described below.
 
+## Template artwork, second edition (2026-11-18)
+
+The first-edition product illustrations read as clip art next to a paid-quality template catalog. The catalog now uses abstract editorial artwork instead: gradient light fields, fine geometry (rings, arches, glass panes, a sphere, light beams, a horizon, a perspective grid) and film grain. No objects, no photographs, no third-party media.
+
+- **Source of truth:** `assets/source/art/*.svg` (13 files, `<title>`/`<desc>` mark them as original PopupLoom artwork authored 2026-11-18).
+- **Generator:** `scripts/generate-template-art.cjs` renders `assets/art/*.jpg` at 1200×750 (16:10), JPEG quality 86, with Sharp.
+- **First edition kept:** `assets/*.jpg` stay in place because saved customer popups may reference those URLs. New templates point at `assets/art/`.
+
+## Template previews (2026-11-18)
+
+`assets/templates/<id>.webp` (1200×750), `<id>-600.webp` (600×375) and `<id>.jpg` (1200×750, social cards) are screenshots of each catalog template drawn by the project's own runtime (`popuploom.js`) over a neutral, obviously mock website. Generator: `scripts/capture-template-previews.cjs` (local Chrome or Edge, local server, no network media). They contain only project artwork and sample copy.
+
 ## External video
 
 The demo video is the official Blender Foundation “Big Buck Bunny” upload:

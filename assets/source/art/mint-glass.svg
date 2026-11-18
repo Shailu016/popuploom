@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750" role="img" aria-label="Mint glass">
+<title>Mint glass</title>
+<desc>Original PopupLoom abstract artwork authored for this project on 2026-11-18. Two frosted panes with a mint rim light on ink.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#070B0E"/><stop offset="1" stop-color="#0B1A17"/></linearGradient>
+  <filter id="blur" filterUnits="userSpaceOnUse" x="-400" y="-400" width="2000" height="1550"><feGaussianBlur stdDeviation="90"/></filter>
+  <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="18"/></filter>
+  <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+  <linearGradient id="pane" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.14"/><stop offset="1" stop-color="#fff" stop-opacity="0.02"/></linearGradient>
+  <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7FF5CC" stop-opacity=".9"/><stop offset=".35" stop-color="#7FF5CC" stop-opacity="0"/></linearGradient>
+  <linearGradient id="archfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#35F0B0" stop-opacity=".55"/><stop offset="1" stop-color="#35F0B0" stop-opacity="0"/></linearGradient>
+  <radialGradient id="orbfill" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="#35F0B0"/><stop offset=".55" stop-color="#35F0B0"/><stop offset="1" stop-color="#0B1A17"/></radialGradient>
+  <radialGradient id="sun" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#35F0B0" stop-opacity=".95"/><stop offset=".7" stop-color="#35F0B0" stop-opacity=".35"/><stop offset="1" stop-color="#35F0B0" stop-opacity="0"/></radialGradient>
+  <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0B1A17" stop-opacity=".9"/><stop offset="1" stop-color="#0B1A17"/></linearGradient>
+  <linearGradient id="fadeTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#070B0E"/><stop offset=".85" stop-color="#070B0E" stop-opacity=".0"/></linearGradient>
+  <radialGradient id="vig" cx="55%" cy="45%" r="80%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.45"/></radialGradient>
+</defs>
+<rect width="1200" height="750" fill="url(#bg)"/>
+<g filter="url(#blur)"><ellipse cx="860" cy="380" rx="340" ry="280" fill="#1C8C6A" opacity="0.75"/><ellipse cx="1060" cy="140" rx="240" ry="200" fill="#35F0B0" opacity="0.3"/></g>
+
+    <g transform="rotate(-12 700 380)">
+      <rect x="520" y="150" width="420" height="470" rx="44" fill="url(#pane)" stroke="#7FF5CC" stroke-opacity=".38" stroke-width="1.4"/>
+      <rect x="520" y="150" width="420" height="470" rx="44" fill="none" stroke="url(#edge)" stroke-width="2"/>
+    </g>
+    <g transform="rotate(8 760 420)">
+      <rect x="640" y="250" width="360" height="400" rx="40" fill="url(#pane)" stroke="#7FF5CC" stroke-opacity=".28" stroke-width="1.2"/>
+    </g>
+<rect width="1200" height="750" fill="url(#vig)"/>
+<rect width="1200" height="750" filter="url(#grain)" opacity="0.075" style="mix-blend-mode:overlay"/>
+</svg>
