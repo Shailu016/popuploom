@@ -11,7 +11,9 @@
    families or weights ship:
      node scripts/self-host-fonts.cjs
 
-   Licences: assets/fonts/LICENSES.txt (copied from each family's repository). */
+   Licences: assets/fonts/LICENSES.txt is maintained by hand (copied from each
+   family's repository). This script refuses to finish if a family it downloads
+   has no entry there. */
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
@@ -54,8 +56,17 @@ async function get(url, binary) {
     if (prior) { prior.weights.push(+weight); continue; }
     faces.push({ family, style, weights: [+weight], file, range, bytes: buf.length });
   }
+  // Never ship a family without its licence text: LICENSES.txt must name every family downloaded.
+  const squash = (x) => String(x).toLowerCase().replace(/[^a-z]/g, "");
+  const licencePath = path.join(dir, "LICENSES.txt");
+  const licences = fs.existsSync(licencePath) ? squash(fs.readFileSync(licencePath, "utf8")) : "";
+  const unlicensed = [...new Set(faces.map((f) => f.family))].filter((fam) => !licences.includes(squash(fam)));
+  if (unlicensed.length) {
+    for (const f of faces) if (unlicensed.includes(f.family)) fs.unlinkSync(path.join(dir, f.file));
+    throw new Error("No licence text in assets/fonts/LICENSES.txt for: " + unlicensed.join(", ") + ". Add its OFL text first.");
+  }
   // remove files from an older run
-  const keep = new Set(faces.map((f) => f.file).concat(["manifest.json", "LICENSES.txt"]));
+  const keep =new Set(faces.map((f) => f.file).concat(["manifest.json", "LICENSES.txt"]));
   for (const f of fs.readdirSync(dir)) if (/\.woff2$/.test(f) && !keep.has(f)) fs.unlinkSync(path.join(dir, f));
   fs.writeFileSync(path.join(dir, "manifest.json"), JSON.stringify(faces, null, 2) + "\n");
 

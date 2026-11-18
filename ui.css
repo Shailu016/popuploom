@@ -1077,10 +1077,6 @@ main.doc { display: block; }
 .doc-toc a { display: block; padding: 6px 0 6px 14px; margin-left: -1px; border-left: 2px solid transparent; font-size: 13.5px; line-height: 1.4; color: var(--muted); text-decoration: none; transition: color var(--fast), border-color var(--fast); }
 .doc-toc a:hover { color: var(--text); }
 .doc-toc a.on { color: var(--text); border-left-color: var(--acc); }
-.doc-cta-card { padding: 18px; border: 1px solid var(--line-2); border-radius: var(--r-lg); background: var(--panel); }
-.doc-cta-card p { margin: 0 0 14px; font-size: 14px; line-height: 1.55; color: var(--text-2); }
-.doc-cta-card .btn { width: 100%; justify-content: center; }
-.doc-cta-card .doc-fine { margin: 10px 0 0; font-size: 12px; color: var(--muted); text-align: center; }
 .doc-more ul { list-style: none; margin: 0; padding: 0; }
 .doc-more li { margin: 0; border-top: 1px solid var(--line); }
 .doc-more a { display: block; padding: 10px 0; font-size: 13.5px; line-height: 1.4; color: var(--text-2); text-decoration: none; }
