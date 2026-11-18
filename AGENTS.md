@@ -43,6 +43,10 @@ and `docs/SEO_OUTREACH.md` are historical internal records. They keep competitor
 names on purpose so past decisions stay traceable, and each carries a header saying
 so. Do not copy their wording into site content without rewriting it vendor-neutral.
 
+## Content-page shell (do not undo)
+
+Every public content page gets one shell from `scripts/enhance-content-pages.cjs`: sticky nav with a CTA, display fonts, hero with a template preview, table of contents, inline and closing calls to action, and a real footer. Edit that script and `ui.css`, not the generated regions (`<!--pl:...-->` markers). Rules that protect AdSense: the ad unit is injected before the last `</article>` and must stay the only thing there; no CTA or card next to it; nothing sticky at the bottom of the screen; never hide a filled ad. The only ad CSS allowed is collapsing a unit Google reports as `data-ad-status="unfilled"`. Google Auto ads inside the article are controlled in the AdSense console, not here.
+
 ## Other standing rules
 
 - No invented rankings, traffic figures, review counts, certifications, customer
@@ -62,6 +66,8 @@ so. Do not copy their wording into site content without rewriting it vendor-neut
 ## Before you ship
 
 ```bash
+node scripts/generate-template-pages.cjs   # only if app.js templates changed (needs previews)
+node scripts/enhance-content-pages.cjs     # nav, hero, TOC, CTAs and footer on every public page
 node scripts/csp-hashes.js      # after any HTML edit
 npm run sitemap:lastmod         # after adding or editing pages
 npm test                        # regression

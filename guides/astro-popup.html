@@ -28,42 +28,41 @@
 .pl-code code{font-family:var(--font-mono);color:#dbe3f4}
 .pl-small{font-size:12.5px;color:var(--muted-2)}
 </style>
+<!--pl:fonts--><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet"><!--/pl:fonts-->
 </head>
 <body>
-<header class="wrap" style="padding:24px 26px">
-  <nav aria-label="Main"><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/">Guides</a> · <a href="/free-popup-builder-no-limits.html">No pageview limits</a> · <a href="/about.html">About</a></nav>
-  <nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/guides/">Guides</a> › <span>Astro</span></nav>
-</header>
-<main class="wrap" style="padding:30px 26px 80px;max-width:900px">
-  <article>
-    <h1>Add a popup to Astro</h1>
-    <div class="pl-meta">
+<!--pl:nav--><a class="skip-link" href="#main">Skip to content</a><nav class="site-nav" aria-label="Main"><div class="wrap inner"><a class="logo" href="/"><span class="mark"><svg viewBox="0 0 32 32" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.8"><circle cx="12.2" cy="16" r="5.4"/><circle cx="19.8" cy="16" r="5.4"/></svg></span> Popup<span><i>Loom</i></span></a><div class="nav-links"><a href="/templates.html">Templates</a><a href="/guides/">Guides</a><a href="/tools/">Tools</a><a href="/free-popup-builder-no-limits.html">No limits</a><a href="/faq.html">FAQ</a></div><div class="nav-cta"><a class="btn primary small" href="/studio.html?tpl=blank">Open the studio</a></div></div></nav><div class="pl-progress" aria-hidden="true"><i></i></div><!--/pl:nav-->
+<main id="main" class="doc">
+<!--pl:hero--><div class="doc-hero"><div class="wrap doc-hero-in"><div class="doc-hero-copy"><nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/guides/">Guides</a> › <span>Astro</span></nav><div class="kicker">Guide</div><h1>Add a popup to Astro</h1><div class="pl-meta doc-byline">
       <span>By <a href="/about.html">Shailu</a>, founder of PopupLoom</span>
       <span>Published 17 November 2026</span>
       <span>Last updated 17 November 2026</span>
       <span>Checked against the Astro scripts docs on 17 November 2026</span>
-    </div>
+    <span class="doc-rt">3 min read</span></div><nav class="doc-actions" aria-label="Next steps"><a class="btn primary" href="/studio.html?tpl=welcomeHero">Try Welcome Offer, Image Header in the studio</a><a class="btn ghost" href="/templates.html">Browse 53 templates</a></nav><p class="doc-trust">Free to use · no credit card · no pageview cap</p></div><aside class="doc-hero-vis"><figure class="doc-shot"><img class="doc-shot-img" src="/assets/templates/welcomeHero.webp" srcset="/assets/templates/welcomeHero-600.webp 600w, /assets/templates/welcomeHero.webp 1200w" sizes="(max-width: 1000px) 100vw, 520px" width="1200" height="750" alt="Welcome Offer, Image Header popup template preview: Light modal with an image running edge to edge above a one-field email signup" fetchpriority="high" decoding="async"><figcaption>Preview: Welcome Offer, Image Header</figcaption></figure></aside></div></div><!--/pl:hero-->
+<div class="wrap doc-wrap"><div class="doc-grid"><!--pl:grid-->
+<!--pl:toc-m--><nav class="doc-toc-m" aria-label="On this page"><details><summary>On this page</summary><ol><li><a href="#put-it-in-the-layout">Put it in the layout</a></li><li><a href="#why-is-inline">Why is:inline</a></li><li><a href="#only-on-some-pages">Only on some pages</a></li><li><a href="#troubleshooting">Troubleshooting</a></li><li><a href="#test-checklist">Test checklist</a></li><li><a href="#removal">Removal</a></li><li><a href="#official-references">Official references</a></li></ol></details></nav><!--/pl:toc-m-->
+<article class="doc-body">
+<p class="mut">Astro's default treatment of script tags is the one thing that trips people up: a plain <code>&lt;script&gt;</code> is processed, bundled and possibly moved. The widget needs a plain external tag, so the guide uses <code>is:inline</code>. This was checked against the Astro documentation, not tested on a live deployment.</p>
 
-    <p class="mut">Astro's default treatment of script tags is the one thing that trips people up: a plain <code>&lt;script&gt;</code> is processed, bundled and possibly moved. The widget needs a plain external tag, so the guide uses <code>is:inline</code>. This was checked against the Astro documentation, not tested on a live deployment.</p>
-
-    <h2>Put it in the layout</h2>
+    <h2 id="put-it-in-the-layout">Put it in the layout</h2>
     <p>Open the layout that every page uses, for example <code>src/layouts/Base.astro</code>, and add the two lines just before the closing <code>&lt;/body&gt;</code>:</p>
     <pre class="pl-code"><code>&lt;div data-popuploom="YOUR_WIDGET_ID"&gt;&lt;/div&gt;
 &lt;script is:inline src="https://popuploom.com/embed/1.1.0/popuploom.js"&gt;&lt;/script&gt;</code></pre>
     <p>If your pages are wrapped differently, put it in the outermost layout. One copy is enough for the whole site.</p>
 
-    <h2>Why is:inline</h2>
+    <h2 id="why-is-inline">Why is:inline</h2>
     <p>Astro processes <code>&lt;script&gt;</code> tags by default. It can bundle the code, add <code>type="module"</code> and deduplicate scripts across the page. That is useful for your own modules and wrong for a third-party tag that must load as a classic script from its own origin.</p>
     <p><code>is:inline</code> tells Astro to leave the tag untouched: same position, same attributes, no bundling. That is the behaviour the widget documents.</p>
 
-    <h2>Only on some pages</h2>
+    <!--pl:inline-cta--><aside class="doc-inline-cta"><span class="doc-inline-img"><img class="doc-card-pic" src="/assets/templates/welcomeHero.webp" srcset="/assets/templates/welcomeHero-600.webp 600w, /assets/templates/welcomeHero.webp 1200w" sizes="180px" width="1200" height="750" alt="Welcome Offer, Image Header popup template preview: Light modal with an image running edge to edge above a one-field email signup" loading="lazy" decoding="async"></span><div><strong>Try it on your own page</strong><p>Open the Welcome Offer, Image Header template, replace the sample text with your own and preview it on desktop and mobile. Free, no credit card.</p><a class="btn primary small" href="/studio.html?tpl=welcomeHero">Open it in the studio</a></div></aside><!--/pl:inline-cta-->
+<h2 id="only-on-some-pages">Only on some pages</h2>
     <p>If the popup should not appear sitewide, keep it in the layout but wrap it in a condition based on the route, or move the two lines into the specific page template. Do not add it twice: two divs with the same widget id can initialise the widget twice.</p>
 
     <div class="pl-note">
       <p><strong>View transitions.</strong> Astro's view transitions swap content without a full document load. The script loaded with the first document may not run again for the new page. Triggers that depend on time, click or scroll keep working; URL targeting is the part to test. If a route does not fire when reached through a transition, load it directly or trigger the popup from an event.</p>
     </div>
 
-    <h2>Troubleshooting</h2>
+    <h2 id="troubleshooting">Troubleshooting</h2>
     <ul>
       <li><strong>The built HTML has a bundled module instead of the tag.</strong> <code>is:inline</code> is missing, or Astro moved the script into its bundle. Add the attribute and rebuild.</li>
       <li><strong>The popup appears twice.</strong> The two lines exist in both the layout and a page. Keep one copy.</li>
@@ -71,7 +70,7 @@
       <li><strong>It fires on a direct load but not after a transition.</strong> That is the view-transition case above; load the route directly or trigger from an event.</li>
     </ul>
 
-    <h2>Test checklist</h2>
+    <h2 id="test-checklist">Test checklist</h2>
     <ul>
       <li>The rendered HTML contains the div and the script, not a bundled module.</li>
       <li>The popup appears on a fresh load in a private window.</li>
@@ -80,25 +79,55 @@
       <li>If a CSP is set, <code>https://popuploom.com</code> is allowed in <code>script-src</code> and <code>connect-src</code>.</li>
     </ul>
 
-    <h2>Removal</h2>
+    <h2 id="removal">Removal</h2>
     <p>Delete the two lines from the layout and redeploy. The saved popup stays in the studio.</p>
 
-    <h2>Common questions</h2>
+    <h2 id="common-questions">Common questions</h2>
     <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Why does the script need is:inline in Astro?</strong></summary><p style="margin:10px 0 0">Astro processes script tags by default: it bundles them, may add type=module, and can move them. is:inline tells Astro to leave the tag exactly where it is. The widget expects a plain external script in the document, so inline is the predictable option.</p></details>
     <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Should the snippet go in every page or in a layout?</strong></summary><p style="margin:10px 0 0">In a layout that every page uses, once. Repeating it per page invites duplicates and makes the widget id hard to change. If only some pages need the popup, conditionally render the two lines in the layout.</p></details>
     <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Does the popup work with Astro view transitions?</strong></summary><p style="margin:10px 0 0">Test it. View transitions swap page content without a full document load, so a script loaded once may not re-run on the new page. Triggers that depend on time, click or scroll keep working; page targeting is the part to verify.</p></details>
     <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Can the popup load in a static Astro build?</strong></summary><p style="margin:10px 0 0">Yes. The snippet is plain HTML and JavaScript, so it works in static output, server output and hybrid output. No adapter or integration is required.</p></details>
 
-    <h2>Official references</h2>
+    <h2 id="official-references">Official references</h2>
     <ul class="pl-small">
       <li><a href="https://docs.astro.build/en/guides/client-side-scripts/" target="_blank" rel="noopener">Astro: client-side scripts</a> — how scripts are processed and what is:inline changes.</li>
     </ul>
 
     <p class="pl-small">Written by <a href="/about.html">Shailu</a>, founder of PopupLoom. Checked against the Astro documentation on 17 November 2026; not tested on a live deployment. No ranking, traffic or conversion claim is made. Related: <a href="/guides/nextjs-popup.html">Next.js</a>, <a href="/guides/react-popup.html">React</a>, <a href="/guides/static-html-popup.html">static HTML</a> and <a href="/guides/install-popups.html">the general install guide</a>.</p>
   </article>
+<!--pl:aside--><aside class="doc-aside" aria-label="Page tools"><nav class="doc-toc" aria-label="Table of contents"><div class="doc-aside-h">On this page</div><ol><li><a href="#put-it-in-the-layout">Put it in the layout</a></li><li><a href="#why-is-inline">Why is:inline</a></li><li><a href="#only-on-some-pages">Only on some pages</a></li><li><a href="#troubleshooting">Troubleshooting</a></li><li><a href="#test-checklist">Test checklist</a></li><li><a href="#removal">Removal</a></li><li><a href="#official-references">Official references</a></li></ol></nav><div class="doc-cta-card"><div class="doc-aside-h">Build it free</div><p>Pick a template, edit it in the studio and paste two lines of code.</p><a class="btn primary" href="/studio.html?tpl=welcomeHero">Open the studio</a><p class="doc-fine">No credit card. No pageview cap.</p></div><div class="doc-more"><div class="doc-aside-h">Keep reading</div><ul><li><a href="/guides/google-tag-manager-popup.html">Add a popup with Google Tag Manager</a></li><li><a href="/guides/static-html-popup.html">Add a popup to a static HTML site</a></li><li><a href="/guides/bigcommerce-popup.html">Add a popup to BigCommerce</a></li><li><a href="/guides/wordpress-popup-without-plugin.html">How to add a popup to WordPress without a plugin</a></li></ul></div></aside><!--/pl:aside-->
+<!--/pl:grid--></div><!--pl:after--><aside class="doc-after" aria-label="Next steps"><p class="doc-after-h">Start from a template</p><p class="doc-after-sub">Each one opens in the studio. Change the words, colours and trigger, then install it with two lines of code.</p><div class="doc-card-row"><a class="doc-card" href="/studio.html?tpl=drop48"><span class="doc-card-img"><img class="doc-card-pic" src="/assets/templates/drop48.webp" srcset="/assets/templates/drop48-600.webp 600w, /assets/templates/drop48.webp 1200w" sizes="(max-width: 700px) 100vw, 300px" width="1200" height="750" alt="48-Hour Drop popup template preview: Ember-lit modal with a live countdown and a copyable code field" loading="lazy" decoding="async"></span><span class="doc-card-name">48-Hour Drop</span><span class="doc-card-tag">Flash deal</span><span class="doc-card-go">Open in the studio →</span></a><a class="doc-card" href="/studio.html?tpl=firstCode"><span class="doc-card-img"><img class="doc-card-pic" src="/assets/templates/firstCode.webp" srcset="/assets/templates/firstCode-600.webp 600w, /assets/templates/firstCode.webp 1200w" sizes="(max-width: 700px) 100vw, 300px" width="1200" height="750" alt="First-Order Code popup template preview: Editorial cream modal that collects an email for a first-order code; the owner sends the code" loading="lazy" decoding="async"></span><span class="doc-card-name">First-Order Code</span><span class="doc-card-tag">Email for code</span><span class="doc-card-go">Open in the studio →</span></a><a class="doc-card" href="/studio.html?tpl=tapMeter"><span class="doc-card-img"><img class="doc-card-pic" src="/assets/templates/tapMeter.webp" srcset="/assets/templates/tapMeter-600.webp 600w, /assets/templates/tapMeter.webp 1200w" sizes="(max-width: 700px) 100vw, 300px" width="1200" height="750" alt="Tap Meter popup template preview: One-tap page rating with three text choices and an instant thank-you" loading="lazy" decoding="async"></span><span class="doc-card-name">Tap Meter</span><span class="doc-card-tag">Feedback</span><span class="doc-card-go">Open in the studio →</span></a></div><div class="doc-band"><div><p class="doc-band-h">Ready to build your popup?</p><p>The studio is free to use. Save a popup to get its install code and read your leads in the inbox.</p></div><a class="btn primary" href="/studio.html?tpl=blank">Open the studio</a></div></aside><!--/pl:after--></div>
 </main>
-<footer class="wrap" style="padding:24px 0;font-size:13px">
-  <div><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/">Guides</a> · <a href="/free-popup-builder-no-limits.html">No pageview limits</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></div>
-</footer>
+<!--pl:footer--><footer class="site-foot"><div class="wrap"><div class="foot-grid">
+<div class="foot-brand"><a class="logo" href="/"><span class="mark"><svg viewBox="0 0 32 32" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.8"><circle cx="12.2" cy="16" r="5.4"/><circle cx="19.8" cy="16" r="5.4"/></svg></span> Popup<span><i>Loom</i></span></a><p>A free website popup builder with 53 editable templates, a visual studio and a lead inbox. No pageview cap, no credit card.</p><p><a class="btn primary small" href="/studio.html?tpl=blank">Open the studio</a></p></div>
+<div><p class="foot-h">Product</p><ul><li><a href="/studio.html?tpl=blank">Popup studio</a></li><li><a href="/templates.html">All 53 templates</a></li><li><a href="/tools/">Free tools</a></li><li><a href="/free-popup-builder-no-limits.html">No pageview limits</a></li><li><a href="/best-free-popup-builder.html">Nine-point checklist</a></li></ul></div>
+<div><p class="foot-h">Guides</p><ul><li><a href="/guides/install-popups.html">Add a popup to your site</a></li><li><a href="/guides/wordpress-popup.html">WordPress</a></li><li><a href="/guides/shopify-popup.html">Shopify</a></li><li><a href="/guides/webflow-popup.html">Webflow</a></li><li><a href="/guides/popup-builder-for-ecommerce.html">Ecommerce</a></li><li><a href="/guides/">All guides</a></li></ul></div>
+<div><p class="foot-h">Company</p><ul><li><a href="/about.html">About</a></li><li><a href="/faq.html">FAQ</a></li><li><a href="/contact.html">Contact</a></li><li><a href="/security.html">Security</a></li><li><a href="/press.html">Press kit</a></li><li><a href="/privacy.html">Privacy</a></li><li><a href="/terms.html">Terms</a></li></ul></div>
+</div><p class="foot-legal">PopupLoom is an independent product. Template offers, codes and countdowns are sample copy; every claim a site publishes must be true and is the site owner's responsibility.</p></div></footer><!--/pl:footer-->
+<!--pl:script--><script>
+(function () {
+  var bar = document.querySelector(".pl-progress i"), nav = document.querySelector(".site-nav");
+  function tick() {
+    var d = document.documentElement, max = d.scrollHeight - innerHeight, p = max > 0 ? scrollY / max : 0;
+    if (bar) bar.style.transform = "scaleX(" + Math.min(1, Math.max(0, p)) + ")";
+    if (nav) nav.classList.toggle("scrolled", scrollY > 8);
+  }
+  addEventListener("scroll", tick, { passive: true });
+  tick();
+  var links = document.querySelectorAll(".doc-aside .doc-toc a");
+  if (!links.length || !("IntersectionObserver" in window)) return;
+  var map = {};
+  links.forEach(function (a) { map[a.getAttribute("href").slice(1)] = a; });
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      links.forEach(function (a) { a.classList.remove("on"); });
+      var a = map[e.target.id];
+      if (a) a.classList.add("on");
+    });
+  }, { rootMargin: "-80px 0px -70% 0px" });
+  Object.keys(map).forEach(function (id) { var el = document.getElementById(id); if (el) io.observe(el); });
+})();
+</script><!--/pl:script-->
 </body>
 </html>

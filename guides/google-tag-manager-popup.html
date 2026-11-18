@@ -32,25 +32,23 @@
 .pl-wrap{overflow-x:auto}
 .pl-small{font-size:12.5px;color:var(--muted-2)}
 </style>
+<!--pl:fonts--><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet"><!--/pl:fonts-->
 </head>
 <body>
-<header class="wrap" style="padding:24px 26px">
-  <nav aria-label="Main"><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/">Guides</a> · <a href="/free-popup-builder-no-limits.html">No pageview limits</a> · <a href="/about.html">About</a></nav>
-  <nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/guides/">Guides</a> › <span>Google Tag Manager</span></nav>
-</header>
-<main class="wrap" style="padding:30px 26px 80px;max-width:900px">
-  <article>
-    <h1>Add a popup with Google Tag Manager</h1>
-    <div class="pl-meta">
+<!--pl:nav--><a class="skip-link" href="#main">Skip to content</a><nav class="site-nav" aria-label="Main"><div class="wrap inner"><a class="logo" href="/"><span class="mark"><svg viewBox="0 0 32 32" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.8"><circle cx="12.2" cy="16" r="5.4"/><circle cx="19.8" cy="16" r="5.4"/></svg></span> Popup<span><i>Loom</i></span></a><div class="nav-links"><a href="/templates.html">Templates</a><a href="/guides/">Guides</a><a href="/tools/">Tools</a><a href="/free-popup-builder-no-limits.html">No limits</a><a href="/faq.html">FAQ</a></div><div class="nav-cta"><a class="btn primary small" href="/studio.html?tpl=blank">Open the studio</a></div></div></nav><div class="pl-progress" aria-hidden="true"><i></i></div><!--/pl:nav-->
+<main id="main" class="doc">
+<!--pl:hero--><div class="doc-hero"><div class="wrap doc-hero-in"><div class="doc-hero-copy"><nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/guides/">Guides</a> › <span>Google Tag Manager</span></nav><div class="kicker">Guide</div><h1>Add a popup with Google Tag Manager</h1><div class="pl-meta doc-byline">
       <span>By <a href="/about.html">Shailu</a>, founder of PopupLoom</span>
       <span>Published 17 November 2026</span>
       <span>Last updated 17 November 2026</span>
       <span>Checked against the Tag Manager docs on 17 November 2026</span>
-    </div>
+    <span class="doc-rt">3 min read</span></div><nav class="doc-actions" aria-label="Next steps"><a class="btn primary" href="/studio.html?tpl=welcomeHero">Try Welcome Offer, Image Header in the studio</a><a class="btn ghost" href="/templates.html">Browse 53 templates</a></nav><p class="doc-trust">Free to use · no credit card · no pageview cap</p></div><aside class="doc-hero-vis"><figure class="doc-shot"><img class="doc-shot-img" src="/assets/templates/welcomeHero.webp" srcset="/assets/templates/welcomeHero-600.webp 600w, /assets/templates/welcomeHero.webp 1200w" sizes="(max-width: 1000px) 100vw, 520px" width="1200" height="750" alt="Welcome Offer, Image Header popup template preview: Light modal with an image running edge to edge above a one-field email signup" fetchpriority="high" decoding="async"><figcaption>Preview: Welcome Offer, Image Header</figcaption></figure></aside></div></div><!--/pl:hero-->
+<div class="wrap doc-wrap"><div class="doc-grid"><!--pl:grid-->
+<!--pl:toc-m--><nav class="doc-toc-m" aria-label="On this page"><details><summary>On this page</summary><ol><li><a href="#create-the-tag">Create the tag</a></li><li><a href="#choose-the-trigger">Choose the trigger</a></li><li><a href="#consent-and-privacy">Consent and privacy</a></li><li><a href="#test-before-publishing">Test before publishing</a></li><li><a href="#csp-and-checkout">CSP and checkout</a></li><li><a href="#removal">Removal</a></li><li><a href="#official-references">Official references</a></li></ol></details></nav><!--/pl:toc-m-->
+<article class="doc-body">
+<p class="mut">Tag Manager is a good fit when you cannot edit the site's templates or want to control the popup without a deploy. It is a worse fit when the site already hardcodes the snippet: two copies initialise the widget twice. This guide assumes the GTM container is already installed on the site and was checked against the Tag Manager documentation, not tested on a live container.</p>
 
-    <p class="mut">Tag Manager is a good fit when you cannot edit the site's templates or want to control the popup without a deploy. It is a worse fit when the site already hardcodes the snippet: two copies initialise the widget twice. This guide assumes the GTM container is already installed on the site and was checked against the Tag Manager documentation, not tested on a live container.</p>
-
-    <h2>Create the tag</h2>
+    <h2 id="create-the-tag">Create the tag</h2>
     <ol>
       <li>In Tag Manager, open <strong>Tags</strong> and choose <strong>New</strong>.</li>
       <li>For tag type, choose <strong>Custom HTML</strong>.</li>
@@ -60,7 +58,7 @@
 &lt;script src="https://popuploom.com/embed/1.1.0/popuploom.js"&gt;&lt;/script&gt;</code></pre>
     <p>Keep the div and the script together in the same tag. Splitting them across two tags makes the order unpredictable.</p>
 
-    <h2>Choose the trigger</h2>
+    <h2 id="choose-the-trigger">Choose the trigger</h2>
     <div class="pl-wrap">
       <table class="pl-table card">
         <thead><tr><th>Goal</th><th>Trigger</th><th>Note</th></tr></thead>
@@ -73,14 +71,15 @@
     </div>
     <p>The trigger decides where the widget is <em>available</em>; the popup's own targeting decides when it appears. Two layers can disagree, and the symptom is a popup that never shows on a page you expected. Set both deliberately.</p>
 
-    <h2>Consent and privacy</h2>
+    <!--pl:inline-cta--><aside class="doc-inline-cta"><span class="doc-inline-img"><img class="doc-card-pic" src="/assets/templates/welcomeHero.webp" srcset="/assets/templates/welcomeHero-600.webp 600w, /assets/templates/welcomeHero.webp 1200w" sizes="180px" width="1200" height="750" alt="Welcome Offer, Image Header popup template preview: Light modal with an image running edge to edge above a one-field email signup" loading="lazy" decoding="async"></span><div><strong>Try it on your own page</strong><p>Open the Welcome Offer, Image Header template, replace the sample text with your own and preview it on desktop and mobile. Free, no credit card.</p><a class="btn primary small" href="/studio.html?tpl=welcomeHero">Open it in the studio</a></div></aside><!--/pl:inline-cta-->
+<h2 id="consent-and-privacy">Consent and privacy</h2>
     <p>If the site runs a consent banner or Consent Mode, a Custom HTML tag can be held until a choice is made. Check that the tag is permitted after consent and that the popup's own storage (frequency rules) is described in your privacy notice. Tag Manager does not make a third-party widget compliant by itself.</p>
 
     <div class="pl-note">
       <p><strong>Blocked by an ad blocker.</strong> Custom HTML tags under a GTM container can be blocked when a visitor blocks Tag Manager. That is a reason some sites hardcode the snippet instead. Decide which failure mode you prefer: no popup for blockers, or a deploy needed for every change.</p>
     </div>
 
-    <h2>Test before publishing</h2>
+    <h2 id="test-before-publishing">Test before publishing</h2>
     <ol>
       <li>Use <strong>Preview</strong> and connect to the site.</li>
       <li>Confirm the tag fired on the intended route, not on checkout or account pages.</li>
@@ -89,19 +88,19 @@
       <li>Publish a container version. Preview mode alone does not change the live site.</li>
     </ol>
 
-    <h2>CSP and checkout</h2>
+    <h2 id="csp-and-checkout">CSP and checkout</h2>
     <p>If the site sends a Content Security Policy, add <code>https://popuploom.com</code> to <code>script-src</code> and <code>connect-src</code>, and keep the Tag Manager domains allowed. Checkout flows that run on a separate domain or a stripped template may not include the GTM container at all; test the real checkout, not the cart page.</p>
 
-    <h2>Removal</h2>
+    <h2 id="removal">Removal</h2>
     <p>Pause or delete the tag and publish a new container version. The saved popup remains in the studio.</p>
 
-    <h2>Common questions</h2>
+    <h2 id="common-questions">Common questions</h2>
     <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Which tag type should I use for the popup?</strong></summary><p style="margin:10px 0 0">Custom HTML. Paste the widget div and the script tag exactly as the studio provides them. Do not use the conversion or remarketing templates; they expect a different payload.</p></details>
     <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Which trigger should the tag use?</strong></summary><p style="margin:10px 0 0">All Pages is the simplest. If the popup should only appear on some routes, use Page Path conditions instead, and add the same restriction in the popup's URL rule so the two do not disagree.</p></details>
     <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Why is the tag not firing after I publish?</strong></summary><p style="margin:10px 0 0">Check Preview mode first. Common causes are a trigger that does not match the route, a consent setting that blocks the tag until a choice is made, an ad blocker in the test browser, or a second hardcoded snippet loading the same widget.</p></details>
     <details class="card" style="margin:10px 0;padding:16px"><summary><strong>Can I hardcode the snippet and use Tag Manager too?</strong></summary><p style="margin:10px 0 0">No. Two copies load the widget twice and can initialise it twice. Pick one deployment method for a given site.</p></details>
 
-    <h2>Official references</h2>
+    <h2 id="official-references">Official references</h2>
     <ul class="pl-small">
       <li><a href="https://developers.google.com/tag-platform/tag-manager/web" target="_blank" rel="noopener">Google Tag Manager: web developer guide</a> — container installation, tags and triggers.</li>
       <li><a href="https://developers.google.com/tag-platform/security/guides/csp" target="_blank" rel="noopener">Google: CSP for tag platforms</a> — the domains a Tag Manager deployment needs.</li>
@@ -109,9 +108,39 @@
 
     <p class="pl-small">Written by <a href="/about.html">Shailu</a>, founder of PopupLoom. Checked against the Tag Manager documentation on 17 November 2026; not tested on a live container. No ranking, traffic or conversion claim is made. Related: <a href="/guides/install-popups.html">the general install guide</a>, <a href="/guides/static-html-popup.html">static HTML</a> and <a href="/guides/bigcommerce-popup.html">BigCommerce</a>.</p>
   </article>
+<!--pl:aside--><aside class="doc-aside" aria-label="Page tools"><nav class="doc-toc" aria-label="Table of contents"><div class="doc-aside-h">On this page</div><ol><li><a href="#create-the-tag">Create the tag</a></li><li><a href="#choose-the-trigger">Choose the trigger</a></li><li><a href="#consent-and-privacy">Consent and privacy</a></li><li><a href="#test-before-publishing">Test before publishing</a></li><li><a href="#csp-and-checkout">CSP and checkout</a></li><li><a href="#removal">Removal</a></li><li><a href="#official-references">Official references</a></li></ol></nav><div class="doc-cta-card"><div class="doc-aside-h">Build it free</div><p>Pick a template, edit it in the studio and paste two lines of code.</p><a class="btn primary" href="/studio.html?tpl=welcomeHero">Open the studio</a><p class="doc-fine">No credit card. No pageview cap.</p></div><div class="doc-more"><div class="doc-aside-h">Keep reading</div><ul><li><a href="/guides/static-html-popup.html">Add a popup to a static HTML site</a></li><li><a href="/guides/bigcommerce-popup.html">Add a popup to BigCommerce</a></li><li><a href="/guides/wordpress-popup-without-plugin.html">How to add a popup to WordPress without a plugin</a></li><li><a href="/guides/install-popups.html">How to add a popup to your website</a></li></ul></div></aside><!--/pl:aside-->
+<!--/pl:grid--></div><!--pl:after--><aside class="doc-after" aria-label="Next steps"><p class="doc-after-h">Start from a template</p><p class="doc-after-sub">Each one opens in the studio. Change the words, colours and trigger, then install it with two lines of code.</p><div class="doc-card-row"><a class="doc-card" href="/studio.html?tpl=drop48"><span class="doc-card-img"><img class="doc-card-pic" src="/assets/templates/drop48.webp" srcset="/assets/templates/drop48-600.webp 600w, /assets/templates/drop48.webp 1200w" sizes="(max-width: 700px) 100vw, 300px" width="1200" height="750" alt="48-Hour Drop popup template preview: Ember-lit modal with a live countdown and a copyable code field" loading="lazy" decoding="async"></span><span class="doc-card-name">48-Hour Drop</span><span class="doc-card-tag">Flash deal</span><span class="doc-card-go">Open in the studio →</span></a><a class="doc-card" href="/studio.html?tpl=firstCode"><span class="doc-card-img"><img class="doc-card-pic" src="/assets/templates/firstCode.webp" srcset="/assets/templates/firstCode-600.webp 600w, /assets/templates/firstCode.webp 1200w" sizes="(max-width: 700px) 100vw, 300px" width="1200" height="750" alt="First-Order Code popup template preview: Editorial cream modal that collects an email for a first-order code; the owner sends the code" loading="lazy" decoding="async"></span><span class="doc-card-name">First-Order Code</span><span class="doc-card-tag">Email for code</span><span class="doc-card-go">Open in the studio →</span></a><a class="doc-card" href="/studio.html?tpl=tapMeter"><span class="doc-card-img"><img class="doc-card-pic" src="/assets/templates/tapMeter.webp" srcset="/assets/templates/tapMeter-600.webp 600w, /assets/templates/tapMeter.webp 1200w" sizes="(max-width: 700px) 100vw, 300px" width="1200" height="750" alt="Tap Meter popup template preview: One-tap page rating with three text choices and an instant thank-you" loading="lazy" decoding="async"></span><span class="doc-card-name">Tap Meter</span><span class="doc-card-tag">Feedback</span><span class="doc-card-go">Open in the studio →</span></a></div><div class="doc-band"><div><p class="doc-band-h">Ready to build your popup?</p><p>The studio is free to use. Save a popup to get its install code and read your leads in the inbox.</p></div><a class="btn primary" href="/studio.html?tpl=blank">Open the studio</a></div></aside><!--/pl:after--></div>
 </main>
-<footer class="wrap" style="padding:24px 0;font-size:13px">
-  <div><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/">Guides</a> · <a href="/free-popup-builder-no-limits.html">No pageview limits</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></div>
-</footer>
+<!--pl:footer--><footer class="site-foot"><div class="wrap"><div class="foot-grid">
+<div class="foot-brand"><a class="logo" href="/"><span class="mark"><svg viewBox="0 0 32 32" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.8"><circle cx="12.2" cy="16" r="5.4"/><circle cx="19.8" cy="16" r="5.4"/></svg></span> Popup<span><i>Loom</i></span></a><p>A free website popup builder with 53 editable templates, a visual studio and a lead inbox. No pageview cap, no credit card.</p><p><a class="btn primary small" href="/studio.html?tpl=blank">Open the studio</a></p></div>
+<div><p class="foot-h">Product</p><ul><li><a href="/studio.html?tpl=blank">Popup studio</a></li><li><a href="/templates.html">All 53 templates</a></li><li><a href="/tools/">Free tools</a></li><li><a href="/free-popup-builder-no-limits.html">No pageview limits</a></li><li><a href="/best-free-popup-builder.html">Nine-point checklist</a></li></ul></div>
+<div><p class="foot-h">Guides</p><ul><li><a href="/guides/install-popups.html">Add a popup to your site</a></li><li><a href="/guides/wordpress-popup.html">WordPress</a></li><li><a href="/guides/shopify-popup.html">Shopify</a></li><li><a href="/guides/webflow-popup.html">Webflow</a></li><li><a href="/guides/popup-builder-for-ecommerce.html">Ecommerce</a></li><li><a href="/guides/">All guides</a></li></ul></div>
+<div><p class="foot-h">Company</p><ul><li><a href="/about.html">About</a></li><li><a href="/faq.html">FAQ</a></li><li><a href="/contact.html">Contact</a></li><li><a href="/security.html">Security</a></li><li><a href="/press.html">Press kit</a></li><li><a href="/privacy.html">Privacy</a></li><li><a href="/terms.html">Terms</a></li></ul></div>
+</div><p class="foot-legal">PopupLoom is an independent product. Template offers, codes and countdowns are sample copy; every claim a site publishes must be true and is the site owner's responsibility.</p></div></footer><!--/pl:footer-->
+<!--pl:script--><script>
+(function () {
+  var bar = document.querySelector(".pl-progress i"), nav = document.querySelector(".site-nav");
+  function tick() {
+    var d = document.documentElement, max = d.scrollHeight - innerHeight, p = max > 0 ? scrollY / max : 0;
+    if (bar) bar.style.transform = "scaleX(" + Math.min(1, Math.max(0, p)) + ")";
+    if (nav) nav.classList.toggle("scrolled", scrollY > 8);
+  }
+  addEventListener("scroll", tick, { passive: true });
+  tick();
+  var links = document.querySelectorAll(".doc-aside .doc-toc a");
+  if (!links.length || !("IntersectionObserver" in window)) return;
+  var map = {};
+  links.forEach(function (a) { map[a.getAttribute("href").slice(1)] = a; });
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      links.forEach(function (a) { a.classList.remove("on"); });
+      var a = map[e.target.id];
+      if (a) a.classList.add("on");
+    });
+  }, { rootMargin: "-80px 0px -70% 0px" });
+  Object.keys(map).forEach(function (id) { var el = document.getElementById(id); if (el) io.observe(el); });
+})();
+</script><!--/pl:script-->
 </body>
 </html>

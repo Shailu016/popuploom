@@ -20,22 +20,21 @@
 <meta name="twitter:description" content="A step-by-step PopupLoom troubleshooting guide: snippet, saved id, trigger, page and device rules, frequency, selector, CSP, cache and iframe limits.">
 <meta name="twitter:image" content="https://popuploom.com/assets/og-popuploom.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://popuploom.com/"},{"@type":"ListItem","position":2,"name":"Guides","item":"https://popuploom.com/guides/"},{"@type":"ListItem","position":3,"name":"Popup not showing","item":"https://popuploom.com/guides/popup-not-showing.html"}]},{"@type":"Article","@id":"https://popuploom.com/guides/popup-not-showing.html#article","headline":"Popup not showing? A diagnostic guide","description":"A step-by-step PopupLoom troubleshooting guide: snippet, saved id, trigger, page and device rules, frequency, selector, CSP, cache and iframe limits.","datePublished":"2026-11-12","dateModified":"2026-11-16","author":{"@id":"https://popuploom.com/#organization"},"publisher":{"@id":"https://popuploom.com/#organization"},"mainEntityOfPage":"https://popuploom.com/guides/popup-not-showing.html"}]}</script>
+<!--pl:fonts--><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet"><!--/pl:fonts-->
 </head>
 <body>
-<header class="wrap" style="padding:24px 26px">
-  <nav aria-label="Main"><a href="/">PopupLoom</a> · <a href="/templates.html">Templates</a> · <a href="/guides/">Guides</a> · <a href="/about.html">About</a> · <a href="/studio.html?tpl=blank">Open the studio</a></nav>
-  <nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/guides/">Guides</a> › <span>Popup not showing</span></nav>
-</header>
-<main class="wrap" style="padding:30px 26px 80px;max-width:900px">
-  <article>
-    <h1>Popup not showing? A diagnostic guide</h1>
-    <p class="mut" style="font-size:13px;margin:6px 0 18px">By <a href="/about.html">Shailu</a>, founder of PopupLoom · Last updated 16 November 2026</p>
-    <p class="mut">Product screenshots and behavior labels checked on 5 November 2026. Work in a private window and use fake data while testing.</p>
+<!--pl:nav--><a class="skip-link" href="#main">Skip to content</a><nav class="site-nav" aria-label="Main"><div class="wrap inner"><a class="logo" href="/"><span class="mark"><svg viewBox="0 0 32 32" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.8"><circle cx="12.2" cy="16" r="5.4"/><circle cx="19.8" cy="16" r="5.4"/></svg></span> Popup<span><i>Loom</i></span></a><div class="nav-links"><a href="/templates.html">Templates</a><a href="/guides/">Guides</a><a href="/tools/">Tools</a><a href="/free-popup-builder-no-limits.html">No limits</a><a href="/faq.html">FAQ</a></div><div class="nav-cta"><a class="btn primary small" href="/studio.html?tpl=blank">Open the studio</a></div></div></nav><div class="pl-progress" aria-hidden="true"><i></i></div><!--/pl:nav-->
+<main id="main" class="doc">
+<!--pl:hero--><div class="doc-hero"><div class="wrap doc-hero-in"><div class="doc-hero-copy"><nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/guides/">Guides</a> › <span>Popup not showing</span></nav><div class="kicker">Guide</div><h1>Popup not showing? A diagnostic guide</h1><p class="mut doc-byline" style="font-size:13px;margin:6px 0 18px">By <a href="/about.html">Shailu</a>, founder of PopupLoom · Last updated 16 November 2026 · <span class="doc-rt">4 min read</span></p><nav class="doc-actions" aria-label="Next steps"><a class="btn primary" href="/studio.html?tpl=welcomeHero">Try Welcome Offer, Image Header in the studio</a><a class="btn ghost" href="/templates.html">Browse 53 templates</a></nav><p class="doc-trust">Free to use · no credit card · no pageview cap</p></div><aside class="doc-hero-vis"><figure class="doc-shot"><img class="doc-shot-img" src="/assets/templates/welcomeHero.webp" srcset="/assets/templates/welcomeHero-600.webp 600w, /assets/templates/welcomeHero.webp 1200w" sizes="(max-width: 1000px) 100vw, 520px" width="1200" height="750" alt="Welcome Offer, Image Header popup template preview: Light modal with an image running edge to edge above a one-field email signup" fetchpriority="high" decoding="async"><figcaption>Preview: Welcome Offer, Image Header</figcaption></figure></aside></div></div><!--/pl:hero-->
+<div class="wrap doc-wrap"><div class="doc-grid"><!--pl:grid-->
+<!--pl:toc-m--><nav class="doc-toc-m" aria-label="On this page"><details><summary>On this page</summary><ol><li><a href="#start-with-the-published-page">Start with the published page</a></li><li><a href="#1-confirm-the-snippet-and-the-saved-id">1. Confirm the snippet and the saved id</a></li><li><a href="#2-check-the-trigger">2. Check the trigger</a></li><li><a href="#3-check-page-device-and-frequency-rules">3. Check page, device and frequency rules</a></li><li><a href="#4-check-the-browser-console">4. Check the browser console</a></li><li><a href="#5-check-the-platform-and-cache">5. Check the platform and cache</a></li><li><a href="#6-check-the-content-itself">6. Check the content itself</a></li><li><a href="#7-verify-storage-and-follow-up-separately">7. Verify storage and follow-up separately</a></li><li><a href="#when-to-ask-for-help">When to ask for help</a></li></ol></details></nav><!--/pl:toc-m-->
+<article class="doc-body">
+<p class="mut">Product screenshots and behavior labels checked on 5 November 2026. Work in a private window and use fake data while testing.</p>
 
-    <h2>Start with the published page</h2>
+    <h2 id="start-with-the-published-page">Start with the published page</h2>
     <p>The studio preview intentionally silences trigger timing and marks controls as a demo. A working preview is not proof that the live page works. Open the published URL in a private window, with extensions disabled if possible, and reproduce the exact visitor path.</p>
 
-    <h2>1. Confirm the snippet and the saved id</h2>
+    <h2 id="1-confirm-the-snippet-and-the-saved-id">1. Confirm the snippet and the saved id</h2>
     <ol>
       <li>View the page source (not the visual editor) and search for <code>data-popuploom</code>.</li>
       <li>Confirm the div and the <code>popuploom.js</code> script are both present before <code>&lt;/body&gt;</code>.</li>
@@ -44,7 +43,8 @@
     </ol>
     <p>If the page uses an old <code>data-popforge</code> snippet, that legacy path is still supported. Do not mix two different ids on the same page unless you intend to mount two popups.</p>
 
-    <h2>2. Check the trigger</h2>
+    <!--pl:inline-cta--><aside class="doc-inline-cta"><span class="doc-inline-img"><img class="doc-card-pic" src="/assets/templates/welcomeHero.webp" srcset="/assets/templates/welcomeHero-600.webp 600w, /assets/templates/welcomeHero.webp 1200w" sizes="180px" width="1200" height="750" alt="Welcome Offer, Image Header popup template preview: Light modal with an image running edge to edge above a one-field email signup" loading="lazy" decoding="async"></span><div><strong>Try it on your own page</strong><p>Open the Welcome Offer, Image Header template, replace the sample text with your own and preview it on desktop and mobile. Free, no credit card.</p><a class="btn primary small" href="/studio.html?tpl=welcomeHero">Open it in the studio</a></div></aside><!--/pl:inline-cta-->
+<h2 id="2-check-the-trigger">2. Check the trigger</h2>
     <figure>
       <img src="/assets/guides/studio-behavior-panel.webp" alt="PopupLoom behavior panel showing placement, trigger, grace time and frequency settings" style="max-width:100%;height:auto;border-radius:12px;border:1px solid rgba(127,127,127,.25)">
       <figcaption class="mut" style="font-size:13px;margin-top:8px">The Behavior panel. Trigger, grace time, page rules, devices and frequency all have to allow the visit.</figcaption>
@@ -58,7 +58,7 @@
       <li><strong>Page load:</strong> check that the script is not blocked or deferred past a point where the visitor leaves.</li>
     </ul>
 
-    <h2>3. Check page, device and frequency rules</h2>
+    <h2 id="3-check-page-device-and-frequency-rules">3. Check page, device and frequency rules</h2>
     <ul>
       <li>Page mode is all, include, or exclude. An include pattern that does not match the current path suppresses the popup.</li>
       <li>Desktop and mobile toggles are separate. A template can deliberately disable mobile.</li>
@@ -66,7 +66,7 @@
       <li>A visitor who already closed or submitted the popup may not see it again by design.</li>
     </ul>
 
-    <h2>4. Check the browser console</h2>
+    <h2 id="4-check-the-browser-console">4. Check the browser console</h2>
     <p>Open developer tools and reload. Look for:</p>
     <ul>
       <li>a failed request to <code>popuploom.js</code> or the widget config API;</li>
@@ -77,7 +77,7 @@
     </ul>
     <p>If the site has a CSP, allowlist the runtime origin in <code>script-src</code> and the config API in <code>connect-src</code>. Do not remove CSP or add blanket <code>*</code> permissions to make a warning disappear.</p>
 
-    <h2>5. Check the platform and cache</h2>
+    <h2 id="5-check-the-platform-and-cache">5. Check the platform and cache</h2>
     <ul>
       <li>Paste the code in the page body or footer, not inside an iframe, a rich-text field that escapes HTML, or a metafield rendered as text.</li>
       <li>Purge page, object, CDN and optimization-plugin caches. A cached page may contain an old id or no snippet.</li>
@@ -86,7 +86,7 @@
       <li>Webflow custom code usually needs a publish and may not run in the Designer canvas. See the <a href="/guides/webflow-popup.html">Webflow guide</a>.</li>
     </ul>
 
-    <h2>6. Check the content itself</h2>
+    <h2 id="6-check-the-content-itself">6. Check the content itself</h2>
     <ul>
       <li>An empty title, body, image and controls can produce a visually empty card. Add real content.</li>
       <li>A form with a required field cannot submit until the field is filled. That is not a rendering failure.</li>
@@ -95,15 +95,47 @@
       <li>If the popup is configured as a top or bottom bar, check that the page header or another fixed element is not covering it.</li>
     </ul>
 
-    <h2>7. Verify storage and follow-up separately</h2>
+    <h2 id="7-verify-storage-and-follow-up-separately">7. Verify storage and follow-up separately</h2>
     <p>If the popup appears but the lead does not, check the lead inbox and the network response for the submit request. A form success message is not proof that a webhook receiver delivered anything. Browser webhooks are best effort; signed server webhooks have a delivery log. Neither sends email, SMS, PDFs or calendar invitations by itself.</p>
 
-    <h2>When to ask for help</h2>
+    <h2 id="when-to-ask-for-help">When to ask for help</h2>
     <p>Send the published URL, the saved widget id, the trigger setting, a screenshot of the behavior panel, the browser console text and the approximate time of the test to <a href="/contact.html">the contact address</a>. Never send passwords, session tokens, reset links, lead data or webhook secrets.</p>
 
     <p class="mut">See also: <a href="/guides/install-popups.html">installation guide</a> · <a href="/guides/collect-and-export-leads.html">collect and export leads</a> · <a href="/privacy.html">privacy</a> · <a href="/terms.html">terms</a>.</p>
   </article>
+<!--pl:aside--><aside class="doc-aside" aria-label="Page tools"><nav class="doc-toc" aria-label="Table of contents"><div class="doc-aside-h">On this page</div><ol><li><a href="#start-with-the-published-page">Start with the published page</a></li><li><a href="#1-confirm-the-snippet-and-the-saved-id">1. Confirm the snippet and the saved id</a></li><li><a href="#2-check-the-trigger">2. Check the trigger</a></li><li><a href="#3-check-page-device-and-frequency-rules">3. Check page, device and frequency rules</a></li><li><a href="#4-check-the-browser-console">4. Check the browser console</a></li><li><a href="#5-check-the-platform-and-cache">5. Check the platform and cache</a></li><li><a href="#6-check-the-content-itself">6. Check the content itself</a></li><li><a href="#7-verify-storage-and-follow-up-separately">7. Verify storage and follow-up separately</a></li><li><a href="#when-to-ask-for-help">When to ask for help</a></li></ol></nav><div class="doc-cta-card"><div class="doc-aside-h">Build it free</div><p>Pick a template, edit it in the studio and paste two lines of code.</p><a class="btn primary" href="/studio.html?tpl=welcomeHero">Open the studio</a><p class="doc-fine">No credit card. No pageview cap.</p></div><div class="doc-more"><div class="doc-aside-h">Keep reading</div><ul><li><a href="/guides/free-popup-builders-without-pageview-limits.html">Popup pageview limits: how to audit a free plan in 20 minutes</a></li><li><a href="/guides/popup-builder-for-ecommerce.html">Free popup builder for ecommerce stores</a></li><li><a href="/guides/popup-builder-for-quick-commerce.html">Free popup builder for quick commerce websites</a></li><li><a href="/guides/popup-builder-for-lead-generation.html">Free popup builder for lead generation</a></li></ul></div></aside><!--/pl:aside-->
+<!--/pl:grid--></div><!--pl:after--><aside class="doc-after" aria-label="Next steps"><p class="doc-after-h">Start from a template</p><p class="doc-after-sub">Each one opens in the studio. Change the words, colours and trigger, then install it with two lines of code.</p><div class="doc-card-row"><a class="doc-card" href="/studio.html?tpl=drop48"><span class="doc-card-img"><img class="doc-card-pic" src="/assets/templates/drop48.webp" srcset="/assets/templates/drop48-600.webp 600w, /assets/templates/drop48.webp 1200w" sizes="(max-width: 700px) 100vw, 300px" width="1200" height="750" alt="48-Hour Drop popup template preview: Ember-lit modal with a live countdown and a copyable code field" loading="lazy" decoding="async"></span><span class="doc-card-name">48-Hour Drop</span><span class="doc-card-tag">Flash deal</span><span class="doc-card-go">Open in the studio →</span></a><a class="doc-card" href="/studio.html?tpl=firstCode"><span class="doc-card-img"><img class="doc-card-pic" src="/assets/templates/firstCode.webp" srcset="/assets/templates/firstCode-600.webp 600w, /assets/templates/firstCode.webp 1200w" sizes="(max-width: 700px) 100vw, 300px" width="1200" height="750" alt="First-Order Code popup template preview: Editorial cream modal that collects an email for a first-order code; the owner sends the code" loading="lazy" decoding="async"></span><span class="doc-card-name">First-Order Code</span><span class="doc-card-tag">Email for code</span><span class="doc-card-go">Open in the studio →</span></a><a class="doc-card" href="/studio.html?tpl=tapMeter"><span class="doc-card-img"><img class="doc-card-pic" src="/assets/templates/tapMeter.webp" srcset="/assets/templates/tapMeter-600.webp 600w, /assets/templates/tapMeter.webp 1200w" sizes="(max-width: 700px) 100vw, 300px" width="1200" height="750" alt="Tap Meter popup template preview: One-tap page rating with three text choices and an instant thank-you" loading="lazy" decoding="async"></span><span class="doc-card-name">Tap Meter</span><span class="doc-card-tag">Feedback</span><span class="doc-card-go">Open in the studio →</span></a></div><div class="doc-band"><div><p class="doc-band-h">Ready to build your popup?</p><p>The studio is free to use. Save a popup to get its install code and read your leads in the inbox.</p></div><a class="btn primary" href="/studio.html?tpl=blank">Open the studio</a></div></aside><!--/pl:after--></div>
 </main>
-<footer class="wrap" style="padding:24px 26px"><a href="/">PopupLoom — free website popup builder</a> · <a href="/guides/">Guides</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></footer>
+<!--pl:footer--><footer class="site-foot"><div class="wrap"><div class="foot-grid">
+<div class="foot-brand"><a class="logo" href="/"><span class="mark"><svg viewBox="0 0 32 32" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.8"><circle cx="12.2" cy="16" r="5.4"/><circle cx="19.8" cy="16" r="5.4"/></svg></span> Popup<span><i>Loom</i></span></a><p>A free website popup builder with 53 editable templates, a visual studio and a lead inbox. No pageview cap, no credit card.</p><p><a class="btn primary small" href="/studio.html?tpl=blank">Open the studio</a></p></div>
+<div><p class="foot-h">Product</p><ul><li><a href="/studio.html?tpl=blank">Popup studio</a></li><li><a href="/templates.html">All 53 templates</a></li><li><a href="/tools/">Free tools</a></li><li><a href="/free-popup-builder-no-limits.html">No pageview limits</a></li><li><a href="/best-free-popup-builder.html">Nine-point checklist</a></li></ul></div>
+<div><p class="foot-h">Guides</p><ul><li><a href="/guides/install-popups.html">Add a popup to your site</a></li><li><a href="/guides/wordpress-popup.html">WordPress</a></li><li><a href="/guides/shopify-popup.html">Shopify</a></li><li><a href="/guides/webflow-popup.html">Webflow</a></li><li><a href="/guides/popup-builder-for-ecommerce.html">Ecommerce</a></li><li><a href="/guides/">All guides</a></li></ul></div>
+<div><p class="foot-h">Company</p><ul><li><a href="/about.html">About</a></li><li><a href="/faq.html">FAQ</a></li><li><a href="/contact.html">Contact</a></li><li><a href="/security.html">Security</a></li><li><a href="/press.html">Press kit</a></li><li><a href="/privacy.html">Privacy</a></li><li><a href="/terms.html">Terms</a></li></ul></div>
+</div><p class="foot-legal">PopupLoom is an independent product. Template offers, codes and countdowns are sample copy; every claim a site publishes must be true and is the site owner's responsibility.</p></div></footer><!--/pl:footer-->
+<!--pl:script--><script>
+(function () {
+  var bar = document.querySelector(".pl-progress i"), nav = document.querySelector(".site-nav");
+  function tick() {
+    var d = document.documentElement, max = d.scrollHeight - innerHeight, p = max > 0 ? scrollY / max : 0;
+    if (bar) bar.style.transform = "scaleX(" + Math.min(1, Math.max(0, p)) + ")";
+    if (nav) nav.classList.toggle("scrolled", scrollY > 8);
+  }
+  addEventListener("scroll", tick, { passive: true });
+  tick();
+  var links = document.querySelectorAll(".doc-aside .doc-toc a");
+  if (!links.length || !("IntersectionObserver" in window)) return;
+  var map = {};
+  links.forEach(function (a) { map[a.getAttribute("href").slice(1)] = a; });
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      links.forEach(function (a) { a.classList.remove("on"); });
+      var a = map[e.target.id];
+      if (a) a.classList.add("on");
+    });
+  }, { rootMargin: "-80px 0px -70% 0px" });
+  Object.keys(map).forEach(function (id) { var el = document.getElementById(id); if (el) io.observe(el); });
+})();
+</script><!--/pl:script-->
 </body>
 </html>
