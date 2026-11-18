@@ -43,11 +43,11 @@ Inconsistent facts are the most common reason directories and AI systems fail to
 | Previous name | PopForge (legacy embed domain only; not the current product name) |
 | Website | https://popuploom.com/ |
 | Category | Website popup builder / lead-capture widget |
-| Tagline | Free website popup builder with 45 templates |
+| Tagline | Free website popup builder with 53 templates |
 | Price | Free |
 | Free plan details | No credit card, no trial timer, no paid upgrade inside the product |
 | Account | Optional to design and preview; required to save and install |
-| Templates | 45 original starting designs, plus a blank canvas |
+| Templates | 53 original starting designs, plus a blank canvas |
 | Triggers | Page load, delay, scroll depth, scroll to element, click, desktop exit intent |
 | Targeting | Include/exclude page paths with wildcards; desktop and phone separately; six frequency modes |
 | Install | Two-line snippet before the closing body tag |
@@ -59,7 +59,7 @@ Inconsistent facts are the most common reason directories and AI systems fail to
 
 ### Short description (about 50 words)
 
-> PopupLoom is a free website popup builder for small shops, ecommerce stores and lead-generation sites. It includes 45 templates, six popup triggers, page and device targeting, a hosted install snippet, a lead inbox and CSV export. No credit card or trial timer is required; a free account is needed to save and install a popup.
+> PopupLoom is a free website popup builder for small shops, ecommerce stores and lead-generation sites. It includes 53 templates, six popup triggers, page and device targeting, a hosted install snippet, a lead inbox and CSV export. No credit card or trial timer is required; a free account is needed to save and install a popup.
 
 ### Medium description (about 100 words)
 
@@ -67,7 +67,7 @@ Inconsistent facts are the most common reason directories and AI systems fail to
 
 ### One-liner (under 100 characters)
 
-> Free website popup builder with 45 templates, hosted embed code and lead capture.
+> Free website popup builder with 53 templates, hosted embed code and lead capture.
 
 ### Tags / keywords
 
@@ -178,7 +178,7 @@ AlternativeTo ranks for “alternative to X” searches. Add PopupLoom as an alt
 
 Suggested sentence:
 
-> PopupLoom is a free website popup builder with 45 templates, hosted embed code and lead capture. It does not include email/SMS sending, cart data, A/B testing or native app messaging; those require other tools.
+> PopupLoom is a free website popup builder with 53 templates, hosted embed code and lead capture. It does not include email/SMS sending, cart data, A/B testing or native app messaging; those require other tools.
 
 Do not write “better than” or make unverifiable claims about competitors.
 
@@ -232,13 +232,13 @@ Product Hunt is one shot per product. Prepare before launching.
 - Logo: `popuploom-logo-512.png`
 - Gallery: template catalog, studio desktop, studio mobile, plus a simple 3-panel “build → embed → capture” image if time allows
 - Thumbnail: 240×240 crop of the logo (the 512 file works)
-- Tagline (60 chars max): `Free website popup builder with 45 templates`
+- Tagline (60 chars max): `Free website popup builder with 53 templates`
 - Topics: Marketing, No-code, Ecommerce, Lead Generation, Website Builder
 - First comment: founder story + what is free + what it does not do
 
 ### First comment draft
 
-> Hi Product Hunt — I built PopupLoom because most popup tools either charge monthly or cap the useful features. PopupLoom is free: 45 templates, six triggers, page/device targeting, a hosted two-line embed, a lead inbox and CSV export. No credit card and no trial timer.
+> Hi Product Hunt — I built PopupLoom because most popup tools either charge monthly or cap the useful features. PopupLoom is free: 53 templates, six triggers, page/device targeting, a hosted two-line embed, a lead inbox and CSV export. No credit card and no trial timer.
 >
 > It is intentionally focused. It does not send email/SMS, read cart data, generate coupons, run A/B tests or work inside native apps. If you need those, keep your existing stack and use PopupLoom for the popup layer.
 >
@@ -272,7 +272,7 @@ Subject: `Free popup builder for your [year] roundup`
 
 > Hi [Name],
 >
-> I read your [article title] while checking which free popup tools are still actually free. One option missing from the list is PopupLoom (https://popuploom.com/): a free website popup builder with 45 templates, six triggers, page/device targeting, a hosted embed and CSV lead export. No credit card or trial timer.
+> I read your [article title] while checking which free popup tools are still actually free. One option missing from the list is PopupLoom (https://popuploom.com/): a free website popup builder with 53 templates, six triggers, page/device targeting, a hosted embed and CSV lead export. No credit card or trial timer.
 >
 > It is not a fit for every section — it does not send email/SMS, read cart data or run A/B tests — so I am not asking you to replace anything. If you cover “free, no card” options, it may be a useful addition.
 >
