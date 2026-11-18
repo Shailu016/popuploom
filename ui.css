@@ -1108,12 +1108,6 @@ main.doc { display: block; }
 /* legal and chrome-only pages keep their narrow measure */
 main#main:not(.doc) { padding-top: 30px; }
 
-/* ---- AdSense: never leave a blank box. Collapse a unit only when Google
-   reports it unfilled; a filled ad is never hidden or restyled. ---- */
-ins.adsbygoogle[data-ad-status="unfilled"] { display: none !important; }
-.pl-ad:has(ins.adsbygoogle[data-ad-status="unfilled"]),
-.google-auto-placed:has(ins.adsbygoogle[data-ad-status="unfilled"]) { display: none !important; }
-.pl-ad { margin: 36px 0 64px; }
 
 @media (max-width: 1000px) {
   .doc-hero-in { grid-template-columns: minmax(0, 1fr); gap: 30px; padding-top: 30px; padding-bottom: 36px; }

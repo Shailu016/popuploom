@@ -146,3 +146,7 @@ Still outstanding for advertising:
 ## Additional artwork and previews (2026-11-18, second batch)
 
 Six more original pieces were added with the same generator (`scripts/generate-template-art.cjs`): `rose-waves`, `dusk-orb`, `harvest-horizon`, `lagoon-waves`, `ink-arch` and `teal-glass`, plus a new layered-ribbon motif. Sources are in `assets/source/art/`, renders in `assets/art/`. Previews for the eight new templates were captured with `scripts/capture-template-previews.cjs`. All generated in-house from code: no stock media, photographs or third-party material.
+
+## Guide hero scenes (2026-11-18)
+
+`assets/guides/scene-*.webp` (1200x750 and 600x375) are in-context scenes: a catalog template drawn by the project runtime over a small original sample page (store, grocery, blog, cart). The pages are built in `scripts/capture-guide-heroes.cjs` from project artwork in `assets/art/`; the copy is sample text and the pages are labelled as sample pages in the image alt text. No photographs, stock images or third-party products.

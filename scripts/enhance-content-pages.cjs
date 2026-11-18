@@ -49,9 +49,18 @@ const SHOTS = {
   studio: { src: "/assets/guides/studio-editor-desktop.webp", w: 1366, h: 900, alt: "The PopupLoom studio editing a popup with the live preview beside the controls", cap: "The PopupLoom studio: edit the popup, watch the preview." },
   inbox: { src: "/assets/guides/lead-inbox-demo.webp", w: 1366, h: 900, alt: "The PopupLoom lead inbox showing sample rows", cap: "The lead inbox, shown with sample rows." }
 };
+/* In-context scenes (scripts/capture-guide-heroes.cjs): a popup over a sample page. */
+const scene = (name, tplId, alt, cap) => ({ src: `/assets/guides/scene-${name}.webp`, small: `/assets/guides/scene-${name}-600.webp`, w: 1200, h: 750, alt, cap, tplId });
+Object.assign(SHOTS, {
+  "scene-store": scene("store", "drop48", "A sample online store page with a discount popup showing a countdown and a code field over it (illustration)", "A discount popup over a sample store page."),
+  "scene-grocery": scene("grocery", "barnews", "A sample grocery delivery page with a notice bar across the top asking visitors to check their area (illustration)", "A notice bar over a sample grocery page."),
+  "scene-blog": scene("blog", "leadShelf", "A sample blog article with a corner slide-in offering a free guide for an email address (illustration)", "A corner signup over a sample article."),
+  "scene-cart": scene("cart", "cartRescue", "A sample shopping cart page with an exit-intent popup holding a shipping and discount offer (illustration)", "A cart-rescue popup over a sample cart page."),
+  "scene-welcome": scene("welcome", "firstCode", "A sample online store page with a first-order signup popup asking for an email address (illustration)", "A welcome signup over a sample store page.")
+});
 const GUIDE_VISUAL = {
-  "popup-builder-for-quick-commerce": "launchDay", "popup-builder-for-ecommerce": "drop48", "popup-builder-for-lead-generation": "leadShelf",
-  "exit-intent-popup": "fullscreenExit", "email-signup-popup": "firstCode", "collect-and-export-leads": "inbox"
+  "popup-builder-for-quick-commerce": "scene-grocery", "popup-builder-for-ecommerce": "scene-store", "popup-builder-for-lead-generation": "scene-blog",
+  "exit-intent-popup": "scene-cart", "email-signup-popup": "scene-welcome", "collect-and-export-leads": "inbox"
 };
 const GUIDE_TEMPLATES = {
   "popup-builder-for-quick-commerce": ["launchDay", "barnews", "firstCode"],
@@ -187,7 +196,11 @@ function shotFor(file, featured) {
   const base = path.basename(file, ".html");
   // A clean template preview beats the studio screenshot, which shows a test account name.
   const v = featured || GUIDE_VISUAL[base] || "welcomeHero";
-  if (SHOTS[v]) return { html: `<img class="doc-shot-img" src="${SHOTS[v].src}" width="${SHOTS[v].w}" height="${SHOTS[v].h}" alt="${esc(SHOTS[v].alt)}" fetchpriority="high" decoding="async">`, cap: SHOTS[v].cap, tpl: null };
+  if (SHOTS[v]) {
+    const S = SHOTS[v];
+    const srcset = S.small ? ` srcset="${S.small} 600w, ${S.src} 1200w" sizes="(max-width: 1000px) 100vw, 520px"` : "";
+    return { html: `<img class="doc-shot-img" src="${S.src}"${srcset} width="${S.w}" height="${S.h}" alt="${esc(S.alt)}" fetchpriority="high" decoding="async">`, cap: S.cap, tpl: S.tplId ? byId[S.tplId] || null : null };
+  }
   const t = byId[v];
   if (!t || !media.hasPreview(t.id)) return { html: "", cap: "", tpl: null };
   return { html: media.pictureHTML(t, { lazy: false, sizes: "(max-width: 1000px) 100vw, 520px" }).replace('class="tpl-shot-img"', 'class="doc-shot-img"'), cap: `Preview: ${t.name}`, tpl: t };

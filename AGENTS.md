@@ -45,7 +45,7 @@ so. Do not copy their wording into site content without rewriting it vendor-neut
 
 ## Content-page shell (do not undo)
 
-Every public content page gets one shell from `scripts/enhance-content-pages.cjs`: sticky nav with a CTA, display fonts, hero with a template preview, table of contents, inline and closing calls to action, and a real footer. Edit that script and `ui.css`, not the generated regions (`<!--pl:...-->` markers). Rules that protect AdSense: the ad unit is injected before the last `</article>` and must stay the only thing there; no CTA or card next to it; nothing sticky at the bottom of the screen; never hide a filled ad. The only ad CSS allowed is collapsing a unit Google reports as `data-ad-status="unfilled"`. Google Auto ads inside the article are controlled in the AdSense console, not here.
+Every public content page gets one shell from `scripts/enhance-content-pages.cjs`: sticky nav with a CTA, display fonts, hero with a template preview, table of contents, inline and closing calls to action, and a real footer. Edit that script and `ui.css`, not the generated regions (`<!--pl:...-->` markers). Rules that protect AdSense: the shell never touches ads. Do not add, restyle, hide, move or wrap the ad unit or anything Google injects; the owner decided (2026-11-18) that all AdSense behaviour, including Auto ads, is handled only in the AdSense console. The injector still places its one unit before the last `</article>`; no CTA or card sits next to it, and nothing is sticky at the bottom of the screen.
 
 ## Other standing rules
 
