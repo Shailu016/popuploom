@@ -24,6 +24,8 @@ const htmlFiles = new Set([
   "guides/popup-builder-for-ecommerce.html", "guides/popup-builder-for-quick-commerce.html",
   "guides/popup-builder-for-lead-generation.html", "guides/nextjs-popup.html", "guides/react-popup.html", "guides/astro-popup.html",
   "guides/google-tag-manager-popup.html", "guides/static-html-popup.html", "guides/bigcommerce-popup.html",
+  "guides/email-signup-popup.html", "guides/exit-intent-popup.html", "guides/free-popup-builders-without-pageview-limits.html",
+  "guides/squarespace-wix-popup.html", "verify-email.html",
   "migration.html", "reset-password.html", "leads.html",
   "privacy.html", "about.html", "contact.html", "terms.html",
   "templates/email-signup.html", "templates/discount.html", "templates/exit-intent.html",

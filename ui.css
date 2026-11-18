@@ -1056,6 +1056,7 @@ main.doc { display: block; }
 .doc-body strong { color: var(--text); font-weight: 600; }
 .doc-body .mut { color: var(--muted); }
 .doc-body code, .doc-body .mono { font-family: var(--font-mono); font-size: .88em; background: rgba(255,255,255,.06); border: 1px solid var(--line); padding: .12em .4em; border-radius: 6px; color: var(--text); }
+.doc-body :not(pre) > code { overflow-wrap: anywhere; } /* long inline snippets must wrap on phones */
 .doc-body pre { background: var(--bg-deep); border: 1px solid var(--line-2); border-radius: var(--r); padding: 16px 18px; overflow-x: auto; font-size: 13.5px; line-height: 1.6; margin: 0 0 1.4em; }
 .doc-body pre code { background: none; border: 0; padding: 0; }
 .doc-body .card { border-radius: var(--r-lg); background: var(--panel); border: 1px solid var(--line); }

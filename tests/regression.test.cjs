@@ -107,6 +107,16 @@ test('publisher verification is public without enabling ads and ads.txt requires
  }finally{if(previous===undefined)delete process.env.ADSENSE_PUBLISHER_ID;else process.env.ADSENSE_PUBLISHER_ID=previous;}
 });
 
+test('the Express CSP allowlist covers every page the Worker hashes',()=>{
+ // Both servers must grant inline-script hashes to the same pages, or a page that
+ // works in production silently loses its scripts in local development.
+ const src=fs.readFileSync(path.join(root,'server','security.js'),'utf8');
+ const start=src.indexOf('const htmlFiles');
+ const express=new Set([...src.slice(start,src.indexOf(']);',start)).matchAll(/"([^"]+\.html)"/g)].map(m=>m[1]));
+ const worker=Object.keys(JSON.parse(fs.readFileSync(path.join(root,'worker','csp-hashes.json'),'utf8')));
+ const missing=worker.filter(f=>!express.has(f));
+ assert.deepEqual(missing,[],'server/security.js htmlFiles is missing: '+missing.join(', '));
+});
 test('every template asset reference points at a shipped file',()=>{
  const src=fs.readFileSync(path.join(root,'app.js'),'utf8');
  const refs=[...src.matchAll(/@assets\/((?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9._-]+\.(?:jpg|jpeg|png|svg|webp|gif))/g)].map(m=>m[1]);

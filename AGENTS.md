@@ -53,6 +53,13 @@ Fonts are self-hosted (`assets/fonts/`, licences in `LICENSES.txt`, all SIL OFL 
 
 ## Other standing rules
 
+- "Last updated" and JSON-LD `dateModified` change only when a page's own text
+  changes. A redesign, a shell rebuild or a new template count is not a content
+  update; bumping the date for it is a false freshness claim. The sitemap follows
+  `dateModified` (`npm run sitemap:lastmod`).
+- Embed releases are frozen. `/embed/1.1.0/` serves `embed-releases/1.1.0/` byte
+  for byte; a runtime change ships as a new version directory. The build fails if
+  a published release changes.
 - No invented rankings, traffic figures, review counts, certifications, customer
   logos or conversion benchmarks. Dated, source-linked facts only.
 - Free-tier and pricing claims must come from the vendor's own page and carry a
