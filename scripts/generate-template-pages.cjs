@@ -526,12 +526,23 @@ function esc(value) {
 
 const CATALOG = loadCatalog();
 
+/* Display format of a template, from its placement. Drives the card label and the gallery filter. */
+const FORMATS = [
+  ["modal", "Popup"], ["slide", "Corner slide-in"], ["topbar", "Top bar"], ["bottombar", "Bottom bar"], ["fullscreen", "Fullscreen"]
+];
+function formatOf(placement) {
+  const p = String(placement || "modal");
+  if (p.indexOf("slide:") === 0) return "slide";
+  return FORMATS.some(([k]) => k === p) ? p : "modal";
+}
+const formatLabel = (key) => (FORMATS.find(([k]) => k === key) || FORMATS[0])[1];
+
 function parseTemplates() {
   const entries = CATALOG.templates.map((t) => {
     const category = CATEGORY_OF[t.id];
     if (!category) throw new Error("Template " + t.id + " has no category in CATEGORY_OF; add it before publishing");
     if (!media.hasPreview(t.id)) throw new Error("Missing preview image for " + t.id + "; run node scripts/capture-template-previews.cjs");
-    return { id: t.id, name: t.name, description: t.blurb, tag: t.tag, blurb: t.blurb, journey: t.journey, best: !!t.best, category };
+    return { id: t.id, name: t.name, description: t.blurb, tag: t.tag, blurb: t.blurb, journey: t.journey, best: !!t.best, category, format: formatOf(t.cfg.placement) };
   });
   for (const id of Object.keys(CATEGORY_OF)) {
     if (!entries.some((e) => e.id === id)) throw new Error("CATEGORY_OF lists " + id + " but app.js has no such template");
@@ -550,16 +561,18 @@ function cardHTML(t, opts) {
   // The gallery passes publicHref so it never links to the noindex studio URL;
   // category pages are the public home of each card and do open the studio.
   if (o.publicHref) {
-    return `<div class="tg-card" id="${t.id}">
+    return `<div class="tg-card" id="${t.id}" data-format="${t.format}" data-goal="${t.journey}">
   <a class="tg-shot" href="${o.publicHref}" aria-label="${esc(t.name)}: see the template">${img}</a>
-  <div class="tg-meta"><${heading} class="tg-name"><a href="${o.publicHref}">${esc(t.name)}</a></${heading}><span class="tg-tag">${esc(t.tag)}</span></div>
+  <div class="tg-meta"><${heading} class="tg-name"><a href="${o.publicHref}">${esc(t.name)}</a></${heading}><span class="tg-tag">${esc(formatLabel(t.format))}</span></div>
+  <p class="tg-kind">${esc(t.tag)}</p>
   <p class="tg-blurb">${esc(t.blurb)}</p>
   <p class="tg-actions"><a class="btn primary small" href="${o.publicHref}">View template</a>${guide ? ` <a class="btn ghost small" href="${guide}">Read the full guide</a>` : ""}</p>
 </div>`;
   }
-  return `<div class="tg-card" id="${t.id}">
+  return `<div class="tg-card" id="${t.id}" data-format="${t.format}" data-goal="${t.journey}">
   <a class="tg-shot" href="/studio.html?tpl=${t.id}" aria-label="Open ${esc(t.name)} in the studio">${img}</a>
-  <div class="tg-meta"><${heading} class="tg-name">${esc(t.name)}</${heading}><span class="tg-tag">${esc(t.tag)}</span></div>
+  <div class="tg-meta"><${heading} class="tg-name">${esc(t.name)}</${heading}><span class="tg-tag">${esc(formatLabel(t.format))}</span></div>
+  <p class="tg-kind">${esc(t.tag)}</p>
   <p class="tg-blurb">${esc(t.blurb)}</p>
   <p class="tg-actions"><a class="btn primary small" href="/studio.html?tpl=${t.id}">Use this template</a>${guide ? ` <a class="btn ghost small" href="${guide}">Read the full guide</a>` : ""}</p>
 </div>`;
@@ -726,6 +739,22 @@ const DEEP_DIVES = [
   ["/templates/shipping-notice-popup.html", "Shipping notice template", "a top bar for delays and cut-off dates that comes down on time."]
 ];
 
+const GALLERY_FAQ = [
+  ["Are these popup templates free?", "Yes. Every template is free to preview, edit and install, with no pageview cap and no trial. A free account is only needed to save a popup and get its install code."],
+  ["Do I need to code to use a template?", "No. Pick a template, change the words, colours, image and trigger in the studio, then paste a two-line snippet before the closing body tag of your site. WordPress, Shopify, Webflow, Squarespace and Wix each have a short guide."],
+  ["Can I change a template completely?", "Yes. A template is only a starting point. You can change every word, the colours, the image, the placement, the trigger, the frequency and which pages and devices it appears on, or start from a blank popup instead."],
+  ["Where do the leads from a template go?", "Responses land in your PopupLoom lead inbox, where you can export them as CSV. An optional signed webhook can forward them to another tool. Sending any follow-up email is up to you."],
+  ["Are the offers, codes and countdowns in the previews real?", "No. Every preview uses sample copy. Discounts, stock levels, prizes, deadlines and guarantees must be true and honored by the site owner, so replace the sample text with your own before you publish."],
+  ["Which template should I start with?", "Start from the job the popup has to do. Use an email signup popup to grow a list, an offer popup to move a visitor to checkout, an exit-intent popup to catch someone leaving on desktop, and an announcement bar for one line of news."]
+];
+
+const HOW_TO = [
+  ["Pick a template", "Choose the job first (capture an email, make a sale, announce news), then a layout that fits your page."],
+  ["Make it yours", "Open it in the studio and replace the sample text, colours and image. Set when it appears and how often."],
+  ["Preview on desktop and mobile", "Check both sizes, and test the trigger on a real page before you rely on it."],
+  ["Install and measure", "Save the popup, paste the two-line install code before the closing body tag, then read views and leads in your inbox."]
+];
+
 function writeGallery(entries) {
   const url = "https://popuploom.com/templates.html";
   const title = "Free Website Popup Templates | PopupLoom";
@@ -765,6 +794,10 @@ function writeGallery(entries) {
           }))
         },
         author: { "@type": "Person", name: "Shailu", url: "https://popuploom.com/about.html" }
+      },
+      {
+        "@type": "FAQPage",
+        mainEntity: GALLERY_FAQ.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } }))
       }
     ]
   };
@@ -820,7 +853,26 @@ ${items.map((t) => cardHTML(t, { heading: "h3", lazy: eager-- <= 0, publicHref: 
   <div class="card" style="margin:18px 0;padding:16px 18px;border-color:rgba(255,106,31,.3)"><b>These are editable design examples, not live offers.</b> Any discount, stock level, prize, points balance, email/SMS/PDF delivery, guarantee or security claim must be true, and is supplied and honored by the website owner — not by PopupLoom. Demo social-proof names and times are labeled sample data.</div>
   </div>
   <nav class="tg-jump" aria-label="Template journeys">${byJourney.map(({ j, items }) => `<a href="#${j.id}">${esc(j.label)} <span>${items.length}</span></a>`).join("")}</nav>
+  <div class="tg-filter" id="tgFilter" role="group" aria-label="Filter templates by format" hidden>
+    <span class="tg-filter-label">Format</span>
+    <button type="button" class="tg-chip" data-format="all" aria-pressed="true">All <span>${entries.length}</span></button>
+    ${FORMATS.filter(([k]) => entries.some((t) => t.format === k)).map(([k, label]) => `<button type="button" class="tg-chip" data-format="${k}" aria-pressed="false">${esc(label)} <span>${entries.filter((t) => t.format === k).length}</span></button>`).join(" ")}
+    <span class="tg-filter-status" id="tgStatus" role="status" aria-live="polite"></span>
+  </div>
 ${sections}
+  <section class="tg-scratch" aria-labelledby="scratch">
+    <h2 id="scratch">Nothing quite right? Start from a blank popup</h2>
+    <p>Every template here is a starting point. If none matches your page, open the studio with an empty popup and build your own layout, copy and trigger.</p>
+    <p><a class="btn primary" href="/studio.html?tpl=blank">Start from a blank popup</a></p>
+  </section>
+  <section aria-labelledby="how" style="margin:52px 0 0">
+    <h2 id="how">How to add a popup template to your website</h2>
+    <ol class="tg-steps">${HOW_TO.map(([h, p]) => `<li><strong>${esc(h)}.</strong> ${esc(p)}</li>`).join("")}</ol>
+  </section>
+  <section aria-labelledby="faq" style="margin:44px 0 0">
+    <h2 id="faq">Popup template questions</h2>
+    ${GALLERY_FAQ.map(([q, a]) => `<details class="card" style="margin:10px 0;padding:16px"><summary><strong>${esc(q)}</strong></summary><p style="margin:10px 0 0">${esc(a)}</p></details>`).join("")}
+  </section>
   <section aria-labelledby="browse" style="margin:56px 0 0">
     <h2 id="browse">Browse popup templates by category</h2>
     <p>Start with the job you need the popup to do. Each category page explains when to use it, how to set it up and which template fits.</p>
@@ -833,6 +885,28 @@ ${sections}
   </section>
 </main>
 <footer class="wrap" style="padding:24px 26px"><a href="/">PopupLoom — free website popup builder</a> · <a href="/guides/">Guides</a> · <a href="/about.html">About</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></footer>
+<script>
+(function () {
+  var bar = document.getElementById("tgFilter");
+  if (!bar) return;
+  bar.hidden = false;
+  var chips = bar.querySelectorAll(".tg-chip"), status = document.getElementById("tgStatus");
+  function apply(fmt) {
+    var shown = 0;
+    document.querySelectorAll(".tg-card").forEach(function (c) {
+      var on = fmt === "all" || c.getAttribute("data-format") === fmt;
+      c.hidden = !on;
+      if (on) shown++;
+    });
+    document.querySelectorAll(".tg-section").forEach(function (sec) {
+      sec.hidden = !sec.querySelector(".tg-card:not([hidden])");
+    });
+    chips.forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-format") === fmt ? "true" : "false"); });
+    status.textContent = fmt === "all" ? "" : "Showing " + shown + " template" + (shown === 1 ? "" : "s");
+  }
+  chips.forEach(function (b) { b.addEventListener("click", function () { apply(b.getAttribute("data-format")); }); });
+})();
+</script>
 </body>
 </html>
 `;
