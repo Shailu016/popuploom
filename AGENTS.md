@@ -47,6 +47,10 @@ so. Do not copy their wording into site content without rewriting it vendor-neut
 
 Every public content page gets one shell from `scripts/enhance-content-pages.cjs`: sticky nav with a CTA, display fonts, hero with a template preview, table of contents, inline and closing calls to action, and a real footer. Edit that script and `ui.css`, not the generated regions (`<!--pl:...-->` markers). Rules that protect AdSense: the shell never touches ads. Do not add, restyle, hide, move or wrap the ad unit or anything Google injects; the owner decided (2026-11-18) that all AdSense behaviour, including Auto ads, is handled only in the AdSense console. The injector still places its one unit before the last `</article>`; the sticky side rail holds only text links (table of contents and related guides), never a button or card, so no call to action can sit beside the ad; the closing cards and band come after it with a wide gap, and nothing is sticky at the bottom of the screen.
 
+## Fonts
+
+Fonts are self-hosted (`assets/fonts/`, licences in `LICENSES.txt`, all SIL OFL 1.1). Do not add Google Fonts or any other third-party font link. To change families or weights, edit and re-run `scripts/self-host-fonts.cjs`; the file names carry a hash and are cached as immutable, so never edit a font file in place.
+
 ## Other standing rules
 
 - No invented rankings, traffic figures, review counts, certifications, customer

@@ -27,6 +27,8 @@ function cacheControlFor(file, options) {
   const path = normalize(file);
   const adsNonce = options && options.adsNonce;
   if (path.startsWith("/embed/")) return "public, max-age=31536000, immutable";
+  // Self-hosted fonts: file names carry a content hash, so they never change in place.
+  if (path.startsWith("/assets/fonts/") && /\.woff2$/.test(path)) return "public, max-age=31536000, immutable";
   if (isPrivateHtml(path)) return "no-store";
   if (path.endsWith(".html")) {
     // Ad pages embed a nonce that changes on every response. Shared caches must

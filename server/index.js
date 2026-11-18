@@ -380,7 +380,7 @@ app.use((req, res, next) => {
 });
 app.use("/assets", express.static(path.join(__dirname, "..", "assets"), {
   dotfiles: "deny", index: false, redirect: false,
-  setHeaders: res => res.setHeader("Cache-Control", "no-store")
+  setHeaders: (res, filePath) => res.setHeader("Cache-Control", /[\\/]fonts[\\/][^\\/]+\.woff2$/.test(filePath) ? "public, max-age=31536000, immutable" : "no-store")
 }));
 
 // Unknown routes are real 404s, not a soft homepage. Express 5 no longer

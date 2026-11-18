@@ -90,7 +90,9 @@ const LOGO_HTML = LOGO.replace(/href="[^"]*"/, 'href="/"');
 
 const NAV = `<!--pl:nav--><a class="skip-link" href="#main">Skip to content</a><nav class="site-nav" aria-label="Main"><div class="wrap inner">${LOGO_HTML}<div class="nav-links"><a href="/templates.html">Templates</a><a href="/guides/">Guides</a><a href="/tools/">Tools</a><a href="/free-popup-builder-no-limits.html">No limits</a><a href="/faq.html">FAQ</a></div><div class="nav-cta"><a class="btn primary small" href="/studio.html?tpl=blank">Open the studio</a></div></div></nav><div class="pl-progress" aria-hidden="true"><i></i></div><!--/pl:nav-->`;
 
-const FONTS = `<!--pl:fonts--><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet"><!--/pl:fonts-->`;
+const fontsLinks = require("./fonts-links.cjs");
+// Self-hosted fonts (scripts/self-host-fonts.cjs): preload the two faces every page needs.
+const FONTS = `<!--pl:fonts-->${fontsLinks.preloadLinks()}<!--/pl:fonts-->`;
 
 const FOOTER = `<!--pl:footer--><footer class="site-foot"><div class="wrap"><div class="foot-grid">
 <div class="foot-brand">${LOGO_HTML}<p>A free website popup builder with ${COUNT} editable templates, a visual studio and a lead inbox. No pageview cap, no credit card.</p><p><a class="btn primary small" href="/studio.html?tpl=blank">Open the studio</a></p></div>
@@ -281,15 +283,36 @@ function doc(html, file) {
 }
 
 /* -------------------------------------------------------------------- run */
+/* The home page is bespoke: only its footer and font links come from the shared shell. */
+function homepage(html) {
+  if (/<!--pl:footer-->/.test(html)) html = html.replace(region("footer"), () => FOOTER + "\n");
+  else if (/<footer class="foot">/.test(html)) html = html.replace(/<footer class="foot">[\s\S]*?<\/footer>\n?/, () => FOOTER + "\n");
+  else throw new Error("index.html: footer not found");
+  return fontsLinks.swap(html);
+}
+
 let n = 0;
-for (const file of [...DOC, ...CHROME_ONLY]) {
+for (const file of [...DOC, ...CHROME_ONLY, "index.html"]) {
   const abs = path.join(root, file);
   const raw = fs.readFileSync(abs, "utf8");
   const crlf = raw.includes("\r\n");
-  let html = cleanGenerated(raw.replace(/\r\n/g, "\n"));
-  html = chromeCommon(html);
-  if (DOC.has(file)) html = doc(html, file);
+  let html = raw.replace(/\r\n/g, "\n");
+  if (file === "index.html") html = homepage(html);
+  else {
+    html = chromeCommon(cleanGenerated(html));
+    if (DOC.has(file)) html = doc(html, file);
+  }
   const out = crlf ? html.replace(/\n/g, "\r\n") : html;
   if (out !== raw) { fs.writeFileSync(abs, out); n++; }
 }
-console.log(`Enhanced ${DOC.size} reading pages and ${CHROME_ONLY.length} chrome-only pages (${n} files changed).`);
+// App pages keep their own chrome; only their font links change.
+for (const file of ["studio.html", "profile.html", "reset-password.html", "verify-email.html"]) {
+  const abs = path.join(root, file);
+  if (!fs.existsSync(abs)) continue;
+  const raw = fs.readFileSync(abs, "utf8");
+  const crlf = raw.includes("\r\n");
+  const html = fontsLinks.swap(raw.replace(/\r\n/g, "\n"));
+  const out = crlf ? html.replace(/\n/g, "\r\n") : html;
+  if (out !== raw) { fs.writeFileSync(abs, out); n++; }
+}
+console.log(`Enhanced ${DOC.size} reading pages, ${CHROME_ONLY.length} chrome-only pages and the home page footer (${n} files changed).`);

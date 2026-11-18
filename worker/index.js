@@ -479,7 +479,7 @@ async function serveStatic(request, env, pathname, sec, cors, headOnly) {
     // Express falls through to the SPA fallback when a static asset is missing.
     if (asset.status === 404) return new Response("Not found", {status:404,headers:{...sec,...cors,"X-Robots-Tag":"noindex"}});
     const headers = new Headers(asset.headers);
-    headers.set("Cache-Control", "no-store");
+    headers.set("Cache-Control", cachePolicy.cacheControlFor(file));
     return new Response(headOnly ? null : asset.body, { status: asset.status, headers: { ...sec, ...cors, ...Object.fromEntries(headers) } });
   }
   // Search Console / Bing verification drop files. The strict name pattern
