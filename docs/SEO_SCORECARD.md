@@ -1,21 +1,20 @@
 # SEO scorecard
 
-Last run: 2026-11-18 · https://popuploom.com
+Last run: 2026-11-20 · https://popuploom.com
 
 | Metric | Value |
 |---|---:|
 | Sitemap pages | 63 |
 | Audit issues | 0 |
-| Average words per page | 1118 |
+| Average words per page | 1353 |
 | Pages under 400 words | 0 |
 | Pages with structured data | 63/63 |
-| GSC clicks / impressions (from CSV) | n/a |
+| GSC clicks / impressions (from CSV) | 24 / 243 |
 
 ## History
 
 | Date | Pages | Issues | Avg words | Thin | Schema | Clicks / impressions |
 |---|---:|---:|---:|---:|---:|---:|
-| 2026-11-16 | 45 | 0 | 983 | 0 | 45/45 | n/a |
 | 2026-11-16 | 47 | 0 | 1091 | 0 | 47/47 | n/a |
 | 2026-11-16 | 47 | 0 | 1344 | 0 | 47/47 | n/a |
 | 2026-11-16 | 42 | 2 | 1110 | 0 | 42/42 | n/a |
@@ -27,6 +26,7 @@ Last run: 2026-11-18 · https://popuploom.com
 | 2026-11-17 | 57 | 0 | 1096 | 0 | 57/57 | n/a |
 | 2026-11-17 | 63 | 0 | 1118 | 0 | 63/63 | n/a |
 | 2026-11-18 | 63 | 0 | 1118 | 0 | 63/63 | n/a |
+| 2026-11-20 | 63 | 0 | 1353 | 0 | 63/63 | 24 / 243 |
 
 ## How to record GSC data
 
