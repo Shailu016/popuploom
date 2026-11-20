@@ -627,7 +627,7 @@ function renderPage(categoryKey, templates) {
             image: media.imageObject(t)
           }))
         },
-        author: { "@type": "Person", name: "Shailu", url: "https://popuploom.com/about.html" }
+        author: { "@type": "Person", name: "Shailu016", url: "https://popuploom.com/about.html" }
       }
     ]
   };
@@ -670,7 +670,7 @@ function renderPage(categoryKey, templates) {
   <nav class="mut" aria-label="Breadcrumb" style="font-size:13px;margin-top:10px"><a href="/">Home</a> › <a href="/templates.html">Templates</a> › <span>${esc(c.label)}</span></nav>
   <div class="kicker">${items.length} template${items.length === 1 ? "" : "s"} in this set</div>
   <h1>${esc(c.h1)}</h1>
-  <p class="mut doc-byline">By <a href="/about.html">Shailu</a>, founder of PopupLoom · Last updated ${LAST_UPDATED}</p>
+  <p class="mut doc-byline">By <a href="/about.html">Shailu016</a>, founder of PopupLoom · Last updated ${LAST_UPDATED}</p>
   <nav class="doc-actions" aria-label="Next steps"><a class="btn primary" href="/studio.html?tpl=${lead.id}">Open ${esc(lead.name)} in the studio</a><a class="btn ghost" href="/templates.html">Browse all ${TEMPLATE_COUNT} templates</a></nav>
 </div><aside class="doc-hero-vis"><figure class="doc-shot">${media.pictureHTML(lead, { lazy: false, sizes: "(max-width: 1000px) 100vw, 520px" }).replace('class="tpl-shot-img"', 'class="doc-shot-img"')}<figcaption>Preview: ${esc(lead.name)}</figcaption></figure></aside></div></div>
 <div class="wrap doc-cat-body">
@@ -808,7 +808,7 @@ function writeGallery(entries) {
             image: media.imageObject(t)
           }))
         },
-        author: { "@type": "Person", name: "Shailu", url: "https://popuploom.com/about.html" }
+        author: { "@type": "Person", name: "Shailu016", url: "https://popuploom.com/about.html" }
       },
       {
         "@type": "FAQPage",
@@ -862,7 +862,7 @@ ${items.map((t) => cardHTML(t, { heading: "h3", lazy: eager-- <= 0, publicHref: 
 <main class="wrap tg-page" style="padding:30px 26px 80px">
   <div class="tg-intro">
   <h1>${TEMPLATE_COUNT} free website popup templates</h1>
-  <p class="mut" style="font-size:13px;margin:6px 0 18px">By <a href="/about.html">Shailu</a>, founder of PopupLoom · Last updated ${LAST_UPDATED}</p>
+  <p class="mut" style="font-size:13px;margin:6px 0 18px">By <a href="/about.html">Shailu016</a>, founder of PopupLoom · Last updated ${LAST_UPDATED}</p>
   <p>Choose a starting design and customize its content, appearance and trigger. Preview as a guest; sign in to save and get your installation code. Template names describe designs, not guaranteed results.</p>
   <p>Not sure where to start? Read the free playbooks for <a href="/guides/popup-builder-for-ecommerce.html">ecommerce stores</a>, <a href="/guides/popup-builder-for-quick-commerce.html">quick-commerce and grocery delivery</a>, or <a href="/guides/popup-builder-for-lead-generation.html">lead generation</a>.</p>
   <div class="card" style="margin:18px 0;padding:16px 18px;border-color:rgba(255,106,31,.3)"><b>These are editable design examples, not live offers.</b> Any discount, stock level, prize, points balance, email/SMS/PDF delivery, guarantee or security claim must be true, and is supplied and honored by the website owner — not by PopupLoom. Demo social-proof names and times are labeled sample data.</div>

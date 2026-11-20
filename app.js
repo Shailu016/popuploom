@@ -705,6 +705,46 @@
         resendEl.disabled = false;
       }
     };
+    // Public pages (the home page) ship the dialog without credential fields so
+    // the indexable HTML holds no password input; build them on first open.
+    // Pages that already contain the fields (studio, profile) are left alone.
+    function ensureAuthFields() {
+      if (document.getElementById("authEmail") || !errEl || !errEl.parentNode) return;
+      function make(tag, props, css) {
+        var node = document.createElement(tag);
+        Object.keys(props || {}).forEach(function (k) {
+          if (k === "text") node.textContent = props[k];
+          else node.setAttribute(k, props[k]);
+        });
+        if (css) node.style.cssText = css;
+        return node;
+      }
+      function field(labelText, input, css) {
+        var row = make("div", { "class": "fieldset" }, css);
+        row.appendChild(make("label", { "class": "label", "for": input.id, text: labelText }));
+        row.appendChild(input);
+        return row;
+      }
+      var parent = errEl.parentNode;
+      var nameRow = field("Your name", make("input", { "class": "inp", id: "authName", type: "text", placeholder: "Maya", autocomplete: "name", maxlength: "60" }), "margin-bottom:14px;display:none");
+      nameRow.id = "authNameRow";
+      var googleWrap = make("div", { id: "authGoogleWrap" }, "display:none;margin-bottom:18px");
+      googleWrap.appendChild(make("div", { id: "authGoogleBtn" }, "display:flex;justify-content:center;min-height:44px"));
+      var divider = make("div", {}, "display:flex;align-items:center;gap:12px;margin-top:16px;color:var(--muted-2);font-size:11px;letter-spacing:.1em;text-transform:uppercase");
+      var rule = "flex:1;height:1px;background:rgba(255,255,255,.1)";
+      divider.appendChild(make("span", {}, rule));
+      divider.appendChild(document.createTextNode("or use email"));
+      divider.appendChild(make("span", {}, rule));
+      googleWrap.appendChild(divider);
+      var emailRow = field("Email", make("input", { "class": "inp", id: "authEmail", type: "email", placeholder: "you@example.com", autocomplete: "email" }), "margin-bottom:14px");
+      var passInput = make("input", { "class": "inp", id: "authPass", type: "password", placeholder: "••••••••", autocomplete: "current-password" });
+      passInput.addEventListener("keydown", function (ev) { if (ev.key === "Enter") submit(); });
+      var passRow = field("Password", passInput, "margin-bottom:20px");
+      var forgotWrap = make("div", {}, "text-align:right;margin-top:8px");
+      forgotWrap.appendChild(make("a", { href: "./reset-password.html", id: "authForgot", text: "Forgot password?" }, "color:var(--acc);font-size:12.5px;text-decoration:none"));
+      passRow.appendChild(forgotWrap);
+      [nameRow, googleWrap, emailRow, passRow].forEach(function (node) { parent.insertBefore(node, errEl); });
+    }
     function setMode(next) {
       mode = next === "register" ? "register" : "login";
       var isLogin = mode === "login";
@@ -728,6 +768,7 @@
       showErr("");
     }
     function open() {
+      ensureAuthFields();
       modal.style.display = "flex";
       setMode(mode);
       var wrap = document.getElementById("authGoogleWrap");

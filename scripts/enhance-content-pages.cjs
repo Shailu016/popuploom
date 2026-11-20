@@ -98,7 +98,7 @@ const FOOTER = `<!--pl:footer--><footer class="site-foot"><div class="wrap"><div
 <div class="foot-brand">${LOGO_HTML}<p>A free website popup builder with ${COUNT} editable templates, a visual studio and a lead inbox. No pageview cap, no credit card.</p><p><a class="btn primary small" href="/studio.html?tpl=blank">Open the studio</a></p></div>
 <div><p class="foot-h">Product</p><ul><li><a href="/studio.html?tpl=blank">Popup studio</a></li><li><a href="/templates.html">All ${COUNT} templates</a></li><li><a href="/tools/">Free tools</a></li><li><a href="/free-popup-builder-no-limits.html">No pageview limits</a></li><li><a href="/best-free-popup-builder.html">Nine-point checklist</a></li></ul></div>
 <div><p class="foot-h">Guides</p><ul><li><a href="/guides/install-popups.html">Add a popup to your site</a></li><li><a href="/guides/wordpress-popup.html">WordPress</a></li><li><a href="/guides/shopify-popup.html">Shopify</a></li><li><a href="/guides/webflow-popup.html">Webflow</a></li><li><a href="/guides/popup-builder-for-ecommerce.html">Ecommerce</a></li><li><a href="/guides/">All guides</a></li></ul></div>
-<div><p class="foot-h">Company</p><ul><li><a href="/about.html">About</a></li><li><a href="/faq.html">FAQ</a></li><li><a href="/contact.html">Contact</a></li><li><a href="/security.html">Security</a></li><li><a href="/press.html">Press kit</a></li><li><a href="/privacy.html">Privacy</a></li><li><a href="/terms.html">Terms</a></li></ul></div>
+<div><p class="foot-h">Project</p><ul><li><a href="/about.html">About</a></li><li><a href="https://www.linkedin.com/in/shailendra-yadav-3234a11b5" rel="me noopener" target="_blank">LinkedIn</a></li><li><a href="https://github.com/Shailu016" rel="me noopener" target="_blank">GitHub</a></li><li><a href="/faq.html">FAQ</a></li><li><a href="/contact.html">Contact</a></li><li><a href="/security.html">Security</a></li><li><a href="/press.html">Press kit</a></li><li><a href="/privacy.html">Privacy</a></li><li><a href="/terms.html">Terms</a></li></ul></div>
 </div><p class="foot-legal">PopupLoom is an independent product. Template offers, codes and countdowns are sample copy; every claim a site publishes must be true and is the site owner's responsibility.</p></div></footer><!--/pl:footer-->`;
 
 const SCRIPT = `<!--pl:script--><script>
@@ -139,7 +139,7 @@ function cleanGenerated(html) {
     const h1 = (hero[1].match(/<h1>[\s\S]*?<\/h1>/) || [""])[0];
     let by = (hero[1].match(/<p class="mut doc-byline"[^>]*>[\s\S]*?<\/p>/) || hero[1].match(/<div class="[a-z-]*meta doc-byline">[\s\S]*?<\/div>/) || [""])[0];
     by = by.replace(/ · <span class="doc-rt">[\s\S]*?<\/span>/, "").replace(/<span class="doc-rt">[\s\S]*?<\/span>/, "").replace(" doc-byline", "");
-    if (by.indexOf("By ") === -1 && by.indexOf("Shailu") === -1) by = "";
+    if (by.indexOf("By ") === -1 && by.indexOf("Shailu016") === -1) by = "";
     html = html.replace(region("hero"), "");
     html = html.replace(/<article>\n?/, `${crumb ? "" : ""}<article>\n    ${h1}\n    ${by}\n`);
     if (crumb) html = html.replace(/<main\b[^>]*>/, (m) => m + "\n  " + crumb);
@@ -225,7 +225,7 @@ function doc(html, file) {
   const h1m = body.match(/<h1>[\s\S]*?<\/h1>/);
   if (!h1m) throw new Error(file + ": no <h1>");
   body = body.replace(h1m[0], "");
-  const byM = body.match(/<p class="mut" style="font-size:13px;margin:6px 0 18px">By <a href="\/about\.html">Shailu<\/a>[\s\S]*?<\/p>/) || body.match(/^\s*<div class="[a-z-]*meta">[\s\S]*?<\/div>/);
+  const byM = body.match(/<p class="mut" style="font-size:13px;margin:6px 0 18px">By <a href="\/about\.html">Shailu016<\/a>[\s\S]*?<\/p>/) || body.match(/^\s*<div class="[a-z-]*meta">[\s\S]*?<\/div>/);
   const byline = byM ? byM[0] : "";
   if (byM) body = body.replace(byM[0], "");
 
