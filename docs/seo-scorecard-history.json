@@ -152,5 +152,27 @@
     "thinPages": 0,
     "schemaCoverage": 63,
     "gsc": null
+  },
+  {
+    "date": "2026-11-20",
+    "origin": "https://popuploom.com",
+    "sitemap": 63,
+    "issues": 0,
+    "totalWords": 85243,
+    "averageWords": 1353,
+    "thinPages": 0,
+    "schemaCoverage": 63,
+    "gsc": {
+      "pages": {
+        "rows": 31,
+        "clicks": 24,
+        "impressions": 243
+      },
+      "queries": {
+        "rows": 35,
+        "clicks": 7,
+        "impressions": 62
+      }
+    }
   }
 ]
