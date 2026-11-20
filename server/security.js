@@ -23,7 +23,7 @@ const htmlFiles = new Set([
   "guides/webflow-popup.html", "guides/collect-and-export-leads.html", "guides/popup-not-showing.html",
   "guides/popup-builder-for-ecommerce.html", "guides/popup-builder-for-quick-commerce.html",
   "guides/popup-builder-for-lead-generation.html", "guides/nextjs-popup.html", "guides/react-popup.html", "guides/astro-popup.html",
-  "guides/google-tag-manager-popup.html", "guides/static-html-popup.html", "guides/bigcommerce-popup.html",
+  "guides/google-tag-manager-popup.html", "guides/static-html-popup.html", "guides/bigcommerce-popup.html", "guides/framer-popup.html", "guides/carrd-popup.html",
   "guides/email-signup-popup.html", "guides/exit-intent-popup.html", "guides/free-popup-builders-without-pageview-limits.html",
   "guides/squarespace-wix-popup.html", "verify-email.html",
   "migration.html", "reset-password.html", "leads.html",
@@ -37,7 +37,7 @@ const htmlFiles = new Set([
   "templates/age-verification-popup.html", "templates/free-shipping-bar.html",
   "templates/video-popup.html", "templates/feedback-popup.html", "templates/referral-popup.html",
   "templates/trust-badge-popup.html", "templates/giveaway-popup.html", "templates/shipping-notice-popup.html",
-  "tools/index.html", "tools/popup-roi-calculator.html", "tools/popup-copy-swipe-file.html", "tools/exit-intent-code-generator.html", "tools/popup-copy-generator.html"
+  "tools/index.html", "tools/popup-roi-calculator.html", "tools/popup-copy-swipe-file.html", "tools/exit-intent-code-generator.html", "tools/popup-copy-generator.html", "tools/popup-html-generator.html", "tools/announcement-bar-generator.html"
 ]);
 const policyCache = new Map();
 const hash = text => "'sha256-" + crypto.createHash("sha256").update(text).digest("base64") + "'";

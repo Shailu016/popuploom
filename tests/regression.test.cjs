@@ -75,10 +75,10 @@ test('the tools hub is a real page and every tool points back to it',async()=>{
  const html=String(hub.data);
  assert.match(html,/<link rel="canonical" href="https:\/\/popuploom\.com\/tools\/">/);
  assert.match(html,/<h1>Free popup tools that run in your browser<\/h1>/);
- assert.match(html,/"@type":"ItemList","numberOfItems":4/);
+ assert.match(html,/"@type":"ItemList","numberOfItems":6/);
  assert.match(html,/"@type":"FAQPage"/);
  assert.equal(hub.headers.get('vary'),'Accept');
- for(const tool of ['popup-roi-calculator.html','popup-copy-generator.html','popup-copy-swipe-file.html','exit-intent-code-generator.html']){
+ for(const tool of ['popup-roi-calculator.html','popup-copy-generator.html','popup-copy-swipe-file.html','exit-intent-code-generator.html','popup-html-generator.html','announcement-bar-generator.html']){
   assert.ok(html.includes('href="/tools/'+tool+'"'),'hub links '+tool);
   // Every tool must reach the hub through its breadcrumb, or the set has no parent.
   const page=String((await api('/tools/'+tool)).data);

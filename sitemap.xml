@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://popuploom.com/</loc><lastmod>2026-11-18</lastmod></url>
+  <url><loc>https://popuploom.com/</loc><lastmod>2026-11-20</lastmod></url>
   <url><loc>https://popuploom.com/templates.html</loc><lastmod>2026-11-18</lastmod></url>
   <url><loc>https://popuploom.com/faq.html</loc><lastmod>2026-11-06</lastmod></url>
-  <url><loc>https://popuploom.com/security.html</loc><lastmod>2026-11-06</lastmod></url>
+  <url><loc>https://popuploom.com/security.html</loc><lastmod>2026-11-20</lastmod></url>
   <url><loc>https://popuploom.com/press.html</loc><lastmod>2026-11-06</lastmod></url>
-  <url><loc>https://popuploom.com/guides/</loc><lastmod>2026-11-18</lastmod></url>
+  <url><loc>https://popuploom.com/guides/</loc><lastmod>2026-11-20</lastmod></url>
   <url><loc>https://popuploom.com/guides/install-popups.html</loc><lastmod>2026-11-16</lastmod></url>
   <url><loc>https://popuploom.com/guides/wordpress-popup.html</loc><lastmod>2026-11-16</lastmod></url>
   <url><loc>https://popuploom.com/guides/shopify-popup.html</loc><lastmod>2026-11-16</lastmod></url>
@@ -19,7 +19,7 @@
   <url><loc>https://popuploom.com/guides/popup-builder-for-ecommerce.html</loc><lastmod>2026-11-16</lastmod></url>
   <url><loc>https://popuploom.com/guides/popup-builder-for-quick-commerce.html</loc><lastmod>2026-11-16</lastmod></url>
   <url><loc>https://popuploom.com/guides/popup-builder-for-lead-generation.html</loc><lastmod>2026-11-16</lastmod></url>
-  <url><loc>https://popuploom.com/about.html</loc><lastmod>2026-11-18</lastmod></url>
+  <url><loc>https://popuploom.com/about.html</loc><lastmod>2026-11-20</lastmod></url>
   <url><loc>https://popuploom.com/contact.html</loc><lastmod>2026-11-18</lastmod></url>
   <url><loc>https://popuploom.com/terms.html</loc><lastmod>2026-11-18</lastmod></url>
   <url><loc>https://popuploom.com/privacy.html</loc><lastmod>2026-11-18</lastmod></url>
@@ -40,7 +40,7 @@
   <url><loc>https://popuploom.com/templates/spin-to-win-popup.html</loc><lastmod>2026-11-16</lastmod></url>
   <url><loc>https://popuploom.com/best-free-popup-builder.html</loc><lastmod>2026-11-16</lastmod></url>
   <url><loc>https://popuploom.com/guides/wordpress-popup-without-plugin.html</loc><lastmod>2026-11-16</lastmod></url>
-  <url><loc>https://popuploom.com/tools/</loc><lastmod>2026-11-17</lastmod></url>
+  <url><loc>https://popuploom.com/tools/</loc><lastmod>2026-11-20</lastmod></url>
   <url><loc>https://popuploom.com/tools/popup-roi-calculator.html</loc><lastmod>2026-11-16</lastmod></url>
   <url><loc>https://popuploom.com/tools/popup-copy-swipe-file.html</loc><lastmod>2026-11-16</lastmod></url>
   <url><loc>https://popuploom.com/templates/cart-rescue-popup.html</loc><lastmod>2026-11-16</lastmod></url>
@@ -50,6 +50,8 @@
   <url><loc>https://popuploom.com/templates/age-verification-popup.html</loc><lastmod>2026-11-16</lastmod></url>
   <url><loc>https://popuploom.com/templates/free-shipping-bar.html</loc><lastmod>2026-11-16</lastmod></url>
   <url><loc>https://popuploom.com/tools/exit-intent-code-generator.html</loc><lastmod>2026-11-16</lastmod></url>
+  <url><loc>https://popuploom.com/tools/popup-html-generator.html</loc><lastmod>2026-11-20</lastmod></url>
+  <url><loc>https://popuploom.com/tools/announcement-bar-generator.html</loc><lastmod>2026-11-20</lastmod></url>
   <url><loc>https://popuploom.com/tools/popup-copy-generator.html</loc><lastmod>2026-11-16</lastmod></url>
   <url><loc>https://popuploom.com/guides/nextjs-popup.html</loc><lastmod>2026-11-17</lastmod></url>
   <url><loc>https://popuploom.com/guides/react-popup.html</loc><lastmod>2026-11-17</lastmod></url>
@@ -57,6 +59,8 @@
   <url><loc>https://popuploom.com/guides/google-tag-manager-popup.html</loc><lastmod>2026-11-17</lastmod></url>
   <url><loc>https://popuploom.com/guides/static-html-popup.html</loc><lastmod>2026-11-17</lastmod></url>
   <url><loc>https://popuploom.com/guides/bigcommerce-popup.html</loc><lastmod>2026-11-17</lastmod></url>
+  <url><loc>https://popuploom.com/guides/framer-popup.html</loc><lastmod>2026-11-20</lastmod></url>
+  <url><loc>https://popuploom.com/guides/carrd-popup.html</loc><lastmod>2026-11-20</lastmod></url>
   <url><loc>https://popuploom.com/templates/video-popup.html</loc><lastmod>2026-11-17</lastmod></url>
   <url><loc>https://popuploom.com/templates/feedback-popup.html</loc><lastmod>2026-11-17</lastmod></url>
   <url><loc>https://popuploom.com/templates/referral-popup.html</loc><lastmod>2026-11-17</lastmod></url>

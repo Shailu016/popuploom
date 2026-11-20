@@ -74,7 +74,7 @@ const FALLBACK_TEMPLATES = ["drop48", "firstCode", "tapMeter"];
 
 const CLUSTERS = [
   ["guides/popup-builder-for-ecommerce.html", "guides/popup-builder-for-quick-commerce.html", "guides/popup-builder-for-lead-generation.html", "guides/exit-intent-popup.html", "guides/email-signup-popup.html", "guides/collect-and-export-leads.html", "guides/popup-not-showing.html", "guides/free-popup-builders-without-pageview-limits.html"],
-  ["guides/install-popups.html", "guides/wordpress-popup.html", "guides/shopify-popup.html", "guides/webflow-popup.html", "guides/squarespace-wix-popup.html", "guides/nextjs-popup.html", "guides/react-popup.html", "guides/astro-popup.html", "guides/google-tag-manager-popup.html", "guides/static-html-popup.html", "guides/bigcommerce-popup.html", "guides/wordpress-popup-without-plugin.html"],
+  ["guides/install-popups.html", "guides/wordpress-popup.html", "guides/shopify-popup.html", "guides/webflow-popup.html", "guides/squarespace-wix-popup.html", "guides/nextjs-popup.html", "guides/react-popup.html", "guides/astro-popup.html", "guides/google-tag-manager-popup.html", "guides/static-html-popup.html", "guides/bigcommerce-popup.html", "guides/framer-popup.html", "guides/carrd-popup.html", "guides/wordpress-popup-without-plugin.html"],
   docTemplates
 ];
 
