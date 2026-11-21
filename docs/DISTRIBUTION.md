@@ -19,9 +19,11 @@ Build the upload ZIP:
 Compress-Archive -Path wordpress-plugin\popuploom -DestinationPath wordpress-plugin\popuploom-1.0.1.zip -Force
 ```
 
-Status: **submitted 2026-11-12**, slug `popuploom`, version 1.0.1, awaiting review.
-The form reported "Awaiting Review"; the review email arrives at the WordPress.org
-account address. Do not resubmit while it is pending.
+Status: **in review, round 1 answered.** Submitted 2026-11-12 as 1.0.1, slug `popuploom`.
+On 2026-11-17 the reviewers pended it for two small issues: drop "Free" from the display name and list
+the owner in Contributors. Version 1.0.2 fixes both. It was uploaded on 2026-11-21 and the reply was sent on
+the review email thread the same day. The plugin is not public until approved. Do not resubmit; reply on
+the existing thread and do not ask for a status update for about a month.
 
 Plugin Check evidence: run against a local WordPress 7.1 + SQLite install with the
 official Plugin Check plugin. Final result: **no errors found**. Two findings were
