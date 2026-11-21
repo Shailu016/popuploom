@@ -132,11 +132,11 @@ These are known findings from `SECURITY_AUDIT.md`. Each is a separate, testable 
 
 - [x] Four new guides: Squarespace/Wix, exit intent, email signup, and a dated free-builder comparison
 - [x] WordPress guide rewritten around real Search Console queries; Shopify and Webflow expanded with “without an app” sections
-- [x] WordPress plugin **submitted** to WordPress.org on 2026-11-12; slug `popuploom`; awaiting review (1–10 days, often longer)
+- [x] WordPress plugin **submitted** to WordPress.org on 2026-11-12; slug `popuploom`. Reviewers asked for two small fixes on 2026-11-17; version 1.0.2 uploaded and reply sent 2026-11-21; awaiting the next review round
 - [x] Public helper repo: <https://github.com/Shailu016/popuploom-embed>
 - [x] Optional “Popup by PopupLoom” credit toggle (off by default)
 - [x] Markdown negotiation implemented at the origin (`Accept: text/markdown`); Cloudflare's native toggle requires a Pro plan and stays off
-- [ ] **YOU:** reply to the WordPress.org review email when it arrives (do not resubmit)
+- [x] Replied to the WordPress.org review email with 1.0.2 (2026-11-21). Next: watch the inbox for round 2 and reply on the same thread; do not resubmit or ask for a status update for about a month
 - [ ] Decide later: publish `popuploom-embed` to npm, and how to measure badge referrals
 
 ---
