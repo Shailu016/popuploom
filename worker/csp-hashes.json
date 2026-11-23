@@ -43,7 +43,7 @@
   "templates/announcement-bar.html": "'sha256-e3hCEmhzKWpwoiRLRIIxmtxpdORvdNBYlUaIgK/lIms=' 'sha256-AMxwpWRxHfWT4KucAybc1t8TALNR8q3aTGXbwTa0sac='",
   "templates/announcements.html": "'sha256-1KpHdNP7LPaFtifTcGP9u8GqwyBcyGW5S+cBTiV1/D4=' 'sha256-AMxwpWRxHfWT4KucAybc1t8TALNR8q3aTGXbwTa0sac='",
   "templates/back-in-stock-popup.html": "'sha256-bAxU8ecjzyxkHOGUXefcLjsjSJQSuXmbPRYtUbIAiJo=' 'sha256-AMxwpWRxHfWT4KucAybc1t8TALNR8q3aTGXbwTa0sac='",
-  "templates/black-friday-popup.html": "'sha256-G9h+Mzc+VFhU3n+XeCJ+Z0dtI5uwhm+NSvW5ADOcj7s=' 'sha256-AMxwpWRxHfWT4KucAybc1t8TALNR8q3aTGXbwTa0sac='",
+  "templates/black-friday-popup.html": "'sha256-T+CzWCuMRgl0FG6F3LUVUbtS2I2UIZGjUnGaeCRDfQQ=' 'sha256-AMxwpWRxHfWT4KucAybc1t8TALNR8q3aTGXbwTa0sac='",
   "templates/cart-rescue-popup.html": "'sha256-7vm1+v5zxb/yP4et8e9MfAUdaThVzOhaKxYgplLdjyA=' 'sha256-AMxwpWRxHfWT4KucAybc1t8TALNR8q3aTGXbwTa0sac='",
   "templates/discount-popup.html": "'sha256-PuvivBCpQSnz33Lin3saJArXXAS972b5dPyAlY6KVzM=' 'sha256-AMxwpWRxHfWT4KucAybc1t8TALNR8q3aTGXbwTa0sac='",
   "templates/discount.html": "'sha256-cwQvT/h2doRRw4S2D7bPoauRxTk/toWJ2JNLizgJJGw=' 'sha256-AMxwpWRxHfWT4KucAybc1t8TALNR8q3aTGXbwTa0sac='",
