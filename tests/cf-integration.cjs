@@ -12,7 +12,7 @@ const env={JWT_SECRET:require('crypto').randomBytes(32).toString('hex'),RESEND_A
   assert.ok(guide.includes('data-pl-ad="1"') && guide.includes('adsbygoogle.js') && guide.includes('Advertisement'));
   assert.ok(nonce && policy.includes("'nonce-" + nonce + "'") && policy.includes("'strict-dynamic'"));
   assert.ok(!policy.includes("'unsafe-eval'"));
-  for (const path of ['/studio.html', '/profile.html', '/leads.html', '/reset-password.html', '/migration.html', '/templates/email-signup.html', '/free-popup-builder-no-limits.html', '/best-free-popup-builder.html', '/templates/exit-intent-popup.html', '/tools/popup-roi-calculator.html', '/tools/popup-copy-swipe-file.html']) {
+  for (const path of ['/studio.html', '/profile.html', '/leads.html', '/reset-password.html', '/migration.html', '/templates/email-signup.html', '/templates/exit-intent-popup.html', '/tools/popup-roi-calculator.html', '/tools/popup-copy-swipe-file.html']) {
     const res = await worker.fetch(new Request('https://popuploom.com' + path), adEnv, { waitUntil() {} });
     const body = await res.text();
     assert.ok(!body.includes('adsbygoogle.js') && !body.includes('data-pl-ad'), path + ' must stay ad-free');
@@ -23,7 +23,7 @@ const env={JWT_SECRET:require('crypto').randomBytes(32).toString('hex'),RESEND_A
     assert.equal(res.status, 301, old + ' must redirect');
     assert.equal(res.headers.get('location'), '/free-popup-builder-no-limits.html', old + ' target');
   }
-  for (const path of ['/', '/templates.html', '/faq.html', '/guides/']) {
+  for (const path of ['/', '/templates.html', '/faq.html', '/guides/', '/free-popup-builder-no-limits.html', '/best-free-popup-builder.html', '/guides/wordpress-popup-without-plugin.html', '/guides/nextjs-popup.html', '/guides/react-popup.html', '/guides/astro-popup.html', '/guides/google-tag-manager-popup.html', '/guides/static-html-popup.html', '/guides/bigcommerce-popup.html', '/guides/framer-popup.html', '/guides/carrd-popup.html']) {
     const res = await worker.fetch(new Request('https://popuploom.com' + path), adEnv, { waitUntil() {} });
     const body = await res.text();
     assert.ok(body.includes('adsbygoogle.js') && body.includes('data-pl-ad'), path + ' must carry the ad unit');
