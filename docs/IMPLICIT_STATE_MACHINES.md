@@ -643,7 +643,7 @@ the at-most-once-ish semantics explicitly.
 
 **Transitions** (`shared/ads.js:71-98`)
 - Evaluated per request from env; any failed gate returns the original HTML unchanged.
-- Per-page eligibility is a separate allowlist (`shared/ad-pages.js`, 20 pages).
+- Per-page eligibility is a separate allowlist (`shared/ad-pages.js`, 31 pages).
 - Injection is idempotent: skips if `data-pl-ad=` or `adsbygoogle.js` is already present.
 - A nonce is minted per response; the loader goes in `<head>`, the unit before
   `</article>` / `</main>` / `<footer>` / `</body>` in that order.

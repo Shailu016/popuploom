@@ -30,7 +30,18 @@
     "/guides/popup-not-showing.html",
     "/guides/popup-builder-for-ecommerce.html",
     "/guides/popup-builder-for-quick-commerce.html",
-    "/guides/popup-builder-for-lead-generation.html"
+    "/guides/popup-builder-for-lead-generation.html",
+    "/guides/wordpress-popup-without-plugin.html",
+    "/guides/nextjs-popup.html",
+    "/guides/react-popup.html",
+    "/guides/astro-popup.html",
+    "/guides/google-tag-manager-popup.html",
+    "/guides/static-html-popup.html",
+    "/guides/bigcommerce-popup.html",
+    "/guides/framer-popup.html",
+    "/guides/carrd-popup.html",
+    "/best-free-popup-builder.html",
+    "/free-popup-builder-no-limits.html"
   ]);
   function isAdPage(pathname) {
     return AD_PAGES.has(String(pathname || ""));
